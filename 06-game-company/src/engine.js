@@ -70,6 +70,6 @@ const splats=[];function splat(x,y,col,n=6){for(let i=0;i<n;i++)splats.push({x:x
 // ===== 像素数字 3x5 =====
 const DIG={'-':'000000111000000','0':'111101101101111','1':'010110010010111','2':'111001111100111','3':'111001111001111','4':'101101111001001','5':'111100111001111','6':'111100111101111','7':'111001010010010','8':'111101111101111','9':'111101111001111','!':'010010010000010','+':'000010111010000'};
 function pnum(str,x,y,col,s=1){str=String(str);let cx=x-Math.floor(str.length*4*s/2);for(const ch of str){const g=DIG[ch];if(g){ctx.fillStyle='#14121a';for(let i=0;i<15;i++)if(g[i]==='1')ctx.fillRect(cx+(i%3)*s+1,y+Math.floor(i/3)*s+1,s,s);ctx.fillStyle=col;for(let i=0;i<15;i++)if(g[i]==='1')ctx.fillRect(cx+(i%3)*s,y+Math.floor(i/3)*s,s,s)}cx+=4*s}}
-const nums=[];function dmgNum(x,y,v,col='#fff',big=false){nums.push({x,y,v:Math.round(v),col,t:0,big})}
+const nums=[];function dmgNum(x,y,v,col='#fff',big=false){nums.push({x,y,v:typeof v==='number'?Math.round(v):v,col,t:0,big})}
 function updNums(dt){for(let i=nums.length-1;i>=0;i--){nums[i].t+=dt;nums[i].y-=dt*(30-nums[i].t*40);if(nums[i].t>.7)nums.splice(i,1)}}
 function drawNums(cx,cy){for(const n of nums)pnum(n.v,Math.round(n.x-cx),Math.round(n.y-cy),n.col,n.big?2:1)}

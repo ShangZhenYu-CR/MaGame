@@ -50,6 +50,7 @@
 .shopt{font-size:1em;margin-top:.4em;opacity:.85}#shop{display:flex;gap:.8em;margin:.6em 0}
 .sitem{pointer-events:auto;font:inherit;width:11em;padding:.5em;background:#2a2640;color:#fff;border:.25em solid #14121a;box-shadow:inset 0 0 0 .15em #6a6488;cursor:pointer;display:flex;flex-direction:column;gap:.2em;text-align:left}
 .sitem b{font-size:1em}.sitem span{font-size:.75em;opacity:.8}.sitem i{font-style:normal;color:#ffd84a;font-weight:800}.sitem:disabled{opacity:.35;cursor:default}.sitem:not(:disabled):hover{background:#3a3458}
+#bossst{height:.5em;background:#2a2030;border:.2em solid #14121a;border-top:0}#bossstag{height:100%;width:0;background:#9fd8ff;transition:width .1s}#bossstag.on{background:#ffd84a}
 #err{position:fixed;left:8px;right:8px;bottom:8px;color:#fff;background:#a33;padding:8px;font:12px monospace;white-space:pre-wrap;z-index:99;display:none;max-height:40vh;overflow:auto}
 </style></head><body>
 <canvas id="screen"></canvas>
@@ -57,8 +58,8 @@
  <div id="hud"><div id="hpw"><div id="hpbar"><div id="hprally"></div><div id="hpfill"></div><div id="hptxt">100 / 100</div></div><div id="flasks"></div><div id="stats"></div></div><div id="tdoor"></div><div id="flow"></div><div id="rush"></div>
   <div id="tr"><div id="floor" class="k">1F · 美术部</div><div id="cellw">✦ <span id="cells">0</span></div><div id="timer">0:00</div><div id="mode"></div></div>
   <div id="slots"><div class="slot pane"><span class="kk">J</span><canvas id="ic1" width="48" height="48"></canvas><div class="nm" id="n1"></div><div class="af" id="a1"></div></div><div class="slot pane"><span class="kk">K</span><canvas id="ic2" width="48" height="48"></canvas><div class="nm" id="n2"></div><div class="af" id="a2"></div><div id="cd2"></div></div></div>
-  <div id="help">A/D 移动 · 空格 跳（空中再按二段跳）· S+空格 下平台 · 空中 S+J 下劈<br>J 建模工具 · K 地编工具 · Shift 翻滚 · Q 吃便当 · E 拾取/互动 · Esc 暂停 · 支持手柄</div>
-  <div id="bossbar"><div id="bossname" class="k"></div><div id="bossb"><div id="bossfill"></div></div></div>
+  <div id="help">A/D 移动 · 空格 跳（按住跳更高，空中再按二段跳）· 贴墙自动攀边 · S+空格 下平台 · 空中 S+J 下劈<br>J 建模工具 · 翻滚后立刻 J = 冲刺斩 · K 地编工具 · Shift 翻滚（踩点躲开 = 完美闪避）· Q 便当 · E 互动 · Esc 暂停</div>
+  <div id="bossbar"><div id="bossname" class="k"></div><div id="bossb"><div id="bossfill"></div></div><div id="bossst"><div id="bossstag"></div></div></div>
   <div id="prompt" class="pane"></div><div id="toast" class="pane"></div>
  </div>
  <div id="banner"><div id="bn1" class="k"></div><div id="bn2"></div></div>
@@ -147,7 +148,7 @@ const splats=[];function splat(x,y,col,n=6){for(let i=0;i<n;i++)splats.push({x:x
 // ===== 像素数字 3x5 =====
 const DIG={'-':'000000111000000','0':'111101101101111','1':'010110010010111','2':'111001111100111','3':'111001111001111','4':'101101111001001','5':'111100111001111','6':'111100111101111','7':'111001010010010','8':'111101111101111','9':'111101111001111','!':'010010010000010','+':'000010111010000'};
 function pnum(str,x,y,col,s=1){str=String(str);let cx=x-Math.floor(str.length*4*s/2);for(const ch of str){const g=DIG[ch];if(g){ctx.fillStyle='#14121a';for(let i=0;i<15;i++)if(g[i]==='1')ctx.fillRect(cx+(i%3)*s+1,y+Math.floor(i/3)*s+1,s,s);ctx.fillStyle=col;for(let i=0;i<15;i++)if(g[i]==='1')ctx.fillRect(cx+(i%3)*s,y+Math.floor(i/3)*s,s,s)}cx+=4*s}}
-const nums=[];function dmgNum(x,y,v,col='#fff',big=false){nums.push({x,y,v:Math.round(v),col,t:0,big})}
+const nums=[];function dmgNum(x,y,v,col='#fff',big=false){nums.push({x,y,v:typeof v==='number'?Math.round(v):v,col,t:0,big})}
 function updNums(dt){for(let i=nums.length-1;i>=0;i--){nums[i].t+=dt;nums[i].y-=dt*(30-nums[i].t*40);if(nums[i].t>.7)nums.splice(i,1)}}
 function drawNums(cx,cy){for(const n of nums)pnum(n.v,Math.round(n.x-cx),Math.round(n.y-cy),n.col,n.big?2:1)}
 
@@ -385,7 +386,7 @@ function tickStatus(e,dt){if(e.slowT>0)e.slowT-=dt;if(e.bleedT>0){e.bleedT-=dt;e
 // ===== 玩家 =====
 const P={};
 function resetPlayer(keep){Object.assign(P,{x:6*TS,y:19*TS,w:10,h:26,vx:0,vy:0,face:1,onGround:true,drop:false,dropT:0,coyote:0,buffer:0,jumps:0,rollT:0,rollCd:0,inv:0,hurtT:0,cut:false,
- atk:null,combo:0,comboT:0,skillCd:0,parryT:0,sprayT:0,healT:0,anim:0,blinkT:2,stepT:0,dead:false,landT:0,rally:0,rallyT:0,rootT:0,dive:false,lastHit:''});
+ atk:null,combo:0,comboT:0,skillCd:0,parryT:0,sprayT:0,healT:0,anim:0,blinkT:2,stepT:0,dead:false,landT:0,rally:0,rallyT:0,rootT:0,dive:false,lastHit:'',rollBuf:0,rollEnd:-9,airStall:false,mantle:null,pdT:0,pdUsed:false,atkQueued:0});
  if(!keep)Object.assign(P,{hp:100,maxHp:100,flasks:2,maxFlasks:2,prim:'stylus',sec:'palette',primLv:0,primAff:[],secLv:0,secAff:[],stat:{line:0,color:0,body:0},cells:0,dmgMul:1,spdMul:1,rollMul:1,cdMul:1,airJumps:1,steal:0,critMul:1.5,upg:[]})}
 const RUN=150,ACC=1800,AACC=1100,GRAV=1350,JV=420,DJV=410,MAXF=520,ROLLV=290,ROLLT=.3;
 function playerUpdate(dt){
@@ -394,11 +395,15 @@ function playerUpdate(dt){
  P.rootT-=dt;const rooted=P.rootT>0;if(P.flowT>0){P.flowT-=dt;if(P.flowT<=0)P.flow=0}if(rooted&&Math.random()<.3)part(P.x+rnd(-8,8),P.y-rnd(10,26),0,-20,'#3a6ad8',.4,2,-20);
  if(P.rally>0){P.rallyT-=dt;if(P.rallyT<=0)P.rally=Math.max(0,P.rally-14*dt);P.rally=Math.min(P.rally,P.maxHp-P.hp)}
  const ix=rooted?0:(down('right')?1:0)-(down('left')?1:0);
+ if(P.pdT>0){P.pdT-=dt;if(Math.random()<.5)part(P.x+rnd(-6,6),P.y-rnd(4,26),0,-30,pick(['#ffd84a','#fff']),.35,1,-20)}
+ // 攀边
+ if(P.mantle){const m=P.mantle;m.t+=dt;const k=Math.min(1,m.t/.17);P.y=lerp(m.y0,m.y1,Math.min(1,k*1.7));P.x=lerp(m.x0,m.x1,Math.max(0,(k-.35)/.65));P.vx=0;P.vy=0;if(k>=1){P.mantle=null;P.onGround=true;P.landT=.08;P.jumps=P.airJumps;P.airStall=false}return}
  // 回血
  if(P.healT>0){P.healT-=dt;P.hp=Math.min(P.maxHp,P.hp+P.maxHp*.5*dt/.45);P.vx*=.8;if(Math.random()<.5)part(P.x+rnd(-6,6),P.y-rnd(4,24),0,-40,'#7af07a',.5,2,-50);moveBody(P,dt);return}
  // 翻滚
- if(pressed('roll')&&P.rollCd<=0&&P.rollT<=0){if(P.atk&&P.atk.phase!=='re'&&P.atk.t<P.atk.def.su*.6){}else{P.atk=null;P.rollT=ROLLT;P.inv=Math.max(P.inv,.26+(P.rollMul<1?.06:0));P.rollCd=.55*P.rollMul;if(ix)P.face=ix;SFX.roll();burst(P.x,P.y-2,6,'#cfc6b8',60,.3,2,100)}}
- if(P.rollT>0){P.rollT-=dt;P.vx=P.face*ROLLV;if(Math.random()<.6)ghosts.push({x:P.x,y:P.y,face:P.face,t:.18,roll:P.anim})}
+ if(pressed('roll'))P.rollBuf=.15;else P.rollBuf-=dt;
+ if(P.rollBuf>0&&P.rollCd<=0&&P.rollT<=0){if(P.atk&&P.atk.phase!=='re'&&P.atk.t<P.atk.def.su*.6){}else{P.rollBuf=0;P.pdUsed=P.inv>0;P.atk=null;P.rollT=ROLLT;P.inv=Math.max(P.inv,.26+(P.rollMul<1?.06:0));P.rollCd=.55*P.rollMul;if(ix)P.face=ix;SFX.roll();burst(P.x,P.y-2,6,'#cfc6b8',60,.3,2,100)}}
+ if(P.rollT>0){P.rollT-=dt;if(P.rollT<=0)P.rollEnd=P.anim;P.vx=P.face*ROLLV;if(Math.random()<.6)ghosts.push({x:P.x,y:P.y,face:P.face,t:.18,roll:P.anim})}
  else{
   let mv=1;if(P.atk){const d=P.atk.def;mv=P.atk.phase==='ac'?.15:d.heavy?.2:.45}if(P.sprayT>0)mv=.35;
   const tv=ix*RUN*mv,a=P.onGround?ACC:AACC;if(ix&&!P.atk&&P.sprayT<=0)P.face=ix;
@@ -411,15 +416,23 @@ function playerUpdate(dt){
   else if(P.coyote>0){P.vy=-JV;P.coyote=0;P.buffer=0;P.cut=false;P.jumpAt=P.anim;SFX.jump();burst(P.x,P.y,5,'#cfc6b8',50,.25,2,80);if(P.atk&&P.atk.phase==='re')P.atk=null}
   else if(P.jumps>0){P.jumps--;P.vy=-DJV;P.buffer=0;P.cut=true;P.djT=.3;SFX.djump();ringFx(P.x,P.y,'#7fd8ff');burst(P.x,P.y,10,['#7fd8ff','#c8f0ff','#3a8ad8'],100,.35,2,60)}}
  if(!down('jump')&&P.vy<0&&!P.cut&&P.anim-(P.jumpAt||0)>.12){P.vy*=.55;P.cut=true}
- P.vy=Math.min(MAXF,P.vy+GRAV*dt*(P.vy>0?1.15:1));
+ const apex=!P.onGround&&Math.abs(P.vy)<55&&down('jump')?.55:1;
+ P.vy=Math.min(MAXF,P.vy+GRAV*dt*(P.vy>0?1.15:1)*apex);
  // 攻击
  if(pressed('atk')&&!P.onGround&&down('down')&&!P.dive&&P.rollT<=0&&groundBelow(P.x,P.y)-P.y>28){P.dive=true;P.atk=null;P.atkQueued=0;P.vy=520;SFX.heavy();KP['KeyJ']=0;KP['Mouse0']=0;KP['Pad2']=0}
  if(P.dive){P.vx=0;P.vy=Math.max(P.vy,560);for(const e of targets()){if(Math.abs(e.x-P.x)<e.w/2+P.w/2&&P.y>e.y-e.h&&P.y-8<e.y){damage(e,18,P.face,0,false,false,'dive');e.state=e.isBoss?e.state:'stun';e.timer=.6;P.dive=false;P.vy=-330;P.jumps=P.airJumps;P.cut=true;hitstop=.07;shake=4;break}}}
- if(pressed('atk')&&P.rollT<=0&&!P.dive)P.atkQueued=.15;else P.atkQueued=(P.atkQueued||0)-dt;
- if(P.atkQueued>0){const can=!P.atk||(P.atk.phase==='re'&&P.atk.t>P.atk.def.re*.25);if(can){const W=WEAPONS[P.prim];if(P.comboT<=0||!P.atk&&P.comboT<=0)P.combo=0;const def=W.combo[P.combo%W.combo.length];P.atk={def,t:0,phase:'su',hit:new Set(),idx:P.combo%W.combo.length};P.combo++;P.comboT=.5;P.atkQueued=0;(def.heavy?SFX.heavy:SFX.swing)()}}
+ if(pressed('atk')&&!P.dive)P.atkQueued=.18;else P.atkQueued=(P.atkQueued||0)-dt;
+ if(P.atkQueued>0&&P.rollT<=0&&!P.dive){const can=!P.atk||(P.atk.phase==='re'&&P.atk.t>P.atk.def.re*.25);if(can){const W=WEAPONS[P.prim];if(P.comboT<=0)P.combo=0;if(ix)P.face=ix;
+   let def=W.combo[P.combo%W.combo.length],idx=P.combo%W.combo.length;
+   // 冲刺斩：翻滚结束 0.2 秒内出手，直接打出终结技并多冲一段
+   if(P.onGround&&P.anim-P.rollEnd<.2){const fin=W.combo[W.combo.length-1];def=Object.assign({},fin,{lunge:fin.lunge*1.6+90,dash:1,su:fin.su*.6});idx=W.combo.length-1;P.combo=W.combo.length-1;P.rollEnd=-9;burst(P.x,P.y-2,8,W.ink,90,.3,2,100)}
+   // 空中第一刀会短暂滞空，方便空中连段
+   if(!P.onGround&&!P.airStall){P.airStall=true;P.vy=Math.min(P.vy,-60)}
+   P.atk={def,t:0,phase:'su',hit:new Set(),idx};P.combo++;P.comboT=.5;P.atkQueued=0;(def.heavy||def.dash?SFX.heavy:SFX.swing)()}}
  if(P.atk){const a=P.atk,d=a.def,sp=P.spdMul*(hasAff(1,'speed')?1.15:1);a.t+=dt*sp;
   if(a.phase==='su'&&a.t>=d.su){a.phase='ac';a.t=0;P.vx+=P.face*d.lunge}
   else if(a.phase==='ac'){doHit(a);if(a.t>=d.ac){a.phase='re';a.t=0}}
+  if(P.atk&&!P.onGround&&P.atk.phase!=='re'&&P.vy>40)P.vy=40;
   else if(a.phase==='re'&&a.t>=d.re){P.atk=null;if(P.combo>=WEAPONS[P.prim].combo.length)P.combo=0}}
  // 副武器
  if(pressed('skill')&&P.skillCd<=0&&P.rollT<=0)useSkill();
@@ -435,9 +448,19 @@ function playerUpdate(dt){
   for(const k of pickups)if(k.k==='crate'&&Math.abs(k.x-P.x)<40&&Math.abs(k.y-P.y)<30)hitCrate(k,99)}
  else if(P.onGround&&P.lastAir>.25){SFX.land();burst(P.x,P.y,6,'#cfc6b8',70,.3,2,120);P.landT=.12}
  if(tileAt(Math.floor(P.x/TS),Math.floor((P.y-3)/TS))===3&&P.inv<=0){if(hurtPlayer(8,-P.face,null,'图钉'))P.vy=-300}
- P.lastAir=P.onGround?0:(P.lastAir||0)+dt;
+ P.lastAir=P.onGround?0:(P.lastAir||0)+dt;if(P.onGround)P.airStall=false;
+ if(!P.onGround&&ix&&P.hitWall===ix)tryMantle(ix);
  if(P.onGround&&Math.abs(P.vx)>40){P.stepT-=dt;if(P.stepT<=0){P.stepT=.25;part(P.x-P.face*4,P.y-1,-P.face*20,-20,'#cfc6b8',.3,1,50)}}
  if(P.y>LV.h*TS+40){P.y=10*TS;P.x=Math.max(P.x-40,3*TS);hurtPlayer(10,0)}}
+// 攀边：空中贴墙且墙顶在胸口以下，自动爬上去
+function tryMantle(ix){if(P.vy<-260||P.atk||P.dive||P.rollT>0||P.healT>0||P.hurtT>0)return false;
+ const fx=Math.floor((P.x+ix*(P.w/2+2))/TS),cx=Math.floor(P.x/TS);
+ for(let ty=Math.floor((P.y-22)/TS);ty<=Math.floor((P.y-1)/TS);ty++){const ly=ty*TS,d=P.y-ly;if(d<1||d>22)continue;
+  if(isSolid(fx,ty)&&!isSolid(fx,ty-1)&&!isSolid(fx,ty-2)&&!isSolid(cx,ty-1)&&!isSolid(cx,ty-2)){
+   P.mantle={x0:P.x,y0:P.y,x1:ix>0?fx*TS+P.w/2+1:(fx+1)*TS-P.w/2-1,y1:ly,t:0};P.face=ix;P.vx=P.vy=0;P.atkQueued=0;SFX.land();burst(ix>0?fx*TS:(fx+1)*TS,ly,5,'#cfc6b8',50,.25,2,80);return true}}
+ return false}
+// 完美闪避：翻滚刚开始时躲过攻击，短暂子弹时间，下一刀必暴击
+function perfectDodge(){P.pdUsed=true;P.pdT=2;P.inv=Math.max(P.inv,.45);slowmo=.3;slowT=.35;SFX.parry();ringFx(P.x,P.y-14,'#ffd84a');burst(P.x,P.y-14,12,['#ffd84a','#fff'],140,.35,2,0);P.flow=(P.flow||0)+3;P.flowT=4;toast('完美闪避！下一击必暴击',1000)}
 const ghosts=[];
 function ringFx(x,y,col){for(let i=0;i<10;i++){const a=i/10*Math.PI*2;part(x,y,Math.cos(a)*80,Math.sin(a)*30,col,.25,2,0)}}
 function atkBox(a){const d=a.def,f=P.face;if(d.thrust)return{x0:P.x+(f>0?2:-d.rng),x1:P.x+(f>0?d.rng:-2),y0:P.y-18-d.hh/2,y1:P.y-18+d.hh/2};return{x0:P.x+(f>0?-4:-d.rng),x1:P.x+(f>0?d.rng:4),y0:P.y-16-d.hh/2-4,y1:P.y-16+d.hh/2+2}}
@@ -445,14 +468,16 @@ function overlapE(b,e){return b.x1>e.x-e.w/2&&b.x0<e.x+e.w/2&&b.y1>e.y-e.h&&b.y0
 function targets(){const t=enemies.filter(e=>e.hp>0);if(boss&&boss.hp>0&&boss.state!=='intro'&&boss.state!=='tele_out')t.push(boss);return t}
 function doHit(a){const b=atkBox(a),d=a.def;let any=false;
  for(const e of targets()){if(a.hit.has(e)||!overlapE(b,e))continue;a.hit.add(e);any=true;let crit=!!d.crit;
+  if(!crit&&(P.pdT>0||d.dash))crit=true;
   if(!crit){if(P.prim==='marker'&&(e.state==='stun'||e.slowT>0||e.bleedT>0))crit=true;else if(P.prim==='knife'&&e.bleedT>0)crit=true;else if(P.prim==='ruler'&&Math.abs(e.x-P.x)>d.rng*.62)crit=true;else if(hasAff(1,'critc')&&Math.random()<.15)crit=true}
   damage(e,d.dmg,P.face,d.kb,crit,false,'prim');if(hasAff(1,'bleed'))applyStatus(e,'bleed');if(hasAff(1,'slow'))applyStatus(e,'slow')}
  for(const k of pickups)if(k.k==='crate'&&!a.hit.has(k)&&b.x1>k.x-8&&b.x0<k.x+8&&b.y1>k.y-14&&b.y0<k.y){a.hit.add(k);hitCrate(k,d.dmg)}
  for(const pr of projs)if(pr.from==='e'&&pr.breakable&&b.x1>pr.x-pr.r&&b.x0<pr.x+pr.r&&b.y1>pr.y-pr.r&&b.y0<pr.y+pr.r){pr.life=0;burst(pr.x,pr.y,6,'#fff',90,.25)}
- if(any){hitstop=Math.max(hitstop,d.crit?.09:d.heavy?.07:.045);shake=Math.max(shake,d.crit?4:d.heavy?3.5:2)}}
+ if(any){if(P.pdT>0)P.pdT=0;hitstop=Math.max(hitstop,d.crit?.09:d.heavy?.07:.045);shake=Math.max(shake,d.crit?4:d.heavy?3.5:2)}}
 function damage(e,dmg,dir,kb,crit,quiet,src='prim'){if(e.hp<=0)return;let mul=P.dmgMul;const big=e.elite||e.isBoss;
  if(src==='prim'||src==='dive')mul*=(1+.15*P.stat.line)*(1+.12*P.primLv)*(big&&hasAff(1,'elite')?1.35:1);else if(src==='sec')mul*=(1+.15*P.stat.color)*(1+.12*P.secLv)*(big&&hasAff(2,'elite')?1.35:1);else if(src==='dot')mul*=1+.15*P.stat.color;else if(src==='turret')mul=P.dmgMul;
- if(src!=='dot')mul*=flowMul();let v=dmg*mul*(crit?P.critMul:1)*rnd(.92,1.08);
+ if(src!=='dot')mul*=flowMul();if(e.isBoss&&e.state==='stagger')mul*=1.35;let v=dmg*mul*(crit?P.critMul:1)*rnd(.92,1.08);
+ if(e.isBoss&&src!=='dot'&&e.state!=='stagger'&&e.state!=='roar'&&e.state!=='dead'){e.stag+=v*(src==='dive'?1.6:1)*(crit?1.3:1);if(e.stag>=e.stagMax)e.stagPend=true}
  if(e.type==='firewall'&&e.state!=='tired'&&e.state!=='stun'&&src!=='dot'){const front=(src==='prim'||src==='dive')?sign(P.x-e.x)===e.face:dir===-e.face;if(front){v*=.15;SFX.select();burst(e.x+e.face*8,e.y-14,6,['#ffd84a','#fff'],120,.25);dmgNum(e.x,e.y-e.h-6,v,'#9aa0a8');e.hp-=v;e.flash=.04;if(e.hp<=0)enemyDie(e);return}}
  if(src!=='dot'&&P.rally>0){const r=Math.min(P.rally,2+v*.25);P.hp=Math.min(P.maxHp,P.hp+r);P.rally-=r}
  if(src==='sec'){if(hasAff(2,'bleed'))applyStatus(e,'bleed');if(hasAff(2,'slow'))applyStatus(e,'slow')}
@@ -461,7 +486,10 @@ function damage(e,dmg,dir,kb,crit,quiet,src='prim'){if(e.hp<=0)return;let mul=P.
  e.hp-=v;e.flash=.08;
  const W=WEAPONS[P.prim];if(!quiet){burst(e.x,e.y-e.h/2,crit?14:8,W.ink||['#fff'],crit?220:150,.4,2,350);splat(e.x,groundBelow(e.x,e.y-2),pick(W.ink||['#888']),crit?5:3);(crit?SFX.crit:SFX.hit)()}
  dmgNum(e.x+rnd(-4,4),e.y-e.h-6,v,crit?'#ffd84a':'#fff',crit);
- if(e.isBoss){e.vx+=dir*kb*.05}else{const res=e.elite?.4:1;e.vx=dir*kb*res;if(e.type!=='printer'&&e.type!=='popup'&&e.type!=='sticky')e.vy=Math.min(e.vy,-60*res);if(!e.elite&&(e.state==='wind'||e.state==='move')&&dmg>=8){e.state='stun';e.timer=.25}}
+ if(e.isBoss){e.vx+=dir*kb*.05}else{const res=e.elite?.4:1;e.vx=dir*kb*res;if(e.type!=='printer'&&e.type!=='popup'&&e.type!=='sticky')e.vy=Math.min(e.vy,-60*res);const pd=dmg*(crit?1.4:1)+kb*.04;e.poise-=pd;e.poiseT=1.4;
+  if(e.poise<=0){e.poise=e.maxPoise;if(e.state!=='stun'){e.state='stun';e.timer=e.elite?.9:.5;e.windT=0;e.vx=dir*kb*res*1.2;burst(e.x,e.y-e.h,8,['#ffd84a','#fff'],120,.3,2,0);if(e.elite||e.maxPoise>=24)dmgNum(e.x,e.y-e.h-14,'!','#ffd84a',true)}}
+  else if(ATK_STATES.includes(e.state)){e.vx*=.25}
+  else if(e.state==='idle'||e.state==='move'){e.state='stun';e.timer=e.elite?.08:.2}}
  if(e.hp<=0)e.isBoss?bossDie():enemyDie(e)}
 function useSkill(){const k=P.sec,dbl=hasAff(2,'double');P.skillCd=secCd();
  if(k==='palette'){projs.push({kind:'palette',from:'p',x:P.x+P.face*8,y:P.y-16,vx:P.face*330,vy:0,r:6,dmg:12,life:2,t:0,hit:new Map(),ret:false});if(dbl)projs.push({kind:'palette',from:'p',x:P.x+P.face*8,y:P.y-22,vx:P.face*300,vy:-70,r:6,dmg:12,life:2,t:0,hit:new Map(),ret:false});SFX.throw()}
@@ -470,7 +498,9 @@ function useSkill(){const k=P.sec,dbl=hasAff(2,'double');P.skillCd=secCd();
  else if(k==='boxcol'){if(!placeBox(dbl)){P.skillCd=.2;toast('这里放不下',800)}}
  else if(k==='turret'){const gy=groundBelow(P.x+P.face*12,P.y-4);projs.push({kind:'turret',from:'p',x:P.x+P.face*12,y:gy,life:dbl?13:9,max:dbl?13:9,t:0,cd:.3,ang:P.face>0?0:Math.PI});SFX.door();burst(P.x+P.face*12,gy-6,10,['#9fd8ff','#fff'],80,.3)}
  else if(k==='inkbomb'){projs.push({kind:'ink',from:'p',x:P.x+P.face*6,y:P.y-20,vx:P.face*190+P.vx*.3,vy:-260,r:4,dmg:30,life:3,t:0,grav:700});if(dbl)projs.push({kind:'ink',from:'p',x:P.x+P.face*6,y:P.y-20,vx:P.face*120+P.vx*.3,vy:-320,r:4,dmg:30,life:3,t:0,grav:700});SFX.throw()}}
-function hurtPlayer(dmg,dir,src,name){if(P.inv>0||P.dead||G.state!=='play')return false;if(G.hard)dmg=Math.round(dmg*1.3);
+function hurtPlayer(dmg,dir,src,name){if(P.dead||G.state!=='play')return false;
+ if(P.inv>0){if(P.rollT>ROLLT-.17&&!P.pdUsed&&src)perfectDodge();return false}
+ if(P.mantle)P.mantle=null;if(G.hard)dmg=Math.round(dmg*1.3);
  if(P.parryT>0){SFX.parry();hitstop=.1;if(P.sec==='eraser'&&P.rally>0){P.hp=Math.min(P.maxHp,P.hp+P.rally);dmgNum(P.x,P.y-44,'+'+Math.round(P.rally),'#7af07a');P.rally=0;hud()}burst(P.x+P.face*10,P.y-16,16,['#fff','#f2a0b0'],200,.35);dmgNum(P.x,P.y-34,'0','#9fd3f0');if(src&&src.isProj&&src.vx!==undefined){src.from='p';src.vx=-(src.vx||P.face*100)*1.3;src.vy=-Math.abs(src.vy||0);src.dmg=(src.dmg||10)*2;src.owner=null}else if(src&&src.isBoss){damage(src,25,P.face,0,true,false,'sec')}else if(src&&EDEF[src.type]&&src.hp>0){src.state='stun';src.timer=1.5;damage(src,20,P.face,120,true,false,'sec')}P.inv=.3;return false}
  if((P.flow||0)>=10)toast('心流中断',900);P.flow=0;P.hp-=dmg;P.rally=Math.min(P.maxHp-Math.max(0,P.hp),P.rally+dmg*.6);P.rallyT=1.6;P.lastHit=name||(src&&src.isBoss?src.name:src&&src.type?NAMES[src.type]:src&&src.kind?KIND_NAME[src.kind]||'':'')||'意外';P.inv=.9;P.dive=false;P.hurtT=.35;P.vx=dir*160;P.vy=-180;P.atk=null;P.sprayT=0;P.healT=0;shake=Math.max(shake,5);hitstop=Math.max(hitstop,.08);flashRed=.25;SFX.hurt();burst(P.x,P.y-14,12,['#d8584a','#fff'],160,.4);dmgNum(P.x,P.y-36,dmg,'#ff5a4a');hud();
  if(P.hp<=0){P.hp=0;P.dead=true;playerDie()}return true}
@@ -550,18 +580,26 @@ function drawProjs(cx,cy){for(const p of projs){const x=R(p.x-cx),y=R(p.y-cy);
  case 'zone':if(!p.on){ctx.globalAlpha=.25+.25*Math.sin(p.t*24);px(p.x0-cx,y-6,p.x1-p.x0,6,'#ff5a4a');ctx.globalAlpha=1}else{px(p.x0-cx,y-5,p.x1-p.x0,5,'#d8584a');for(let xx=p.x0;xx<p.x1;xx+=10)px(xx-cx,y-8-((xx+Math.floor(p.t*20))%3),3,3,'#ffd84a')}break;
  }}}
 // ===== 敌人 =====
-const enemies=[];const EDEF={crumple:{hp:30,w:14,h:14,dmg:12},sticky:{hp:18,w:12,h:12,dmg:10,fly:1},printer:{hp:40,w:20,h:16,dmg:10},bug:{hp:22,w:12,h:9,dmg:9},popup:{hp:26,w:22,h:16,dmg:10,fly:1},kpi:{hp:56,w:14,h:22,dmg:14},firewall:{hp:64,w:14,h:22,dmg:14},invite:{hp:14,w:16,h:14,dmg:4,fly:1}};
-function spawnEnemy(s,minion){const d=EDEF[s.type],m=s.elite?2.6:1;const e={type:s.type,x:s.x,y:s.y,hx:s.x,hy:s.y,w:d.w,h:d.h,vx:0,vy:0,face:-1,hp:d.hp*m*(1+(LV.floor-1)*.35)*(G.hard?1.5:1),max:0,dmg:Math.round(d.dmg*(s.elite?1.3:1)*(1+(LV.floor-1)*.2)),fly:!!d.fly,state:'idle',timer:rnd(0,1),anim:rnd(0,9),flash:0,elite:!!s.elite,cd:0,onGround:false,minion:!!minion,aggro:false};e.max=e.hp;enemies.push(e);return e}
+const enemies=[];// poise：韧性。出招（前摇/冲刺）时只有打空韧性才能打断；普通状态下挨打会小硬直
+const EDEF={crumple:{hp:30,w:14,h:14,dmg:12,poise:16},sticky:{hp:18,w:12,h:12,dmg:10,fly:1,poise:10},printer:{hp:40,w:20,h:16,dmg:10,poise:24},bug:{hp:22,w:12,h:9,dmg:9,poise:8},popup:{hp:26,w:22,h:16,dmg:10,fly:1,poise:16},kpi:{hp:56,w:14,h:22,dmg:14,poise:40},firewall:{hp:64,w:14,h:22,dmg:14,poise:44},invite:{hp:14,w:16,h:14,dmg:4,fly:1,poise:4}};
+const ATK_STATES=['wind','lunge','bash','swoop','slam'];
+// 出招名额：同一时间最多几只怪在出招，避免围殴时无从闪避
+function atkToken(e,ranged){let n=0;for(const o of enemies)if(o!==e&&o.hp>0&&!!o.ranged===ranged&&ATK_STATES.includes(o.state)&&Math.abs(o.x-P.x)<300)n++;const max=ranged?2:(G.hard?3:2);if(n>=max){e.cd=rnd(.25,.6);return false}return true}
+function spawnEnemy(s,minion){const d=EDEF[s.type],m=s.elite?2.6:1;const e={type:s.type,x:s.x,y:s.y,hx:s.x,hy:s.y,w:d.w,h:d.h,vx:0,vy:0,face:-1,hp:d.hp*m*(1+(LV.floor-1)*.35)*(G.hard?1.5:1),max:0,dmg:Math.round(d.dmg*(s.elite?1.3:1)*(1+(LV.floor-1)*.2)),fly:!!d.fly,ranged:s.type==='printer'||s.type==='popup',poise:d.poise*(s.elite?2.5:1),maxPoise:d.poise*(s.elite?2.5:1),poiseT:0,state:'idle',timer:rnd(0,1),anim:rnd(0,9),flash:0,elite:!!s.elite,cd:0,onGround:false,minion:!!minion,aggro:false};e.max=e.hp;enemies.push(e);return e}
 function enemyDie(e){e.hp=0;SFX.die();shake=Math.max(shake,2.5);burst(e.x,e.y-e.h/2,18,['#14121a','#3a3a46',e.elite?'#ff5a4a':'#9aa0a8'],180,.5,3,300);splat(e.x,groundBelow(e.x,e.y-2),'#3a3a46',5);G.kills++;
  const n=e.elite?8:irnd(1,3);for(let i=0;i<n;i++)pickups.push({k:'cell',x:e.x,y:e.y-e.h/2,vx:rnd(-80,80),vy:rnd(-200,-80)});if(e.elite)dropWeapon(e.x,e.y-10);if(Math.random()<.08)pickups.push({k:'food',x:e.x,y:e.y-6,vy:-120});
  if(P.steal)P.hp=Math.min(P.maxHp,P.hp+P.steal);if(hasAff(1,'steal'))P.hp=Math.min(P.maxHp,P.hp+3);hud()}
 function updEnemies(dtA){for(let i=enemies.length-1;i>=0;i--){const e=enemies[i];if(e.hp<=0){enemies.splice(i,1);continue}tickStatus(e,dtA);if(e.hp<=0)continue;const dt=dtA*(e.slowT>0?.5:1);
- e.anim+=dt;e.flash-=dt;e.timer-=dt;e.cd-=dt;const dx=P.x-e.x,dy=(P.y-13)-(e.y-e.h/2),dist=Math.hypot(dx,dy);
+ e.anim+=dt;e.flash-=dt;e.timer-=dt;e.cd-=dt;if(e.poiseT>0)e.poiseT-=dt;else e.poise=Math.min(e.maxPoise,e.poise+e.maxPoise*.8*dt);separate(e,dt);const dx=P.x-e.x,dy=(P.y-13)-(e.y-e.h/2),dist=Math.hypot(dx,dy);
  if(!e.aggro&&dist<200&&Math.abs(dx)<220)e.aggro=true;if(!e.aggro){e.idleT=(e.idleT||0)+dt;}
- if(e.state==='stun'){e.vx*=.9;if(e.timer<=0)e.state='idle'}
+ if(e.state==='stun'){if(e.fly){const nx=e.x+e.vx*dt;if(!isSolid(Math.floor(nx/TS),Math.floor((e.y-6)/TS)))e.x=nx;e.vx*=.88;e.vy*=.88}
+  else{const sv=e.vx;e.vy=Math.min(MAXF,e.vy+GRAV*dt);moveBody(e,dt);e.vx*=.88;
+   // 撞墙：被打飞撞到墙上额外受伤
+   if(e.hitWall&&Math.abs(sv)>150&&!e.splatted){e.splatted=true;e.timer+=.35;shake=Math.max(shake,3);SFX.stamp();burst(e.x+e.hitWall*e.w/2,e.y-e.h/2,10,['#fff','#cfc6b8'],140,.3);damage(e,6+LV.floor*2,0,0,false,true,'dot')}}
+  if(e.timer<=0){e.state='idle';e.splatted=false}}
  else switch(e.type){
  case 'crumple':case 'kpi':{const spd=e.type==='kpi'?48:72;
-  if(e.state==='idle'||e.state==='move'){if(e.aggro){e.face=sign(dx)||e.face;e.state='move';e.vx=e.face*spd;if(Math.abs(dx)<(e.type==='kpi'?34:30)&&Math.abs(dy)<24&&e.cd<=0){e.state='wind';e.timer=e.type==='kpi'?.6:.42;e.windT=e.timer;e.vx=0;SFX.warn()}}else{e.vx=Math.sin(e.anim*.7)*25;if(e.vx)e.face=sign(e.vx)}}
+  if(e.state==='idle'||e.state==='move'){if(e.aggro){e.face=sign(dx)||e.face;e.state='move';e.vx=e.face*spd;if(Math.abs(dx)<(e.type==='kpi'?34:30)&&Math.abs(dy)<24&&e.cd<=0&&atkToken(e,false)){e.state='wind';e.timer=e.type==='kpi'?.6:.42;e.windT=e.timer;e.vx=0;SFX.warn()}}else{e.vx=Math.sin(e.anim*.7)*25;if(e.vx)e.face=sign(e.vx)}}
   else if(e.state==='wind'){e.vx=0;if(e.timer<=0){if(e.type==='crumple'){e.state='lunge';e.timer=.26;e.vx=e.face*230;e.vy=-120}else{e.state='slam';e.timer=.4;shake=Math.max(shake,3);SFX.stamp();for(const d of[-1,1])eproj({kind:'wave',x:e.x+d*8,y:e.y,vx:d*170,vy:0,r:5,dmg:e.dmg,life:1.2,col:'#f2c14e'})}}}
   else if(e.state==='lunge'){if(Math.abs(dx)<e.w/2+5&&Math.abs(dy)<18)hurtPlayer(e.dmg,e.face,e);if(e.timer<=0){e.state='idle';e.cd=1}}
   else if(e.state==='slam'){e.vx=0;if(e.timer<=0){e.state='idle';e.cd=1.4}}
@@ -571,18 +609,18 @@ function updEnemies(dtA){for(let i=enemies.length-1;i>=0;i--){const e=enemies[i]
  case 'bug':{e.vy=Math.min(MAXF,e.vy+GRAV*dt);if(e.aggro){e.face=sign(dx)||e.face;e.vx=e.face*110;if(e.onGround&&Math.abs(dx)<70&&e.cd<=0){e.vy=-280;e.vx=e.face*170;e.cd=1.1}}else e.vx=Math.sin(e.anim)*30;
   moveBody(e,dt);if(e.hitWall&&e.onGround)e.vy=-260;e.cd2=(e.cd2||0)-dt;if(e.cd2<=0&&Math.abs(dx)<e.w/2+5&&Math.abs(dy)<14){if(hurtPlayer(e.dmg,e.face,e))e.cd2=.8}break}
  case 'sticky':{const hx=P.x-e.face*20,hy=P.y-60;
-  if(e.state==='idle'){const tx=e.aggro?hx:e.hx+Math.sin(e.anim)*30,ty=e.aggro?hy:e.hy+Math.sin(e.anim*1.7)*10;e.vx+=(tx-e.x)*2*dt-e.vx*1.5*dt;e.vy+=(ty-e.y)*2*dt-e.vy*1.5*dt;e.face=sign(dx)||e.face;if(e.aggro&&e.cd<=0&&dist<120){e.state='wind';e.timer=.5;e.windT=.5;e.vx*=.2;e.vy*=.2;SFX.warn()}}
+  if(e.state==='idle'){const tx=e.aggro?hx:e.hx+Math.sin(e.anim)*30,ty=e.aggro?hy:e.hy+Math.sin(e.anim*1.7)*10;e.vx+=(tx-e.x)*2*dt-e.vx*1.5*dt;e.vy+=(ty-e.y)*2*dt-e.vy*1.5*dt;e.face=sign(dx)||e.face;if(e.aggro&&e.cd<=0&&dist<120&&atkToken(e,false)){e.state='wind';e.timer=.5;e.windT=.5;e.vx*=.2;e.vy*=.2;SFX.warn()}}
   else if(e.state==='wind'){e.vx*=.9;e.vy*=.9;if(e.timer<=0){e.state='swoop';e.timer=.55;const d=Math.hypot(dx,dy)||1;e.vx=dx/d*270;e.vy=dy/d*270}}
   else if(e.state==='swoop'){if(Math.abs(dx)<e.w/2+5&&Math.abs(dy)<16)hurtPlayer(e.dmg,sign(e.vx),e);if(e.timer<=0){e.state='idle';e.cd=1.3}}
   e.x+=e.vx*dt;e.y+=e.vy*dt;if(isSolid(Math.floor(e.x/TS),Math.floor((e.y-6)/TS))){e.x-=e.vx*dt;e.y-=e.vy*dt;e.vx*=-.5;e.vy*=-.5}break}
  case 'printer':{e.vy=Math.min(MAXF,e.vy+GRAV*dt);e.vx*=.8;moveBody(e,dt);e.face=sign(dx)||e.face;
-  if(e.state==='idle'&&e.aggro&&Math.abs(dy)<60&&Math.abs(dx)<260&&e.cd<=0){e.state='wind';e.timer=.5;e.windT=.5}
+  if(e.state==='idle'&&e.aggro&&Math.abs(dy)<60&&Math.abs(dx)<260&&e.cd<=0&&atkToken(e,true)){e.state='wind';e.timer=.5;e.windT=.5}
   else if(e.state==='wind'&&e.timer<=0){e.state='idle';e.cd=1.8;SFX.shoot();eproj({kind:'paper',x:e.x+e.face*10,y:e.y-9,vx:e.face*190,vy:0,r:5,dmg:e.dmg,life:3,breakable:true})}break}
  case 'popup':{const want=P.x-sign(dx)*120,tY=P.y-55;e.vx+=((e.aggro?want:e.hx)-e.x)*1.5*dt-e.vx*2*dt;e.vy+=((e.aggro?tY:e.hy)-e.y)*1.5*dt-e.vy*2*dt;e.x+=e.vx*dt;e.y+=e.vy*dt;e.face=sign(dx)||1;
-  if(e.state==='idle'&&e.aggro&&e.cd<=0&&dist<240){e.state='wind';e.timer=.45;e.windT=.45}
+  if(e.state==='idle'&&e.aggro&&e.cd<=0&&dist<240&&atkToken(e,true)){e.state='wind';e.timer=.45;e.windT=.45}
   else if(e.state==='wind'&&e.timer<=0){e.state='idle';e.cd=2.1;const d=dist||1;SFX.shoot();eproj({kind:'x',x:e.x,y:e.y-8,vx:dx/d*160,vy:dy/d*160,r:4,dmg:e.dmg,life:3,breakable:true})}break}
  case 'firewall':{e.vy=Math.min(MAXF,e.vy+GRAV*dt);
-  if(e.state==='idle'||e.state==='move'){if(e.aggro){e.face=sign(dx)||e.face;e.state='move';e.vx=e.face*36;if(Math.abs(dx)<46&&Math.abs(dy)<22&&e.cd<=0){e.state='wind';e.timer=.6;e.windT=.6;e.vx=0;SFX.warn()}}else e.vx=0}
+  if(e.state==='idle'||e.state==='move'){if(e.aggro){e.face=sign(dx)||e.face;e.state='move';e.vx=e.face*36;if(Math.abs(dx)<46&&Math.abs(dy)<22&&e.cd<=0&&atkToken(e,false)){e.state='wind';e.timer=.6;e.windT=.6;e.vx=0;SFX.warn()}}else e.vx=0}
   else if(e.state==='wind'){e.vx=0;if(e.timer<=0){e.state='bash';e.timer=.26;e.vx=e.face*270}}
   else if(e.state==='bash'){if(Math.abs(dx)<e.w/2+7&&Math.abs(dy)<18)hurtPlayer(e.dmg,e.face,e);if(e.timer<=0||e.hitWall){e.state='tired';e.timer=1.0;e.vx=0}}
   else if(e.state==='tired'){e.vx*=.85;if(e.timer<=0){e.state='idle';e.cd=1.3}}
@@ -590,6 +628,10 @@ function updEnemies(dtA){for(let i=enemies.length-1;i>=0;i--){const e=enemies[i]
  case 'invite':{const d=dist||1,spd=e.aggro?72:0;e.vx+=(dx/d*spd-e.vx)*2*dt;e.vy+=(dy/d*spd-e.vy)*2*dt;e.x+=e.vx*dt;e.y+=e.vy*dt;e.face=sign(dx)||1;
   if(Math.abs(dx)<12&&Math.abs(dy)<16&&P.inv<=0&&P.rollT<=0){P.rootT=1.2;hurtPlayer(e.dmg,0,e);toast('被拉进了会议……',1200);e.hp=0;burst(e.x,e.y-6,12,['#f4f4f8','#3a6ad8'],120,.35)}break}}
  if(e.y>LV.h*TS+60)e.hp=0}}
+// 怪物之间互相推开，不再叠成一坨
+function separate(e,dt){if(ATK_STATES.includes(e.state))return;for(const o of enemies){if(o===e||o.hp<=0||o.fly!==e.fly)continue;const dx=e.x-o.x,dy=(e.y-e.h/2)-(o.y-o.h/2),minx=(e.w+o.w)*.45;
+ if(Math.abs(dx)<minx&&Math.abs(dy)<(e.h+o.h)*.45){const push=(minx-Math.abs(dx))*(dx===0?(Math.random()<.5?-1:1):sign(dx))*6*dt;const nx=e.x+push;
+  if(e.fly||(!isSolid(Math.floor((nx+sign(push)*e.w/2)/TS),Math.floor((e.y-2)/TS))&&tileAt(Math.floor(nx/TS),Math.floor((e.y+2)/TS))))e.x=nx;if(e.fly)e.y+=sign(dy||1)*(e.h*.45-Math.abs(dy))*3*dt}}}
 // ===== 拾取物 =====
 const pickups=[];
 function updPickups(dt){for(let i=pickups.length-1;i>=0;i--){const k=pickups[i];
@@ -628,7 +670,7 @@ const BOSSDEF={
  pd:{name:'制作人 · 需求变更',hp:720,w:16,h:38,quote:'“需求有一点点小调整……”',p2:'“上线前再加个功能！”',dead:'“需求……冻结。”',contact:10},
  ceo:{name:'老板 · 画大饼',hp:950,w:26,h:48,quote:'“年轻人，项目做成了，大家都有饼吃！”',p2:'“这个饼，可大了！”',dead:'“好吧……今天准时下班。”',contact:14}};
 function bsp(b){return(b.phase===3?1.5:b.phase===2?1.3:1)*(G.hard?1.15:1)}
-function spawnBoss(kind){const d=BOSSDEF[kind],hp=Math.round(d.hp*(G.hard?1.4:1));boss={kind,isBoss:true,name:d.name,x:LV.arenaX+LV.arenaW-80,y:19*TS,w:d.w,h:d.h,vx:0,vy:0,face:-1,hp,max:hp,state:'intro',t:0,anim:0,flash:0,phase:1,onGround:true,drop:false,cd:0,idleT:1,contactCd:0,pen:-.4,alpha:1,minions:0,seq:0};
+function spawnBoss(kind){const d=BOSSDEF[kind],hp=Math.round(d.hp*(G.hard?1.4:1));boss={kind,isBoss:true,name:d.name,x:LV.arenaX+LV.arenaW-80,y:19*TS,w:d.w,h:d.h,vx:0,vy:0,face:-1,hp,max:hp,state:'intro',t:0,anim:0,flash:0,phase:1,onGround:true,drop:false,cd:0,idleT:1,contactCd:0,pen:-.4,alpha:1,minions:0,seq:0,stag:0,stagMax:Math.round(hp*.13),stagPend:false,phasePend:0};
  bossBanner(d.name,d.quote);Snd.play('boss');SFX.boss()}
 function bossChoose(){const b=boss,dx=P.x-b.x,dist=Math.abs(dx),sp=bsp(b);b.t=0;b.seq++;const prev=b.last;for(let tries=0;tries<3;tries++){
  if(b.kind==='ad'){const r=Math.random();b.state=dist>140?(r<.55?'dash_wind':'notes'):(r<.4?'dash_wind':r<.7?'stamp_up':'notes');if(b.seq%4===0)b.state='stamp_up'}
@@ -637,17 +679,28 @@ function bossChoose(){const b=boss,dx=P.x-b.x,dist=Math.abs(dx),sp=bsp(b);b.t=0;
  if(b.state!==prev)break}b.last=b.state;b.sp=sp}
 function bossUpdate(dtA){const b=boss;if(!b)return;if(b.state!=='dead'){tickStatus(b,dtA);if(!boss)return}const dt=dtA*(b.slowT>0?.75:1);b.anim+=dt;b.flash-=dt;b.t+=dt;b.contactCd-=dt;const dx=P.x-b.x,sp=bsp(b);
  if(b.state==='dead'){b.vx*=.9;if(Math.random()<.5){burst(b.x+rnd(-14,14),b.y-rnd(4,b.h),6,['#ffd84a','#fff','#d8584a'],200,.5,3,200)}if(b.t>1.6){bossGone()}return}
- if(b.phase===1&&b.hp<b.max*.5){b.phase=2;toast(BOSSDEF[b.kind].name.split(' · ')[0]+'：'+BOSSDEF[b.kind].p2,2600);shake=6;SFX.boss();burst(b.x,b.y-b.h/2,30,['#ff5a4a','#ffd84a'],260,.6,3,100);
-  if(b.kind==='ceo'){for(const s of[-1,1])spawnEnemy({type:'kpi',x:clamp(b.x+s*120,LV.arenaX+60,LV.arenaX+LV.arenaW-60),y:19*TS},true)}}
- if(b.phase===2&&b.hp<b.max*.25){b.phase=3;toast(BOSSDEF[b.kind].name.split(' · ')[0]+' 狂暴了！',1800);shake=7;SFX.boss();burst(b.x,b.y-b.h/2,40,['#ff3a3a','#fff'],300,.6,3,100)}
+ // 破绽槽：持续输出会攒满，满了 Boss 原地失衡，受到伤害提高
+ if(b.state!=='stagger')b.stag=Math.max(0,b.stag-b.stagMax*.05*dt);
+ const grounded=['idle','recover','dash_wind','notes','doc','change','laser','pie','kpi','bigpie'].includes(b.state)&&b.onGround!==false;
+ if(b.stagPend&&grounded){b.stagPend=false;b.stag=0;b.state='stagger';b.t=0;b.vx=-b.face*120;b.thrown=false;b.jumped=false;SFX.parry();SFX.stamp();shake=6;hitstop=Math.max(hitstop,.12);toast('破绽！趁现在猛攻',1400);burst(b.x,b.y-b.h,24,['#ffd84a','#fff'],220,.5,3,0)}
+ // 转阶段：等 Boss 落地空闲时才怒吼，把玩家震开
+ if(!b.phasePend&&b.phase===1&&b.hp<b.max*.5)b.phasePend=2;
+ if(!b.phasePend&&b.phase===2&&b.hp<b.max*.25)b.phasePend=3;
+ if(b.phasePend&&(b.state==='idle'||b.state==='recover')){const np=b.phasePend;b.phasePend=0;b.phase=np;b.state='roar';b.t=0;b.vx=0;
+  toast(np===2?BOSSDEF[b.kind].name.split(' · ')[0]+'：'+BOSSDEF[b.kind].p2:BOSSDEF[b.kind].name.split(' · ')[0]+' 狂暴了！',2400);shake=7;SFX.boss();burst(b.x,b.y-b.h/2,np===2?30:40,np===2?['#ff5a4a','#ffd84a']:['#ff3a3a','#fff'],280,.6,3,100);
+  for(const p of projs)if(p.from==='e'&&p.isProj){p.life=0;burst(p.x,p.y,4,'#fff',60,.2)}
+  if(Math.abs(P.x-b.x)<110&&!P.dead){P.vx=sign(P.x-b.x||1)*280;P.vy=-220;P.hurtT=.2;P.atk=null}
+  if(np===2&&b.kind==='ceo'){for(const s of[-1,1])spawnEnemy({type:'kpi',x:clamp(b.x+s*120,LV.arenaX+60,LV.arenaX+LV.arenaW-60),y:19*TS},true)}}
  let grav=true;
  switch(b.state){
+ case 'roar':b.vx=0;b.face=sign(dx)||b.face;if(Math.random()<.6)part(b.x+rnd(-20,20),b.y-b.h-rnd(0,10),rnd(-60,60),-rnd(40,100),'#ff5a4a',.4,2,0);if(b.t>1.0){b.state='idle';b.t=0;b.idleT=.3}break;
+ case 'stagger':b.vx*=.88;if(Math.random()<.3)part(b.x+rnd(-8,8),b.y-b.h-6,rnd(-30,30),-30,'#ffd84a',.4,2,0);if(b.t>2.3){b.state='idle';b.t=0;b.idleT=.25}break;
  case 'intro':b.vx=0;b.face=sign(dx)||-1;if(b.t>2.2){b.state='idle';b.t=0;b.idleT=.6}break;
  case 'idle':{b.face=sign(dx)||b.face;const walk=b.kind==='pd'?0:b.kind==='ceo'?38:55;b.vx=Math.abs(dx)>70?b.face*walk:0;b.pen=lerp(b.pen,-.4,.1);if(b.t>b.idleT/sp)bossChoose();break}
  // ---- 主美 ----
  case 'dash_wind':b.vx=0;b.face=sign(dx)||b.face;b.pen=lerp(b.pen,-2.6,.2);if(b.t<.05)SFX.warn();if(b.t>.55/sp){b.state='dash';b.t=0;SFX.heavy()}break;
  case 'dash':b.vx=b.face*370*sp;b.pen=lerp(b.pen,1.2,.4);if(Math.random()<.8)part(b.x-b.face*6,b.y-20,-b.face*60,rnd(-20,20),'#e8483a',.3,2,0);
-  if(Math.abs(dx)<26&&P.y>b.y-b.h&&P.y-P.h<b.y)hurtPlayer(20,b.face,b);if(b.t>.5||b.hitWall){b.state='recover';b.t=0;b.rec=.65;if(b.hitWall){shake=4;SFX.stamp()}}break;
+  if(Math.abs(dx)<26&&P.y>b.y-b.h&&P.y-P.h<b.y)hurtPlayer(20,b.face,b);if(b.t>.5||b.hitWall){if(b.hitWall){shake=4;SFX.stamp()}b.dashN=(b.dashN||0)+1;if(b.phase>=2&&b.dashN<(b.phase>=3?3:2)){b.state='dash_wind';b.t=.2;b.face=sign(dx)||-b.face}else{b.dashN=0;b.state='recover';b.t=0;b.rec=.65}}break;
  case 'notes':b.vx=0;b.face=sign(dx)||b.face;b.pen=lerp(b.pen,-1.8,.2);if(b.t>.35&&!b.thrown){b.thrown=true;SFX.throw();const n=b.phase>=2?5:3;for(let i=0;i<n;i++){const T=.75+i*.15,tx=P.x+(i-(n-1)/2)*34,vx=(tx-b.x)/T;eproj({kind:'note',x:b.x+b.face*8,y:b.y-30,vx,vy:-300,grav:600,r:5,dmg:12,life:3,breakable:true})}}
   if(b.t>.8){b.thrown=false;b.state='idle';b.t=0;b.idleT=.7}break;
  case 'stamp_up':b.vx=0;if(b.t<.25){b.pen=-2.8}else{b.vy=-820;grav=false;b.y+=b.vy*dt;if(b.y<-80){b.state='stamp_hover';b.t=0;b.y=-80}}break;
@@ -659,10 +712,10 @@ function bossUpdate(dtA){const b=boss;if(!b)return;if(b.state!=='dead'){tickStat
  case 'tele_in':grav=false;b.alpha=b.t/.3;b.face=sign(dx)||1;if(b.t>.3){b.alpha=1;b.state='idle';b.t=0;b.idleT=.4}break;
  case 'doc':b.vx=0;b.face=sign(dx)||b.face;if(b.t>.4&&!b.thrown){b.thrown=true;SFX.throw();const n=b.phase>=2?2:1;for(let i=0;i<n;i++){const dy=(P.y-14)-(b.y-24),d=Math.hypot(dx,dy)||1;eproj({kind:'doc',x:b.x,y:b.y-24,vx:dx/d*320+(i?0:0),vy:dy/d*320-(i?120:0),r:7,dmg:12,life:3,owner:b,pierce:true})}}if(b.t>1.1){b.thrown=false;b.state='idle';b.t=0;b.idleT=.6}break;
  case 'change':b.vx=0;if(b.t<.05){toast('需求变更！',1200);SFX.warn();const n=b.phase>=2?2:1,secs=[0,1,2].sort(()=>Math.random()-.5);const W3=LV.arenaW/3;for(let i=0;i<n;i++){const s=secs[i];projs.push({kind:'zone',x0:LV.arenaX+s*W3+8,x1:LV.arenaX+(s+1)*W3-8,y:19*TS,t:0,warn:1.0,dur:2.0,dmg:12,life:9})}}if(b.t>1.2){b.state='idle';b.t=0;b.idleT=.8}break;
- case 'laser':b.vx=0;b.face=sign(dx)||b.face;if(b.t<.05){projs.push({kind:'laser',x:b.x,y:P.y-13,t:0,warn:.8,dmg:18,life:3})}if(b.t>1.4){b.state='idle';b.t=0;b.idleT=.5}break;
+ case 'laser':b.vx=0;b.face=sign(dx)||b.face;if(b.t<.05){projs.push({kind:'laser',x:b.x,y:P.y-13,t:0,warn:.8,dmg:18,life:3});if(b.phase>=3)projs.push({kind:'laser',x:b.x,y:P.y-13-48,t:-.35,warn:.8,dmg:18,life:3})}if(b.t>1.4){b.state='idle';b.t=0;b.idleT=.5}break;
  // ---- 老板 ----
  case 'pie':b.vx=0;b.face=sign(dx)||b.face;if(b.t>.5&&!b.thrown){b.thrown=true;SFX.throw();const n=b.phase>=2?4:3;for(let i=0;i<n;i++)eproj({kind:'pie',x:b.x+b.face*16,y:b.y-34,vx:b.face*rnd(110,260),vy:-rnd(220,360),grav:700,r:6,dmg:12,life:4.5,pierce:true})}if(b.t>1){b.thrown=false;b.state='idle';b.t=0;b.idleT=.7}break;
- case 'pound':if(b.t<.3){b.vx=0}else if(!b.jumped){b.jumped=true;b.vy=-520;b.vx=clamp(dx/1.0,-260,260);SFX.jump()}else if(b.onGround&&b.t>.45){b.jumped=false;SFX.stamp();shake=7;for(const d of[-1,1])eproj({kind:'wave',x:b.x+d*14,y:b.y,vx:d*200*sp,vy:0,r:6,dmg:16,life:2,col:'#e8b060'});if(Math.abs(dx)<30)hurtPlayer(20,sign(dx)||1,b);b.state='recover';b.t=0;b.rec=.9}break;
+ case 'pound':if(b.t<.3){b.vx=0}else if(!b.jumped){b.jumped=true;b.vy=-520;b.vx=clamp(dx/1.0,-260,260);SFX.jump()}else if(b.onGround&&b.t>.45){b.jumped=false;SFX.stamp();shake=7;for(const d of[-1,1])eproj({kind:'wave',x:b.x+d*14,y:b.y,vx:d*200*sp,vy:0,r:6,dmg:16,life:2,col:'#e8b060'});if(Math.abs(dx)<30)hurtPlayer(20,sign(dx)||1,b);b.poundN=(b.poundN||0)+1;if(b.phase>=3&&b.poundN<3){b.state='pound';b.t=.15}else{b.poundN=0;b.state='recover';b.t=0;b.rec=.9}}break;
  case 'kpi':b.vx=0;if(b.t<.05){toast('KPI 上涨！',1000);const n=b.phase>=2?6:5;for(let i=0;i<n;i++){const x=i===0?P.x:LV.arenaX+40+((i*137+Math.floor(Math.random()*90))%(LV.arenaW-80));projs.push({kind:'kpi',x,y:19*TS,t:-i*.22,warn:.6,w:22,hgt:70+i*6,dmg:16,col:pick(['#d8584a','#f2c14e','#5ab85a']),life:9})}}if(b.t>1.8){b.state='idle';b.t=0;b.idleT=.6}break;
  case 'bigpie':b.vx=0;if(b.t<.05){toast('画大饼！',1200);SFX.boss()}if(b.t>.7&&!b.thrown){b.thrown=true;eproj({kind:'bigpie',x:b.x+b.face*20,y:19*TS-22,vx:b.face*230,vy:0,r:22,dmg:22,life:4,pierce:true})}if(b.t>1.8){b.thrown=false;b.state='idle';b.t=0;b.idleT=.8}break;
  }
@@ -673,11 +726,13 @@ function bossUpdate(dtA){const b=boss;if(!b)return;if(b.state!=='dead'){tickStat
  else if(!['stamp_up','stamp_hover','tele'].includes(b.state))moveBody(b,dt);
  b.x=clamp(b.x,LV.arenaX+3*TS,LV.arenaX+LV.arenaW-2*TS);
  // 接触伤害
- if(b.state!=='intro'&&b.state!=='tele'&&b.alpha>.5&&b.contactCd<=0&&Math.abs(dx)<b.w/2+P.w/2&&P.y>b.y-b.h&&P.y-P.h<b.y){if(hurtPlayer(BOSSDEF[b.kind].contact,sign(dx)||1,b))b.contactCd=.8}}
+ if(b.state!=='intro'&&b.state!=='tele'&&b.state!=='stagger'&&b.state!=='roar'&&b.alpha>.5&&b.contactCd<=0&&Math.abs(dx)<b.w/2+P.w/2&&P.y>b.y-b.h&&P.y-P.h<b.y){if(hurtPlayer(BOSSDEF[b.kind].contact,sign(dx)||1,b))b.contactCd=.8}}
 function bossDie(){const b=boss;if(b.state==='dead')return;b.hp=0;b.state='dead';b.t=0;slowmo=.25;slowT=.9;SFX.boom();shake=10;hitstop=.2;toast(b.name.split(' · ')[0]+'：'+BOSSDEF[b.kind].dead,3000);$('bossbar').classList.remove('show');for(const e of enemies)if(e.minion)e.hp=0}
 function bossGone(){const b=boss;burst(b.x,b.y-b.h/2,60,['#ffd84a','#fff','#d8584a','#7fd8ff'],320,.8,3,200);for(let i=0;i<20;i++)pickups.push({k:'cell',x:b.x,y:b.y-20,vx:rnd(-160,160),vy:rnd(-300,-100)});
  pickups.push({k:'door',x:LV.exitX,y:19*TS,open:true});boss=null;G.bossDone=true;Snd.play(LV.th.song);SFX.win();banner(LV.floor<3?'本层通关！去右边的门':'老板被说服了！去下班吧','',2600)}
 function drawBossExtras(cx,cy){const b=boss;if(!b)return;
+ if(b.state==='stagger'){const x=R(b.x-cx),y=R(b.y-cy-b.h-8);for(let i=0;i<3;i++){const a=b.anim*5+i*2.1;px(x+Math.cos(a)*10-1,y+Math.sin(a)*3-1,3,3,'#ffd84a');px(x+Math.cos(a)*10,y+Math.sin(a)*3,1,1,'#fff')}}
+ if(b.state==='roar'){ctx.globalAlpha=Math.max(0,.5-b.t*.5);pring(R(b.x-cx),R(b.y-cy-b.h/2),R(20+b.t*120),'#ff5a4a',2);ctx.globalAlpha=1}
  if(b.state==='stamp_hover'||b.state==='stamp_fall'){const gy=19*TS-cy,x=R(b.x-cx);ctx.globalAlpha=.35+.25*Math.sin(b.anim*30);px(x-16,gy-3,32,3,'#ff3a3a');ctx.globalAlpha=1;pnum('!',x,gy-24,'#ff5a4a',2)}
  if(b.state==='dash_wind'&&Math.floor(b.anim*14)%2===0)pnum('!',R(b.x-cx),R(b.y-cy-b.h-14),'#ff5a4a',2)}
 
@@ -736,6 +791,7 @@ function pauseStats(){const r=[];r.push(`主武器 <b>${wname(P.prim,P.primLv)}<
 // ===== 渲染 =====
 const VIG=(()=>{const c=document.createElement('canvas');c.width=VW;c.height=VH;const g=c.getContext('2d');const gr=g.createRadialGradient(VW/2,VH/2,VH*.35,VW/2,VH/2,VH*.95);gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(1,'rgba(10,6,20,.45)');g.fillStyle=gr;g.fillRect(0,0,VW,VH);return c})();
 function poseOf(){const p={},a=P.anim,spd=Math.abs(P.vx)/RUN;p.blink=P.blinkT<0;
+ if(P.mantle){const k=Math.min(1,P.mantle.t/.17);p.armF=lerp(3,1.2,k);p.elbF=lerp(.2,1.4,k);p.armB=lerp(2.8,.8,k);p.legA=lerp(.2,1.2,k);p.kneeA=1.6;p.legB=-.2;p.kneeB=.8;p.crouch=lerp(0,4,k);p.lean=2;return p}
  if(P.healT>0){p.armF=2.7;p.elbF=.8;p.armB=.3;p.bob=0;return p}
  if(P.hurtT>0){p.lean=-2;p.armF=2.2;p.armB=2.4;p.legA=.3;p.legB=-.3;p.hurt=1;return p}
  if(!P.onGround){if(P.vy<0){p.legA=.6;p.kneeA=1.2;p.legB=-.2;p.kneeB=.4;p.armF=-.6;p.armB=.8}else{p.legA=.3;p.kneeA=.4;p.legB=-.4;p.kneeB=.6;p.armF=.9;p.armB=-.7}}
@@ -793,7 +849,7 @@ function step(dt){T+=dt;
  if(G.state==='play'){G.time+=dt;G.floorT+=dt;
   if(!P.dead)playerUpdate(dt);updEnemies(dt);bossUpdate(dt);updProjs(dt);updPickups(dt);updBoxes(dt);updRush(dt);
   if(!boss&&!G.bossDone&&P.x>LV.arenaX+4*TS){LV.gate.active=true;G.bossLock=true;spawnBoss(LV.th.boss)}
-  if(boss){const b=$('bossfill');b.style.width=Math.max(0,boss.hp/boss.max*100)+'%'}
+  if(boss){const b=$('bossfill');b.style.width=Math.max(0,boss.hp/boss.max*100)+'%';const s=$('bossstag');s.style.width=(boss.state==='stagger'?Math.max(0,1-boss.t/2.3):Math.min(1,boss.stag/boss.stagMax))*100+'%';s.classList.toggle('on',boss.state==='stagger'||boss.stagPend)}
   for(const s of splats)s.life-=dt*.15}
  else if(G.state==='dead'){updProjs(dt);P.vy=Math.min(MAXF,P.vy+GRAV*dt);P.vx*=.9;moveBody(P,dt)}
  updParts(dt);updNums(dt);if(LV)updCamera(dt)}

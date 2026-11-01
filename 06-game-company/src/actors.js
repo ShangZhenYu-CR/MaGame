@@ -28,7 +28,7 @@ function tickStatus(e,dt){if(e.slowT>0)e.slowT-=dt;if(e.bleedT>0){e.bleedT-=dt;e
 // ===== 玩家 =====
 const P={};
 function resetPlayer(keep){Object.assign(P,{x:6*TS,y:19*TS,w:10,h:26,vx:0,vy:0,face:1,onGround:true,drop:false,dropT:0,coyote:0,buffer:0,jumps:0,rollT:0,rollCd:0,inv:0,hurtT:0,cut:false,
- atk:null,combo:0,comboT:0,skillCd:0,parryT:0,sprayT:0,healT:0,anim:0,blinkT:2,stepT:0,dead:false,landT:0,rally:0,rallyT:0,rootT:0,dive:false,lastHit:''});
+ atk:null,combo:0,comboT:0,skillCd:0,parryT:0,sprayT:0,healT:0,anim:0,blinkT:2,stepT:0,dead:false,landT:0,rally:0,rallyT:0,rootT:0,dive:false,lastHit:'',rollBuf:0,rollEnd:-9,airStall:false,mantle:null,pdT:0,pdUsed:false,atkQueued:0});
  if(!keep)Object.assign(P,{hp:100,maxHp:100,flasks:2,maxFlasks:2,prim:'stylus',sec:'palette',primLv:0,primAff:[],secLv:0,secAff:[],stat:{line:0,color:0,body:0},cells:0,dmgMul:1,spdMul:1,rollMul:1,cdMul:1,airJumps:1,steal:0,critMul:1.5,upg:[]})}
 const RUN=150,ACC=1800,AACC=1100,GRAV=1350,JV=420,DJV=410,MAXF=520,ROLLV=290,ROLLT=.3;
 function playerUpdate(dt){
@@ -37,11 +37,15 @@ function playerUpdate(dt){
  P.rootT-=dt;const rooted=P.rootT>0;if(P.flowT>0){P.flowT-=dt;if(P.flowT<=0)P.flow=0}if(rooted&&Math.random()<.3)part(P.x+rnd(-8,8),P.y-rnd(10,26),0,-20,'#3a6ad8',.4,2,-20);
  if(P.rally>0){P.rallyT-=dt;if(P.rallyT<=0)P.rally=Math.max(0,P.rally-14*dt);P.rally=Math.min(P.rally,P.maxHp-P.hp)}
  const ix=rooted?0:(down('right')?1:0)-(down('left')?1:0);
+ if(P.pdT>0){P.pdT-=dt;if(Math.random()<.5)part(P.x+rnd(-6,6),P.y-rnd(4,26),0,-30,pick(['#ffd84a','#fff']),.35,1,-20)}
+ // 攀边
+ if(P.mantle){const m=P.mantle;m.t+=dt;const k=Math.min(1,m.t/.17);P.y=lerp(m.y0,m.y1,Math.min(1,k*1.7));P.x=lerp(m.x0,m.x1,Math.max(0,(k-.35)/.65));P.vx=0;P.vy=0;if(k>=1){P.mantle=null;P.onGround=true;P.landT=.08;P.jumps=P.airJumps;P.airStall=false}return}
  // 回血
  if(P.healT>0){P.healT-=dt;P.hp=Math.min(P.maxHp,P.hp+P.maxHp*.5*dt/.45);P.vx*=.8;if(Math.random()<.5)part(P.x+rnd(-6,6),P.y-rnd(4,24),0,-40,'#7af07a',.5,2,-50);moveBody(P,dt);return}
  // 翻滚
- if(pressed('roll')&&P.rollCd<=0&&P.rollT<=0){if(P.atk&&P.atk.phase!=='re'&&P.atk.t<P.atk.def.su*.6){}else{P.atk=null;P.rollT=ROLLT;P.inv=Math.max(P.inv,.26+(P.rollMul<1?.06:0));P.rollCd=.55*P.rollMul;if(ix)P.face=ix;SFX.roll();burst(P.x,P.y-2,6,'#cfc6b8',60,.3,2,100)}}
- if(P.rollT>0){P.rollT-=dt;P.vx=P.face*ROLLV;if(Math.random()<.6)ghosts.push({x:P.x,y:P.y,face:P.face,t:.18,roll:P.anim})}
+ if(pressed('roll'))P.rollBuf=.15;else P.rollBuf-=dt;
+ if(P.rollBuf>0&&P.rollCd<=0&&P.rollT<=0){if(P.atk&&P.atk.phase!=='re'&&P.atk.t<P.atk.def.su*.6){}else{P.rollBuf=0;P.pdUsed=P.inv>0;P.atk=null;P.rollT=ROLLT;P.inv=Math.max(P.inv,.26+(P.rollMul<1?.06:0));P.rollCd=.55*P.rollMul;if(ix)P.face=ix;SFX.roll();burst(P.x,P.y-2,6,'#cfc6b8',60,.3,2,100)}}
+ if(P.rollT>0){P.rollT-=dt;if(P.rollT<=0)P.rollEnd=P.anim;P.vx=P.face*ROLLV;if(Math.random()<.6)ghosts.push({x:P.x,y:P.y,face:P.face,t:.18,roll:P.anim})}
  else{
   let mv=1;if(P.atk){const d=P.atk.def;mv=P.atk.phase==='ac'?.15:d.heavy?.2:.45}if(P.sprayT>0)mv=.35;
   const tv=ix*RUN*mv,a=P.onGround?ACC:AACC;if(ix&&!P.atk&&P.sprayT<=0)P.face=ix;
@@ -54,15 +58,23 @@ function playerUpdate(dt){
   else if(P.coyote>0){P.vy=-JV;P.coyote=0;P.buffer=0;P.cut=false;P.jumpAt=P.anim;SFX.jump();burst(P.x,P.y,5,'#cfc6b8',50,.25,2,80);if(P.atk&&P.atk.phase==='re')P.atk=null}
   else if(P.jumps>0){P.jumps--;P.vy=-DJV;P.buffer=0;P.cut=true;P.djT=.3;SFX.djump();ringFx(P.x,P.y,'#7fd8ff');burst(P.x,P.y,10,['#7fd8ff','#c8f0ff','#3a8ad8'],100,.35,2,60)}}
  if(!down('jump')&&P.vy<0&&!P.cut&&P.anim-(P.jumpAt||0)>.12){P.vy*=.55;P.cut=true}
- P.vy=Math.min(MAXF,P.vy+GRAV*dt*(P.vy>0?1.15:1));
+ const apex=!P.onGround&&Math.abs(P.vy)<55&&down('jump')?.55:1;
+ P.vy=Math.min(MAXF,P.vy+GRAV*dt*(P.vy>0?1.15:1)*apex);
  // 攻击
  if(pressed('atk')&&!P.onGround&&down('down')&&!P.dive&&P.rollT<=0&&groundBelow(P.x,P.y)-P.y>28){P.dive=true;P.atk=null;P.atkQueued=0;P.vy=520;SFX.heavy();KP['KeyJ']=0;KP['Mouse0']=0;KP['Pad2']=0}
  if(P.dive){P.vx=0;P.vy=Math.max(P.vy,560);for(const e of targets()){if(Math.abs(e.x-P.x)<e.w/2+P.w/2&&P.y>e.y-e.h&&P.y-8<e.y){damage(e,18,P.face,0,false,false,'dive');e.state=e.isBoss?e.state:'stun';e.timer=.6;P.dive=false;P.vy=-330;P.jumps=P.airJumps;P.cut=true;hitstop=.07;shake=4;break}}}
- if(pressed('atk')&&P.rollT<=0&&!P.dive)P.atkQueued=.15;else P.atkQueued=(P.atkQueued||0)-dt;
- if(P.atkQueued>0){const can=!P.atk||(P.atk.phase==='re'&&P.atk.t>P.atk.def.re*.25);if(can){const W=WEAPONS[P.prim];if(P.comboT<=0||!P.atk&&P.comboT<=0)P.combo=0;const def=W.combo[P.combo%W.combo.length];P.atk={def,t:0,phase:'su',hit:new Set(),idx:P.combo%W.combo.length};P.combo++;P.comboT=.5;P.atkQueued=0;(def.heavy?SFX.heavy:SFX.swing)()}}
+ if(pressed('atk')&&!P.dive)P.atkQueued=.18;else P.atkQueued=(P.atkQueued||0)-dt;
+ if(P.atkQueued>0&&P.rollT<=0&&!P.dive){const can=!P.atk||(P.atk.phase==='re'&&P.atk.t>P.atk.def.re*.25);if(can){const W=WEAPONS[P.prim];if(P.comboT<=0)P.combo=0;if(ix)P.face=ix;
+   let def=W.combo[P.combo%W.combo.length],idx=P.combo%W.combo.length;
+   // 冲刺斩：翻滚结束 0.2 秒内出手，直接打出终结技并多冲一段
+   if(P.onGround&&P.anim-P.rollEnd<.2){const fin=W.combo[W.combo.length-1];def=Object.assign({},fin,{lunge:fin.lunge*1.6+90,dash:1,su:fin.su*.6});idx=W.combo.length-1;P.combo=W.combo.length-1;P.rollEnd=-9;burst(P.x,P.y-2,8,W.ink,90,.3,2,100)}
+   // 空中第一刀会短暂滞空，方便空中连段
+   if(!P.onGround&&!P.airStall){P.airStall=true;P.vy=Math.min(P.vy,-60)}
+   P.atk={def,t:0,phase:'su',hit:new Set(),idx};P.combo++;P.comboT=.5;P.atkQueued=0;(def.heavy||def.dash?SFX.heavy:SFX.swing)()}}
  if(P.atk){const a=P.atk,d=a.def,sp=P.spdMul*(hasAff(1,'speed')?1.15:1);a.t+=dt*sp;
   if(a.phase==='su'&&a.t>=d.su){a.phase='ac';a.t=0;P.vx+=P.face*d.lunge}
   else if(a.phase==='ac'){doHit(a);if(a.t>=d.ac){a.phase='re';a.t=0}}
+  if(P.atk&&!P.onGround&&P.atk.phase!=='re'&&P.vy>40)P.vy=40;
   else if(a.phase==='re'&&a.t>=d.re){P.atk=null;if(P.combo>=WEAPONS[P.prim].combo.length)P.combo=0}}
  // 副武器
  if(pressed('skill')&&P.skillCd<=0&&P.rollT<=0)useSkill();
@@ -78,9 +90,19 @@ function playerUpdate(dt){
   for(const k of pickups)if(k.k==='crate'&&Math.abs(k.x-P.x)<40&&Math.abs(k.y-P.y)<30)hitCrate(k,99)}
  else if(P.onGround&&P.lastAir>.25){SFX.land();burst(P.x,P.y,6,'#cfc6b8',70,.3,2,120);P.landT=.12}
  if(tileAt(Math.floor(P.x/TS),Math.floor((P.y-3)/TS))===3&&P.inv<=0){if(hurtPlayer(8,-P.face,null,'图钉'))P.vy=-300}
- P.lastAir=P.onGround?0:(P.lastAir||0)+dt;
+ P.lastAir=P.onGround?0:(P.lastAir||0)+dt;if(P.onGround)P.airStall=false;
+ if(!P.onGround&&ix&&P.hitWall===ix)tryMantle(ix);
  if(P.onGround&&Math.abs(P.vx)>40){P.stepT-=dt;if(P.stepT<=0){P.stepT=.25;part(P.x-P.face*4,P.y-1,-P.face*20,-20,'#cfc6b8',.3,1,50)}}
  if(P.y>LV.h*TS+40){P.y=10*TS;P.x=Math.max(P.x-40,3*TS);hurtPlayer(10,0)}}
+// 攀边：空中贴墙且墙顶在胸口以下，自动爬上去
+function tryMantle(ix){if(P.vy<-260||P.atk||P.dive||P.rollT>0||P.healT>0||P.hurtT>0)return false;
+ const fx=Math.floor((P.x+ix*(P.w/2+2))/TS),cx=Math.floor(P.x/TS);
+ for(let ty=Math.floor((P.y-22)/TS);ty<=Math.floor((P.y-1)/TS);ty++){const ly=ty*TS,d=P.y-ly;if(d<1||d>22)continue;
+  if(isSolid(fx,ty)&&!isSolid(fx,ty-1)&&!isSolid(fx,ty-2)&&!isSolid(cx,ty-1)&&!isSolid(cx,ty-2)){
+   P.mantle={x0:P.x,y0:P.y,x1:ix>0?fx*TS+P.w/2+1:(fx+1)*TS-P.w/2-1,y1:ly,t:0};P.face=ix;P.vx=P.vy=0;P.atkQueued=0;SFX.land();burst(ix>0?fx*TS:(fx+1)*TS,ly,5,'#cfc6b8',50,.25,2,80);return true}}
+ return false}
+// 完美闪避：翻滚刚开始时躲过攻击，短暂子弹时间，下一刀必暴击
+function perfectDodge(){P.pdUsed=true;P.pdT=2;P.inv=Math.max(P.inv,.45);slowmo=.3;slowT=.35;SFX.parry();ringFx(P.x,P.y-14,'#ffd84a');burst(P.x,P.y-14,12,['#ffd84a','#fff'],140,.35,2,0);P.flow=(P.flow||0)+3;P.flowT=4;toast('完美闪避！下一击必暴击',1000)}
 const ghosts=[];
 function ringFx(x,y,col){for(let i=0;i<10;i++){const a=i/10*Math.PI*2;part(x,y,Math.cos(a)*80,Math.sin(a)*30,col,.25,2,0)}}
 function atkBox(a){const d=a.def,f=P.face;if(d.thrust)return{x0:P.x+(f>0?2:-d.rng),x1:P.x+(f>0?d.rng:-2),y0:P.y-18-d.hh/2,y1:P.y-18+d.hh/2};return{x0:P.x+(f>0?-4:-d.rng),x1:P.x+(f>0?d.rng:4),y0:P.y-16-d.hh/2-4,y1:P.y-16+d.hh/2+2}}
@@ -88,14 +110,16 @@ function overlapE(b,e){return b.x1>e.x-e.w/2&&b.x0<e.x+e.w/2&&b.y1>e.y-e.h&&b.y0
 function targets(){const t=enemies.filter(e=>e.hp>0);if(boss&&boss.hp>0&&boss.state!=='intro'&&boss.state!=='tele_out')t.push(boss);return t}
 function doHit(a){const b=atkBox(a),d=a.def;let any=false;
  for(const e of targets()){if(a.hit.has(e)||!overlapE(b,e))continue;a.hit.add(e);any=true;let crit=!!d.crit;
+  if(!crit&&(P.pdT>0||d.dash))crit=true;
   if(!crit){if(P.prim==='marker'&&(e.state==='stun'||e.slowT>0||e.bleedT>0))crit=true;else if(P.prim==='knife'&&e.bleedT>0)crit=true;else if(P.prim==='ruler'&&Math.abs(e.x-P.x)>d.rng*.62)crit=true;else if(hasAff(1,'critc')&&Math.random()<.15)crit=true}
   damage(e,d.dmg,P.face,d.kb,crit,false,'prim');if(hasAff(1,'bleed'))applyStatus(e,'bleed');if(hasAff(1,'slow'))applyStatus(e,'slow')}
  for(const k of pickups)if(k.k==='crate'&&!a.hit.has(k)&&b.x1>k.x-8&&b.x0<k.x+8&&b.y1>k.y-14&&b.y0<k.y){a.hit.add(k);hitCrate(k,d.dmg)}
  for(const pr of projs)if(pr.from==='e'&&pr.breakable&&b.x1>pr.x-pr.r&&b.x0<pr.x+pr.r&&b.y1>pr.y-pr.r&&b.y0<pr.y+pr.r){pr.life=0;burst(pr.x,pr.y,6,'#fff',90,.25)}
- if(any){hitstop=Math.max(hitstop,d.crit?.09:d.heavy?.07:.045);shake=Math.max(shake,d.crit?4:d.heavy?3.5:2)}}
+ if(any){if(P.pdT>0)P.pdT=0;hitstop=Math.max(hitstop,d.crit?.09:d.heavy?.07:.045);shake=Math.max(shake,d.crit?4:d.heavy?3.5:2)}}
 function damage(e,dmg,dir,kb,crit,quiet,src='prim'){if(e.hp<=0)return;let mul=P.dmgMul;const big=e.elite||e.isBoss;
  if(src==='prim'||src==='dive')mul*=(1+.15*P.stat.line)*(1+.12*P.primLv)*(big&&hasAff(1,'elite')?1.35:1);else if(src==='sec')mul*=(1+.15*P.stat.color)*(1+.12*P.secLv)*(big&&hasAff(2,'elite')?1.35:1);else if(src==='dot')mul*=1+.15*P.stat.color;else if(src==='turret')mul=P.dmgMul;
- if(src!=='dot')mul*=flowMul();let v=dmg*mul*(crit?P.critMul:1)*rnd(.92,1.08);
+ if(src!=='dot')mul*=flowMul();if(e.isBoss&&e.state==='stagger')mul*=1.35;let v=dmg*mul*(crit?P.critMul:1)*rnd(.92,1.08);
+ if(e.isBoss&&src!=='dot'&&e.state!=='stagger'&&e.state!=='roar'&&e.state!=='dead'){e.stag+=v*(src==='dive'?1.6:1)*(crit?1.3:1);if(e.stag>=e.stagMax)e.stagPend=true}
  if(e.type==='firewall'&&e.state!=='tired'&&e.state!=='stun'&&src!=='dot'){const front=(src==='prim'||src==='dive')?sign(P.x-e.x)===e.face:dir===-e.face;if(front){v*=.15;SFX.select();burst(e.x+e.face*8,e.y-14,6,['#ffd84a','#fff'],120,.25);dmgNum(e.x,e.y-e.h-6,v,'#9aa0a8');e.hp-=v;e.flash=.04;if(e.hp<=0)enemyDie(e);return}}
  if(src!=='dot'&&P.rally>0){const r=Math.min(P.rally,2+v*.25);P.hp=Math.min(P.maxHp,P.hp+r);P.rally-=r}
  if(src==='sec'){if(hasAff(2,'bleed'))applyStatus(e,'bleed');if(hasAff(2,'slow'))applyStatus(e,'slow')}
@@ -104,7 +128,10 @@ function damage(e,dmg,dir,kb,crit,quiet,src='prim'){if(e.hp<=0)return;let mul=P.
  e.hp-=v;e.flash=.08;
  const W=WEAPONS[P.prim];if(!quiet){burst(e.x,e.y-e.h/2,crit?14:8,W.ink||['#fff'],crit?220:150,.4,2,350);splat(e.x,groundBelow(e.x,e.y-2),pick(W.ink||['#888']),crit?5:3);(crit?SFX.crit:SFX.hit)()}
  dmgNum(e.x+rnd(-4,4),e.y-e.h-6,v,crit?'#ffd84a':'#fff',crit);
- if(e.isBoss){e.vx+=dir*kb*.05}else{const res=e.elite?.4:1;e.vx=dir*kb*res;if(e.type!=='printer'&&e.type!=='popup'&&e.type!=='sticky')e.vy=Math.min(e.vy,-60*res);if(!e.elite&&(e.state==='wind'||e.state==='move')&&dmg>=8){e.state='stun';e.timer=.25}}
+ if(e.isBoss){e.vx+=dir*kb*.05}else{const res=e.elite?.4:1;e.vx=dir*kb*res;if(e.type!=='printer'&&e.type!=='popup'&&e.type!=='sticky')e.vy=Math.min(e.vy,-60*res);const pd=dmg*(crit?1.4:1)+kb*.04;e.poise-=pd;e.poiseT=1.4;
+  if(e.poise<=0){e.poise=e.maxPoise;if(e.state!=='stun'){e.state='stun';e.timer=e.elite?.9:.5;e.windT=0;e.vx=dir*kb*res*1.2;burst(e.x,e.y-e.h,8,['#ffd84a','#fff'],120,.3,2,0);if(e.elite||e.maxPoise>=24)dmgNum(e.x,e.y-e.h-14,'!','#ffd84a',true)}}
+  else if(ATK_STATES.includes(e.state)){e.vx*=.25}
+  else if(e.state==='idle'||e.state==='move'){e.state='stun';e.timer=e.elite?.08:.2}}
  if(e.hp<=0)e.isBoss?bossDie():enemyDie(e)}
 function useSkill(){const k=P.sec,dbl=hasAff(2,'double');P.skillCd=secCd();
  if(k==='palette'){projs.push({kind:'palette',from:'p',x:P.x+P.face*8,y:P.y-16,vx:P.face*330,vy:0,r:6,dmg:12,life:2,t:0,hit:new Map(),ret:false});if(dbl)projs.push({kind:'palette',from:'p',x:P.x+P.face*8,y:P.y-22,vx:P.face*300,vy:-70,r:6,dmg:12,life:2,t:0,hit:new Map(),ret:false});SFX.throw()}
@@ -113,7 +140,9 @@ function useSkill(){const k=P.sec,dbl=hasAff(2,'double');P.skillCd=secCd();
  else if(k==='boxcol'){if(!placeBox(dbl)){P.skillCd=.2;toast('这里放不下',800)}}
  else if(k==='turret'){const gy=groundBelow(P.x+P.face*12,P.y-4);projs.push({kind:'turret',from:'p',x:P.x+P.face*12,y:gy,life:dbl?13:9,max:dbl?13:9,t:0,cd:.3,ang:P.face>0?0:Math.PI});SFX.door();burst(P.x+P.face*12,gy-6,10,['#9fd8ff','#fff'],80,.3)}
  else if(k==='inkbomb'){projs.push({kind:'ink',from:'p',x:P.x+P.face*6,y:P.y-20,vx:P.face*190+P.vx*.3,vy:-260,r:4,dmg:30,life:3,t:0,grav:700});if(dbl)projs.push({kind:'ink',from:'p',x:P.x+P.face*6,y:P.y-20,vx:P.face*120+P.vx*.3,vy:-320,r:4,dmg:30,life:3,t:0,grav:700});SFX.throw()}}
-function hurtPlayer(dmg,dir,src,name){if(P.inv>0||P.dead||G.state!=='play')return false;if(G.hard)dmg=Math.round(dmg*1.3);
+function hurtPlayer(dmg,dir,src,name){if(P.dead||G.state!=='play')return false;
+ if(P.inv>0){if(P.rollT>ROLLT-.17&&!P.pdUsed&&src)perfectDodge();return false}
+ if(P.mantle)P.mantle=null;if(G.hard)dmg=Math.round(dmg*1.3);
  if(P.parryT>0){SFX.parry();hitstop=.1;if(P.sec==='eraser'&&P.rally>0){P.hp=Math.min(P.maxHp,P.hp+P.rally);dmgNum(P.x,P.y-44,'+'+Math.round(P.rally),'#7af07a');P.rally=0;hud()}burst(P.x+P.face*10,P.y-16,16,['#fff','#f2a0b0'],200,.35);dmgNum(P.x,P.y-34,'0','#9fd3f0');if(src&&src.isProj&&src.vx!==undefined){src.from='p';src.vx=-(src.vx||P.face*100)*1.3;src.vy=-Math.abs(src.vy||0);src.dmg=(src.dmg||10)*2;src.owner=null}else if(src&&src.isBoss){damage(src,25,P.face,0,true,false,'sec')}else if(src&&EDEF[src.type]&&src.hp>0){src.state='stun';src.timer=1.5;damage(src,20,P.face,120,true,false,'sec')}P.inv=.3;return false}
  if((P.flow||0)>=10)toast('心流中断',900);P.flow=0;P.hp-=dmg;P.rally=Math.min(P.maxHp-Math.max(0,P.hp),P.rally+dmg*.6);P.rallyT=1.6;P.lastHit=name||(src&&src.isBoss?src.name:src&&src.type?NAMES[src.type]:src&&src.kind?KIND_NAME[src.kind]||'':'')||'意外';P.inv=.9;P.dive=false;P.hurtT=.35;P.vx=dir*160;P.vy=-180;P.atk=null;P.sprayT=0;P.healT=0;shake=Math.max(shake,5);hitstop=Math.max(hitstop,.08);flashRed=.25;SFX.hurt();burst(P.x,P.y-14,12,['#d8584a','#fff'],160,.4);dmgNum(P.x,P.y-36,dmg,'#ff5a4a');hud();
  if(P.hp<=0){P.hp=0;P.dead=true;playerDie()}return true}
@@ -193,18 +222,26 @@ function drawProjs(cx,cy){for(const p of projs){const x=R(p.x-cx),y=R(p.y-cy);
  case 'zone':if(!p.on){ctx.globalAlpha=.25+.25*Math.sin(p.t*24);px(p.x0-cx,y-6,p.x1-p.x0,6,'#ff5a4a');ctx.globalAlpha=1}else{px(p.x0-cx,y-5,p.x1-p.x0,5,'#d8584a');for(let xx=p.x0;xx<p.x1;xx+=10)px(xx-cx,y-8-((xx+Math.floor(p.t*20))%3),3,3,'#ffd84a')}break;
  }}}
 // ===== 敌人 =====
-const enemies=[];const EDEF={crumple:{hp:30,w:14,h:14,dmg:12},sticky:{hp:18,w:12,h:12,dmg:10,fly:1},printer:{hp:40,w:20,h:16,dmg:10},bug:{hp:22,w:12,h:9,dmg:9},popup:{hp:26,w:22,h:16,dmg:10,fly:1},kpi:{hp:56,w:14,h:22,dmg:14},firewall:{hp:64,w:14,h:22,dmg:14},invite:{hp:14,w:16,h:14,dmg:4,fly:1}};
-function spawnEnemy(s,minion){const d=EDEF[s.type],m=s.elite?2.6:1;const e={type:s.type,x:s.x,y:s.y,hx:s.x,hy:s.y,w:d.w,h:d.h,vx:0,vy:0,face:-1,hp:d.hp*m*(1+(LV.floor-1)*.35)*(G.hard?1.5:1),max:0,dmg:Math.round(d.dmg*(s.elite?1.3:1)*(1+(LV.floor-1)*.2)),fly:!!d.fly,state:'idle',timer:rnd(0,1),anim:rnd(0,9),flash:0,elite:!!s.elite,cd:0,onGround:false,minion:!!minion,aggro:false};e.max=e.hp;enemies.push(e);return e}
+const enemies=[];// poise：韧性。出招（前摇/冲刺）时只有打空韧性才能打断；普通状态下挨打会小硬直
+const EDEF={crumple:{hp:30,w:14,h:14,dmg:12,poise:16},sticky:{hp:18,w:12,h:12,dmg:10,fly:1,poise:10},printer:{hp:40,w:20,h:16,dmg:10,poise:24},bug:{hp:22,w:12,h:9,dmg:9,poise:8},popup:{hp:26,w:22,h:16,dmg:10,fly:1,poise:16},kpi:{hp:56,w:14,h:22,dmg:14,poise:40},firewall:{hp:64,w:14,h:22,dmg:14,poise:44},invite:{hp:14,w:16,h:14,dmg:4,fly:1,poise:4}};
+const ATK_STATES=['wind','lunge','bash','swoop','slam'];
+// 出招名额：同一时间最多几只怪在出招，避免围殴时无从闪避
+function atkToken(e,ranged){let n=0;for(const o of enemies)if(o!==e&&o.hp>0&&!!o.ranged===ranged&&ATK_STATES.includes(o.state)&&Math.abs(o.x-P.x)<300)n++;const max=ranged?2:(G.hard?3:2);if(n>=max){e.cd=rnd(.25,.6);return false}return true}
+function spawnEnemy(s,minion){const d=EDEF[s.type],m=s.elite?2.6:1;const e={type:s.type,x:s.x,y:s.y,hx:s.x,hy:s.y,w:d.w,h:d.h,vx:0,vy:0,face:-1,hp:d.hp*m*(1+(LV.floor-1)*.35)*(G.hard?1.5:1),max:0,dmg:Math.round(d.dmg*(s.elite?1.3:1)*(1+(LV.floor-1)*.2)),fly:!!d.fly,ranged:s.type==='printer'||s.type==='popup',poise:d.poise*(s.elite?2.5:1),maxPoise:d.poise*(s.elite?2.5:1),poiseT:0,state:'idle',timer:rnd(0,1),anim:rnd(0,9),flash:0,elite:!!s.elite,cd:0,onGround:false,minion:!!minion,aggro:false};e.max=e.hp;enemies.push(e);return e}
 function enemyDie(e){e.hp=0;SFX.die();shake=Math.max(shake,2.5);burst(e.x,e.y-e.h/2,18,['#14121a','#3a3a46',e.elite?'#ff5a4a':'#9aa0a8'],180,.5,3,300);splat(e.x,groundBelow(e.x,e.y-2),'#3a3a46',5);G.kills++;
  const n=e.elite?8:irnd(1,3);for(let i=0;i<n;i++)pickups.push({k:'cell',x:e.x,y:e.y-e.h/2,vx:rnd(-80,80),vy:rnd(-200,-80)});if(e.elite)dropWeapon(e.x,e.y-10);if(Math.random()<.08)pickups.push({k:'food',x:e.x,y:e.y-6,vy:-120});
  if(P.steal)P.hp=Math.min(P.maxHp,P.hp+P.steal);if(hasAff(1,'steal'))P.hp=Math.min(P.maxHp,P.hp+3);hud()}
 function updEnemies(dtA){for(let i=enemies.length-1;i>=0;i--){const e=enemies[i];if(e.hp<=0){enemies.splice(i,1);continue}tickStatus(e,dtA);if(e.hp<=0)continue;const dt=dtA*(e.slowT>0?.5:1);
- e.anim+=dt;e.flash-=dt;e.timer-=dt;e.cd-=dt;const dx=P.x-e.x,dy=(P.y-13)-(e.y-e.h/2),dist=Math.hypot(dx,dy);
+ e.anim+=dt;e.flash-=dt;e.timer-=dt;e.cd-=dt;if(e.poiseT>0)e.poiseT-=dt;else e.poise=Math.min(e.maxPoise,e.poise+e.maxPoise*.8*dt);separate(e,dt);const dx=P.x-e.x,dy=(P.y-13)-(e.y-e.h/2),dist=Math.hypot(dx,dy);
  if(!e.aggro&&dist<200&&Math.abs(dx)<220)e.aggro=true;if(!e.aggro){e.idleT=(e.idleT||0)+dt;}
- if(e.state==='stun'){e.vx*=.9;if(e.timer<=0)e.state='idle'}
+ if(e.state==='stun'){if(e.fly){const nx=e.x+e.vx*dt;if(!isSolid(Math.floor(nx/TS),Math.floor((e.y-6)/TS)))e.x=nx;e.vx*=.88;e.vy*=.88}
+  else{const sv=e.vx;e.vy=Math.min(MAXF,e.vy+GRAV*dt);moveBody(e,dt);e.vx*=.88;
+   // 撞墙：被打飞撞到墙上额外受伤
+   if(e.hitWall&&Math.abs(sv)>150&&!e.splatted){e.splatted=true;e.timer+=.35;shake=Math.max(shake,3);SFX.stamp();burst(e.x+e.hitWall*e.w/2,e.y-e.h/2,10,['#fff','#cfc6b8'],140,.3);damage(e,6+LV.floor*2,0,0,false,true,'dot')}}
+  if(e.timer<=0){e.state='idle';e.splatted=false}}
  else switch(e.type){
  case 'crumple':case 'kpi':{const spd=e.type==='kpi'?48:72;
-  if(e.state==='idle'||e.state==='move'){if(e.aggro){e.face=sign(dx)||e.face;e.state='move';e.vx=e.face*spd;if(Math.abs(dx)<(e.type==='kpi'?34:30)&&Math.abs(dy)<24&&e.cd<=0){e.state='wind';e.timer=e.type==='kpi'?.6:.42;e.windT=e.timer;e.vx=0;SFX.warn()}}else{e.vx=Math.sin(e.anim*.7)*25;if(e.vx)e.face=sign(e.vx)}}
+  if(e.state==='idle'||e.state==='move'){if(e.aggro){e.face=sign(dx)||e.face;e.state='move';e.vx=e.face*spd;if(Math.abs(dx)<(e.type==='kpi'?34:30)&&Math.abs(dy)<24&&e.cd<=0&&atkToken(e,false)){e.state='wind';e.timer=e.type==='kpi'?.6:.42;e.windT=e.timer;e.vx=0;SFX.warn()}}else{e.vx=Math.sin(e.anim*.7)*25;if(e.vx)e.face=sign(e.vx)}}
   else if(e.state==='wind'){e.vx=0;if(e.timer<=0){if(e.type==='crumple'){e.state='lunge';e.timer=.26;e.vx=e.face*230;e.vy=-120}else{e.state='slam';e.timer=.4;shake=Math.max(shake,3);SFX.stamp();for(const d of[-1,1])eproj({kind:'wave',x:e.x+d*8,y:e.y,vx:d*170,vy:0,r:5,dmg:e.dmg,life:1.2,col:'#f2c14e'})}}}
   else if(e.state==='lunge'){if(Math.abs(dx)<e.w/2+5&&Math.abs(dy)<18)hurtPlayer(e.dmg,e.face,e);if(e.timer<=0){e.state='idle';e.cd=1}}
   else if(e.state==='slam'){e.vx=0;if(e.timer<=0){e.state='idle';e.cd=1.4}}
@@ -214,18 +251,18 @@ function updEnemies(dtA){for(let i=enemies.length-1;i>=0;i--){const e=enemies[i]
  case 'bug':{e.vy=Math.min(MAXF,e.vy+GRAV*dt);if(e.aggro){e.face=sign(dx)||e.face;e.vx=e.face*110;if(e.onGround&&Math.abs(dx)<70&&e.cd<=0){e.vy=-280;e.vx=e.face*170;e.cd=1.1}}else e.vx=Math.sin(e.anim)*30;
   moveBody(e,dt);if(e.hitWall&&e.onGround)e.vy=-260;e.cd2=(e.cd2||0)-dt;if(e.cd2<=0&&Math.abs(dx)<e.w/2+5&&Math.abs(dy)<14){if(hurtPlayer(e.dmg,e.face,e))e.cd2=.8}break}
  case 'sticky':{const hx=P.x-e.face*20,hy=P.y-60;
-  if(e.state==='idle'){const tx=e.aggro?hx:e.hx+Math.sin(e.anim)*30,ty=e.aggro?hy:e.hy+Math.sin(e.anim*1.7)*10;e.vx+=(tx-e.x)*2*dt-e.vx*1.5*dt;e.vy+=(ty-e.y)*2*dt-e.vy*1.5*dt;e.face=sign(dx)||e.face;if(e.aggro&&e.cd<=0&&dist<120){e.state='wind';e.timer=.5;e.windT=.5;e.vx*=.2;e.vy*=.2;SFX.warn()}}
+  if(e.state==='idle'){const tx=e.aggro?hx:e.hx+Math.sin(e.anim)*30,ty=e.aggro?hy:e.hy+Math.sin(e.anim*1.7)*10;e.vx+=(tx-e.x)*2*dt-e.vx*1.5*dt;e.vy+=(ty-e.y)*2*dt-e.vy*1.5*dt;e.face=sign(dx)||e.face;if(e.aggro&&e.cd<=0&&dist<120&&atkToken(e,false)){e.state='wind';e.timer=.5;e.windT=.5;e.vx*=.2;e.vy*=.2;SFX.warn()}}
   else if(e.state==='wind'){e.vx*=.9;e.vy*=.9;if(e.timer<=0){e.state='swoop';e.timer=.55;const d=Math.hypot(dx,dy)||1;e.vx=dx/d*270;e.vy=dy/d*270}}
   else if(e.state==='swoop'){if(Math.abs(dx)<e.w/2+5&&Math.abs(dy)<16)hurtPlayer(e.dmg,sign(e.vx),e);if(e.timer<=0){e.state='idle';e.cd=1.3}}
   e.x+=e.vx*dt;e.y+=e.vy*dt;if(isSolid(Math.floor(e.x/TS),Math.floor((e.y-6)/TS))){e.x-=e.vx*dt;e.y-=e.vy*dt;e.vx*=-.5;e.vy*=-.5}break}
  case 'printer':{e.vy=Math.min(MAXF,e.vy+GRAV*dt);e.vx*=.8;moveBody(e,dt);e.face=sign(dx)||e.face;
-  if(e.state==='idle'&&e.aggro&&Math.abs(dy)<60&&Math.abs(dx)<260&&e.cd<=0){e.state='wind';e.timer=.5;e.windT=.5}
+  if(e.state==='idle'&&e.aggro&&Math.abs(dy)<60&&Math.abs(dx)<260&&e.cd<=0&&atkToken(e,true)){e.state='wind';e.timer=.5;e.windT=.5}
   else if(e.state==='wind'&&e.timer<=0){e.state='idle';e.cd=1.8;SFX.shoot();eproj({kind:'paper',x:e.x+e.face*10,y:e.y-9,vx:e.face*190,vy:0,r:5,dmg:e.dmg,life:3,breakable:true})}break}
  case 'popup':{const want=P.x-sign(dx)*120,tY=P.y-55;e.vx+=((e.aggro?want:e.hx)-e.x)*1.5*dt-e.vx*2*dt;e.vy+=((e.aggro?tY:e.hy)-e.y)*1.5*dt-e.vy*2*dt;e.x+=e.vx*dt;e.y+=e.vy*dt;e.face=sign(dx)||1;
-  if(e.state==='idle'&&e.aggro&&e.cd<=0&&dist<240){e.state='wind';e.timer=.45;e.windT=.45}
+  if(e.state==='idle'&&e.aggro&&e.cd<=0&&dist<240&&atkToken(e,true)){e.state='wind';e.timer=.45;e.windT=.45}
   else if(e.state==='wind'&&e.timer<=0){e.state='idle';e.cd=2.1;const d=dist||1;SFX.shoot();eproj({kind:'x',x:e.x,y:e.y-8,vx:dx/d*160,vy:dy/d*160,r:4,dmg:e.dmg,life:3,breakable:true})}break}
  case 'firewall':{e.vy=Math.min(MAXF,e.vy+GRAV*dt);
-  if(e.state==='idle'||e.state==='move'){if(e.aggro){e.face=sign(dx)||e.face;e.state='move';e.vx=e.face*36;if(Math.abs(dx)<46&&Math.abs(dy)<22&&e.cd<=0){e.state='wind';e.timer=.6;e.windT=.6;e.vx=0;SFX.warn()}}else e.vx=0}
+  if(e.state==='idle'||e.state==='move'){if(e.aggro){e.face=sign(dx)||e.face;e.state='move';e.vx=e.face*36;if(Math.abs(dx)<46&&Math.abs(dy)<22&&e.cd<=0&&atkToken(e,false)){e.state='wind';e.timer=.6;e.windT=.6;e.vx=0;SFX.warn()}}else e.vx=0}
   else if(e.state==='wind'){e.vx=0;if(e.timer<=0){e.state='bash';e.timer=.26;e.vx=e.face*270}}
   else if(e.state==='bash'){if(Math.abs(dx)<e.w/2+7&&Math.abs(dy)<18)hurtPlayer(e.dmg,e.face,e);if(e.timer<=0||e.hitWall){e.state='tired';e.timer=1.0;e.vx=0}}
   else if(e.state==='tired'){e.vx*=.85;if(e.timer<=0){e.state='idle';e.cd=1.3}}
@@ -233,6 +270,10 @@ function updEnemies(dtA){for(let i=enemies.length-1;i>=0;i--){const e=enemies[i]
  case 'invite':{const d=dist||1,spd=e.aggro?72:0;e.vx+=(dx/d*spd-e.vx)*2*dt;e.vy+=(dy/d*spd-e.vy)*2*dt;e.x+=e.vx*dt;e.y+=e.vy*dt;e.face=sign(dx)||1;
   if(Math.abs(dx)<12&&Math.abs(dy)<16&&P.inv<=0&&P.rollT<=0){P.rootT=1.2;hurtPlayer(e.dmg,0,e);toast('被拉进了会议……',1200);e.hp=0;burst(e.x,e.y-6,12,['#f4f4f8','#3a6ad8'],120,.35)}break}}
  if(e.y>LV.h*TS+60)e.hp=0}}
+// 怪物之间互相推开，不再叠成一坨
+function separate(e,dt){if(ATK_STATES.includes(e.state))return;for(const o of enemies){if(o===e||o.hp<=0||o.fly!==e.fly)continue;const dx=e.x-o.x,dy=(e.y-e.h/2)-(o.y-o.h/2),minx=(e.w+o.w)*.45;
+ if(Math.abs(dx)<minx&&Math.abs(dy)<(e.h+o.h)*.45){const push=(minx-Math.abs(dx))*(dx===0?(Math.random()<.5?-1:1):sign(dx))*6*dt;const nx=e.x+push;
+  if(e.fly||(!isSolid(Math.floor((nx+sign(push)*e.w/2)/TS),Math.floor((e.y-2)/TS))&&tileAt(Math.floor(nx/TS),Math.floor((e.y+2)/TS))))e.x=nx;if(e.fly)e.y+=sign(dy||1)*(e.h*.45-Math.abs(dy))*3*dt}}}
 // ===== 拾取物 =====
 const pickups=[];
 function updPickups(dt){for(let i=pickups.length-1;i>=0;i--){const k=pickups[i];

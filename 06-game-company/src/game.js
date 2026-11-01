@@ -53,6 +53,7 @@ function pauseStats(){const r=[];r.push(`主武器 <b>${wname(P.prim,P.primLv)}<
 // ===== 渲染 =====
 const VIG=(()=>{const c=document.createElement('canvas');c.width=VW;c.height=VH;const g=c.getContext('2d');const gr=g.createRadialGradient(VW/2,VH/2,VH*.35,VW/2,VH/2,VH*.95);gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(1,'rgba(10,6,20,.45)');g.fillStyle=gr;g.fillRect(0,0,VW,VH);return c})();
 function poseOf(){const p={},a=P.anim,spd=Math.abs(P.vx)/RUN;p.blink=P.blinkT<0;
+ if(P.mantle){const k=Math.min(1,P.mantle.t/.17);p.armF=lerp(3,1.2,k);p.elbF=lerp(.2,1.4,k);p.armB=lerp(2.8,.8,k);p.legA=lerp(.2,1.2,k);p.kneeA=1.6;p.legB=-.2;p.kneeB=.8;p.crouch=lerp(0,4,k);p.lean=2;return p}
  if(P.healT>0){p.armF=2.7;p.elbF=.8;p.armB=.3;p.bob=0;return p}
  if(P.hurtT>0){p.lean=-2;p.armF=2.2;p.armB=2.4;p.legA=.3;p.legB=-.3;p.hurt=1;return p}
  if(!P.onGround){if(P.vy<0){p.legA=.6;p.kneeA=1.2;p.legB=-.2;p.kneeB=.4;p.armF=-.6;p.armB=.8}else{p.legA=.3;p.kneeA=.4;p.legB=-.4;p.kneeB=.6;p.armF=.9;p.armB=-.7}}
@@ -110,7 +111,7 @@ function step(dt){T+=dt;
  if(G.state==='play'){G.time+=dt;G.floorT+=dt;
   if(!P.dead)playerUpdate(dt);updEnemies(dt);bossUpdate(dt);updProjs(dt);updPickups(dt);updBoxes(dt);updRush(dt);
   if(!boss&&!G.bossDone&&P.x>LV.arenaX+4*TS){LV.gate.active=true;G.bossLock=true;spawnBoss(LV.th.boss)}
-  if(boss){const b=$('bossfill');b.style.width=Math.max(0,boss.hp/boss.max*100)+'%'}
+  if(boss){const b=$('bossfill');b.style.width=Math.max(0,boss.hp/boss.max*100)+'%';const s=$('bossstag');s.style.width=(boss.state==='stagger'?Math.max(0,1-boss.t/2.3):Math.min(1,boss.stag/boss.stagMax))*100+'%';s.classList.toggle('on',boss.state==='stagger'||boss.stagPend)}
   for(const s of splats)s.life-=dt*.15}
  else if(G.state==='dead'){updProjs(dt);P.vy=Math.min(MAXF,P.vy+GRAV*dt);P.vx*=.9;moveBody(P,dt)}
  updParts(dt);updNums(dt);if(LV)updCamera(dt)}

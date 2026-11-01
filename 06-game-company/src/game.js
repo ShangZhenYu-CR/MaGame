@@ -1,0 +1,143 @@
+// ===== 游戏流程 =====
+const G={state:'title',floor:1,time:0,kills:0,deaths:0,bossDone:false,snap:null,hard:false,floorT:0,prev:null};
+let hitstop=0,shake=0,slowmo=1,slowT=0,flashRed=0,T=0;const cam={x:0,y:0};
+const UPG=[{id:'dmg',n:'灵感爆发',d:'所有伤害 +20%',ic:'💡'},{id:'hp',n:'加班体质',d:'最大生命 +30',ic:'💪'},{id:'roll',n:'摸鱼大师',d:'翻滚冷却 -35%，无敌更久',ic:'🐟'},{id:'spd',n:'速写手',d:'攻击速度 +18%',ic:'✍️'},
+ {id:'flask',n:'多带个便当',d:'便当上限 +1',ic:'🍱'},{id:'steal',n:'落笔有神',d:'击败敌人回复 4 生命',ic:'🖌️'},{id:'jump',n:'人体工学椅',d:'空中跳跃 +1',ic:'🪑'},{id:'crit',n:'甲方满意',d:'暴击伤害 +60%',ic:'⭐'},{id:'cd',n:'快捷键大师',d:'副武器冷却 -30%',ic:'⌨️'}];
+function applyUpg(id){P.upg.push(id);if(id==='dmg')P.dmgMul*=1.2;if(id==='hp'){P.maxHp+=30}if(id==='roll')P.rollMul*=.65;if(id==='spd')P.spdMul*=1.18;if(id==='flask')P.maxFlasks++;if(id==='steal')P.steal+=4;if(id==='jump')P.airJumps++;if(id==='crit')P.critMul+=.6;if(id==='cd')P.cdMul*=.7}
+// ===== HUD =====
+function slotIcon(cv,w){const c=cv.getContext('2d');c.imageSmoothingEnabled=false;ctx.clearRect(0,0,24,24);ctx.fillStyle='rgba(0,0,0,0)';drawIcon(w,12,12);c.clearRect(0,0,cv.width,cv.height);c.drawImage(buf,0,0,24,24,0,0,cv.width,cv.height)}
+function hud(){$('hpfill').style.width=(P.hp/P.maxHp*100)+'%';$('hprally').style.width=((P.hp+P.rally)/P.maxHp*100)+'%';$('hptxt').textContent=Math.ceil(P.hp)+' / '+P.maxHp;$('flasks').textContent='🍱'.repeat(P.flasks)+'▫'.repeat(Math.max(0,P.maxFlasks-P.flasks));
+ $('stats').innerHTML=`<span class=s1>建模 ${P.stat.line}</span><span class=s2>地编 ${P.stat.color}</span><span class=s3>体力 ${P.stat.body}</span>`;
+ const k1=P.prim+P.primLv+P.primAff.join(),k2=P.sec+P.secLv+P.secAff.join();if(hud.p!==k1){hud.p=k1;slotIcon($('ic1'),P.prim);$('n1').textContent=wname(P.prim,P.primLv);$('a1').textContent=P.primAff.map(a=>AFF[a].n).join(' · ')}if(hud.s!==k2){hud.s=k2;slotIcon($('ic2'),P.sec);$('n2').textContent=wname(P.sec,P.secLv);$('a2').textContent=P.secAff.map(a=>AFF[a].n).join(' · ')}hudCells()}
+function hudCells(){$('cells').textContent=P.cells}
+let toastT=0,bannerT=0;
+function toast(s,ms=1800){const t=$('toast');t.textContent=s;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),ms)}
+function banner(a,b,ms=2200){$('bn1').textContent=a;$('bn2').textContent=b||'';const e=$('banner');e.classList.add('show');clearTimeout(bannerT);bannerT=setTimeout(()=>e.classList.remove('show'),ms)}
+function bossBanner(name,quote){banner(name,quote,2600);$('bossname').textContent=name;$('bossbar').classList.add('show')}
+function show(id,v){$(id).classList.toggle('show',v)}
+// ===== 楼层 =====
+function loadFloor(n,fromRetry){G.floor=n;G.rush=null;genLevel(n);LV.tlimit=[0,110,140,160][n]*(G.hard?.8:1);G.floorT=0;enemies.length=0;projs.length=0;pickups.length=0;parts.length=0;splats.length=0;nums.length=0;boss=null;G.bossDone=false;G.bossLock=false;
+ resetPlayer(true);P.hp=P.maxHp;P.flasks=P.maxFlasks;
+ for(const s of LV.spawns)spawnEnemy(s);for(const k of LV.pick)pickups.push(Object.assign({vy:0},k));
+ G.snap=JSON.stringify({prim:P.prim,sec:P.sec,primLv:P.primLv,primAff:P.primAff,secLv:P.secLv,secAff:P.secAff,stat:P.stat,cells:P.cells,dmgMul:P.dmgMul,spdMul:P.spdMul,rollMul:P.rollMul,cdMul:P.cdMul,airJumps:P.airJumps,steal:P.steal,critMul:P.critMul,maxHp:P.maxHp,maxFlasks:P.maxFlasks,upg:P.upg});
+ cam.x=0;cam.y=8;G.state='play';Snd.play(LV.th.song);$('floor').textContent=LV.th.name;banner(LV.th.name,['','赶在下班前，穿过美术部','Bug 满地爬的研发部','最后一关：老板办公室'][n],2400);hud()}
+function exitFloor(){if(G.state!=='play')return;SFX.door();if(G.floor<3){G.state='rest';openRest()}else{G.state='end';openEnd()}}
+function playerDie(){G.deaths++;G.state='dead';Snd.play('rest');$('dcause').textContent=P.lastHit?'击倒你的是：'+P.lastHit:'';setTimeout(()=>{show('dead',true)},900)}
+function retry(){show('dead',false);const s=JSON.parse(G.snap);Object.assign(P,s);P.cells=Math.floor(s.cells*.5);loadFloor(G.floor,true)}
+// 灵感卷轴
+const STATS={line:{n:'建模',d:'建模工具（主武器）与下劈伤害 +15%，生命 +10',c:'#e8783a'},color:{n:'地编',d:'地编工具（副武器、炮台、灼烧）伤害 +15%，冷却 -5%，生命 +10',c:'#3a8ad8'},body:{n:'体力',d:'最大生命 +25（并回复）',c:'#5ab85a'}};
+let scrollOpts=[];
+function openScroll(){G.prev=G.state==='scroll'?G.prev:G.state;G.state='scroll';const ks=Object.keys(STATS).sort(()=>Math.random()-.5).slice(0,2);scrollOpts=ks;const box=$('scards');box.innerHTML='';
+ ks.forEach((k,i)=>{const s=STATS[k],d=document.createElement('button');d.className='card';d.style.borderColor=s.c;d.innerHTML=`<div class="ci" style="color:${s.c}">✦</div><div class="cn">${s.n} +1</div><div class="cd">${s.d}</div><div class="ck">${i+1}</div>`;d.onclick=()=>chooseScroll(i);box.appendChild(d)});show('scroll',true)}
+function chooseScroll(i){if(G.state!=='scroll')return;const k=scrollOpts[i];P.stat[k]++;const add=k==='body'?25:10;P.maxHp+=add;P.hp+=add;SFX.heal();show('scroll',false);G.state=G.prev||'play';hud.p=hud.s=null;hud();if(G.state==='rest')rollShop();toast(STATS[k].n+' +1');}
+// 茶水间
+let restOpts=[];
+function openRest(){Snd.play('rest');P.hp=P.maxHp;P.flasks=P.maxFlasks;P.rally=0;rollRest();rollShop();show('rest',true)}
+const SHOP=[{id:'flask',n:'加大便当盒',d:'便当上限 +1',c:55},{id:'scroll',n:'灵感卷轴',d:'选一项属性 +1',c:45},{id:'sharpen',n:'武器打磨',d:'主武器等级 +1',c:40},{id:'reforge',n:'重铸词缀',d:'重新随机主武器词缀',c:30}];
+function rollShop(){const box=$('shop');box.innerHTML='';SHOP.forEach((s,i)=>{const b=document.createElement('button');b.className='sitem';const bought=P.bought&&P.bought.includes(s.id)&&s.id!=='scroll';b.disabled=P.cells<s.c||bought||(s.id==='sharpen'&&P.primLv>=5);b.innerHTML=`<b>${s.n}</b><span>${s.d}</span><i>✦ ${s.c}</i>`;b.onclick=()=>buy(s);box.appendChild(b)});$('reroll').disabled=P.cells<25;$('reroll').textContent=`花 25 灵感换一批升级（现有 ${P.cells}）`}
+function buy(s){if(P.cells<s.c||G.state!=='rest')return;P.cells-=s.c;P.bought=(P.bought||[]).concat(s.id);SFX.pick();
+ if(s.id==='flask'){P.maxFlasks++;P.flasks++}else if(s.id==='sharpen')P.primLv++;else if(s.id==='reforge'){const n=Math.max(1,P.primAff.length);P.primAff=rollAff(1,n)}else if(s.id==='scroll'){hudCells();openScroll();return}
+ hud.p=hud.s=null;hud();rollShop();toast('买到了：'+s.n)}
+function rollRest(){const pool=UPG.filter(u=>!(u.id==='jump'&&P.airJumps>=3));restOpts=pool.sort(()=>Math.random()-.5).slice(0,3);const box=$('cards');box.innerHTML='';
+ restOpts.forEach((u,i)=>{const d=document.createElement('button');d.className='card';d.innerHTML=`<div class="ci">${u.ic}</div><div class="cn">${u.n}</div><div class="cd">${u.d}</div><div class="ck">${i+1}</div>`;d.onclick=()=>chooseRest(i);box.appendChild(d)});
+ }
+function chooseRest(i){if(G.state!=='rest')return;applyUpg(restOpts[i].id);SFX.pick();show('rest',false);P.bought=[];loadFloor(G.floor+1)}
+$('reroll').onclick=()=>{if(P.cells>=25){P.cells-=25;SFX.select();rollRest();rollShop();hudCells()}};
+// 结局
+function openEnd(){Snd.play('end');show('hud',false);const t=G.time;$('estat').innerHTML=(G.hard?'<b style="color:#ff7a6a">加班模式通关</b><br>':'')+`用时 <b>${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}</b>　击败 <b>${G.kills}</b>　倒下 <b>${G.deaths}</b> 次<br>灵感 <b>${P.cells}</b>　升级 ${P.upg.map(id=>UPG.find(u=>u.id===id).ic).join(' ')||'无'}`;setTimeout(()=>show('end',true),1800);G.endT=0}
+function startGame(hard){Snd.unlock();G.hard=!!hard;show('title',false);show('hud',true);resetPlayer(false);P.bought=[];G.time=0;G.kills=0;G.deaths=0;$('mode').textContent=G.hard?'加班模式':'';loadFloor(1)}
+$('bstart').onclick=()=>startGame(false);$('bhard').onclick=()=>startGame(true);$('bretry').onclick=retry;$('bagain').onclick=()=>{show('end',false);startGame(G.hard)};$('bresume').onclick=()=>togglePause(false);$('bmute').onclick=()=>{$('bmute').textContent=Snd.toggle()?'🔇':'🔊'};
+function togglePause(v){if(G.state!=='play'&&G.state!=='pause')return;if(v)$('pstat').innerHTML=pauseStats();G.state=v?'pause':'play';show('pause',v)}
+function pauseStats(){const r=[];r.push(`主武器 <b>${wname(P.prim,P.primLv)}</b> ${P.primAff.map(a=>'<em>'+AFF[a].n+'</em>').join(' ')}`);r.push(`副武器 <b>${wname(P.sec,P.secLv)}</b> ${P.secAff.map(a=>'<em>'+AFF[a].n+'</em>').join(' ')}`);
+ r.push(`属性　建模 ${P.stat.line} · 地编 ${P.stat.color} · 体力 ${P.stat.body}`);if(P.upg.length)r.push('升级　'+P.upg.map(id=>{const u=UPG.find(q=>q.id===id);return u.ic+u.n}).join('　'));return r.join('<br>')}
+// ===== 渲染 =====
+const VIG=(()=>{const c=document.createElement('canvas');c.width=VW;c.height=VH;const g=c.getContext('2d');const gr=g.createRadialGradient(VW/2,VH/2,VH*.35,VW/2,VH/2,VH*.95);gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(1,'rgba(10,6,20,.45)');g.fillStyle=gr;g.fillRect(0,0,VW,VH);return c})();
+function poseOf(){const p={},a=P.anim,spd=Math.abs(P.vx)/RUN;p.blink=P.blinkT<0;
+ if(P.healT>0){p.armF=2.7;p.elbF=.8;p.armB=.3;p.bob=0;return p}
+ if(P.hurtT>0){p.lean=-2;p.armF=2.2;p.armB=2.4;p.legA=.3;p.legB=-.3;p.hurt=1;return p}
+ if(!P.onGround){if(P.vy<0){p.legA=.6;p.kneeA=1.2;p.legB=-.2;p.kneeB=.4;p.armF=-.6;p.armB=.8}else{p.legA=.3;p.kneeA=.4;p.legB=-.4;p.kneeB=.6;p.armF=.9;p.armB=-.7}}
+ else if(spd>.1){const ph=a*13;p.legA=Math.sin(ph)*.85;p.legB=-Math.sin(ph)*.85;p.kneeA=Math.max(0,-Math.cos(ph))*1.1;p.kneeB=Math.max(0,Math.cos(ph))*1.1;p.armF=-Math.sin(ph)*.7;p.armB=Math.sin(ph)*.7;p.elbF=p.elbB=.6;p.bob=Math.abs(Math.sin(ph))>.7?-1:0;p.lean=1}
+ else{p.bob=Math.sin(a*2.4)>.3?1:0;p.armF=.15;p.armB=-.1;p.elbF=.3;p.legA=.08;p.legB=-.08}
+ if(P.landT>0){p.crouch=2}
+ if(P.atk){const d=P.atk.def;let k=P.atk.phase==='su'?0:P.atk.phase==='ac'?Math.min(1,P.atk.t/d.ac):1;
+  if(d.thrust){p.armF=lerp(1.0,1.6,k);p.elbF=lerp(-.6,0,k);p.lean=lerp(-1,2,k);p.armB=-.6}else{p.armF=lerp(d.arc[0],d.arc[1],k);p.elbF=.1;p.lean=k>0?2:-1;p.armB=-.5}p.legA=.5;p.legB=-.5;p.kneeB=.5}
+ if(P.dive){p.armF=0;p.elbF=0;p.armB=-.3;p.legA=.9;p.kneeA=1.6;p.legB=.6;p.kneeB=1.6;p.crouch=3}
+ if(P.sprayT>0){p.armF=1.55;p.elbF=0;p.lean=1}
+ if(P.parryT>0){p.armF=2.2;p.elbF=-.4;p.lean=-1}
+ return p}
+function drawPlayer(cx,cy){
+ for(let i=ghosts.length-1;i>=0;i--){const g=ghosts[i];ctx.globalAlpha=g.t*2;ctx.save();ctx.translate(R(g.x-cx),R(g.y-cy-8));ctx.rotate(g.roll*g.face*22);px(-6,-6,12,12,'#7fd8ff');ctx.restore();ctx.globalAlpha=1}
+ const x=P.x-cx,y=P.y-cy,flash=P.inv>0&&P.hurtT<=0&&P.rollT<=0&&Math.floor(P.inv*16)%2===0;
+ if(P.rollT>0){ctx.save();ctx.translate(R(x),R(y-8));ctx.rotate(-(ROLLT-P.rollT)/ROLLT*Math.PI*2*P.face);drawMan(0,8,P.face,{crouch:6,legA:1.2,kneeA:2,legB:1,kneeB:2,armF:1.8,elbF:1.4,armB:1.4,lean:2,headY:3},false);ctx.restore();return}
+ if(P.djT>0&&!P.atk&&P.hurtT<=0){ctx.save();ctx.translate(R(x),R(y-12));ctx.rotate((1-P.djT/.3)*Math.PI*2*P.face);drawMan(0,12,P.face,{crouch:4,legA:1,kneeA:1.8,legB:.8,kneeB:1.8,armF:1.6,elbF:1.2,armB:1.2,lean:1,headY:2},false);ctx.restore();return}
+ const pose=poseOf();if(LV.floor!==1){ctx.globalAlpha=.32;for(const[ox,oy]of[[-1,0],[1,0],[0,-1],[0,1]])drawMan(x+ox,y+oy,P.face,pose,true);ctx.globalAlpha=1}
+ if(flash){ctx.globalAlpha=.5}
+ const h=drawMan(x,y,P.face,pose,false);ctx.globalAlpha=1;
+ // 武器
+ const W=WEAPONS[P.prim],kind=P.prim;
+ if(P.dive){drawWeaponAt(kind,h.hx,h.hy,0,P.face);ctx.globalAlpha=.5;pline(x,y-30,x,y-48,2,W.col);ctx.globalAlpha=1}
+ else if(P.atk){const d=P.atk.def;const ang=pose.armF+pose.elbF*.5;drawWeaponAt(kind,h.hx,h.hy,ang,P.face);
+  if(P.atk.phase==='ac'){ctx.globalAlpha=.7;if(d.thrust){pline(x+P.face*6,y-18,x+P.face*d.rng,y-18,2,W.col);px(x+P.face*d.rng-1,y-19,3,3,'#fff')}else smear(x,y-20,8,d.rng-2,d.arc[0],lerp(d.arc[0],d.arc[1],Math.min(1,P.atk.t/d.ac)),P.face,W.col);ctx.globalAlpha=1}}
+ else if(P.healT>0){px(h.hx-4,h.hy-4,8,5,'#c8553d');px(h.hx-4,h.hy-5,8,2,'#f4f1ea')}
+ else if(P.sprayT>0){drawIcon('airbrush',h.hx+P.face*3,h.hy)}
+ else if(P.parryT>0){px(h.hx-3,h.hy-8,7,12,'#f2a0b0');px(h.hx-3,h.hy-8,7,4,'#3a6ad8')}
+ else drawWeaponAt(kind,h.hx,h.hy,.5,P.face)}
+function render(){const th=LV.th,cx=R(cam.x+(Math.random()-.5)*shake*2),cy=R(cam.y+(Math.random()-.5)*shake*2);
+ drawBackground(cx,cy,T);
+ for(const d of LV.decor)if(d.k!=='window'&&d.k!=='lamp'&&d.k!=='sign')drawDecor(d,cx,cy,th,T);
+ for(const s of LV.signs){const x=R(s.x-cx),y=R(s.y-cy);if(x>-100&&x<VW+100){}}
+ for(const s of splats){ctx.globalAlpha=Math.min(1,s.life);px(s.x-cx,s.y-cy-1,s.w,2,s.col);ctx.globalAlpha=1}
+ const near=drawPickups(cx,cy,T);
+ drawTiles(cx,cy);
+ if(boss){ctx.globalAlpha=boss.alpha===undefined?1:clamp(boss.alpha,0,1);drawBoss(boss,cx,cy);ctx.globalAlpha=1;drawBossExtras(cx,cy)}
+ for(const e of enemies)if(Math.abs(e.x-cx-VW/2)<VW)drawEnemy(e,cx,cy);
+ for(const e of enemies)if(e.hp<e.max&&e.hp>0){const x=R(e.x-cx-8),y=R(e.y-cy-e.h-6);px(x,y,16,2,'#2a2030');px(x,y,R(16*e.hp/e.max),2,e.elite?'#ffb84a':'#ff5a4a')}
+ drawProjs(cx,cy);
+ if(G.state!=='dead'||Math.floor(T*8)%2)drawPlayer(cx,cy);
+ drawParts(cx,cy);drawNums(cx,cy);
+ ctx.drawImage(VIG,0,0);
+ if(flashRed>0){ctx.fillStyle=`rgba(216,40,40,${flashRed*.6})`;ctx.fillRect(0,0,VW,VH)}
+ if(slowT>0){ctx.fillStyle='rgba(255,255,255,.06)';ctx.fillRect(0,0,VW,VH)}
+ // 提示
+ const pr=$('prompt');if(near){let s='';if(near.k==='weapon'){const W=WEAPONS[near.w],old=W.slot===1?P.prim:P.sec,af=(near.aff||[]).map(a=>`<em>${AFF[a].n}</em>${AFF[a].d}`).join('　');s=`<b>E</b> 拾取 ${wname(near.w,near.lv)}<small>${W.desc}　（替换${WEAPONS[old].name}）</small>${af?'<small class=af>'+af+'</small>':''}`}else if(near.k==='chest')s='<b>E</b> 打开宝箱';else if(near.k==='tdoor')s='<b>E</b> 打开准时下班门';else if(near.k==='wireterm')s='<b>E</b> 补模型<small>这里有一段没做完的场景，地编的活儿</small>';else if(near.k==='rush')s=`<b>E</b> 接下加急任务<small>限时清掉刷出来的怪，奖励高级武器</small>`;else s=`<b>E</b> ${G.floor<3?'进入茶水间':'下班！'}`;if(pr.dataset.s!==s){pr.innerHTML=s;pr.dataset.s=s}pr.classList.add('show')}else pr.classList.remove('show')}
+function updCamera(dt){let tx=P.x-VW/2+P.face*36,ty=P.y-175;
+ if(boss||G.bossLock){tx=LV.arenaX}
+ tx=clamp(tx,0,LV.w*TS-VW);ty=clamp(ty,0,LV.h*TS-VH);cam.x=lerp(cam.x,tx,1-Math.exp(-6*dt));cam.y=lerp(cam.y,ty,1-Math.exp(-6*dt))}
+function step(dt){T+=dt;
+ if(slowT>0){slowT-=dt/Math.max(slowmo,.01);if(slowT<=0)slowmo=1}
+ shake=Math.max(0,shake-dt*20);flashRed=Math.max(0,flashRed-dt*2);
+ for(let i=ghosts.length-1;i>=0;i--){ghosts[i].t-=dt;if(ghosts[i].t<=0)ghosts.splice(i,1)}
+ if(G.state==='play'){G.time+=dt;G.floorT+=dt;
+  if(!P.dead)playerUpdate(dt);updEnemies(dt);bossUpdate(dt);updProjs(dt);updPickups(dt);updBoxes(dt);updRush(dt);
+  if(!boss&&!G.bossDone&&P.x>LV.arenaX+4*TS){LV.gate.active=true;G.bossLock=true;spawnBoss(LV.th.boss)}
+  if(boss){const b=$('bossfill');b.style.width=Math.max(0,boss.hp/boss.max*100)+'%'}
+  for(const s of splats)s.life-=dt*.15}
+ else if(G.state==='dead'){updProjs(dt);P.vy=Math.min(MAXF,P.vy+GRAV*dt);P.vx*=.9;moveBody(P,dt)}
+ updParts(dt);updNums(dt);if(LV)updCamera(dt)}
+// 标题画面
+function renderTitle(){if(!LV)genLevel(1);const th=THEME[1],sx=(T*20)%(LV.arenaX-VW),sy=98;drawBackground(sx,sy,T);for(const d of LV.decor)if(d.k!=='window'&&d.k!=='lamp'&&d.k!=='sign')drawDecor(d,sx,sy,th,T);drawTiles(sx,sy);
+ ctx.save();ctx.translate(360,groundBelow(sx+360,120)-98);ctx.scale(3,3);const ph=T*10;drawMan(0,0,-1,{legA:Math.sin(ph)*.8,legB:-Math.sin(ph)*.8,kneeA:Math.max(0,-Math.cos(ph)),kneeB:Math.max(0,Math.cos(ph)),armF:-Math.sin(ph)*.7,armB:Math.sin(ph)*.7,elbF:.6,elbB:.6,lean:1,bob:Math.abs(Math.sin(ph))>.7?-1:0,blink:(T%3)<.12},false);drawWeaponAt('stylus',-3,-12,.5,-1);ctx.restore();ctx.drawImage(VIG,0,0)}
+function renderEnd(){G.endT=(G.endT||0)+1/60;const t=G.endT,gy=Math.round(VH*.83);const g=ctx.createLinearGradient(0,0,0,VH);g.addColorStop(0,'#3a3a7a');g.addColorStop(.55,'#f28a5a');g.addColorStop(1,'#ffd08a');ctx.fillStyle=g;ctx.fillRect(0,0,VW,VH);
+ pcirc(Math.round(VW*.72),Math.round(VH*.58),30,'#ffe2a0');for(let i=0;i<14;i++){const bx=i*40-((t*10)%40),bh=40+((i*37)%60);px(bx,gy-bh,34,bh,'#3a2a4a');for(let k=0;k<6;k++)if((i+k)%3)px(bx+5+(k%2)*14,gy-bh+8+Math.floor(k/2)*14,5,7,'#ffd27a')}
+ px(0,gy,VW,VH-gy,'#2a2030');for(let x=0;x<VW+40;x+=40)px(x-((t*30)%40),gy+20,20,3,'#5a4a5a');
+ ctx.save();ctx.translate(Math.round(VW*.16+((t*14)%(VW*.1))),gy);ctx.scale(2,2);const ph=t*9;drawMan(0,0,1,{legA:Math.sin(ph)*.6,legB:-Math.sin(ph)*.6,kneeA:Math.max(0,-Math.cos(ph))*.8,kneeB:Math.max(0,Math.cos(ph))*.8,armF:-Math.sin(ph)*.5,armB:Math.sin(ph)*.5,elbF:.4,elbB:.4,bob:Math.abs(Math.sin(ph))>.7?-1:0},false);ctx.restore()}
+function uiTick(){if(G.state!=='play')return;const fl=P.flow||0,fe=$('flow');if(fl>=3){const tier=fl>=50?3:fl>=25?2:fl>=10?1:0;fe.innerHTML=`心流 ×${fl}${tier?` <i>+${tier*10}%</i>`:''}`;fe.className='t'+tier}else fe.innerHTML='';
+ const re=$('rush');if(G.rush){const left=G.rush.list.filter(e=>e.hp>0).length;re.textContent=`加急任务 ${Math.ceil(G.rush.t)}s · 剩 ${left}/${G.rush.total}`}else re.textContent='';
+ const cd=secCd();$('hprally').style.width=((P.hp+P.rally)/P.maxHp*100)+'%';
+ const td=$('tdoor'),left=LV.tlimit-G.floorT,tdk=LV.pick&&pickups.find(k=>k.k==='tdoor');if(tdk&&!tdk.used&&left>0&&!boss&&!G.bossDone){td.textContent='准时下班门 '+Math.floor(left/60)+':'+String(Math.floor(left%60)).padStart(2,'0');td.className=left<20?'warn':''}else td.textContent='';$('cd2').style.height=(Math.max(0,P.skillCd)/cd*100)+'%';const t=G.time;$('timer').textContent=Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0');
+ if(Math.floor(T*10)!==uiTick.k){uiTick.k=Math.floor(T*10);$('hpfill').style.width=(P.hp/P.maxHp*100)+'%';$('hptxt').textContent=Math.ceil(P.hp)+' / '+P.maxHp}}
+// ===== 主循环 =====
+let last=0;
+function frame(ts){requestAnimationFrame(frame);try{let dt=Math.min(.05,(ts-last)/1000||.016);last=ts;
+ pollPad();if(pressed('pause'))togglePause(G.state==='play');
+ if(G.state==='scroll'){if(pressed('opt1'))chooseScroll(0);else if(pressed('opt2'))chooseScroll(1)}
+ if(G.state==='rest'){if(pressed('opt1'))chooseRest(0);else if(pressed('opt2'))chooseRest(1);else if(pressed('opt3'))chooseRest(2)}
+ if(G.state==='dead'&&(pressed('confirm')||KP['Space'])&&$('dead').classList.contains('show'))retry();
+ if(G.state==='title'&&pressed('confirm'))startGame(false);
+ if(KP['KeyM'])$('bmute').textContent=Snd.toggle()?'🔇':'🔊';
+ if(G.state==='title'){T+=dt;renderTitle()}
+ else if(G.state==='end'){T+=dt;renderEnd()}
+ else if(G.state==='pause'||G.state==='rest'||G.state==='scroll'){render()}
+ else{let d=dt*slowmo;if(hitstop>0){hitstop-=dt;d*=.04}step(d);render()}
+ uiTick();present();clearPressed()}catch(e){__err(e)}}
+requestAnimationFrame(frame);

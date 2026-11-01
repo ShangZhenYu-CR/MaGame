@@ -1,0 +1,79 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>马楠：通关游戏公司</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:#000;overflow:hidden;color:#fff;font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;user-select:none;-webkit-user-select:none}
+#screen{position:fixed;inset:0;image-rendering:pixelated;image-rendering:crisp-edges;cursor:crosshair}
+#ui{position:fixed;pointer-events:none;overflow:hidden}
+.k{font-family:"ZCOOL KuaiLe",system-ui,sans-serif}
+.pane{background:rgba(20,18,30,.82);border:.35em solid #14121a;box-shadow:inset 0 0 0 .25em #f4f1ea;border-radius:.2em}
+#hud{position:absolute;inset:0;opacity:0;transition:opacity .4s}#hud.show{opacity:1}
+#hpw{position:absolute;left:1.2em;top:1.2em;width:20em}
+#hpbar{height:1.6em;background:#2a2030;border:.3em solid #14121a;position:relative}#hpfill{height:100%;background:linear-gradient(#ff7a6a,#d8483a);width:100%;transition:width .15s}
+#hptxt{position:absolute;inset:0;text-align:center;font-size:.85em;line-height:1.45em;font-weight:800;text-shadow:0 .1em 0 #000}
+#flasks{margin-top:.4em;font-size:1.1em;letter-spacing:.1em}
+#tr{position:absolute;right:1.2em;top:1.2em;text-align:right;font-weight:800;text-shadow:0 .12em 0 #000}#floor{font-size:1.2em}#cellw{font-size:1.1em;color:#ffd84a}#timer{opacity:.8;font-size:.9em}
+#slots{position:absolute;left:1.2em;bottom:1.2em;display:flex;gap:.8em}
+.slot{width:6.2em;height:6.2em;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.slot canvas{width:3.6em;height:3.6em;image-rendering:pixelated}.slot .kk{position:absolute;left:-.4em;top:-.6em;background:#ffd84a;color:#14121a;font-weight:900;padding:0 .35em;border:.2em solid #14121a;font-size:.9em}
+.slot .nm{font-size:.75em;font-weight:700;margin-top:.1em}#cd2{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);height:0}
+#help{position:absolute;right:1.2em;bottom:1.2em;font-size:.7em;opacity:.65;text-align:right;line-height:1.6;text-shadow:0 .1em 0 #000}
+#bossbar{position:absolute;left:50%;bottom:1.4em;transform:translateX(-50%);width:44em;text-align:center;opacity:0;transition:opacity .4s}#bossbar.show{opacity:1}
+#bossname{font-size:1.3em;font-weight:900;text-shadow:0 .12em 0 #000;margin-bottom:.3em}#bossb{height:1.3em;background:#2a2030;border:.3em solid #14121a}#bossfill{height:100%;width:100%;background:linear-gradient(#ffb84a,#d8583a);transition:width .12s}
+#prompt{position:absolute;left:50%;bottom:9em;transform:translateX(-50%);padding:.5em 1em;font-size:1em;opacity:0;transition:opacity .15s;white-space:nowrap;text-align:center}#prompt.show{opacity:1}
+#prompt b{background:#ffd84a;color:#14121a;padding:0 .35em;margin-right:.3em}#prompt small{display:block;font-size:.75em;opacity:.75;margin-top:.2em}
+#toast{position:absolute;left:50%;top:7em;transform:translateX(-50%);padding:.5em 1.2em;font-size:1.05em;font-weight:700;opacity:0;transition:opacity .25s;white-space:nowrap}#toast.show{opacity:1}
+#banner{position:absolute;left:0;right:0;top:30%;text-align:center;opacity:0;transform:scale(.9);transition:all .4s}#banner.show{opacity:1;transform:scale(1)}
+#bn1{font-size:4em;text-shadow:0 .08em 0 #14121a,0 0 .3em rgba(0,0,0,.5)}#bn2{font-size:1.4em;margin-top:.3em;text-shadow:0 .12em 0 #000;font-weight:700}
+.ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:auto;opacity:0;visibility:hidden;transition:opacity .4s}.ov.show{opacity:1;visibility:visible}
+#title{background:linear-gradient(90deg,rgba(14,10,24,.92) 0%,rgba(14,10,24,.78) 50%,rgba(14,10,24,0) 72%);align-items:flex-start;padding-left:4em;text-align:left}
+#title h1{font-size:5em;margin:0;line-height:1.05;text-shadow:0 .08em 0 #d8483a}#title .sub{font-size:1.5em;margin:.4em 0 1em;color:#ffd84a}
+.ctl{font-size:.95em;line-height:1.9;opacity:.92}.ctl b{display:inline-block;min-width:2.6em;text-align:center;background:#f4f1ea;color:#14121a;padding:0 .3em;margin-right:.4em;border-radius:.15em}
+.btn{pointer-events:auto;font:inherit;font-family:"ZCOOL KuaiLe",system-ui,sans-serif;font-size:1.8em;color:#14121a;background:#ffd84a;border:.2em solid #14121a;padding:.25em 1.2em;margin-top:.8em;cursor:pointer;box-shadow:0 .2em 0 #14121a}.btn:hover{background:#ffe88a}.btn:active{transform:translateY(.15em);box-shadow:0 .05em 0 #14121a}.btn:disabled{opacity:.4;cursor:default}
+#pause,#dead,#rest,#end{background:rgba(14,10,24,.78)}
+#cards{display:flex;gap:1.6em;margin:1.4em 0 .6em}
+.card{pointer-events:auto;width:13em;height:17em;font:inherit;color:#14121a;background:#f4f1ea;border:.35em solid #14121a;box-shadow:0 .4em 0 #14121a;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6em;position:relative;transition:transform .12s}
+.card:hover{transform:translateY(-.5em)}.ci{font-size:3.4em}.cn{font-family:"ZCOOL KuaiLe",system-ui;font-size:1.7em}.cd{font-size:.95em;padding:0 1em;line-height:1.4}.ck{position:absolute;top:.3em;left:.5em;font-weight:900;opacity:.4}
+#end{background:linear-gradient(rgba(14,10,24,0) 30%,rgba(14,10,24,.7))}#end h2{font-size:4.4em;margin:0;text-shadow:0 .08em 0 #d8483a}#estat{font-size:1.2em;line-height:1.8;margin:.6em 0}
+#bmute{position:absolute;right:1.2em;top:5.6em;pointer-events:auto;font-size:1.2em;background:rgba(20,18,30,.6);border:.15em solid #14121a;color:#fff;cursor:pointer;padding:.1em .4em}
+#hprally{position:absolute;left:0;top:0;bottom:0;background:#f2c14e;opacity:.85;width:0;transition:width .3s}#hpfill{position:absolute;left:0;top:0;bottom:0}
+#stats{margin-top:.3em;display:flex;gap:.5em;font-size:.75em;font-weight:800}#stats span{padding:0 .4em;border:.15em solid #14121a}.s1{background:#e8483a}.s2{background:#3a8ad8}.s3{background:#5ab85a}
+#tdoor{position:absolute;left:50%;top:1.2em;transform:translateX(-50%);font-weight:800;font-size:1em;color:#bde986;text-shadow:0 .12em 0 #000}#tdoor.warn{color:#ff7a6a}
+#mode{color:#ff7a6a;font-size:.85em}
+#flow{position:absolute;left:1.2em;top:6.6em;font-weight:900;font-size:1.1em;text-shadow:0 .12em 0 #000;color:#fff}#flow i{font-style:normal;color:#ffd84a}#flow.t1{color:#ffd84a}#flow.t2{color:#ff9a4a}#flow.t3{color:#ff5aa8;font-size:1.25em}
+#rush{position:absolute;left:50%;top:2.6em;transform:translateX(-50%);font-weight:900;font-size:1.1em;color:#ff7a6a;text-shadow:0 .12em 0 #000}
+.s1{background:#e8783a!important}.slot .af{font-size:.6em;color:#ffd84a;position:absolute;bottom:-1.6em;white-space:nowrap}
+.btn.hard{background:#d8583a;color:#fff}.btn.hard:hover{background:#ff7a5a}
+#pstat{font-size:1.05em;line-height:1.9;margin:.6em 0}#pstat em,#prompt em{font-style:normal;color:#ffd84a;margin-right:.3em}#prompt .af{color:#f4e8c8}
+#dcause{font-size:1.4em;color:#ff9a8a;margin-top:.4em}
+.shopt{font-size:1em;margin-top:.4em;opacity:.85}#shop{display:flex;gap:.8em;margin:.6em 0}
+.sitem{pointer-events:auto;font:inherit;width:11em;padding:.5em;background:#2a2640;color:#fff;border:.25em solid #14121a;box-shadow:inset 0 0 0 .15em #6a6488;cursor:pointer;display:flex;flex-direction:column;gap:.2em;text-align:left}
+.sitem b{font-size:1em}.sitem span{font-size:.75em;opacity:.8}.sitem i{font-style:normal;color:#ffd84a;font-weight:800}.sitem:disabled{opacity:.35;cursor:default}.sitem:not(:disabled):hover{background:#3a3458}
+#err{position:fixed;left:8px;right:8px;bottom:8px;color:#fff;background:#a33;padding:8px;font:12px monospace;white-space:pre-wrap;z-index:99;display:none;max-height:40vh;overflow:auto}
+</style></head><body>
+<canvas id="screen"></canvas>
+<div id="ui">
+ <div id="hud"><div id="hpw"><div id="hpbar"><div id="hprally"></div><div id="hpfill"></div><div id="hptxt">100 / 100</div></div><div id="flasks"></div><div id="stats"></div></div><div id="tdoor"></div><div id="flow"></div><div id="rush"></div>
+  <div id="tr"><div id="floor" class="k">1F · 美术部</div><div id="cellw">✦ <span id="cells">0</span></div><div id="timer">0:00</div><div id="mode"></div></div>
+  <div id="slots"><div class="slot pane"><span class="kk">J</span><canvas id="ic1" width="48" height="48"></canvas><div class="nm" id="n1"></div><div class="af" id="a1"></div></div><div class="slot pane"><span class="kk">K</span><canvas id="ic2" width="48" height="48"></canvas><div class="nm" id="n2"></div><div class="af" id="a2"></div><div id="cd2"></div></div></div>
+  <div id="help">A/D 移动 · 空格 跳（空中再按二段跳）· S+空格 下平台 · 空中 S+J 下劈<br>J 建模工具 · K 地编工具 · Shift 翻滚 · Q 吃便当 · E 拾取/互动 · Esc 暂停 · 支持手柄</div>
+  <div id="bossbar"><div id="bossname" class="k"></div><div id="bossb"><div id="bossfill"></div></div></div>
+  <div id="prompt" class="pane"></div><div id="toast" class="pane"></div>
+ </div>
+ <div id="banner"><div id="bn1" class="k"></div><div id="bn2"></div></div>
+ <button id="bmute">🔊</button>
+ <div id="title" class="ov show"><h1 class="k">马楠<br>通关游戏公司</h1><div class="sub k">一个建模师兼地编的下班之路</div>
+  <div class="ctl"><b>A D</b>移动　<b>空格</b>跳 / 二段跳　<b>S+空格</b>跳下平台<br><b>J</b>建模工具（主武器）　<b>K</b>地编工具（副武器）　<b>Shift</b>翻滚（无敌）<br><b>Q</b>吃便当回血　<b>E</b>拾取武器 / 开宝箱　<b>Esc</b>暂停<br>鼠标左键 = J，右键 = K</div>
+  <div><button class="btn" id="bstart">开始上班</button>　<button class="btn hard" id="bhard">加班模式</button></div><div class="ctl" style="font-size:.8em;opacity:.7;margin-top:.6em">加班模式：敌人更硬更痛，Boss 更快，准时门时间更紧</div></div>
+ <div id="pause" class="ov"><h2 class="k" style="font-size:3.6em;margin:0">暂停</h2><div id="pstat"></div><div class="ctl" style="margin-top:1em"><b>A D</b>移动　<b>空格</b>跳　<b>J</b>攻击　<b>K</b>副武器　<b>Shift</b>翻滚　<b>Q</b>回血　<b>E</b>拾取</div><button class="btn" id="bresume">继续</button></div>
+ <div id="dead" class="ov"><h2 class="k" style="font-size:4em;margin:0">需求太多，先躺一会儿……</h2><div id="dcause"></div><div style="font-size:1.2em;margin-top:.6em">重新挑战本层（保留武器和升级，灵感减半）</div><button class="btn" id="bretry">再来（Enter）</button></div>
+ <div id="rest" class="ov"><h2 class="k" style="font-size:3.8em;margin:0">☕ 茶水间</h2><div style="font-size:1.2em;margin-top:.4em">喝口水，生命和便当都补满了。选一个升级（按 1 / 2 / 3）</div><div id="cards"></div><div class="shopt">🥤 自动售货机（用灵感购买，每样每层一次）</div><div id="shop"></div><button class="btn" id="reroll" style="font-size:1.1em">花 25 灵感换一批</button></div>
+ <div id="scroll" class="ov"><h2 class="k" style="font-size:3.6em;margin:0">✦ 灵感卷轴</h2><div style="font-size:1.2em;margin-top:.4em">选一项属性提升（按 1 / 2）</div><div id="scards" style="display:flex;gap:1.6em;margin-top:1.2em"></div></div>
+ <div id="end" class="ov"><h2 class="k">下班了。</h2><div class="k" style="font-size:1.8em;color:#ffd84a">踏实做事，好好生活。</div><div id="estat"></div><button class="btn" id="bagain">再上一次班</button></div>
+</div>
+<pre id="err"></pre>
+<script>window.__e=0;function __err(x){if(__e++)return;const d=document.getElementById('err');d.style.display='block';d.textContent='出错了：'+(x&&x.message||x)+'\n'+(x&&x.stack||'')}addEventListener('error',e=>{if(e.target&&e.target.tagName==='LINK')return;__err(e.error||e.message)},true);</script>
+<script>try{
+__JS__
+}catch(e){__err(e)}</script></body></html>

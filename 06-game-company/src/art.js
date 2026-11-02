@@ -1,5 +1,11 @@
 // ===== 美术 =====
 const R=Math.round;
+// ===== 外部美术素材（art/ 下的 png，由 build.py 内嵌）=====
+const SPR={};let useSpr=true;
+for(const k in (typeof ART_SRC!=='undefined'?ART_SRC:{})){const im=new Image();im.src=ART_SRC[k];SPR[k]=im}
+function sprReady(n){const im=SPR[n];return !!(im&&im.complete&&im.naturalWidth)}
+// 画一帧：横向序列帧，脚底中心对齐 (x,y)，朝左时水平翻转
+function sprFrame(n,i,x,y,face,fw=48,fh=48){if(!sprReady(n))return false;const im=SPR[n],c=Math.floor(im.naturalWidth/fw);i=((i%c)+c)%c;ctx.save();ctx.translate(R(x),R(y));ctx.scale(face,1);ctx.drawImage(im,i*fw,0,fw,fh,-fw/2,-fh,fw,fh);ctx.restore();return true}
 function px(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(R(x),R(y),w,h)}
 function pline(x0,y0,x1,y1,w,c){ctx.fillStyle=c;const d=Math.max(Math.abs(x1-x0),Math.abs(y1-y0)),n=Math.max(1,Math.ceil(d));const o=Math.floor(w/2);for(let i=0;i<=n;i++){const t=i/n;ctx.fillRect(R(x0+(x1-x0)*t)-o,R(y0+(y1-y0)*t)-o,w,w)}}
 function pcirc(cx,cy,r,c){ctx.fillStyle=c;for(let y=-r;y<=r;y++){const w=Math.round(Math.sqrt(r*r-y*y));ctx.fillRect(R(cx-w),R(cy+y),w*2+1,1)}}

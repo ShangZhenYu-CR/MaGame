@@ -71,6 +71,16 @@ function drawPlayer(cx,cy){
  const x=P.x-cx,y=P.y-cy,flash=P.inv>0&&P.hurtT<=0&&P.rollT<=0&&Math.floor(P.inv*16)%2===0;
  if(P.rollT>0){ctx.save();ctx.translate(R(x),R(y-8));ctx.rotate(-(ROLLT-P.rollT)/ROLLT*Math.PI*2*P.face);drawMan(0,8,P.face,{crouch:6,legA:1.2,kneeA:2,legB:1,kneeB:2,armF:1.8,elbF:1.4,armB:1.4,lean:2,headY:3},false);ctx.restore();return}
  if(P.djT>0&&!P.atk&&P.hurtT<=0){ctx.save();ctx.translate(R(x),R(y-12));ctx.rotate((1-P.djT/.3)*Math.PI*2*P.face);drawMan(0,12,P.face,{crouch:4,legA:1,kneeA:1.8,legB:.8,kneeB:1.8,armF:1.6,elbF:1.2,armB:1.2,lean:1,headY:2},false);ctx.restore();return}
+ // 新美术：有素材就用序列帧（T 键切换新旧）
+ if(useSpr&&sprReady('player_idle')&&sprReady('player_run')){let n='player_idle',fi=Math.floor(P.anim*5);
+  if(P.atk&&sprReady('player_atk_stylus_1')){const a=P.atk;n='player_atk_stylus_1';fi=a.phase==='su'?0:a.phase==='ac'?(a.t<a.def.ac/2?1:2):3}
+  else if(!P.onGround&&!P.healT){n='player_run';fi=P.vy<0?1:5}
+  else if(Math.abs(P.vx)>20&&P.healT<=0){n='player_run';P.runD=(P.runD||0)+Math.abs(P.vx)/60;fi=Math.floor(P.runD*.21)}
+  if(LV.floor!==1){ctx.globalAlpha=.3;for(const[ox,oy]of[[-1,0],[1,0],[0,-1],[0,1]])sprFrame(n,fi,x+ox,y+oy,P.face);ctx.globalAlpha=1}
+  if(flash)ctx.globalAlpha=.5;sprFrame(n,fi,x,y,P.face);ctx.globalAlpha=1;
+  if(P.atk&&P.atk.phase==='ac'){const d=P.atk.def,W=WEAPONS[P.prim];ctx.globalAlpha=.75;if(d.thrust){pline(x+P.face*6,y-22,x+P.face*(d.rng+4),y-22,2,W.col);px(x+P.face*(d.rng+4)-1,y-23,3,3,'#fff')}else smear(x,y-24,10,d.rng+4,d.arc[0],lerp(d.arc[0],d.arc[1],Math.min(1,P.atk.t/d.ac)),P.face,W.col);ctx.globalAlpha=1}
+  if(P.dive){ctx.globalAlpha=.5;pline(x,y-40,x,y-58,2,WEAPONS[P.prim].col);ctx.globalAlpha=1}
+  return}
  const pose=poseOf();if(LV.floor!==1){ctx.globalAlpha=.32;for(const[ox,oy]of[[-1,0],[1,0],[0,-1],[0,1]])drawMan(x+ox,y+oy,P.face,pose,true);ctx.globalAlpha=1}
  if(flash){ctx.globalAlpha=.5}
  const h=drawMan(x,y,P.face,pose,false);ctx.globalAlpha=1;
@@ -135,6 +145,7 @@ function frame(ts){requestAnimationFrame(frame);try{let dt=Math.min(.05,(ts-last
  if(G.state==='rest'){if(pressed('opt1'))chooseRest(0);else if(pressed('opt2'))chooseRest(1);else if(pressed('opt3'))chooseRest(2)}
  if(G.state==='dead'&&(pressed('confirm')||KP['Space'])&&$('dead').classList.contains('show'))retry();
  if(G.state==='title'&&pressed('confirm'))startGame(false);
+ if(KP['KeyT']&&G.state==='play'){useSpr=!useSpr;toast(useSpr?'新美术':'旧美术（代码像素）',900)}
  if(KP['KeyM'])$('bmute').textContent=Snd.toggle()?'🔇':'🔊';
  if(G.state==='title'){T+=dt;renderTitle()}
  else if(G.state==='end'){T+=dt;renderEnd()}

@@ -36,7 +36,7 @@ function bossUpdate(dtA){const b=boss;if(!b)return;if(b.state!=='dead'){tickStat
  if(!b.phasePend&&b.phase===1&&b.hp<b.max*.5)b.phasePend=2;
  if(!b.phasePend&&b.phase===2&&b.hp<b.max*.25)b.phasePend=3;
  if(b.phasePend&&(b.state==='idle'||b.state==='recover')){const np=b.phasePend;b.phasePend=0;b.phase=np;b.state='roar';b.t=0;b.vx=0;
-  {const D=BOSSDEF[b.kind],nm=b.kind==='ljy'?'刘敬阳':D.name.split(' · ')[0];toast(np===2?nm+'：'+D.p2:D.p3?nm+'：'+D.p3:nm+' 狂暴了！',2400)}if(b.kind==='ljy'&&np===2){b.state='transform';b.t=0}shake=7;SFX.boss();burst(b.x,b.y-b.h/2,np===2?30:40,np===2?['#ff5a4a','#ffd84a']:['#ff3a3a','#fff'],280,.6,3,100);sfx('fx_roar',b.x,b.y-b.h/2,1,12);
+  {const D=BOSSDEF[b.kind],nm=b.kind==='ljy'?'刘敬阳':D.name.split(' · ')[0];toast(np===2?nm+'：'+D.p2:D.p3?nm+'：'+D.p3:nm+' 狂暴了！',2400)}if(b.kind==='ljy'&&np===2){b.state='transform';b.t=0;slowmo=.45;slowT=.7}if(b.kind==='ljy'&&np===3){slowmo=.4;slowT=.5}shake=7;SFX.boss();burst(b.x,b.y-b.h/2,np===2?30:40,np===2?['#ff5a4a','#ffd84a']:['#ff3a3a','#fff'],280,.6,3,100);if(b.kind!=='ljy')sfx('fx_roar',b.x,b.y-b.h/2,1,12);
   for(const p of projs)if(p.from==='e'&&p.isProj){p.life=0;burst(p.x,p.y,4,'#fff',60,.2)}
   if(Math.abs(P.x-b.x)<110&&!P.dead){P.vx=sign(P.x-b.x||1)*280;P.vy=-220;P.hurtT=.2;P.atk=null}
   if(np===2&&b.kind==='ceo'){for(const s of[-1,1])spawnEnemy({type:'kpi',x:clamp(b.x+s*120,LV.arenaX+60,LV.arenaX+LV.arenaW-60),y:19*TS},true)}}
@@ -128,7 +128,7 @@ function ljyUpdate(b,dt,dx,sp){const gy=19*TS,AX0=LV.arenaX+3*TS,AX1=LV.arenaX+L
  case 'slam':if(b.t<.32){b.vx=0}else if(!b.jumped){b.jumped=true;b.vy=-540;b.vx=clamp(dx/0.95,-280,280);SFX.jump()}else if(b.onGround&&b.t>.45){b.jumped=false;SFX.stamp();shake=7;b.landT=.36;for(const d of[-1,1])eproj({kind:'wave',x:b.x+d*16,y:b.y,vx:d*210*sp,vy:0,r:6,dmg:16,life:2,col:'#9aa0a8'});burst(b.x,b.y-4,16,['#9aa0a8','#fff'],180,.4);if(Math.abs(dx)<36)hurtPlayer(24,sign(dx)||1,b);b.state='recover';b.t=0;b.rec=.8}break;
  // ---- 变身 ----
  case 'transform':b.vx=0;b.face=sign(dx)||b.face;if(Math.random()<.9)part(b.x+rnd(-20,20),b.y-rnd(0,b.h),rnd(-40,40),-rnd(60,160),pick(['#ff8a2a','#ffd84a','#c8281e','#fff']),.5,3,-40);
-  if(b.t>.9&&!b.armor){b.armor=true;b.h=76;b.flash=.3;SFX.boom();shake=9;hitstop=Math.max(hitstop,.12);burst(b.x,b.y-34,50,['#ff8a2a','#ffd84a','#c8281e','#fff'],320,.7,3,0);ringFx(b.x,b.y-34,'#ff8a2a');if(Math.abs(P.x-b.x)<120&&!P.dead){P.vx=sign(P.x-b.x||1)*300;P.vy=-240}}
+  if(b.t>.9&&!b.armor){b.armor=true;b.h=76;b.flash=.3;SFX.boom();shake=9;hitstop=Math.max(hitstop,.12);slowmo=.3;slowT=.55;flashRed=.35;banner('炎龙铠甲','合 体 ！',1600);$('bossname').textContent='炎龙铠甲 · 刘敬阳';$('bossname').classList.add('flame');burst(b.x,b.y-34,50,['#ff8a2a','#ffd84a','#c8281e','#fff'],320,.7,3,0);ringFx(b.x,b.y-34,'#ff8a2a');if(Math.abs(P.x-b.x)<120&&!P.dead){P.vx=sign(P.x-b.x||1)*300;P.vy=-240}}
   if(b.t>1.8)done(.3);break;
  // ---- 二阶段：炎龙铠甲 ----
  case 'fdash_wind':b.vx=0;b.face=sign(dx)||b.face;if(b.t<.05)SFX.warn();if(Math.random()<.6)part(b.x-b.face*10,b.y-rnd(0,30),-b.face*60,-20,'#ff8a2a',.3,2,0);if(b.t>.48/sp){b.state='fdash';b.t=0;b.trailX=b.x;SFX.heavy()}break;
@@ -175,3 +175,36 @@ function drawLJY(b,t,c){const A=!!b.armor,st=b.state,bob=st==='idle'||st==='reco
   else if(st==='cube'&&b.t<.5){px(hx-6,hy-14,12,12,c(K));px(hx-5,hy-13,10,10,c('#c8ccd6'));px(hx-5,hy-13,10,2,c('#f4f4f8'));pline(hx-5,hy-13,hx+4,hy-4,1,c('#5ab85a'))}
   else if(st!=='bell'||b.t<.4){px(hx-1,hy-8,3,16,c('#3a3a46'));px(hx-4,hy-10,9,4,c(K));px(hx-4,hy+6,9,4,c(K));px(hx-3,hy-9,7,2,c('#6a6e78'));px(hx-3,hy+7,7,2,c('#6a6e78'))}}
  else{ctx.globalAlpha=.5+.3*Math.sin(t*20);pcirc(hx,hy,5,'#ff8a2a');ctx.globalAlpha=1;px(hx-3,hy-3,6,6,c(G))}}
+// ===== 刘敬阳变身演出 =====
+// 火焰龙卷（分前后两层，包住 Boss）、龙影（变身合体那一下和三阶段龙魂爆发）、四周压暗 + 聚光
+function ljyCineK(b){if(!b||b.kind!=='ljy')return 0;if(b.state==='transform')return Math.min(1,b.t/.35)*(b.t>1.5?Math.max(0,1-(b.t-1.5)/.3):1);if(b.state==='roar'&&b.phase>=3)return Math.min(1,b.t/.2)*Math.max(0,1-Math.max(0,b.t-.7)/.3);return 0}
+function drawLjyTornado(b,cx,cy,front){if(!b||b.kind!=='ljy'||b.state!=='transform')return;const x=R(b.x-cx),gy=R(b.y-cy),t=b.t,k=Math.min(1,t/.3)*(t>1.45?Math.max(0,1-(t-1.45)/.35):1);if(k<=0)return;
+ const sp=front?'fx_ljy_tornado_front':'fx_ljy_tornado_back';if(useSpr&&sprReady(sp)){ctx.globalAlpha=k;sprFrame(sp,Math.floor(t*12),x,gy,1);ctx.globalAlpha=1;return}
+ const H=130*Math.min(1,t/.5),cols=['#ffd84a','#ff8a2a','#e8483a','#c8281e'];
+ if(!front){ // 中心火柱的光
+  for(let r=0;r<3;r++){ctx.globalAlpha=k*(.18+r*.08);const w=R(46-r*12);px(x-w/2,R(gy-H),w,R(H),r===2?'#fff2a0':r===1?'#ffb84a':'#ff5a2a')}
+  ctx.globalAlpha=k*.6;px(x-44,gy-4,88,4,'#ff8a2a');px(x-30,gy-6,60,2,'#ffd84a')}
+ // 4 股火焰螺旋缠绕上升，按前后分层
+ for(let sI=0;sI<4;sI++)for(let i=0;i<34;i++){const h=i/33,a=t*9+sI*Math.PI/2+h*7,z=Math.cos(a);if((z>0)!==front)continue;const rad=14+h*26+3*Math.sin(t*14+i),xx=x+Math.sin(a)*rad,yy=gy-h*H,sz=R(2+(1-h)*4+(front?1:0));
+  ctx.globalAlpha=k*(front?.85:.6)*(1-h*.4);px(R(xx-sz/2),R(yy-sz/2),sz,sz+1,cols[Math.min(3,Math.floor(h*3.2+(i%2)*.5))])}
+ // 火星
+ for(let i=0;i<10;i++){const a=t*6+i*2.4,h=((t*.9+i*.13)%1);if((Math.cos(a)>0)!==front)continue;ctx.globalAlpha=k*(1-h);px(R(x+Math.sin(a)*(20+h*40)),R(gy-h*H*1.2),2,2,'#fff2a0')}
+ ctx.globalAlpha=1}
+function drawLjyDragon(b,cx,cy){if(!b||b.kind!=='ljy')return;let t0;if(b.state==='transform'&&b.t>.85)t0=b.t-.85;else if(b.state==='roar'&&b.phase>=3)t0=b.t;else return;
+ const k=Math.min(1,t0/.25)*Math.max(0,1-Math.max(0,t0-.65)/.35);if(k<=0)return;const x=R(b.x-cx),gy=R(b.y-cy),f=b.face||1,rise=Math.min(1,t0/.45);
+ if(useSpr&&sprReady('fx_ljy_dragon')){ctx.globalAlpha=k;sprFrame('fx_ljy_dragon',Math.min(sprN('fx_ljy_dragon')-1,Math.floor(t0*10)),x,gy,f);ctx.globalAlpha=1;return}
+ // 程序画：火龙从脚下盘旋而上，身体由尾到颈逐渐变粗，背上有金色背鳍，头在 Boss 头顶上方回望
+ const N=40,pts=[];for(let i=0;i<N;i++){const h=i/(N-1),yy=gy-6-h*128*rise,xx=x+Math.sin(h*6.5-b.anim*3)*(40-h*22)*f;pts.push([xx,yy,h])}
+ for(let i=0;i<N;i++){const [xx,yy,h]=pts[i],r=1.5+h*6;ctx.globalAlpha=k*.5;pcirc(R(xx),R(yy),R(r+2),'#7a1410');ctx.globalAlpha=k*.85;pcirc(R(xx),R(yy),R(r),h>.3&&i%4<2?'#ff8a2a':'#e8483a');ctx.globalAlpha=k;px(R(xx-r*.4),R(yy-r*.6),R(Math.max(1,r*.6)),1,'#ffd84a');
+  if(i%4===0&&i>4){const [nx,ny]=pts[Math.min(N-1,i+1)],dx=nx-xx,dy=ny-yy,l=Math.hypot(dx,dy)||1,ox=-dy/l*f,oy=dx/l*f;pline(R(xx),R(yy),R(xx+ox*(r+5)),R(yy+oy*(r+5)-3),1,'#f2c14e')}}
+ const [hx,hy]=pts[N-1];ctx.globalAlpha=k;
+ // 鬃毛火焰
+ for(let i=0;i<6;i++){const a=-1.2+i*.35+Math.sin(b.anim*12+i)*.15;pline(R(hx),R(hy),R(hx-f*Math.cos(a)*16),R(hy+Math.sin(a)*14-4),2,i%2?'#ffd84a':'#ff8a2a')}
+ // 头：长吻、下颚、龙角、发光的眼
+ pcirc(R(hx),R(hy),9,'#7a1410');pcirc(R(hx),R(hy),8,'#e8483a');px(R(hx),R(hy-4),f*14,6,'#e8483a');px(R(hx+f*2),R(hy-5),f*12,2,'#ff8a2a');px(R(hx+f*1),R(hy+3),f*12,3,'#c8281e');px(R(hx+f*13),R(hy-4),f*2,3,'#14121a');
+ const open=Math.max(0,Math.sin(t0*9));px(R(hx+f*3),R(hy+2),f*10,R(1+open*3),'#ffd84a');
+ px(R(hx+f*2),R(hy-7),3,3,'#fff2a0');px(R(hx+f*3),R(hy-6),1,1,'#ff3a1a');
+ pline(R(hx-f*2),R(hy-7),R(hx-f*14),R(hy-20),2,'#f2c14e');pline(R(hx-f*1),R(hy-8),R(hx-f*8),R(hy-23),2,'#f2c14e');
+ pline(R(hx+f*14),R(hy),R(hx+f*20),R(hy-4),1,'#ffd84a');pline(R(hx+f*14),R(hy+2),R(hx+f*21),R(hy+6),1,'#ffd84a');ctx.globalAlpha=1}
+function drawLjyCine(cx,cy){const b=boss,k=ljyCineK(b);if(k<=0)return;const x=b.x-cx,y=b.y-cy-40;
+ const g=ctx.createRadialGradient(x,y,40,x,y,170);g.addColorStop(0,'rgba(10,4,8,0)');g.addColorStop(.55,`rgba(10,4,8,${.45*k})`);g.addColorStop(1,`rgba(10,4,8,${.85*k})`);ctx.fillStyle=g;ctx.fillRect(0,0,VW,VH)}

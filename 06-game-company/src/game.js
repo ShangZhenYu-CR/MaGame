@@ -27,7 +27,7 @@ function hudCells(){$('cells').textContent=P.cells}
 let toastT=0,bannerT=0;
 function toast(s,ms=1800){const t=$('toast');t.textContent=s;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),ms)}
 function banner(a,b,ms=2200){$('bn1').textContent=a;$('bn2').textContent=b||'';const e=$('banner');e.classList.add('show');clearTimeout(bannerT);bannerT=setTimeout(()=>e.classList.remove('show'),ms)}
-function bossBanner(name,quote){banner(name,quote,2600);$('bossname').textContent=name;$('bossbar').classList.add('show')}
+function bossBanner(name,quote){banner(name,quote,2600);$('bossname').textContent=name;$('bossname').classList.remove('flame');$('bossbar').classList.add('show')}
 function show(id,v){$(id).classList.toggle('show',v)}
 // ===== 楼层 =====
 function loadFloor(n,fromRetry){G.floor=n;G.rush=null;genLevel(n);LV.tlimit=[0,110,140,160,90][n]*(G.hard?.8:1);G.floorT=0;enemies.length=0;projs.length=0;pickups.length=0;parts.length=0;fxs.length=0;corpses.length=0;splats.length=0;nums.length=0;boss=null;G.bossDone=false;G.bossLock=false;
@@ -165,7 +165,7 @@ function render(){const th=LV.th,cx=R(cam.x+(Math.random()-.5)*shake*2),cy=R(cam
  for(const s of splats){ctx.globalAlpha=Math.min(1,s.life);px(s.x-cx,s.y-cy-1,s.w,2,s.col);ctx.globalAlpha=1}
  const near=drawPickups(cx,cy,T);
  drawTiles(cx,cy);drawRoom(cx,cy);
- if(boss){ctx.globalAlpha=boss.alpha===undefined?1:clamp(boss.alpha,0,1);drawBoss(boss,cx,cy);ctx.globalAlpha=1;drawBossExtras(cx,cy)}
+ if(boss){drawLjyDragon(boss,cx,cy);drawLjyTornado(boss,cx,cy,false);ctx.globalAlpha=boss.alpha===undefined?1:clamp(boss.alpha,0,1);drawBoss(boss,cx,cy);ctx.globalAlpha=1;drawLjyTornado(boss,cx,cy,true);drawBossExtras(cx,cy)}
  for(const e of enemies)if(Math.abs(e.x-cx-VW/2)<VW)drawEnemy(e,cx,cy);
  ctx.font='bold 8px sans-serif';ctx.textAlign='center';for(const e of enemies)if(e.affix&&e.hp>0&&Math.abs(e.x-cx-VW/2)<VW/2+20){const a=EAFFIX[e.affix],x=R(e.x-cx),y=R(e.y-cy-e.h-10);ctx.fillStyle='#14121a';ctx.fillText(a.n,x+1,y+1);ctx.fillStyle=a.c;ctx.fillText(a.n,x,y)}ctx.textAlign='left';
  for(const e of enemies)if(e.hp<e.max&&e.hp>0){const x=R(e.x-cx-8),y=R(e.y-cy-e.h-6);px(x,y,16,2,'#2a2030');px(x,y,R(16*e.hp/e.max),2,e.elite?'#ffb84a':'#ff5a4a')}
@@ -173,7 +173,7 @@ function render(){const th=LV.th,cx=R(cam.x+(Math.random()-.5)*shake*2),cy=R(cam
  if(P.kfMark){const mx=R(P.kfMark.x-cx),my=R(P.kfMark.y-cy);ctx.globalAlpha=.4+.25*Math.sin(T*8);ctx.save();ctx.translate(mx,my-18);ctx.rotate(Math.PI/4);px(-5,-5,10,10,'#c8a0ff');px(-2,-2,4,4,'#fff');ctx.restore();px(mx-6,my-1,12,1,'#c8a0ff');ctx.globalAlpha=1;pnum(String(Math.ceil(P.kfMark.t)),mx,my-34,'#c8a0ff',1)}
  if(G.state!=='dead'||Math.floor(T*8)%2||(useSpr&&sprReady('player_die')))drawPlayer(cx,cy);
  if(P.chargeT>.08&&P.prim==='render'){const k=Math.min(1,P.chargeT/.55),x=R(P.x-cx),y=R(P.y-cy);px(x-8,y-48,16,2,'#2a2030');px(x-8,y-48,R(16*k),2,k>=1?'#fff6c0':'#ffd84a')}
- drawFx(cx,cy);drawParts(cx,cy);drawNear(cx,cy);drawNums(cx,cy);
+ drawFx(cx,cy);drawParts(cx,cy);drawNear(cx,cy);drawNums(cx,cy);if(boss)drawLjyCine(cx,cy);
  ctx.drawImage(VIG,0,0);
  if(flashRed>0){ctx.fillStyle=`rgba(216,40,40,${flashRed*.6})`;ctx.fillRect(0,0,VW,VH)}
  if(slowT>0){ctx.fillStyle='rgba(255,255,255,.06)';ctx.fillRect(0,0,VW,VH)}

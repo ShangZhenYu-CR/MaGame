@@ -3,16 +3,18 @@ let boss=null;
 const BOSSDEF={
  ad:{name:'主美 · 改稿大师',hp:950,w:22,h:60,quote:'“这版不行，再改一版。”',p2:'“这是终稿……的第二版！”',dead:'“……这版，过了。”',contact:16},
  pd:{name:'制作人 · 需求变更',hp:1250,w:22,h:52,quote:'“需求有一点点小调整……”',p2:'“上线前再加个功能！”',dead:'“需求……冻结。”',contact:16},
- ceo:{name:'老板 · 画大饼',hp:2200,w:34,h:64,quote:'“年轻人，项目做成了，大家都有饼吃！”',p2:'“这个饼，可大了！”',dead:'“好吧……今天准时下班。”',contact:20}};
+ ceo:{name:'老板 · 画大饼',hp:2200,w:34,h:64,quote:'“年轻人，项目做成了，大家都有饼吃！”',p2:'“这个饼，可大了！”',dead:'“好吧……今天准时下班。”',contact:20},
+ ljy:{name:'隐藏大佬 · 刘敬阳',hp:3400,w:30,h:60,quote:'“这么晚还在公司？来，陪我练两组。”',p2:'“炎龙铠甲——合体！”',p3:'“龙魂，燃烧吧！”',dead:'“……好小子。明早七点，健身房见。”',contact:22}};
 function bsp(b){return(b.phase===3?1.5:b.phase===2?1.3:1)*(G.hard?1.15:1)}
 function spawnBoss(kind){const d=BOSSDEF[kind],hp=Math.round(d.hp*(G.hard?1.4:1));boss={kind,isBoss:true,name:d.name,x:LV.arenaX+LV.arenaW-80,y:19*TS,w:d.w,h:d.h,vx:0,vy:0,face:-1,hp,max:hp,state:'intro',t:0,anim:0,flash:0,phase:1,onGround:true,drop:false,cd:0,idleT:1,contactCd:0,pen:-.4,alpha:1,minions:0,seq:0,stag:0,stagMax:Math.round(hp*.25),stagPend:false,phasePend:0,closeT:0,hitLog:[]};
  bossBanner(d.name,d.quote);Snd.play('boss');SFX.boss()}
 // 近身反击：玩家贴身太久，或短时间连砍太多刀，Boss 用一招快速近身技把人打开
 function bossCounterDue(b){const recent=b.hitLog.filter(t=>T-t<1.5).length;return b.closeT>(b.phase>=3?.5:.7)||recent>=5}
-const COUNTER={ad:'sweep_wind',pd:'shove_wind',ceo:'belly_wind'};
+const COUNTER={ad:'sweep_wind',pd:'shove_wind',ceo:'belly_wind',ljy:'curl_wind'};
 function bossChoose(){const b=boss,dx=P.x-b.x,dist=Math.abs(dx),sp=bsp(b);b.t=0;b.seq++;const prev=b.last;
- if(bossCounterDue(b)){b.state=COUNTER[b.kind];b.closeT=0;b.hitLog.length=0;b.last=b.state;b.sp=sp;SFX.warn();return}
+ if(bossCounterDue(b)){b.state=b.kind==='ljy'&&b.phase>=2?'upper_wind':COUNTER[b.kind];b.closeT=0;b.hitLog.length=0;b.last=b.state;b.sp=sp;SFX.warn();return}
  // 玩家贴得近时优先用近身招（不对着空气扔东西）
+ if(b.kind==='ljy'){b.state=dist<70&&Math.random()<.6?pick(LJY_NEAR[b.phase>=2?2:1]):ljyChoose(b,dist,prev);b.last=b.state;b.sp=sp;if(b.state.endsWith('_wind'))SFX.warn();return}
  if(dist<70&&Math.random()<.65){const near={ad:['sweep_wind','stamp_up','sweep_wind','dash_wind'],pd:['shove_wind','tele','change'],ceo:['pound','belly_wind','pound']}[b.kind];b.state=pick(near);if(b.state===prev)b.state=pick(near);b.last=b.state;b.sp=sp;if(b.state.endsWith('_wind'))SFX.warn();return}
  for(let tries=0;tries<3;tries++){
  if(b.kind==='ad'){const r=Math.random();b.state=dist>140?(r<.55?'dash_wind':'notes'):(r<.4?'dash_wind':r<.7?'stamp_up':'notes');if(b.seq%4===0)b.state='stamp_up';if(b.phase>=2&&b.seq%5===2)b.state='rain'}
@@ -25,16 +27,16 @@ function bossUpdate(dtA){const b=boss;if(!b)return;if(b.state!=='dead'){tickStat
  if(!['intro','stagger','roar','tele','tele_in'].includes(b.state)&&Math.abs(dx)<44&&Math.abs((P.y-17)-(b.y-b.h/2))<b.h/2+20&&P.rollT<=0)b.closeT+=dt;else b.closeT=Math.max(0,b.closeT-dt*.6);
  if(b.state==='recover'&&b.t>.25&&bossCounterDue(b)){bossChoose()}
  // 放远程招的时候被贴脸狂砍：中断施法，直接近身反击
- if(['pie','kpi','bigpie','pierain','notes','rain','doc','change','laser','call'].includes(b.state)&&b.t>.35&&(b.hitLog.filter(t=>T-t<1.5).length>=8||b.closeT>1.2)){b.thrown=false;bossChoose()}
+ if(['pie','kpi','bigpie','pierain','notes','rain','doc','change','laser','call','cube','bell','breath','pillars','meteor'].includes(b.state)&&b.t>.35&&(b.hitLog.filter(t=>T-t<1.5).length>=8||b.closeT>1.2)){b.thrown=false;bossChoose()}
  // 破绽槽：持续输出会攒满，满了 Boss 原地失衡，受到伤害提高
  if(b.state!=='stagger')b.stag=Math.max(0,b.stag-b.stagMax*.05*dt);
- const grounded=['idle','recover','dash_wind','notes','doc','change','laser','pie','kpi','bigpie','rain','call','pierain'].includes(b.state)&&b.onGround!==false;
+ const grounded=['idle','recover','dash_wind','notes','doc','change','laser','pie','kpi','bigpie','rain','call','pierain','cube','bell','breath','pillars','meteor','brush_wind','fdash_wind'].includes(b.state)&&b.onGround!==false;
  if(b.stagPend&&grounded){b.stagPend=false;b.stag=0;b.state='stagger';b.t=0;b.vx=-b.face*120;b.thrown=false;b.jumped=false;SFX.parry();SFX.stamp();shake=6;hitstop=Math.max(hitstop,.12);toast('破绽！趁现在猛攻',1400);burst(b.x,b.y-b.h,24,['#ffd84a','#fff'],220,.5,3,0)}
  // 转阶段：等 Boss 落地空闲时才怒吼，把玩家震开
  if(!b.phasePend&&b.phase===1&&b.hp<b.max*.5)b.phasePend=2;
  if(!b.phasePend&&b.phase===2&&b.hp<b.max*.25)b.phasePend=3;
  if(b.phasePend&&(b.state==='idle'||b.state==='recover')){const np=b.phasePend;b.phasePend=0;b.phase=np;b.state='roar';b.t=0;b.vx=0;
-  toast(np===2?BOSSDEF[b.kind].name.split(' · ')[0]+'：'+BOSSDEF[b.kind].p2:BOSSDEF[b.kind].name.split(' · ')[0]+' 狂暴了！',2400);shake=7;SFX.boss();burst(b.x,b.y-b.h/2,np===2?30:40,np===2?['#ff5a4a','#ffd84a']:['#ff3a3a','#fff'],280,.6,3,100);sfx('fx_roar',b.x,b.y-b.h/2,1,12);
+  {const D=BOSSDEF[b.kind],nm=b.kind==='ljy'?'刘敬阳':D.name.split(' · ')[0];toast(np===2?nm+'：'+D.p2:D.p3?nm+'：'+D.p3:nm+' 狂暴了！',2400)}if(b.kind==='ljy'&&np===2){b.state='transform';b.t=0}shake=7;SFX.boss();burst(b.x,b.y-b.h/2,np===2?30:40,np===2?['#ff5a4a','#ffd84a']:['#ff3a3a','#fff'],280,.6,3,100);sfx('fx_roar',b.x,b.y-b.h/2,1,12);
   for(const p of projs)if(p.from==='e'&&p.isProj){p.life=0;burst(p.x,p.y,4,'#fff',60,.2)}
   if(Math.abs(P.x-b.x)<110&&!P.dead){P.vx=sign(P.x-b.x||1)*280;P.vy=-220;P.hurtT=.2;P.atk=null}
   if(np===2&&b.kind==='ceo'){for(const s of[-1,1])spawnEnemy({type:'kpi',x:clamp(b.x+s*120,LV.arenaX+60,LV.arenaX+LV.arenaW-60),y:19*TS},true)}}
@@ -43,7 +45,7 @@ function bossUpdate(dtA){const b=boss;if(!b)return;if(b.state!=='dead'){tickStat
  case 'roar':b.vx=0;b.face=sign(dx)||b.face;if(Math.random()<.6)part(b.x+rnd(-20,20),b.y-b.h-rnd(0,10),rnd(-60,60),-rnd(40,100),'#ff5a4a',.4,2,0);if(b.t>1.0){b.state='idle';b.t=0;b.idleT=.3}break;
  case 'stagger':b.vx*=.88;if(Math.random()<.3)part(b.x+rnd(-8,8),b.y-b.h-6,rnd(-30,30),-30,'#ffd84a',.4,2,0);if(b.t>1.8){b.state='idle';b.t=0;b.idleT=.25}break;
  case 'intro':b.vx=0;b.face=sign(dx)||-1;if(b.t>2.2){b.state='idle';b.t=0;b.idleT=.6}break;
- case 'idle':{b.face=sign(dx)||b.face;const walk=b.kind==='pd'?0:b.kind==='ceo'?55:60;b.vx=Math.abs(dx)>70?b.face*walk:0;b.pen=lerp(b.pen,-.4,.1);if(b.t>b.idleT/sp)bossChoose();break}
+ case 'idle':{b.face=sign(dx)||b.face;const walk=b.kind==='pd'?0:b.kind==='ceo'?55:b.kind==='ljy'?(b.armor?85:65):60;b.vx=Math.abs(dx)>70?b.face*walk:0;b.pen=lerp(b.pen,-.4,.1);if(b.t>b.idleT/sp)bossChoose();break}
  // ---- 近身反击 ----
  case 'sweep_wind':b.vx=0;b.face=sign(dx)||b.face;if(b.t>(b.phase>=3?.3:.38)){b.state='sweep';b.t=0;SFX.heavy();shake=Math.max(shake,3)}break;
  case 'sweep':{b.vx=0;const ax=P.x-b.x;if(!b.hitDone&&((ax*b.face>-18&&ax*b.face<48)&&Math.abs((P.y-17)-(b.y-30))<40)){if(hurtPlayer(26,sign(ax)||b.face,b)){P.vx=(sign(ax)||b.face)*300;P.vy=-240}b.hitDone=true}
@@ -80,22 +82,96 @@ function bossUpdate(dtA){const b=boss;if(!b)return;if(b.state!=='dead'){tickStat
  case 'pie':b.vx=0;b.face=sign(dx)||b.face;if(b.t>.5&&!b.thrown){b.thrown=true;SFX.throw();const n=b.phase>=2?4:3;for(let i=0;i<n;i++)eproj({kind:'pie',x:b.x+b.face*16,y:b.y-34,vx:b.face*rnd(110,260),vy:-rnd(220,360),grav:700,r:6,dmg:12,life:4.5,pierce:true})}if(b.t>1){b.thrown=false;b.state='idle';b.t=0;b.idleT=.55}break;
  case 'pound':if(b.t<.3){b.vx=0}else if(!b.jumped){b.jumped=true;b.vy=-520;b.vx=clamp(dx/1.0,-260,260);SFX.jump()}else if(b.onGround&&b.t>.45){b.jumped=false;SFX.stamp();shake=7;for(const d of[-1,1])eproj({kind:'wave',x:b.x+d*14,y:b.y,vx:d*200*sp,vy:0,r:6,dmg:16,life:2,col:'#e8b060'});b.landT=.36;if(Math.abs(dx)<34)hurtPlayer(26,sign(dx)||1,b);b.poundN=(b.poundN||0)+1;if(b.phase>=3&&b.poundN<3){b.state='pound';b.t=.15}else{b.poundN=0;b.state='recover';b.t=0;b.rec=.9}}break;
  case 'kpi':b.vx=0;if(b.t<.05){toast('KPI 上涨！',1000);const n=b.phase>=2?6:5;for(let i=0;i<n;i++){const x=i===0?P.x:LV.arenaX+40+((i*137+Math.floor(Math.random()*90))%(LV.arenaW-80));projs.push({kind:'kpi',x,y:19*TS,t:-i*.22,warn:.6,w:22,hgt:70+i*6,dmg:16,col:pick(['#d8584a','#f2c14e','#5ab85a']),life:9,follow:b.phase>=3})}}if(b.t>1.8){b.state='idle';b.t=0;b.idleT=.6}break;
+ default:if(b.kind==='ljy')grav=ljyUpdate(b,dt,dx,sp);break;
  case 'bigpie':b.vx=0;if(b.t<.05){toast('画大饼！',1200);SFX.boss()}if(b.t>.7&&!b.thrown){b.thrown=true;eproj({kind:'bigpie',x:b.x+b.face*20,y:19*TS-22,vx:b.face*230,vy:0,r:22,dmg:22,life:4,pierce:true})}if(b.t>1.8){b.thrown=false;b.state='idle';b.t=0;b.idleT=.8}break;
  }
  if(grav&&b.state!=='stamp_fall'){b.vy=Math.min(MAXF,b.vy+GRAV*dt)}
  if(b.state==='stamp_fall'){b.y+=b.vy*dt;const gy=19*TS;if(b.y>=gy){b.y=gy;b.vy=0;b.state='recover';b.t=0;b.rec=.85;b.landT=.36;SFX.stamp();shake=8;splats.push({x:b.x-12,y:gy,w:24,col:'#c8302a',life:5});
    for(const d of[-1,1])eproj({kind:'wave',x:b.x+d*10,y:gy,vx:d*210*sp,vy:0,r:6,dmg:15,life:2,col:'#e8483a'});if(Math.abs(dx)<24)hurtPlayer(22,sign(dx)||1,b);
    if(b.phase>=2&&b.minions<4&&enemies.filter(e=>e.minion).length<2){b.minions++;spawnEnemy({type:'crumple',x:clamp(b.x+pick([-80,80]),LV.arenaX+40,LV.arenaX+LV.arenaW-40),y:gy},true)}}}
- else if(!['stamp_up','stamp_hover','tele'].includes(b.state)){b.drop=b.kind!=='pd';moveBody(b,dt)}// 主美和老板穿过单向平台落回地面，免得卡在高台上
+ else if(!['stamp_up','stamp_hover','tele','dive_up','dive_hover','dive_fall'].includes(b.state)){b.drop=b.kind!=='pd';moveBody(b,dt)}// 主美和老板穿过单向平台落回地面，免得卡在高台上
  b.x=clamp(b.x,LV.arenaX+3*TS,LV.arenaX+LV.arenaW-2*TS);
  // 接触伤害
  // 被动碰撞伤害只在冲撞类动作里生效；平时贴身不扣血，贴脸交给近身反击来惩罚
- if(['dash','belly'].includes(b.state)&&b.alpha>.5&&b.contactCd<=0&&Math.abs(dx)<b.w/2+P.w/2&&P.y>b.y-b.h&&P.y-P.h<b.y){if(hurtPlayer(BOSSDEF[b.kind].contact,sign(dx)||1,b))b.contactCd=.65}}
+ if(['dash','belly','brush','fdash'].includes(b.state)&&b.alpha>.5&&b.contactCd<=0&&Math.abs(dx)<b.w/2+P.w/2&&P.y>b.y-b.h&&P.y-P.h<b.y){if(hurtPlayer(BOSSDEF[b.kind].contact,sign(dx)||1,b))b.contactCd=.65}}
 function bossDie(){const b=boss;if(b.state==='dead')return;b.hp=0;b.state='dead';b.t=0;slowmo=.25;slowT=.9;SFX.boom();shake=10;hitstop=.2;toast(b.name.split(' · ')[0]+'：'+BOSSDEF[b.kind].dead,3000);$('bossbar').classList.remove('show');for(const e of enemies)if(e.minion)e.hp=0}
 function bossGone(){const b=boss;burst(b.x,b.y-b.h/2,60,['#ffd84a','#fff','#d8584a','#7fd8ff'],320,.8,3,200);for(let i=0;i<20;i++)pickups.push({k:'cell',x:b.x,y:b.y-20,vx:rnd(-160,160),vy:rnd(-300,-100)});
- pickups.push({k:'door',x:LV.exitX,y:19*TS,open:true});dropBP(b.x,b.y-20);boss=null;G.bossDone=true;Snd.play(LV.th.song);SFX.win();banner(LV.floor<3?'本层通关！去右边的门':'老板被说服了！去下班吧','',2600)}
+ pickups.push({k:'door',x:LV.exitX,y:19*TS,open:true});dropBP(b.x,b.y-20);boss=null;G.bossDone=true;Snd.play(LV.th.song);SFX.win();banner(LV.floor<3?'本层通关！去右边的门':LV.floor===3?'老板被说服了！去下班吧':'刘敬阳认可了你！去下班吧',LV.floor===3?'……那部货梯，好像能上天台？':'',3200);
+ if(LV.floor===3){const lx=LV.arenaX+14*TS;LV.decor.push({k:'elevator',x:lx-20,y:19*TS-64,gy:19*TS,s:0,lift:1});pickups.push({k:'gymlift',x:lx,y:19*TS})}
+ if(LV.floor===4){SAVE.ljy=(SAVE.ljy||0)+1;saveGame()}}
 function drawBossExtras(cx,cy){const b=boss;if(!b)return;
  if(b.state==='stagger'){const x=R(b.x-cx),y=R(b.y-cy-b.h-8);for(let i=0;i<3;i++){const a=b.anim*5+i*2.1;px(x+Math.cos(a)*10-1,y+Math.sin(a)*3-1,3,3,'#ffd84a');px(x+Math.cos(a)*10,y+Math.sin(a)*3,1,1,'#fff')}}
  if(b.state==='roar'){ctx.globalAlpha=Math.max(0,.5-b.t*.5);pring(R(b.x-cx),R(b.y-cy-b.h/2),R(20+b.t*120),'#ff5a4a',2);ctx.globalAlpha=1}
+ if(b.state==='dive_hover'||b.state==='dive_fall'){const gy=19*TS-cy,x=R(b.x-cx);ctx.globalAlpha=.35+.25*Math.sin(b.anim*30);px(x-28,gy-3,56,3,'#ff8a2a');ctx.globalAlpha=1;pnum('!',x,gy-24,'#ff5a4a',2)}
  if(b.state==='stamp_hover'||b.state==='stamp_fall'){const gy=19*TS-cy,x=R(b.x-cx);ctx.globalAlpha=.35+.25*Math.sin(b.anim*30);px(x-16,gy-3,32,3,'#ff3a3a');ctx.globalAlpha=1;pnum('!',x,gy-24,'#ff5a4a',2)}
- if(['dash_wind','sweep_wind','shove_wind','belly_wind'].includes(b.state)&&Math.floor(b.anim*14)%2===0)pnum('!',R(b.x-cx),R(b.y-cy-b.h-14),'#ff5a4a',2)}
+ if(['dash_wind','sweep_wind','shove_wind','belly_wind','brush_wind','curl_wind','fdash_wind','upper_wind'].includes(b.state)&&Math.floor(b.anim*14)%2===0)pnum('!',R(b.x-cx),R(b.y-cy-b.h-14),'#ff5a4a',2)}
+// ===== 隐藏 Boss：刘敬阳（天台健身房）=====
+// 一阶段中山装：扔方块、雕刻笔刷、哑铃；二阶段炎龙铠甲：烈焰冲刺、龙炎吐息、烈焰柱、炎龙天降、升龙拳；三阶段加天火
+function ljyChoose(b,dist,prev){let s;
+ if(b.phase===1){const o=dist>150?['cube','cube','bell','brush_wind']:['brush_wind','slam','cube','bell'];s=pick(o);if(b.seq%4===0)s='slam'}
+ else{const o=dist>150?['fdash_wind','breath','pillars','dive_up','pillars']:['fdash_wind','breath','pillars','dive_up','upper_wind'];s=pick(o);if(b.phase>=3&&b.seq%3===0)s='meteor'}
+ if(s===prev)s=b.phase===1?pick(['cube','brush_wind','bell']):pick(['fdash_wind','pillars','breath']);return s}
+const LJY_NEAR={1:['curl_wind','slam','brush_wind'],2:['upper_wind','breath','fdash_wind']};
+function ljyFireTrail(x){projs.push({kind:'fireg',from:'x',x,y:19*TS,r:9,t:0,life:2.4,dmg:9})}
+function ljyUpdate(b,dt,dx,sp){const gy=19*TS,AX0=LV.arenaX+3*TS,AX1=LV.arenaX+LV.arenaW-2*TS;let grav=true;
+ if(b.armor&&Math.random()<.35)part(b.x+rnd(-14,14),b.y-rnd(10,b.h),rnd(-20,20),-rnd(40,90),pick(['#ff8a2a','#ffd84a','#c8281e']),.4,2,-60);
+ const done=(idle)=>{b.thrown=false;b.state='idle';b.t=0;b.idleT=idle};
+ switch(b.state){
+ // ---- 一阶段：中山装 ----
+ case 'cube':b.vx=0;b.face=sign(dx)||b.face;if(b.t>.45&&!b.thrown){b.thrown=true;SFX.throw();for(let i=0;i<3;i++){const vy=-300-i*50,g=760,h=56-7,T=(-vy+Math.sqrt(vy*vy+2*g*h))/g,x0=b.x+b.face*12,tx=P.x+(i-1)*44+P.vx*.3;eproj({kind:'cube',x:x0,y:b.y-56,vx:(tx-x0)/T,vy,grav:g,r:7,dmg:16,life:4,breakable:true})}}if(b.t>1.15)done(.5);break;
+ case 'bell':b.vx=0;b.face=sign(dx)||b.face;if(b.t>.4&&!b.thrown){b.thrown=true;SFX.throw();eproj({kind:'bell',x:b.x+b.face*16,y:b.y-34,vx:b.face*340,vy:0,r:9,dmg:18,life:3,owner:b,pierce:true})}if(b.t>1.3)done(.45);break;
+ case 'brush_wind':b.vx=0;b.face=sign(dx)||b.face;if(b.t<.05)SFX.warn();if(b.t>.5/sp){b.state='brush';b.t=0;b.bx0=b.x;SFX.heavy()}break;
+ case 'brush':b.vx=b.face*330*sp;if(Math.random()<.9)part(b.x-b.face*10,gy-2,-b.face*rnd(20,60),-rnd(10,50),pick(['#e8783a','#c8955a','#ffb84a']),.35,2,200);
+  if(b.t>.42||b.hitWall){const x0=Math.min(b.bx0,b.x),x1=Math.max(b.bx0,b.x);projs.push({kind:'zone',style:'clay',x0:x0-6,x1:x1+6,y:gy,t:0,warn:.35,dur:.45,dmg:16,life:3});b.state='recover';b.t=0;b.rec=.6}break;
+ case 'curl_wind':b.vx=0;b.face=sign(dx)||b.face;if(b.t>(b.phase>=3?.3:.38)){b.state='curl';b.t=0;SFX.heavy();shake=Math.max(shake,4)}break;
+ case 'curl':{b.vx=0;const ax=(P.x-b.x)*b.face;if(!b.hitDone&&ax>-12&&ax<52&&Math.abs((P.y-17)-(b.y-34))<46){if(hurtPlayer(24,b.face,b)){P.vx=b.face*180;P.vy=-400}b.hitDone=true}if(b.t>.3){b.hitDone=false;b.state='recover';b.t=0;b.rec=.55}break}
+ case 'slam':if(b.t<.32){b.vx=0}else if(!b.jumped){b.jumped=true;b.vy=-540;b.vx=clamp(dx/0.95,-280,280);SFX.jump()}else if(b.onGround&&b.t>.45){b.jumped=false;SFX.stamp();shake=7;b.landT=.36;for(const d of[-1,1])eproj({kind:'wave',x:b.x+d*16,y:b.y,vx:d*210*sp,vy:0,r:6,dmg:16,life:2,col:'#9aa0a8'});burst(b.x,b.y-4,16,['#9aa0a8','#fff'],180,.4);if(Math.abs(dx)<36)hurtPlayer(24,sign(dx)||1,b);b.state='recover';b.t=0;b.rec=.8}break;
+ // ---- 变身 ----
+ case 'transform':b.vx=0;b.face=sign(dx)||b.face;if(Math.random()<.9)part(b.x+rnd(-20,20),b.y-rnd(0,b.h),rnd(-40,40),-rnd(60,160),pick(['#ff8a2a','#ffd84a','#c8281e','#fff']),.5,3,-40);
+  if(b.t>.9&&!b.armor){b.armor=true;b.h=66;b.flash=.3;SFX.boom();shake=9;hitstop=Math.max(hitstop,.12);burst(b.x,b.y-34,50,['#ff8a2a','#ffd84a','#c8281e','#fff'],320,.7,3,0);ringFx(b.x,b.y-34,'#ff8a2a');if(Math.abs(P.x-b.x)<120&&!P.dead){P.vx=sign(P.x-b.x||1)*300;P.vy=-240}}
+  if(b.t>1.8)done(.3);break;
+ // ---- 二阶段：炎龙铠甲 ----
+ case 'fdash_wind':b.vx=0;b.face=sign(dx)||b.face;if(b.t<.05)SFX.warn();if(Math.random()<.6)part(b.x-b.face*10,b.y-rnd(0,30),-b.face*60,-20,'#ff8a2a',.3,2,0);if(b.t>.48/sp){b.state='fdash';b.t=0;b.trailX=b.x;SFX.heavy()}break;
+ case 'fdash':b.vx=b.face*430*sp;if(Math.abs(b.x-b.trailX)>16){b.trailX=b.x;ljyFireTrail(b.x)}if(Math.random()<.9)part(b.x-b.face*12,b.y-rnd(10,50),-b.face*rnd(60,140),rnd(-30,30),pick(['#ff8a2a','#ffd84a']),.3,2,0);
+  if(b.t>.5||b.hitWall){if(b.hitWall){shake=5;SFX.stamp()}b.dashN=(b.dashN||0)+1;if(b.phase>=3&&b.dashN<2){b.state='fdash_wind';b.t=.22;b.face=sign(dx)||-b.face}else{b.dashN=0;b.state='recover';b.t=0;b.rec=.6}}break;
+ case 'breath':{b.vx=0;if(b.t<.55){b.face=sign(dx)||b.face;if(b.t<.05){SFX.warn();toast('龙炎吐息！',900)}if(Math.random()<.6)part(b.x+b.face*16,b.y-52,b.face*20,-10,'#ffd84a',.25,2,0)}
+  else if(b.t<1.5){b.breathT=(b.breathT||0)-dt;if(b.breathT<=0){b.breathT=.05;const k=(b.t-.55)/.95,ang=(b.phase>=3?-.35+k*.75:-.15+k*.45)+rnd(-.08,.08);SFX.shoot&&Math.random()<.2&&SFX.shoot();eproj({kind:'fireball',x:b.x+b.face*18,y:b.y-52,vx:b.face*Math.cos(ang)*280,vy:Math.sin(ang)*280+60,r:5,dmg:10,life:1})}}
+  else done(.5);break}
+ case 'pillars':b.vx=0;b.face=sign(dx)||b.face;if(b.t<.05){SFX.warn();toast('烈焰柱！',900);const n=b.phase>=3?7:5,dir=b.face;for(let i=0;i<n;i++){const x=b.x+dir*(46+i*42);if(x>AX0-20&&x<AX1+20)projs.push({kind:'pillar',from:'x',x,y:gy,t:-i*.16,warn:.5,w:22,hgt:96,dmg:18,life:4})}
+   if(b.phase>=3)for(let i=0;i<3;i++)projs.push({kind:'pillar',from:'x',x:clamp(P.x+(i-1)*70,AX0,AX1),y:gy,t:-.6-i*.12,warn:.5,w:22,hgt:96,dmg:18,life:4})}
+  if(b.t>1.6)done(.5);break;
+ case 'dive_up':b.vx=0;grav=false;if(b.t<.28){if(Math.random()<.7)part(b.x+rnd(-10,10),b.y-2,rnd(-40,40),-rnd(20,60),'#ff8a2a',.3,2,0)}else{b.vy=-900;b.y+=b.vy*dt;if(b.y<-90){b.state='dive_hover';b.t=0;b.y=-90}}break;
+ case 'dive_hover':grav=false;b.vy=0;b.x=lerp(b.x,clamp(P.x,AX0,AX1),.1);if(b.t>.85/sp){b.state='dive_fall';b.t=0;b.vy=300}break;
+ case 'dive_fall':grav=false;b.vy=1100;b.y+=b.vy*dt;if(b.y>=gy){b.y=gy;b.vy=0;SFX.boom();shake=9;b.landT=.4;burst(b.x,gy-10,40,['#ff8a2a','#ffd84a','#c8281e','#fff'],300,.6,3,200);
+   if(Math.abs(P.x-b.x)<58&&P.y>gy-60)hurtPlayer(28,sign(P.x-b.x)||1,b);for(let i=-3;i<=3;i++)if(i)ljyFireTrail(b.x+i*20);for(const d of[-1,1])eproj({kind:'wave',x:b.x+d*16,y:gy,vx:d*230*sp,vy:0,r:6,dmg:16,life:2,col:'#ff8a2a'});b.state='recover';b.t=0;b.rec=.85}break;
+ case 'upper_wind':b.vx=0;b.face=sign(dx)||b.face;if(Math.random()<.7)part(b.x+b.face*10,b.y-20,0,-80,'#ff8a2a',.3,2,0);if(b.t>(b.phase>=3?.3:.36)){b.state='upper';b.t=0;b.vy=-560;b.vx=b.face*120;SFX.heavy();shake=Math.max(shake,4)}break;
+ case 'upper':{if(Math.random()<.9)part(b.x+rnd(-8,8),b.y-rnd(0,40),rnd(-30,30),60,pick(['#ff8a2a','#ffd84a']),.3,2,0);const ax=(P.x-b.x)*b.face;if(!b.hitDone&&ax>-14&&ax<46&&P.y>b.y-b.h-30&&P.y-P.h<b.y+10){if(hurtPlayer(26,b.face,b)){P.vx=b.face*160;P.vy=-420}b.hitDone=true}
+  if(b.t>.2&&b.onGround){b.hitDone=false;b.vx=0;SFX.stamp();shake=4;b.landT=.3;b.state='recover';b.t=0;b.rec=.55}break}
+ case 'meteor':b.vx=0;b.face=sign(dx)||b.face;if(b.t<.05){toast('天火！',1000);SFX.boss();const n=10,xs=[P.x];for(let i=1;i<n;i++)xs.push(AX0+Math.random()*(AX1-AX0));xs.forEach((x,i)=>projs.push({kind:'drop',from:'x',x,gy,y:-999,t:-i*.11,warn:.7,dmg:16,img:'fire',life:6,isProj:true}))}
+  if(b.t>1.5)done(.5);break;
+ }
+ return grav}
+function drawLJY(b,t,c){const A=!!b.armor,st=b.state,bob=st==='idle'||st==='recover'?Math.round(Math.sin(t*4)):0;
+ const S=A?'#c8281e':'#4a5058',SD=A?'#7a1410':'#353a42',SL=A?'#e8483a':'#5e6670',G=A?'#f2c14e':'#c8b070',K='#14121a';
+ // 腿
+ const walk=Math.abs(b.vx)>10&&b.onGround!==false?Math.sin(t*12)*2:0;px(-10,-15,8,13,c(SD));px(2,-15,8,13,c(SD));px(-10+walk,-3,9,3,c(A?'#3a0a08':'#141418'));px(2-walk,-3,9,3,c(A?'#3a0a08':'#141418'));
+ if(A){px(-10,-10,8,2,c(G));px(2,-10,8,2,c(G))}
+ // 躯干（壮）
+ px(-13,-40+bob,26,26,c(K));px(-12,-39+bob,24,24,c(S));px(-12,-39+bob,24,2,c(SL));px(-12,-17+bob,24,2,c(SD));
+ if(!A){for(let i=0;i<5;i++)px(-1,-36+bob+i*4,2,1,c(G));px(-10,-35+bob,6,4,c(SD));px(4,-35+bob,6,4,c(SD));px(-10,-35+bob,6,1,c(SL));px(4,-35+bob,6,1,c(SL));px(-10,-24+bob,7,5,c(SD));px(3,-24+bob,7,5,c(SD))}
+ else{pcirc(0,-29+bob,6,c(G));pcirc(0,-29+bob,4,c('#ff8a2a'));px(-2,-31+bob,4,2,c('#fff2a0'));px(-12,-20+bob,24,3,c(G))}
+ // 南瓜肩
+ for(const s of[-1,1]){pcirc(s*13,-36+bob,A?9:8,c(K));pcirc(s*13,-36+bob,A?8:7,c(S));pcirc(s*13-2,-38+bob,3,c(SL));if(A){px(s*13-7,-31+bob,14,2,c(G));px(s*13-1,-45+bob,2,3,c(G))}}
+ // 领子、脖子、头
+ if(!A){px(-5,-42+bob,10,3,c(S));px(-4,-41+bob,8,1,c(SD));px(-4,-44+bob,8,2,c('#d8a880'));px(-6,-55+bob,12,12,c('#e8bf9a'));px(-7,-57+bob,14,4,c('#1a1a1e'));px(-7,-55+bob,2,5,c('#1a1a1e'));px(1,-50+bob,2,2,c(K));px(4,-50+bob,2,2,c(K));px(1,-53+bob,3,1,c('#1a1a1e'));px(4,-53+bob,2,1,c('#1a1a1e'));px(1,-46+bob,4,1,c('#a05040'))}
+ else{px(-7,-58+bob,14,15,c(K));px(-6,-57+bob,12,13,c(S));px(-6,-57+bob,12,2,c(SL));px(0,-52+bob,6,3,c(K));px(1,-51+bob,4,1,c(st.endsWith('_wind')||st==='breath'?'#fff':'#ffd84a'));px(-6,-46+bob,12,2,c(G));
+  pline(-4,-57+bob,-9,-64+bob,2,c(G));pline(2,-57+bob,6,-65+bob,2,c(G));px(-1,-60+bob,2,3,c(G));if(st==='breath'&&b.t>.5){ctx.globalAlpha=.8;pcirc(8,-50+bob,3,'#ffd84a');ctx.globalAlpha=1}}
+ // 后手
+ px(-20,-34+bob,7,15,c(K));px(-19,-33+bob,5,13,c(S));px(-19,-21+bob,5,4,c(A?G:'#e8bf9a'));
+ // 前手 + 道具
+ let hx=16,hy=-24+bob;if(st.endsWith('_wind')||st==='cube'&&b.t<.45||st==='bell'&&b.t<.4||st==='dive_up')hy=-50;if(['brush','curl','upper','fdash'].includes(st)){hx=22;hy=st==='curl'||st==='upper'?-48:-30}
+ pline(10,-34+bob,hx,hy,6,c(K));pline(10,-34+bob,hx,hy,4,c(S));px(hx-2,hy-2,5,5,c(A?G:'#e8bf9a'));
+ if(!A){if(st.startsWith('brush')){pline(hx,hy,hx+18,hy-8,3,c(K));pline(hx,hy,hx+17,hy-8,2,c('#2a2a32'));px(hx+16,hy-10,4,4,c('#ff9a3a'))}
+  else if(st==='cube'&&b.t<.5){px(hx-6,hy-14,12,12,c(K));px(hx-5,hy-13,10,10,c('#c8ccd6'));px(hx-5,hy-13,10,2,c('#f4f4f8'));pline(hx-5,hy-13,hx+4,hy-4,1,c('#5ab85a'))}
+  else if(st!=='bell'||b.t<.4){px(hx-1,hy-8,3,16,c('#3a3a46'));px(hx-4,hy-10,9,4,c(K));px(hx-4,hy+6,9,4,c(K));px(hx-3,hy-9,7,2,c('#6a6e78'));px(hx-3,hy+7,7,2,c('#6a6e78'))}}
+ else{ctx.globalAlpha=.5+.3*Math.sin(t*20);pcirc(hx,hy,5,'#ff8a2a');ctx.globalAlpha=1;px(hx-3,hy-3,6,6,c(G))}}

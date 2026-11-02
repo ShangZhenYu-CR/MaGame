@@ -90,19 +90,27 @@
  <div id="rest" class="ov"><h2 class="k" style="font-size:3.8em;margin:0">☕ 茶水间</h2><div style="font-size:1.2em;margin-top:.4em"><span id="resttxt">喝口水，生命和便当都补满了。</span>选一个升级（按 1 / 2 / 3）</div><div id="restbp"></div><div id="cards"></div><div class="shopt">🥤 自动售货机（用灵感购买，每样每层一次）</div><div id="shop"></div><button class="btn" id="reroll" style="font-size:1.1em">花 25 灵感换一批</button></div>
  <div id="scroll" class="ov"><h2 class="k" style="font-size:3.6em;margin:0">✦ 灵感卷轴</h2><div style="font-size:1.2em;margin-top:.4em">选一项属性提升（按 1 / 2）</div><div id="scards" style="display:flex;gap:1.6em;margin-top:1.2em"></div></div>
  <div id="chg" class="ov"><div class="pane chgbox"><h2 class="k">更新内容</h2><div id="chglist"></div><button class="btn" id="bchgx">知道了</button></div></div>
- <div id="end" class="ov"><h2 class="k">下班了。</h2><div class="k" style="font-size:1.8em;color:#ffd84a">踏实做事，好好生活。</div><div id="estat"></div><button class="btn" id="bagain">再上一次班</button></div>
+ <div id="end" class="ov"><h2 class="k" id="etitle">下班了。</h2><div class="k" id="esub" style="font-size:1.8em;color:#ffd84a">踏实做事，好好生活。</div><div id="estat"></div><button class="btn" id="bagain">再上一次班</button></div>
 </div>
 <pre id="err"></pre><div id="artfail"></div>
 <script>window.__e=0;function __err(x){if(__e++)return;const d=document.getElementById('err');d.style.display='block';d.textContent='出错了：'+(x&&x.message||x)+'\n'+(x&&x.stack||'')}addEventListener('error',e=>{if(e.target&&e.target.tagName==='LINK')return;__err(e.error||e.message)},true);</script>
 <script>try{
 const ART_SRC={"boss_ad_dash": {"src": "art/boss/boss_ad_dash@2x.png?v=e2de7447", "s": 2}, "boss_ad_dash_wind": {"src": "art/boss/boss_ad_dash_wind@2x.png?v=e6d6c40d", "s": 2}, "boss_ad_die": {"src": "art/boss/boss_ad_die@2x.png?v=59ac6536", "s": 2}, "boss_ad_idle": {"src": "art/boss/boss_ad_idle@2x.png?v=ce4e26d3", "s": 2}, "boss_ad_intro": {"src": "art/boss/boss_ad_intro@2x.png?v=df481973", "s": 2}, "boss_ad_notes": {"src": "art/boss/boss_ad_notes@2x.png?v=a14bc0dd", "s": 2}, "boss_ad_recover": {"src": "art/boss/boss_ad_recover@2x.png?v=4d37513c", "s": 2}, "boss_ad_roar": {"src": "art/boss/boss_ad_roar@2x.png?v=01960de5", "s": 2}, "boss_ad_stagger": {"src": "art/boss/boss_ad_stagger@2x.png?v=5d27ea3c", "s": 2}, "boss_ad_stamp": {"src": "art/boss/boss_ad_stamp@2x.png?v=372cc653", "s": 2}, "boss_ad_walk": {"src": "art/boss/boss_ad_walk@2x.png?v=f83850f4", "s": 2}, "boss_ceo_bigpie": {"src": "art/boss/boss_ceo_bigpie@2x.png?v=a3769b54", "s": 2}, "boss_ceo_die": {"src": "art/boss/boss_ceo_die@2x.png?v=bc41d018", "s": 2}, "boss_ceo_idle": {"src": "art/boss/boss_ceo_idle@2x.png?v=c8607cd1", "s": 2}, "boss_ceo_intro": {"src": "art/boss/boss_ceo_intro@2x.png?v=afc387aa", "s": 2}, "boss_ceo_kpi": {"src": "art/boss/boss_ceo_kpi@2x.png?v=60a8bee0", "s": 2}, "boss_ceo_pie": {"src": "art/boss/boss_ceo_pie@2x.png?v=f9f6c17a", "s": 2}, "boss_ceo_pound": {"src": "art/boss/boss_ceo_pound@2x.png?v=3e878489", "s": 2}, "boss_ceo_recover": {"src": "art/boss/boss_ceo_recover@2x.png?v=e6f1054a", "s": 2}, "boss_ceo_roar": {"src": "art/boss/boss_ceo_roar@2x.png?v=88251a54", "s": 2}, "boss_ceo_stagger": {"src": "art/boss/boss_ceo_stagger@2x.png?v=cc7f3af8", "s": 2}, "boss_ceo_walk": {"src": "art/boss/boss_ceo_walk@2x.png?v=885f1031", "s": 2}, "boss_pd_change": {"src": "art/boss/boss_pd_change@2x.png?v=312990b4", "s": 2}, "boss_pd_die": {"src": "art/boss/boss_pd_die@2x.png?v=5e30f03b", "s": 2}, "boss_pd_doc": {"src": "art/boss/boss_pd_doc@2x.png?v=1adab678", "s": 2}, "boss_pd_idle": {"src": "art/boss/boss_pd_idle@2x.png?v=f92a18dd", "s": 2}, "boss_pd_intro": {"src": "art/boss/boss_pd_intro@2x.png?v=e3c48000", "s": 2}, "boss_pd_laser": {"src": "art/boss/boss_pd_laser@2x.png?v=17989c06", "s": 2}, "boss_pd_roar": {"src": "art/boss/boss_pd_roar@2x.png?v=2708fc94", "s": 2}, "boss_pd_stagger": {"src": "art/boss/boss_pd_stagger@2x.png?v=e89b2abb", "s": 2}, "boss_pd_tele_in": {"src": "art/boss/boss_pd_tele_in@2x.png?v=560962dc", "s": 2}, "boss_pd_tele_out": {"src": "art/boss/boss_pd_tele_out@2x.png?v=6d5d9b26", "s": 2}, "enemy_bug_attack": {"src": "art/enemy/enemy_bug_attack@2x.png?v=65ab7a8c", "s": 2}, "enemy_bug_die": {"src": "art/enemy/enemy_bug_die@2x.png?v=321bf9d7", "s": 2}, "enemy_bug_idle": {"src": "art/enemy/enemy_bug_idle@2x.png?v=0fd2c925", "s": 2}, "enemy_bug_stun": {"src": "art/enemy/enemy_bug_stun@2x.png?v=1e8b6905", "s": 2}, "enemy_bug_wind": {"src": "art/enemy/enemy_bug_wind@2x.png?v=2020ff26", "s": 2}, "enemy_crumple_attack": {"src": "art/enemy/enemy_crumple_attack@2x.png?v=c79e9a10", "s": 2}, "enemy_crumple_die": {"src": "art/enemy/enemy_crumple_die@2x.png?v=ec3ff39e", "s": 2}, "enemy_crumple_idle": {"src": "art/enemy/enemy_crumple_idle@2x.png?v=637f4adf", "s": 2}, "enemy_crumple_stun": {"src": "art/enemy/enemy_crumple_stun@2x.png?v=822babdc", "s": 2}, "enemy_crumple_wind": {"src": "art/enemy/enemy_crumple_wind@2x.png?v=b38d3d25", "s": 2}, "enemy_firewall_attack": {"src": "art/enemy/enemy_firewall_attack@2x.png?v=53268f98", "s": 2}, "enemy_firewall_die": {"src": "art/enemy/enemy_firewall_die@2x.png?v=ec9ded09", "s": 2}, "enemy_firewall_idle": {"src": "art/enemy/enemy_firewall_idle@2x.png?v=d622dc37", "s": 2}, "enemy_firewall_stun": {"src": "art/enemy/enemy_firewall_stun@2x.png?v=d1fe44f4", "s": 2}, "enemy_firewall_tired": {"src": "art/enemy/enemy_firewall_tired@2x.png?v=f98aab0b", "s": 2}, "enemy_firewall_wind": {"src": "art/enemy/enemy_firewall_wind@2x.png?v=00ac6531", "s": 2}, "enemy_invite_attack": {"src": "art/enemy/enemy_invite_attack@2x.png?v=a4b3245f", "s": 2}, "enemy_invite_die": {"src": "art/enemy/enemy_invite_die@2x.png?v=36944ef0", "s": 2}, "enemy_invite_idle": {"src": "art/enemy/enemy_invite_idle@2x.png?v=efdaf5ca", "s": 2}, "enemy_invite_stun": {"src": "art/enemy/enemy_invite_stun@2x.png?v=30adfc62", "s": 2}, "enemy_invite_wind": {"src": "art/enemy/enemy_invite_wind@2x.png?v=86585f5c", "s": 2}, "enemy_kpi_attack": {"src": "art/enemy/enemy_kpi_attack@2x.png?v=865a2ada", "s": 2}, "enemy_kpi_die": {"src": "art/enemy/enemy_kpi_die@2x.png?v=1991f380", "s": 2}, "enemy_kpi_idle": {"src": "art/enemy/enemy_kpi_idle@2x.png?v=379c3218", "s": 2}, "enemy_kpi_stun": {"src": "art/enemy/enemy_kpi_stun@2x.png?v=355868a8", "s": 2}, "enemy_kpi_wind": {"src": "art/enemy/enemy_kpi_wind@2x.png?v=7fcb36d2", "s": 2}, "enemy_popup_attack": {"src": "art/enemy/enemy_popup_attack@2x.png?v=a3e3b848", "s": 2}, "enemy_popup_die": {"src": "art/enemy/enemy_popup_die@2x.png?v=413df232", "s": 2}, "enemy_popup_idle": {"src": "art/enemy/enemy_popup_idle@2x.png?v=6c0b79be", "s": 2}, "enemy_popup_stun": {"src": "art/enemy/enemy_popup_stun@2x.png?v=ddd1708b", "s": 2}, "enemy_popup_wind": {"src": "art/enemy/enemy_popup_wind@2x.png?v=4a273029", "s": 2}, "enemy_printer_attack": {"src": "art/enemy/enemy_printer_attack@2x.png?v=4ed3c811", "s": 2}, "enemy_printer_die": {"src": "art/enemy/enemy_printer_die@2x.png?v=7d7faa8c", "s": 2}, "enemy_printer_idle": {"src": "art/enemy/enemy_printer_idle@2x.png?v=6ae8c7f6", "s": 2}, "enemy_printer_stun": {"src": "art/enemy/enemy_printer_stun@2x.png?v=b5055ebd", "s": 2}, "enemy_printer_wind": {"src": "art/enemy/enemy_printer_wind@2x.png?v=278252a0", "s": 2}, "enemy_sticky_attack": {"src": "art/enemy/enemy_sticky_attack@2x.png?v=110b42c0", "s": 2}, "enemy_sticky_die": {"src": "art/enemy/enemy_sticky_die@2x.png?v=32a20843", "s": 2}, "enemy_sticky_idle": {"src": "art/enemy/enemy_sticky_idle@2x.png?v=ed8892d5", "s": 2}, "enemy_sticky_stun": {"src": "art/enemy/enemy_sticky_stun@2x.png?v=d53142d5", "s": 2}, "enemy_sticky_wind": {"src": "art/enemy/enemy_sticky_wind@2x.png?v=4cc6191e", "s": 2}, "fx_crit": {"src": "art/fx/fx_crit@2x.png?v=6d970a44", "s": 2}, "fx_dive": {"src": "art/fx/fx_dive@2x.png?v=6285f595", "s": 2}, "fx_djump": {"src": "art/fx/fx_djump@2x.png?v=73ef8355", "s": 2}, "fx_dust": {"src": "art/fx/fx_dust@2x.png?v=17b428de", "s": 2}, "fx_hit": {"src": "art/fx/fx_hit@2x.png?v=cdac0652", "s": 2}, "fx_perfect_dodge": {"src": "art/fx/fx_perfect_dodge@2x.png?v=f76ad850", "s": 2}, "fx_poise_break": {"src": "art/fx/fx_poise_break@2x.png?v=2b8f7250", "s": 2}, "fx_roar": {"src": "art/fx/fx_roar@2x.png?v=d3a07bde", "s": 2}, "proj_bigpie": {"src": "art/fx/proj_bigpie@2x.png?v=867057cf", "s": 2}, "proj_doc": {"src": "art/fx/proj_doc@2x.png?v=a14a4bb9", "s": 2}, "proj_kpi_bar": {"src": "art/fx/proj_kpi_bar@2x.png?v=7214aa38", "s": 2}, "proj_laser": {"src": "art/fx/proj_laser@2x.png?v=5eebda1b", "s": 2}, "proj_note": {"src": "art/fx/proj_note@2x.png?v=b094391c", "s": 2}, "proj_paper": {"src": "art/fx/proj_paper@2x.png?v=5d39b506", "s": 2}, "proj_pie": {"src": "art/fx/proj_pie@2x.png?v=c81c5181", "s": 2}, "proj_wave": {"src": "art/fx/proj_wave@2x.png?v=5cebe732", "s": 2}, "proj_x": {"src": "art/fx/proj_x@2x.png?v=3b20151e", "s": 2}, "proj_zone": {"src": "art/fx/proj_zone@2x.png?v=1d3e73c7", "s": 2}, "pk_bp": {"src": "art/pickup/pk_bp@2x.png?v=c098f412", "s": 2}, "pk_cchest": {"src": "art/pickup/pk_cchest@2x.png?v=fef9b119", "s": 2}, "pk_cell": {"src": "art/pickup/pk_cell@2x.png?v=274d5046", "s": 2}, "pk_chest": {"src": "art/pickup/pk_chest@2x.png?v=3815da3b", "s": 2}, "pk_crate": {"src": "art/pickup/pk_crate@2x.png?v=2291430f", "s": 2}, "pk_door": {"src": "art/pickup/pk_door@2x.png?v=259885af", "s": 2}, "pk_food": {"src": "art/pickup/pk_food@2x.png?v=7240baae", "s": 2}, "pk_rush": {"src": "art/pickup/pk_rush@2x.png?v=c69cdc77", "s": 2}, "pk_scroll": {"src": "art/pickup/pk_scroll@2x.png?v=7b074861", "s": 2}, "pk_tdoor": {"src": "art/pickup/pk_tdoor@2x.png?v=7e9eedf6", "s": 2}, "pk_wireterm": {"src": "art/pickup/pk_wireterm@2x.png?v=dee384ea", "s": 2}, "player_atk_dash": {"src": "art/player/player_atk_dash@2x.png?v=5e2819ef", "s": 2}, "player_atk_knife": {"src": "art/player/player_atk_knife@2x.png?v=6737d621", "s": 2}, "player_atk_marker": {"src": "art/player/player_atk_marker@2x.png?v=b7356de7", "s": 2}, "player_atk_ruler": {"src": "art/player/player_atk_ruler@2x.png?v=8fafcf41", "s": 2}, "player_atk_stylus": {"src": "art/player/player_atk_stylus@2x.png?v=a16e927d", "s": 2}, "player_die": {"src": "art/player/player_die@2x.png?v=b4205f0f", "s": 2}, "player_dive": {"src": "art/player/player_dive@2x.png?v=6f986ab2", "s": 2}, "player_dive_land": {"src": "art/player/player_dive_land@2x.png?v=b2fee3f9", "s": 2}, "player_djump": {"src": "art/player/player_djump@2x.png?v=84939940", "s": 2}, "player_fall": {"src": "art/player/player_fall@2x.png?v=88ebebcc", "s": 2}, "player_heal": {"src": "art/player/player_heal@2x.png?v=0a7ec5cb", "s": 2}, "player_hurt": {"src": "art/player/player_hurt@2x.png?v=bf8f1e38", "s": 2}, "player_idle": {"src": "art/player/player_idle@2x.png?v=9cc22f43", "s": 2}, "player_jump": {"src": "art/player/player_jump@2x.png?v=96631891", "s": 2}, "player_land": {"src": "art/player/player_land@2x.png?v=201a0062", "s": 2}, "player_mantle": {"src": "art/player/player_mantle@2x.png?v=1994c98e", "s": 2}, "player_parry": {"src": "art/player/player_parry@2x.png?v=7d281901", "s": 2}, "player_roll": {"src": "art/player/player_roll@2x.png?v=45ec66a8", "s": 2}, "player_run": {"src": "art/player/player_run@2x.png?v=90c6712d", "s": 2}, "player_spray": {"src": "art/player/player_spray@2x.png?v=9ae79e72", "s": 2}, "weapon_knife": {"src": "art/player/weapon_knife@2x.png?v=22bd8709", "s": 2}, "weapon_marker": {"src": "art/player/weapon_marker@2x.png?v=032f0078", "s": 2}, "weapon_ruler": {"src": "art/player/weapon_ruler@2x.png?v=07ef3024", "s": 2}, "weapon_stylus": {"src": "art/player/weapon_stylus@2x.png?v=1835f835", "s": 2}, "bg_f1_arena": {"src": "art/scene/bg_f1_arena@2x.png?v=1ff20c1f", "s": 2}, "bg_f1_far": {"src": "art/scene/bg_f1_far@2x.png?v=e9d5ed69", "s": 2}, "bg_f1_mid": {"src": "art/scene/bg_f1_mid@2x.png?v=a7c601dd", "s": 2}, "bg_f1_near": {"src": "art/scene/bg_f1_near@2x.png?v=b9e01c6b", "s": 2}, "bg_f2_arena": {"src": "art/scene/bg_f2_arena@2x.png?v=43e688b6", "s": 2}, "bg_f2_far": {"src": "art/scene/bg_f2_far@2x.png?v=88ce1e9e", "s": 2}, "bg_f2_mid": {"src": "art/scene/bg_f2_mid@2x.png?v=ada40cd2", "s": 2}, "bg_f2_near": {"src": "art/scene/bg_f2_near@2x.png?v=7088e10f", "s": 2}, "bg_f3_arena": {"src": "art/scene/bg_f3_arena@2x.png?v=10a0f3c8", "s": 2}, "bg_f3_far": {"src": "art/scene/bg_f3_far@2x.png?v=1c3e4d28", "s": 2}, "bg_f3_mid": {"src": "art/scene/bg_f3_mid@2x.png?v=7f5ca8e5", "s": 2}, "bg_f3_near": {"src": "art/scene/bg_f3_near@2x.png?v=6169c315", "s": 2}, "decor_f1_artwall": {"src": "art/scene/decor_f1_artwall@2x.png?v=aadb8a5d", "s": 2}, "decor_f1_bookshelf": {"src": "art/scene/decor_f1_bookshelf@2x.png?v=9d4e2b71", "s": 2}, "decor_f1_drawingdesk": {"src": "art/scene/decor_f1_drawingdesk@2x.png?v=51d0eb5b", "s": 2}, "decor_f1_easel": {"src": "art/scene/decor_f1_easel@2x.png?v=746becbd", "s": 2}, "decor_f1_elevator": {"src": "art/scene/decor_f1_elevator@2x.png?v=f7d8d632", "s": 2}, "decor_f1_lamp": {"src": "art/scene/decor_f1_lamp@2x.png?v=4ddd757b", "s": 2}, "decor_f1_plant": {"src": "art/scene/decor_f1_plant@2x.png?v=e12496d5", "s": 2}, "decor_f1_sculpture": {"src": "art/scene/decor_f1_sculpture@2x.png?v=f4f5bdb6", "s": 2}, "decor_f1_wastebasket": {"src": "art/scene/decor_f1_wastebasket@2x.png?v=50a86d03", "s": 2}, "decor_f1_watercooler": {"src": "art/scene/decor_f1_watercooler@2x.png?v=fae1078a", "s": 2}, "decor_f2_beanbag": {"src": "art/scene/decor_f2_beanbag@2x.png?v=c026940f", "s": 2}, "decor_f2_board": {"src": "art/scene/decor_f2_board@2x.png?v=316d905f", "s": 2}, "decor_f2_cables": {"src": "art/scene/decor_f2_cables@2x.png?v=c3fb9e27", "s": 2}, "decor_f2_coffee": {"src": "art/scene/decor_f2_coffee@2x.png?v=d7d2dabc", "s": 2}, "decor_f2_elevator": {"src": "art/scene/decor_f2_elevator@2x.png?v=6daf3c3b", "s": 2}, "decor_f2_lamp": {"src": "art/scene/decor_f2_lamp@2x.png?v=fc9450b5", "s": 2}, "decor_f2_poster": {"src": "art/scene/decor_f2_poster@2x.png?v=65074cd6", "s": 2}, "decor_f2_server": {"src": "art/scene/decor_f2_server@2x.png?v=f47e812f", "s": 2}, "decor_f2_whiteboard": {"src": "art/scene/decor_f2_whiteboard@2x.png?v=89536930", "s": 2}, "decor_f2_workstation": {"src": "art/scene/decor_f2_workstation@2x.png?v=d0d1db13", "s": 2}, "decor_f3_aquarium": {"src": "art/scene/decor_f3_aquarium@2x.png?v=106dc249", "s": 2}, "decor_f3_chandelier": {"src": "art/scene/decor_f3_chandelier@2x.png?v=fae39443", "s": 2}, "decor_f3_elevator": {"src": "art/scene/decor_f3_elevator@2x.png?v=b3c7ab6c", "s": 2}, "decor_f3_globe": {"src": "art/scene/decor_f3_globe@2x.png?v=902bd015", "s": 2}, "decor_f3_moneytree": {"src": "art/scene/decor_f3_moneytree@2x.png?v=ab7c7043", "s": 2}, "decor_f3_portrait": {"src": "art/scene/decor_f3_portrait@2x.png?v=75918000", "s": 2}, "decor_f3_sofa": {"src": "art/scene/decor_f3_sofa@2x.png?v=0d762366", "s": 2}, "decor_f3_statue": {"src": "art/scene/decor_f3_statue@2x.png?v=f5804bb5", "s": 2}, "decor_f3_trophycase": {"src": "art/scene/decor_f3_trophycase@2x.png?v=88adf16d", "s": 2}, "decor_f3_winecabinet": {"src": "art/scene/decor_f3_winecabinet@2x.png?v=c5f06e13", "s": 2}, "tiles_f1": {"src": "art/scene/tiles_f1@2x.png?v=7a0e4679", "s": 2}, "tiles_f2": {"src": "art/scene/tiles_f2@2x.png?v=c4c35334", "s": 2}, "tiles_f3": {"src": "art/scene/tiles_f3@2x.png?v=8360a9ad", "s": 2}, "icon_airbrush": {"src": "art/ui/icon_airbrush@2x.png?v=29999ec0", "s": 2}, "icon_boxcol": {"src": "art/ui/icon_boxcol@2x.png?v=d72fef50", "s": 2}, "icon_eraser": {"src": "art/ui/icon_eraser@2x.png?v=7b9bd117", "s": 2}, "icon_inkbomb": {"src": "art/ui/icon_inkbomb@2x.png?v=c952491a", "s": 2}, "icon_knife": {"src": "art/ui/icon_knife@2x.png?v=07ff7bce", "s": 2}, "icon_marker": {"src": "art/ui/icon_marker@2x.png?v=032f0078", "s": 2}, "icon_palette": {"src": "art/ui/icon_palette@2x.png?v=c50742dc", "s": 2}, "icon_ruler": {"src": "art/ui/icon_ruler@2x.png?v=05bbc303", "s": 2}, "icon_stylus": {"src": "art/ui/icon_stylus@2x.png?v=ba401729", "s": 2}, "icon_turret": {"src": "art/ui/icon_turret@2x.png?v=914c4bc4", "s": 2}};
 const ART_ANCHOR={"boss_ad_dash": [[128, 111], [130, 110], [129, 109], [138, 116]], "boss_ad_dash_wind": [[116, 127], [11, 67], [15, 39]], "boss_ad_die": [[123, 141], [124, 141], [122, 142], [119, 146], [128, 159], [124, 159], [136, 159], [124, 159]], "boss_ad_idle": [[116, 128], [115, 128], [116, 128], [114, 128]], "boss_ad_intro": [[114, 129], [114, 128], [116, 129], [117, 129], [123, 125], [119, 129]], "boss_ad_notes": [[105, 138], [79, 134], [77, 137], [80, 139]], "boss_ad_recover": [[117, 130], [110, 149]], "boss_ad_roar": [[115, 131], [116, 133], [118, 132], [119, 132], [118, 134], [117, 131]], "boss_ad_stagger": [[77, 151], [77, 158], [72, 159], [88, 159]], "boss_ad_stamp": [[136, 140], [126, 61], [115, 42], [92, 33], [131, 123], [126, 159], [126, 159], [132, 143]], "boss_ad_walk": [[117, 130], [117, 129], [120, 128], [119, 130], [120, 128], [118, 131]], "boss_pd_doc": [[30, 88], [25, 58], [105, 62], [91, 67]], "boss_pd_laser": [[106, 62], [104, 62], [100, 62], [99, 62], [99, 62], [99, 62]], "boss_ceo_pie": [[30, 56], [142, 74], [128, 76], [127, 96]], "boss_ceo_bigpie": [[124, 88], [139, 82], [145, 78], [151, 74], [128, 82], [122, 88]], "enemy_printer_idle": [[51, 40], [49, 40], [51, 40], [50, 40]], "enemy_printer_wind": [[53, 44], [52, 45], [51, 46]], "enemy_printer_attack": [[45, 48], [35, 48], [35, 48]], "enemy_printer_stun": [[50, 43], [45, 50]], "enemy_printer_die": [[51, 41], [50, 43], [49, 48], null, null], "player_atk_stylus": [[46, 56], [70, 36], [68, 16], [50, 56], [36, 16], [36, 34], [58, 68], [54, 60], [38, 50], [52, 38], [80, 36], [44, 46]], "player_dive": [[48, 24], [64, 18], [58, 60]], "player_dive_land": [[56, 78], [54, 82], [60, 56]], "player_parry": [[64, 34], [62, 34]], "player_spray": [[56, 30], [64, 32]], "player_atk_marker": [[30, 44], [72, 50], [74, 46], [72, 56], [38, 18], [42, 16], [70, 70], [64, 84]], "player_atk_ruler": [[62, 42], [75, 49], [84, 50], [62, 42], [59, 50], [80, 49], [86, 49], [59, 50], [60, 38], [82, 46], [90, 50], [59, 38]], "player_atk_knife": [[48, 52], [46, 42], [84, 40], [88, 42], [52, 48], [80, 32], [84, 20], [84, 28], [50, 50], [42, 24], [80, 66], [82, 64], [56, 46], [34, 42], [80, 46], [84, 42]], "player_atk_dash": [[18, 68], [24, 54], [84, 46], [36, 52], [62, 60]], "weapon_stylus": {"grip": [16, 14]}, "weapon_marker": {"grip": [10, 36]}, "weapon_ruler": {"grip": [18, 11]}, "weapon_knife": {"grip": [10, 22]}, "player_run": [[74, 46], [76, 46], [74, 46], [73, 45], [75, 43], [73, 49], [75, 43], [77, 45]], "player_idle": [[40, 61], [39, 61], [40, 60], [40, 62]], "player_jump": [[27, 68], [28, 65]], "player_fall": [[74, 38], [76, 52]], "player_land": [[73, 80], [67, 63]], "player_hurt": [[61, 38], [69, 55]]};
-const ART_FW={"enemy_printer": 40, "enemy_popup": 40, "enemy_bug": 24, "enemy_firewall": 28, "enemy_invite": 32, "enemy_kpi": 28, "enemy_spray": 48, "boss_ad": 72, "boss_pd": 64, "boss_ceo": 80, "proj_paper": 16, "proj_doc": 16, "proj_kpi_bar": 24, "proj_laser": 32, "proj_x": 12, "proj_zone": 32, "fx_dive": 64, "fx_djump": 24, "fx_dust": 16, "pk_bp": 16, "pk_cchest": 24, "pk_chest": 24, "pk_door": 28, "pk_food": 16, "pk_rush": 16, "pk_scroll": 16, "pk_tdoor": 28, "pk_wireterm": 16};
+const ART_FW={"enemy_printer": 40, "enemy_popup": 40, "enemy_bug": 24, "enemy_firewall": 28, "enemy_invite": 32, "enemy_kpi": 28, "enemy_spray": 48, "boss_ad": 72, "boss_pd": 64, "boss_ceo": 80, "proj_paper": 16, "proj_doc": 16, "proj_kpi_bar": 24, "proj_laser": 32, "proj_x": 12, "proj_zone": 32, "proj_fire": 16, "fx_fireg": 16, "proj_pillar": 24, "fx_dive": 64, "fx_djump": 24, "fx_dust": 16, "pk_bp": 16, "pk_cchest": 24, "pk_chest": 24, "pk_door": 28, "pk_food": 16, "pk_rush": 16, "pk_scroll": 16, "pk_tdoor": 28, "pk_wireterm": 16};
 const ART_GAP={"boss_ceo_pound": [0.0, 0.0, 4.0, 11.0, 13.0, 6.0, 0.0, 0.0], "enemy_invite_attack": [6.0, 7.5, 7.5], "enemy_invite_die": [6.0, 5.5, 4.5, 2.5, 3.5], "enemy_invite_idle": [7.5, 7.5, 6.0, 7.5], "enemy_invite_stun": [4.0, 4.0], "enemy_invite_wind": [7.0, 6.0, 5.5], "enemy_popup_attack": [6.0, 6.0, 6.5], "enemy_popup_die": [2.5, 1.5, 0.5, 1.0, 0.5], "enemy_popup_idle": [1.0, 1.0, 0.5, 1.0], "enemy_popup_stun": [2.5, 0.5], "enemy_popup_wind": [4.5, 0.5, 3.5], "pk_bp": [1.0, 0.5, 1.0, 1.5], "pk_cchest": [2.0, 0.5], "pk_cell": [1.0, 1.0, 1.0, 1.0], "pk_chest": [1.5, 0.5], "pk_crate": [2.5, 2.5], "pk_door": [2.0, 0.5], "pk_food": [1.5], "pk_rush": [1.0, 1.0], "pk_scroll": [1.0, 0.5, 0.5, 1.0], "pk_tdoor": [0.5, 0.5, 0.5], "pk_wireterm": [4.5, 4.5]};
 // ===== 版本号与更新内容 =====
 // 发新版本时：在 CHANGELOG 最前面加一条，build.py 重新生成 index.html，合并到 main 即可。
 // 标题画面会显示最新版本号；玩家没看过的新版本，“更新内容”按钮上会亮“新”字。
 const CHANGELOG=[
+ {v:'v2.0',date:'2026-11-02',items:[
+  '隐藏关卡“天台 · 健身房”：打败老板后，Boss 房中间会出现一部货梯。走右边的门正常下班；坐货梯先到茶水间整备，再上天台',
+  '天台关卡比较短：开头一个高级宝箱，必有实习生小卖部，怪物是各层最难缠的组合',
+  '隐藏 Boss 刘敬阳：一阶段穿中山装，扔建模方块、巨型雕刻笔贴地横扫（地面会翻起黏土尖刺）、扔回旋哑铃、哑铃砸地、贴身时哑铃上勾拳',
+  '半血变身炎龙铠甲：烈焰冲刺（留下火痕）、龙炎吐息、一路烧过来的烈焰柱、炎龙天降、升龙拳；四分之一血时龙魂爆发，召唤天火',
+  '打败刘敬阳是“真 · 下班”结局，标题画面会记下击败次数',
+  '刘敬阳和天台场景暂时是代码画的，正式美术已提需求',
+  '修正同一处同时掉出两把一样的武器']},
  {v:'v1.9',date:'2026-11-02',items:[
   '新敌人·1F 喷漆罐：保持距离，罐子一抖就朝前喷漆，地上留下油漆，踩上去移动减半',
   '新敌人·2F 合并冲突：原地闪烁后瞬移到你身后，头上闪“！”再砍，记得回身或翻滚',
@@ -286,7 +294,14 @@ function drawEnemySpr(e,cx,cy){const b='enemy_'+e.type;if(!useSpr||!sprReady(b+'
  if((e.state==='wind'||e.state==='slashw')&&e.windT>0&&Math.floor(e.anim*12)%2===0)pnum('!',R(x),R(y-e.h-12),'#ff5a4a',2);
  return true}
 // Boss 素材
-function drawBossSpr(b,cx,cy){const p='boss_'+b.kind;if(!useSpr||!sprReady(p+'_idle'))return false;let n=p+'_idle',fi=Math.floor(b.anim*5);const has=k=>sprReady(p+'_'+k),st=b.state,set=(k,f)=>{if(has(k)){n=p+'_'+k;fi=f}};
+// 刘敬阳：一阶段 boss_ljy_xxx，二阶段（铠甲）boss_ljy_p2_xxx；缺的动作用 idle 顶上
+const LJY_ANIM={intro:'intro',cube:'cube',bell:'throw',brush_wind:'brush_wind',brush:'brush',curl_wind:'curl_wind',curl:'curl',slam:'slam',stagger:'stagger',transform:'transform',roar:'roar',dead:'die',
+ fdash_wind:'fdash_wind',fdash:'fdash',breath:'breath',pillars:'pillars',dive_up:'dive_up',dive_hover:'dive_up',dive_fall:'dive',upper_wind:'upper_wind',upper:'upper',meteor:'roar'};
+function drawLJYSpr(b,cx,cy){const pre=b.armor?'boss_ljy_p2_':'boss_ljy_';if(!useSpr||!sprReady(pre+'idle')||(b.state==='transform'&&!sprReady('boss_ljy_transform')))return false;
+ let k=LJY_ANIM[b.state]||(Math.abs(b.vx)>10?'walk':'idle');if(b.state==='transform')k='transform';let n=(k==='transform'?'boss_ljy_':pre)+k;if(!sprReady(n)){k=Math.abs(b.vx)>10&&sprReady(pre+'walk')?'walk':'idle';n=pre+k}
+ const c=sprN(n),loop=['idle','walk','stagger','dive_up','fdash','breath'].includes(k);let fi=loop?Math.floor(b.anim*8):Math.min(c-1,Math.floor(b.t*10));
+ sprFrame(n,fi,b.x-cx,b.y-cy,b.face);if(b.flash>0)sprFrame(n,fi,b.x-cx,b.y-cy,b.face,true);return true}
+function drawBossSpr(b,cx,cy){if(b.kind==='ljy')return drawLJYSpr(b,cx,cy);const p='boss_'+b.kind;if(!useSpr||!sprReady(p+'_idle'))return false;let n=p+'_idle',fi=Math.floor(b.anim*5);const has=k=>sprReady(p+'_'+k),st=b.state,set=(k,f)=>{if(has(k)){n=p+'_'+k;fi=f}};
  if((st==='tele'||st==='tele_in')&&has('tele_out'))ctx.globalAlpha=1;
  // 制作人
  // 近身反击和新招（复用现有动作帧）
@@ -403,7 +418,8 @@ function drawEnemy(e,cx,cy){if(e.elite){ctx.globalAlpha=.35+.2*Math.sin(e.anim*8
 // ===== Boss =====
 function drawBoss(b,cx,cy){if(drawBossSpr(b,cx,cy))return;const x=R(b.x-cx),y=R(b.y-cy),f=b.face,t=b.anim,fl=b.flash>0;const c=(v)=>fl?'#fff':v;
  ctx.save();ctx.translate(x,y);ctx.scale(f,1);
- if(b.kind==='ad'){ // 主美：贝雷帽、围巾、长风衣、大红笔
+ if(b.kind==='ljy')drawLJY(b,t,c);
+ else if(b.kind==='ad'){ // 主美：贝雷帽、围巾、长风衣、大红笔
   const bob=Math.sin(t*4)*1;px(-6,-4,4,4,c('#2a2230'));px(2,-4,4,4,c('#2a2230'));px(-8,-26+bob,16,22,c('#5a3a6a'));px(-8,-26+bob,16,2,c('#6a4a7a'));px(-1,-25+bob,2,20,c('#4a2a5a'));
   px(-7,-29+bob,14,4,c('#e8b84a'));px(4,-27+bob,4,8,c('#e8b84a'));
   px(-6,-39+bob,12,11,c('#e8bf9a'));px(-7,-42+bob,14,4,c('#c8302a'));px(-3,-44+bob,6,2,c('#c8302a'));px(4,-43+bob,2,2,c('#c8302a'));
@@ -427,14 +443,16 @@ function drawPenArm(x,y,a,c){pline(x,y,x+Math.sin(a)*6,y+Math.cos(a)*6,3,c('#5a3
 const THEME={
  1:{name:'1F · 美术部',wall:'#eadfca',wall2:'#ddcfb4',trim:'#b89a74',floor:'#8a6248',floorT:'#a87a58',floorD:'#5e4030',plat:'#b98a5e',platT:'#d8a878',sky:['#9fd3f0','#d8ecf8'],light:'rgba(255,230,170,',enemies:['crumple','sticky','printer','spray'],boss:'ad',song:'f1'},
  2:{name:'2F · 研发部',wall:'#232a42',wall2:'#1c2236',trim:'#3a4a6a',floor:'#3a4258',floorT:'#56607a',floorD:'#242a3a',plat:'#4a5470',platT:'#6a7896',sky:['#0e1426','#1c2a4a'],light:'rgba(120,220,255,',enemies:['bug','popup','firewall','crumple','merge'],boss:'pd',song:'f2'},
- 3:{name:'顶层 · 总裁办',wall:'#cfc6b4',wall2:'#beb4a0',trim:'#a8884a',floor:'#5a2a2a',floorT:'#7a3a36',floorD:'#3a1a1a',plat:'#6a5a4a',platT:'#a8884a',sky:['#1a1c3a','#3a3060'],light:'rgba(255,215,140,',enemies:['kpi','invite','firewall','popup','pm'],boss:'ceo',song:'f3'}};
+ 3:{name:'顶层 · 总裁办',wall:'#cfc6b4',wall2:'#beb4a0',trim:'#a8884a',floor:'#5a2a2a',floorT:'#7a3a36',floorD:'#3a1a1a',plat:'#6a5a4a',platT:'#a8884a',sky:['#1a1c3a','#3a3060'],light:'rgba(255,215,140,',enemies:['kpi','invite','firewall','popup','pm'],boss:'ceo',song:'f3'},
+ 4:{name:'天台 · 健身房',wall:'#3a3448',wall2:'#2e2a3c',trim:'#c8402a',floor:'#3a3a46',floorT:'#5a5a68',floorD:'#24242c',plat:'#5a5a68',platT:'#8a8e98',sky:['#0a0c1e','#2a1a3a'],light:'rgba(255,170,110,',enemies:['firewall','merge','pm','kpi','spray','crumple'],boss:'ljy',song:'f3'}};
 // 背景装饰
 // 装饰物素材：程序生成的装饰种类 → 各层的素材名（用 d.s 在几种之间轮换）；wall=挂在墙上
 const DECOR_MAP={1:{easel:['easel'],frame:['artwall'],plant:['plant','sculpture'],board:['drawingdesk'],shelf:['bookshelf'],cooler:['watercooler','wastebasket']},
  2:{monitor:['workstation'],server:['server'],board:['board','whiteboard'],poster:['poster'],plant:['coffee','beanbag','cables']},
- 3:{trophy:['trophycase'],plant:['moneytree','globe'],frame:['portrait'],poster:['statue','winecabinet'],monitor:['aquarium','sofa']}};
-const DECOR_WALL=['artwall','board','whiteboard','poster','portrait'];
-function drawDecorSpr(d,cx,cy){if(!useSpr||d.gy===undefined)return false;let name=d.k==='elevator'?'elevator':null;const m=DECOR_MAP[LV.floor]&&DECOR_MAP[LV.floor][d.k];if(m)name=m[d.s%m.length];if(!name)return false;const n='decor_f'+LV.floor+'_'+name;if(!sprReady(n))return false;
+ 3:{trophy:['trophycase'],plant:['moneytree','globe'],frame:['portrait'],poster:['statue','winecabinet'],monitor:['aquarium','sofa']},
+ 4:{trophy:['dumbbellrack','barbellrack'],plant:['plant','punchbag'],frame:['neon'],poster:['mirror','lockers'],monitor:['treadmill','bench']}};
+const DECOR_WALL=['artwall','board','whiteboard','poster','portrait','neon'];
+function drawDecorSpr(d,cx,cy){if(!useSpr||d.gy===undefined)return false;let name=d.k==='elevator'?'elevator':null;const m=DECOR_MAP[LV.af]&&DECOR_MAP[LV.af][d.k];if(m)name=m[d.s%m.length];if(!name)return false;const n='decor_f'+LV.af+'_'+name;if(!sprReady(n))return false;
  // 第一次画的时候检查摆不摆得下：不能被地面挡住，落地的物件下面要全是地面；放不下就左右挪，挪不开就不放
  if(d.fit===undefined||d.fitN!==n)decorFit(d,n,name);if(d.fit===null)return true;
  const st=DECOR_STYLE[name]||{},b=decorBox(n,name),x=R(d.x+12+d.fit-cx),bot=R(d.gy-(DECOR_WALL.includes(name)?34:0)-cy);
@@ -449,7 +467,7 @@ const DECOR_STYLE={drawingdesk:{scale:.5,base:{k:'desk',w:34,h:17}},wastebasket:
  // 带支架腿的看板 / 白板挂到墙上：只画上半部分（clip=保留的高度，逻辑像素）
  whiteboard:{clip:21},board:{clip:20}};
 function decorBox(n,name){const im=SPR[n],s=SPRS[n]||1,st=DECOR_STYLE[name]||{},k=st.scale||1,W=im.naturalWidth/s*k,H=(st.clip||im.naturalHeight/s)*k;return{w:Math.max(W,st.base?st.base.w:0),h:H+(st.base?st.base.h:0)}}
-function drawDecorBase(b,x,bot){const f=LV.floor,L=R(x-b.w/2);
+function drawDecorBase(b,x,bot){const f=LV.af,L=R(x-b.w/2);
  if(b.k==='desk'){const top=f===1?'#a87a58':f===2?'#5a6070':'#6a3a2a',side=f===1?'#7a5238':f===2?'#3a3e4a':'#4a2418';
   px(L,bot-b.h,b.w,3,top);px(L,bot-b.h+3,b.w,1,side);px(L+2,bot-b.h+4,2,b.h-4,side);px(L+b.w-4,bot-b.h+4,2,b.h-4,side);px(L+b.w-14,bot-b.h+4,10,6,side);px(L+b.w-13,bot-b.h+6,8,1,top);px(L,bot-b.h,b.w,1,'rgba(255,255,255,.18)')}
  else if(b.k==='cabinet'){const c=f===1?['#6a4028','#8a5a38','#c8a070','#5a3420']:f===2?['#2e323e','#3a3e4a','#8a90a0','#262a34']:['#3a2018','#4a2820','#c8a050','#3a2018'];px(L,bot-b.h,b.w,b.h,c[0]);px(L,bot-b.h,b.w,2,c[2]);px(L+2,bot-b.h+4,b.w/2-3,b.h-6,c[1]);px(L+b.w/2+1,bot-b.h+4,b.w/2-3,b.h-6,c[1]);px(L+b.w/2-3,bot-b.h+Math.floor(b.h/2),2,2,c[2]);px(L+b.w/2+1,bot-b.h+Math.floor(b.h/2),2,2,c[2]);px(L,bot-1,b.w,1,'rgba(0,0,0,.35)')}
@@ -469,7 +487,7 @@ function drawDecor(d,cx,cy,th,t){const x=R(d.x-cx),y=R(d.y-cy);if(x<-120||x>VW+1
  case 'board':px(x,y,46,28,'#9aa0a8');px(x+2,y+2,42,24,'#f8f8fa');for(let i=0;i<4;i++)px(x+5,y+6+i*5,10+((i*11+d.s)%26),1,['#3a6ad8','#d8584a','#3a3a46'][i%3]);break;
  case 'poster':px(x,y,18,24,['#d8584a','#3a6ad8','#f2c14e'][d.s%3]);px(x+3,y+3,12,10,'#f4f1ea');px(x+3,y+16,12,2,'#fff');px(x+3,y+19,8,1,'#fff');break;
  case 'trophy':px(x+4,y+16,8,4,'#6a5a4a');px(x+6,y+12,4,4,'#e8b84a');px(x+2,y+2,12,10,'#e8b84a');px(x,y+3,2,5,'#e8b84a');px(x+14,y+3,2,5,'#e8b84a');px(x+4,y+4,2,4,'#fff2c0');break;
- case 'lamp':{const ln=sprReady('decor_f'+LV.floor+'_chandelier')?'decor_f'+LV.floor+'_chandelier':'decor_f'+LV.floor+'_lamp';if(useSpr&&sprReady(ln)){const im=SPR[ln],k=ln.endsWith('chandelier')?1:.5,W=im.naturalWidth/(SPRS[ln]||1)*k,H=im.naturalHeight/(SPRS[ln]||1)*k,top=R(2*TS-cy);px(x,top,1,y+3-top,'#2a2a34');px(x-2,top,5,2,'#2a2a34');ctx.drawImage(im,R(x-W/2),R(y+2),W,H);ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.5+.08*Math.sin(t*3+d.x);pcirc(x,R(y+2+H),2,'#ffe6a0');ctx.restore();break}}px(x,y-40,1,40,'#3a3a46');px(x-1,y,2,6,'#3a3a46');px(x-6,y+6,12,3,'#3a3a46');ctx.fillStyle=th.light+'0.07)';ctx.beginPath();ctx.moveTo(x-5,y+9);ctx.lineTo(x+5,y+9);ctx.lineTo(x+30,y+130);ctx.lineTo(x-30,y+130);ctx.fill();px(x-4,y+9,8,1,'#fff6d0');break;
+ case 'lamp':{const ln=sprReady('decor_f'+LV.af+'_chandelier')?'decor_f'+LV.af+'_chandelier':'decor_f'+LV.af+'_lamp';if(useSpr&&sprReady(ln)){const im=SPR[ln],k=ln.endsWith('chandelier')?1:.5,W=im.naturalWidth/(SPRS[ln]||1)*k,H=im.naturalHeight/(SPRS[ln]||1)*k,top=R(2*TS-cy);px(x,top,1,y+3-top,'#2a2a34');px(x-2,top,5,2,'#2a2a34');ctx.drawImage(im,R(x-W/2),R(y+2),W,H);ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.5+.08*Math.sin(t*3+d.x);pcirc(x,R(y+2+H),2,'#ffe6a0');ctx.restore();break}}px(x,y-40,1,40,'#3a3a46');px(x-1,y,2,6,'#3a3a46');px(x-6,y+6,12,3,'#3a3a46');ctx.fillStyle=th.light+'0.07)';ctx.beginPath();ctx.moveTo(x-5,y+9);ctx.lineTo(x+5,y+9);ctx.lineTo(x+30,y+130);ctx.lineTo(x-30,y+130);ctx.fill();px(x-4,y+9,8,1,'#fff6d0');break;
  case 'sign':px(x,y,64,16,'#2a2d36');px(x+1,y+1,62,14,th.trim);break;
  case 'cooler':px(x,y,12,8,'#9fd3f0');px(x+1,y+8,10,22,'#e8e8ee');px(x+3,y+14,2,2,'#5ab0f0');px(x+7,y+14,2,2,'#d8584a');break;
  case 'shelf':px(x,y,30,3,'#8a6248');px(x,y+16,30,3,'#8a6248');for(let i=0;i<5;i++)px(x+2+i*5,y-9+((i*7+d.s)%4),4,9+((i*3)%3),['#d8584a','#3a6ad8','#f2c14e','#5ab85a','#9a6ad8'][(i+d.s)%5]);break;
@@ -479,7 +497,7 @@ function drawDecor(d,cx,cy,th,t){const x=R(d.x-cx),y=R(d.y-cy);if(x<-120||x>VW+1
 const HT=23,CW=48;
 let LV=null;
 function genLevel(floor){
- const th=THEME[floor],nCh=4,arenaW=30,startW=26,w=startW+nCh*CW+arenaW;
+ const th=THEME[floor],nCh=floor===4?2:4,arenaW=30,startW=26,w=startW+nCh*CW+arenaW;
  const T=new Uint8Array(w*HT);const set=(x,y,v)=>{if(x>=0&&x<w&&y>=0&&y<HT)T[y*w+x]=v};
  const spawns=[],decor=[],pks=[],signs=[];
  // 天花板
@@ -508,7 +526,7 @@ function genLevel(floor){
   const nsegs=segs.filter(s=>!s.room);for(let k=0;k<n;k++){const s=nsegs[irnd(c===0&&nsegs.length>1?1:0,nsegs.length-1)];const type=pick_(th.enemies,k);const ex=(s.x+irnd(1,Math.max(1,s.len-2)))*TS;
    const fly=type==='sticky'||type==='popup';spawns.push({type,x:ex,y:fly?(s.g-irnd(5,8))*TS:s.g*TS})}
   // 图钉陷阱（地面上方一格，宽 2-3 格，避开地图块开头）
-  const spikeP=[.3,.5,.65][floor-1];
+  const spikeP=[.3,.5,.65,.45][floor-1];
   for(const s of segs){if(s.room||s.x<x0+3||s.len<5||Math.random()>spikeP)continue;const sw=irnd(2,3),sx=s.x+irnd(1,s.len-sw-1);let ok=true;for(let i=0;i<sw;i++)if(T[(s.g-1)*w+sx+i]!==0||T[(s.g-4)*w+sx+i]===2||T[(s.g-5)*w+sx+i]===2)ok=false;if(ok)for(let i=0;i<sw;i++)set(sx+i,s.g-1,3)}
   // 纸箱
   for(let k=0;k<irnd(1,2);k++){const s=nsegs[irnd(0,nsegs.length-1)];const cx=s.x+irnd(0,s.len-1);if(T[(s.g-1)*w+cx]===0)pks.push({k:'crate',x:cx*TS+8,y:s.g*TS,hp:14})}
@@ -519,7 +537,7 @@ function genLevel(floor){
   // 加班合同（诅咒宝箱）：第 3 块，一半概率
   if(c===2&&Math.random()<.5){const ss=segs.filter(s=>s.len>=4);if(ss.length){const s=pick(ss),cx=s.x+Math.floor(s.len/2);if(T[(s.g-1)*w+cx]===0)pks.push({k:'cchest',x:cx*TS+8,y:s.g*TS})}}
   // 实习生小卖部：第 3 块，60% 概率。一个实习生 + 三件商品，用灵感买
-  if(c===2&&Math.random()<.6){const ss=segs.filter(s=>!s.room&&s.len>=9&&s.x>x0+2);if(ss.length){const s=pick(ss);let ok=true;for(let i=1;i<9;i++)for(let y=s.g-3;y<s.g;y++)if(T[y*w+s.x+i]!==0&&T[y*w+s.x+i]!==3)ok=false;
+  if(c===2&&Math.random()<.6||floor===4&&c===0){const ss=segs.filter(s=>!s.room&&s.len>=9&&s.x>x0+2);if(ss.length){const s=pick(ss);let ok=true;for(let i=1;i<9;i++)for(let y=s.g-3;y<s.g;y++)if(T[y*w+s.x+i]!==0&&T[y*w+s.x+i]!==3)ok=false;
    if(ok){for(let i=0;i<10;i++)for(let y=s.g-3;y<s.g;y++)if(T[y*w+s.x+i]===3)set(s.x+i,y,0);pks.push({k:'intern',x:(s.x+1)*TS+8,y:s.g*TS});const ws=Object.keys(WARES).sort(()=>Math.random()-.5).slice(0,3);
     ws.forEach((it,i)=>pks.push({k:'ware',item:it,c:Math.round(WARES[it].c*(1+.2*(floor-1))/5)*5,x:(s.x+3.5+i*2.2)*TS,y:s.g*TS}))}}}
   // 加急任务：第 2 块
@@ -549,7 +567,9 @@ function genLevel(floor){
  for(let i=spawns.length-1;i>=0;i--)if(spawns[i].x>=(ax-3)*TS)spawns.splice(i,1);
  const gate={x:ax+2,active:false};
  for(let i=pks.length-1;room&&i>=0;i--){const tx=pks[i].x/TS;if(tx>=room.tx-1&&tx<=room.tx+room.len+1)pks.splice(i,1)}
- LV={floor,th,w,h:HT,T,spawns,decor,pick:pks,signs,boxes:[],room:room&&{x0:room.tx*TS,x1:(room.tx+room.len)*TS,tx:room.tx,len:room.len,g:room.g,state:0,cells:[]},arenaX:ax*TS,arenaW:arenaW*TS,gate,exitX:(w-6)*TS};
+ // 天台：开头送一个高级宝箱
+ if(floor===4){let gy=19;for(let y=2;y<HT;y++)if(T[y*w+(startW-8)]===1){gy=y;break}pks.push({k:'chest',x:(startW-8)*TS+8,y:gy*TS,bonus:true})}
+ LV={floor,af:floor===4&&!(typeof sprReady==='function'&&(sprReady('bg_f4_mid')||sprReady('tiles_f4')))?3:floor,th,w,h:HT,T,spawns,decor,pick:pks,signs,boxes:[],room:room&&{x0:room.tx*TS,x1:(room.tx+room.len)*TS,tx:room.tx,len:room.len,g:room.g,state:0,cells:[]},arenaX:ax*TS,arenaW:arenaW*TS,gate,exitX:(w-6)*TS};
  return LV}
 function pick_(a,i){return a[(i+Math.floor(Math.random()*a.length))%a.length]}
 function tileAt(tx,ty){if(tx<0||tx>=LV.w)return 1;if(ty<0)return 1;if(ty>=LV.h)return 1;if(LV.gate.active&&tx===LV.gate.x)return 1;return LV.T[ty*LV.w+tx]}
@@ -574,8 +594,8 @@ function tileIdx(v,tx,ty){const h=(tx*7+ty*13)%3;
  return {3:18,4:21,5:19}[v]}
 // 平台瓦片素材顶部有几像素透明，画的时候往上挪，让木板上沿和碰撞线对齐（不然人看起来悬空）
 const PLAT_OFF={1:4.5,2:3,3:4.5};
-function drawTilesSpr(cx,cy){const n='tiles_f'+LV.floor;if(!useSpr||!sprReady(n))return false;const im=SPR[n],s=SPRS[n]||1,ts=16*s,x0=Math.max(0,Math.floor(cx/TS)),x1=Math.min(LV.w-1,Math.floor((cx+VW)/TS)),y0=Math.max(0,Math.floor(cy/TS)),y1=Math.min(LV.h-1,Math.floor((cy+VH)/TS));
- for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){const v=LV.T[ty*LV.w+tx];if(!v)continue;const i=tileIdx(v,tx,ty);if(i===undefined)continue;if(v===5)ctx.globalAlpha=.55+.25*Math.sin(T*6+tx);ctx.drawImage(im,(i%8)*ts,Math.floor(i/8)*ts,ts,ts,tx*TS-cx,ty*TS-cy-(v===2?PLAT_OFF[LV.floor]||0:0),TS,TS);ctx.globalAlpha=1}
+function drawTilesSpr(cx,cy){const n='tiles_f'+LV.af;if(!useSpr||!sprReady(n))return false;const im=SPR[n],s=SPRS[n]||1,ts=16*s,x0=Math.max(0,Math.floor(cx/TS)),x1=Math.min(LV.w-1,Math.floor((cx+VW)/TS)),y0=Math.max(0,Math.floor(cy/TS)),y1=Math.min(LV.h-1,Math.floor((cy+VH)/TS));
+ for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){const v=LV.T[ty*LV.w+tx];if(!v)continue;const i=tileIdx(v,tx,ty);if(i===undefined)continue;if(v===5)ctx.globalAlpha=.55+.25*Math.sin(T*6+tx);ctx.drawImage(im,(i%8)*ts,Math.floor(i/8)*ts,ts,ts,tx*TS-cx,ty*TS-cy-(v===2?PLAT_OFF[LV.af]||0:0),TS,TS);ctx.globalAlpha=1}
  if(LV.gate.active){const sx=LV.gate.x*TS-cx;for(let ty=2;ty<LV.h;ty++)ctx.drawImage(im,(20%8)*ts,Math.floor(20/8)*ts,ts,ts,sx,ty*TS-cy,TS,TS)}
  return true}
 function drawTiles(cx,cy){if(drawTilesSpr(cx,cy))return;const th=LV.th,x0=Math.max(0,Math.floor(cx/TS)),x1=Math.min(LV.w-1,Math.floor((cx+VW)/TS)),y0=Math.max(0,Math.floor(cy/TS)),y1=Math.min(LV.h-1,Math.floor((cy+VH)/TS));
@@ -605,10 +625,10 @@ function farCanvas(f){if(FAR[f])return FAR[f];const c=document.createElement('ca
    for(let wy=base-h+5;wy<base-4;wy+=6)for(let wx=x+ox+3;wx<x+ox+w-3;wx+=5){const on=((wx*7+wy*13+f)%11)/11<lit;if(on||f===1){g.fillStyle=f===1?'rgba(255,255,255,.35)':win;g.fillRect(wx,wy,2,3)}}}
   x+=w+Math.floor(rr()*4)}});
  return FAR[f]=c}
-function drawFar(cx,cy){const n='bg_f'+LV.floor+'_far',ox=Math.floor(cx*.15),oy=R(-cy*.12)-12;
+function drawFar(cx,cy){const n='bg_f'+LV.af+'_far',ox=Math.floor(cx*.15),oy=R(-cy*.12)-12;
  if(sprReady(n)){const im=SPR[n],s=SPRS[n]||1,W=im.naturalWidth/s,H=im.naturalHeight/s;for(let x=-(ox%W);x<VW;x+=W)ctx.drawImage(im,x,oy,W,H);return}
- const c=farCanvas(LV.floor);for(let x=-(ox%480);x<VW;x+=480)ctx.drawImage(c,x,oy,480,300)}
-function drawBackground(cx,cy,t){const th=LV.th,f=LV.floor,mid='bg_f'+f+'_mid',arena='bg_f'+f+'_arena';
+ const c=farCanvas(LV.af);for(let x=-(ox%480);x<VW;x+=480)ctx.drawImage(c,x,oy,480,300)}
+function drawBackground(cx,cy,t){const th=LV.th,f=LV.af,mid='bg_f'+f+'_mid',arena='bg_f'+f+'_arena';
  if(sprReady(mid)){drawFar(cx,cy);const im=SPR[mid],s=SPRS[mid]||1,W=im.naturalWidth/s,H=im.naturalHeight/s,y0=R(2*TS-cy);
   const hasA=sprReady(arena),ax0=R(LV.arenaX-cx),ax1=ax0+LV.arenaW;
   // Boss 房那段不画普通墙面，让 Boss 房墙面的窗户透出窗外景色
@@ -623,7 +643,7 @@ function drawBackground(cx,cy,t){const th=LV.th,f=LV.floor,mid='bg_f'+f+'_mid',a
  px(0,R(15*TS-cy),VW,R(2*TS),'rgba(0,0,0,.06)');px(0,R(15*TS-cy),VW,1,th.trim);px(0,R(17*TS-cy),VW,2,th.trim);
  for(const d of LV.decor)if(d.k==='window'||d.k==='lamp'||d.k==='sign')drawDecor(d,cx,cy,th,t)}
 // 灯光：只照背景和装饰（在地面、角色之前画），让前景更突出
-function drawLights(cx,cy,t){const f=LV.floor,th=LV.th;
+function drawLights(cx,cy,t){const f=LV.af,th=LV.th;
  const scene=sprReady('bg_f'+f+'_mid');const amb=scene?{1:0,2:.06,3:.12}[f]:{1:0,2:.16,3:.45}[f];if(amb){ctx.fillStyle=f===2?`rgba(20,24,64,${amb})`:`rgba(8,6,26,${amb})`;ctx.fillRect(0,0,VW,VH)}
  ctx.save();ctx.globalCompositeOperation='lighter';
  for(const d of LV.decor){const x=R(d.x-cx),y=R(d.y-cy);if(x<-120||x>VW+120)continue;
@@ -635,7 +655,7 @@ function drawLights(cx,cy,t){const f=LV.floor,th=LV.th;
  ctx.restore()}
 // 近景剪影层：试玩反馈说像奇怪的影子，默认关闭
 const SHOW_NEAR=false;
-function drawNear(cx,cy){if(!SHOW_NEAR)return;const n='bg_f'+LV.floor+'_near';if(!sprReady(n))return;const im=SPR[n],s=SPRS[n]||1,W=im.naturalWidth/s,H=im.naturalHeight/s;for(let x=-(Math.floor(cx*1.3)%W);x<VW;x+=W)ctx.drawImage(im,x,VH-H,W,H)}
+function drawNear(cx,cy){if(!SHOW_NEAR)return;const n='bg_f'+LV.af+'_near';if(!sprReady(n))return;const im=SPR[n],s=SPRS[n]||1,W=im.naturalWidth/s,H=im.naturalHeight/s;for(let x=-(Math.floor(cx*1.3)%W);x<VW;x+=W)ctx.drawImage(im,x,VH-H,W,H)}
 
 // ===== 武器定义 =====
 const WEAPONS={
@@ -832,6 +852,7 @@ function interact(){
   if(pk.k==='cchest'&&!pk.open){pk.open=true;SFX.boss();const n=8+LV.floor*3;P.curse=(P.curse||0)+n;dropWeapon(pk.x,pk.y-8,true);pickups.push({k:'scroll',x:pk.x+14,y:pk.y-6,vy:-140});for(let i=0;i<20;i++)pickups.push({k:'cell',x:pk.x,y:pk.y-10,vx:rnd(-140,140),vy:rnd(-280,-100)});burst(pk.x,pk.y-8,24,['#c87aff','#3a1a4a','#fff'],180,.6);toast('签了加班合同！击败 '+n+' 个敌人前，受到的伤害翻倍',2600);return}
   if(pk.k==='chest'&&!pk.open){pk.open=true;SFX.door();const r=Math.random();if(pk.bonus){dropWeapon(pk.x,pk.y-8,true);pickups.push({k:'scroll',x:pk.x+14,y:pk.y-6,vy:-120});toast('隐藏宝箱！')}else if(r<.75)dropWeapon(pk.x,pk.y-8);else{pickups.push({k:'food',x:pk.x-8,y:pk.y-6,vy:-120});pickups.push({k:'food',x:pk.x+8,y:pk.y-6,vy:-120})}burst(pk.x,pk.y-8,16,['#f2c14e','#fff'],160,.5);return}
   if(pk.k==='ware'&&!pk.sold){buyWare(pk);return}
+  if(pk.k==='gymlift'&&G.state==='play'){G.extra=true;SFX.door();G.state='rest';openRest();return}
   if(pk.k==='weapon'){const slot=WEAPONS[pk.w].slot,bag=slot===1?P.primBag:P.secBag;
    if(bag.length<BAG_MAX){bag.push({w:pk.w,lv:pk.lv||0,aff:pk.aff||[]});equipFromBag(slot,bag.length-1);pk.dead=true;pickups.splice(pickups.indexOf(pk),1);SFX.pick();hud.p=hud.s=null;hud();toast('放进背包：'+wname(pk.w,pk.lv)+'（按住 '+(slot===1?'R':'F')+' 切换）',1600);return}
    if(slot===1){const o=[P.prim,P.primLv,P.primAff];P.prim=pk.w;P.primLv=pk.lv||0;P.primAff=pk.aff||[];[pk.w,pk.lv,pk.aff]=o;P.combo=0;P.atk=null;P.primBag[P.primIdx]={w:P.prim,lv:P.primLv,aff:P.primAff}}else{const o=[P.sec,P.secLv,P.secAff];P.sec=pk.w;P.secLv=pk.lv||0;P.secAff=pk.aff||[];[pk.w,pk.lv,pk.aff]=o;P.secBag[P.secIdx]={w:P.sec,lv:P.secLv,aff:P.secAff}}SFX.pick();hud.p=hud.s=null;hud();toast('换上了 '+(slot===1?wname(P.prim,P.primLv):wname(P.sec,P.secLv)));return}
@@ -841,7 +862,7 @@ function dropBP(x,y){const have=P.bps||[],locked=BP_ALL.filter(b=>!SAVE.bp.inclu
 // 从背包装备第 i 把（slot 1 主武器 / 2 副武器）
 function equipFromBag(slot,i){if(slot===1){P.primBag[P.primIdx]={w:P.prim,lv:P.primLv,aff:P.primAff};const it=P.primBag[i];P.primIdx=i;P.prim=it.w;P.primLv=it.lv;P.primAff=it.aff;P.combo=0;P.atk=null;P.chargeT=0}
  else{P.secBag[P.secIdx]={w:P.sec,lv:P.secLv,aff:P.secAff};const it=P.secBag[i];P.secIdx=i;P.sec=it.w;P.secLv=it.lv;P.secAff=it.aff;P.sprayT=0;P.parryT=0;P.kfMark=null}hud.p=hud.s=null}
-function dropWeapon(x,y,bonus){const own=[...(P.primBag||[]).map(b=>b.w),...(P.secBag||[]).map(b=>b.w),P.prim,P.sec];const pool=[...PRIM,...SECN].filter(w=>!own.includes(w)&&unlocked(w)),w=pick(pool),slot=WEAPONS[w].slot;
+function dropWeapon(x,y,bonus){const own=[...(P.primBag||[]).map(b=>b.w),...(P.secBag||[]).map(b=>b.w),P.prim,P.sec,...pickups.filter(k=>k.k==='weapon').map(k=>k.w)];let pool=[...PRIM,...SECN].filter(w=>!own.includes(w)&&unlocked(w));if(!pool.length)pool=[...PRIM,...SECN].filter(w=>w!==P.prim&&w!==P.sec&&unlocked(w));const w=pick(pool),slot=WEAPONS[w].slot;
  const lv=clamp(LV.floor-1+(Math.random()<.35?1:0)+(bonus?1:0),0,5),n=bonus?2:Math.min(2,irnd(0,LV.floor));pickups.push({k:'weapon',w,lv,aff:rollAff(slot,n),x,y,vy:-160})}
 function placeBox(dbl){const tx0=Math.floor((P.x+P.face*22)/TS)+(P.face>0?0:-1),w=dbl?3:2;let gy=Math.floor(groundBelow((tx0+.5)*TS,P.y-8)/TS);const cells=[];
  for(let i=0;i<w;i++)for(let j=1;j<=2;j++){const tx=tx0+i*(P.face>0?1:-1),ty=gy-j;if(tileAt(tx,ty)!==0)return false;cells.push([tx,ty])}
@@ -881,22 +902,28 @@ function updProjs(dt){for(let i=projs.length-1;i>=0;i--){const p=projs[i];if(p.l
   if(p.t>p.warn&&!p.up){p.up=true;SFX.stamp();shake=Math.max(shake,3)}
   if(p.up&&!p.hitDone&&P.y>p.y-p.hgt&&Math.abs(P.x-p.x)<p.w/2+4){if(hurtPlayer(p.dmg,sign(P.x-p.x)||1,p))p.hitDone=true}continue}
  else if(p.kind==='laser'){if(p.t>p.warn&&!p.fired){p.fired=true;SFX.laser();shake=Math.max(shake,4)}if(p.fired&&p.t<p.warn+.45&&Math.abs(P.y-13-p.y)<10&&!p.hitDone){if(hurtPlayer(p.dmg,P.x<p.x?-1:1,p))p.hitDone=true}continue}
+ else if(p.kind==='cube'){p.vy+=p.grav*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;
+  if(Math.abs(P.x-p.x)<P.w/2+p.r&&P.y-P.h<p.y+p.r&&P.y>p.y-p.r){if(hurtPlayer(p.dmg,sign(p.vx)||1,p))p.life=0}
+  const gy=19*TS;if(p.life>0&&p.vy>0&&p.y+p.r>=gy){p.life=0;SFX.stamp();shake=Math.max(shake,2);burst(p.x,gy-4,10,['#c8ccd6','#8a8e98','#fff'],140,.35);for(const d of[-1,1])eproj({kind:'wave',x:p.x+d*6,y:gy,vx:d*150,vy:0,r:5,dmg:12,life:1.1,col:'#c8ccd6'})}continue}
+ else if(p.kind==='fireg'){if(P.onGround&&Math.abs(P.x-p.x)<p.r+3&&Math.abs(P.y-p.y)<6)hurtPlayer(p.dmg,sign(P.x-p.x)||1,p);if(Math.random()<.25)part(p.x+rnd(-p.r,p.r),p.y-2,0,-rnd(30,70),pick(['#ff8a2a','#ffd84a','#c8281e']),.35,2,-40);continue}
+ else if(p.kind==='pillar'){if(p.t>p.warn&&!p.on){p.on=true;SFX.boom();shake=Math.max(shake,3);burst(p.x,p.y-10,10,['#ff8a2a','#ffd84a'],160,.4)}if(p.on&&!p.hitDone&&p.t<p.warn+.4&&Math.abs(P.x-p.x)<p.w/2+4&&P.y>p.y-p.hgt){if(hurtPlayer(p.dmg,sign(P.x-p.x)||1,p))p.hitDone=true}if(p.t>p.warn+.55)p.life=0;continue}
  else if(p.kind==='paint'){if(P.onGround&&Math.abs(P.x-p.x)<p.r+3&&Math.abs(P.y-p.y)<6)P.stickT=.12;continue}
  else if(p.kind==='zone'){if(p.t>p.warn&&!p.on){p.on=true;SFX.warn()}if(p.on&&p.t<p.warn+p.dur&&P.onGround&&P.x>p.x0&&P.x<p.x1){hurtPlayer(p.dmg,0,p)}if(p.t>p.warn+p.dur)p.life=0;continue}
  else{if(p.grav)p.vy+=p.grav*dt;
   if(p.kind==='pie'||p.kind==='bigpie'){const gy=groundBelow(p.x,p.y-p.r);if(p.y+p.r>gy&&p.vy>0){p.y=gy-p.r;p.vy=p.kind==='bigpie'?0:-Math.abs(p.vy)*.55;if(Math.abs(p.vy)<60)p.vy=0}p.rot=(p.rot||0)+p.vx*dt*.1}
-  if(p.kind==='doc'){if(p.t>.7&&p.owner){const dx=p.owner.x-p.x,dy=p.owner.y-24-p.y,d=Math.hypot(dx,dy)||1;p.vx+=dx/d*900*dt;p.vy+=dy/d*900*dt;if(d<14&&p.t>1)p.life=0}}
+  if(p.kind==='doc'||p.kind==='bell'){if(p.t>.7&&p.owner){const dx=p.owner.x-p.x,dy=p.owner.y-24-p.y,d=Math.hypot(dx,dy)||1;p.vx+=dx/d*900*dt;p.vy+=dy/d*900*dt;if(d<14&&p.t>1)p.life=0}}
   if(p.kind==='note'||p.kind==='paper'){p.y+=Math.sin(p.t*10)*.4}}
  p.x+=(p.vx||0)*dt;p.y+=(p.vy||0)*dt;
  if(p.kind==='wave'){p.y=groundBelow(p.x,p.y-4);if(isSolid(Math.floor((p.x+sign(p.vx)*4)/TS),Math.floor((p.y-4)/TS)))p.life=0;if(Math.random()<.7)part(p.x,p.y-2,rnd(-20,20),-rnd(40,90),p.col||'#c8c0b0',.3,2,200)}
  if(p.from==='e'){if(Math.abs(P.x-p.x)<P.w/2+p.r&&P.y-P.h<p.y+p.r&&P.y>p.y-p.r-(p.kind==='wave'?10:0)){if(p.kind==='wave'&&!P.onGround&&P.y<p.y-6){}else if(hurtPlayer(p.dmg,sign(p.vx)||sign(P.x-p.x),p)||p.from!=='e'){if(p.from==='e'&&!p.pierce)p.life=0}}}
  else if(p.kind!=='palette'&&p.isProj){for(const e of targets())if(Math.abs(e.x-p.x)<e.w/2+p.r&&p.y>e.y-e.h&&p.y<e.y+p.r){if(p.src==='turret')damage(e,p.dmg*(1+.15*P.stat.color)*(1+.12*P.secLv),sign(p.vx),40,false,false,'turret');else damage(e,p.dmg,sign(p.vx),120,true,false,'sec');p.life=0;break}}
- if(p.kind!=='wave'&&p.kind!=='pie'&&p.kind!=='bigpie'&&p.kind!=='palette'&&p.kind!=='doc'&&isSolid(Math.floor(p.x/TS),Math.floor(p.y/TS))){p.life=0;burst(p.x,p.y,5,'#fff',80,.2)}
+ if(p.kind!=='wave'&&p.kind!=='pie'&&p.kind!=='bigpie'&&p.kind!=='palette'&&p.kind!=='doc'&&p.kind!=='bell'&&isSolid(Math.floor(p.x/TS),Math.floor(p.y/TS))){p.life=0;burst(p.x,p.y,5,'#fff',80,.2)}
  if(p.life<=0||p.x<-50||p.x>LV.w*TS+50)projs.splice(i,1)}}
 function drawProjs(cx,cy){for(const p of projs){const x=R(p.x-cx),y=R(p.y-cy);
  switch(p.kind){
  case 'palette':ctx.save();ctx.translate(x,y);ctx.rotate(p.t*18);pline(0,0,7,0,2,'#e8483a');pline(0,0,0,-7,2,'#5ab85a');pline(0,0,-5,4,2,'#3a8ad8');px(6,-1,2,3,'#e8483a');px(-1,-8,3,2,'#5ab85a');px(-1,-1,3,3,'#fff');ctx.restore();break;
  case 'drop':{const gy=R(p.gy-cy);if(p.t>=0&&p.y<-900||p.t<p.warn){const k=Math.max(0,Math.min(1,p.t/p.warn));ctx.globalAlpha=.25+.45*k;px(x-4-R(6*k),gy-2,8+R(12*k),2,'#ff3a3a');px(x-2-R(3*k),gy-3,4+R(6*k),1,'#ff7a6a');ctx.globalAlpha=1}
+  else if(p.img==='fire'){const yy=R(p.y-cy);if(!(useSpr&&sprFrame('proj_fire',Math.floor(p.t*12),x,yy,1,false,'center'))){pcirc(x,yy,6,'#c8281e');pcirc(x,yy-1,4,'#ff8a2a');pcirc(x,yy-2,2,'#ffd84a');px(x-1,yy-14,3,8,'#ff8a2a')}ctx.globalAlpha=.4;px(x-6,gy-2,12,2,'#ff3a3a');ctx.globalAlpha=1}
   else{const n=p.img==='pie'?'proj_pie':'proj_note';if(!(useSpr&&sprFrame(n,Math.floor(p.t*12),x,R(p.y-cy),1,false,'center')))pcirc(x,R(p.y-cy),5,p.img==='pie'?'#e8b060':'#f4f1ea');ctx.globalAlpha=.4;px(x-6,gy-2,12,2,'#ff3a3a');ctx.globalAlpha=1}break}
  case 'ebomb':if(!p.done){ctx.globalAlpha=.3+.3*Math.sin(p.t*30);pring(x,y,p.r,'#ff5a4a',1);pring(x,y,R(p.r*p.t/p.warn),'#ffd84a',1);ctx.globalAlpha=1;px(x-3,y-4,6,6,'#3a3a46');px(x-1,y-8,2,4,'#ff7a4a')}else{ctx.globalAlpha=Math.max(0,1-(p.t-p.warn)*4);pcirc(x,y,p.r,'#ffd08a');ctx.globalAlpha=1}break;
  case 'ink':pcirc(x,y,4,'#e8582a');px(x-2,y-3,2,2,'#ffd08a');px(x+1,y+1,2,1,'#a8301a');break;
@@ -915,8 +942,15 @@ function drawProjs(cx,cy){for(const p of projs){const x=R(p.x-cx),y=R(p.y-cy);
   else{const h=R(p.hgt*prog);px(x-p.w/2,y-h,p.w,h,p.col);px(x-p.w/2,y-h,p.w,3,'#fff');px(x-p.w/2+3,y-h+6,2,h-8,'rgba(255,255,255,.35)');if(h>20)pnum('+',x,y-h-8,'#5ab85a')}
   if(p.t>p.warn+1.35)p.life=0;break}
  case 'laser':if(!p.fired){ctx.globalAlpha=.5+.5*Math.sin(p.t*40);px(0,y,VW,1,'#ff5a4a');ctx.globalAlpha=1}else if(p.t<p.warn+.45){if(useSpr&&sprReady('proj_laser')){for(let lx=0;lx<VW;lx+=32)sprFrame('proj_laser',Math.floor(p.t*20),lx+16,y,1,false,'center')}else{px(0,y-5,VW,10,'#ff5a4a');px(0,y-2,VW,4,'#fff')}}if(p.t>p.warn+.5)p.life=0;break;
+ case 'cube':{if(useSpr&&sprFrame('proj_cube',Math.floor(p.t*12),x,y,1,false,'center'))break;ctx.save();ctx.translate(x,y);ctx.rotate(p.t*7);px(-7,-7,14,14,'#14121a');px(-6,-6,12,12,'#c8ccd6');px(-6,-6,12,3,'#f4f4f8');px(-6,3,12,3,'#8a8e98');pline(-6,-6,5,5,1,'#5ab85a');ctx.restore();break}
+ case 'bell':{if(useSpr&&sprFrame('proj_bell',Math.floor(p.t*16),x,y,1,false,'center'))break;ctx.save();ctx.translate(x,y);ctx.rotate(p.t*16);px(-9,-1,18,3,'#3a3a46');for(const s of[-1,1]){px(s*9-3,-6,6,12,'#14121a');px(s*9-2,-5,4,10,'#6a6e78');px(s*9-2,-5,4,2,'#9aa0a8')}ctx.restore();break}
+ case 'fireg':{const a=Math.min(1,p.life/.6);if(useSpr&&sprReady('fx_fireg')){ctx.globalAlpha=a;sprFrame('fx_fireg',Math.floor(p.t*10+p.x),x,y,1);ctx.globalAlpha=1;break}ctx.globalAlpha=.85*a;const f=Math.floor(p.t*12+p.x)%3;px(x-p.r,y-3,p.r*2,3,'#c8281e');px(x-p.r+2,y-6-f,4,4+f,'#ff8a2a');px(x-1,y-8+f,3,6-f,'#ffd84a');px(x+p.r-6,y-5-(2-f),4,3+(2-f),'#ff8a2a');ctx.globalAlpha=1;break}
+ case 'fireball':if(useSpr&&sprFrame('proj_fireball',Math.floor(p.t*12),x,y,sign(p.vx)||1,false,'center'))break;pcirc(x,y,4,'#ff8a2a');pcirc(x,y,2,'#ffd84a');px(x,y,1,1,'#fff');break;
+ case 'pillar':{const gy=y;if(p.on&&useSpr&&sprReady('proj_pillar')){sprFrame('proj_pillar',Math.min(sprN('proj_pillar')-1,Math.floor((p.t-p.warn)/.55*sprN('proj_pillar'))),x,gy,1);break}if(!p.on){if(p.t>0){ctx.globalAlpha=.3+.3*Math.sin(p.t*30);px(x-p.w/2,gy-3,p.w,3,'#ff5a2a');ctx.globalAlpha=1}}else{const k=p.t-p.warn,h=R(p.hgt*Math.min(1,k/.1)*(k>.4?Math.max(0,1-(k-.4)/.15):1));
+   px(x-p.w/2,gy-h,p.w,h,'#c8281e');px(x-p.w/2+3,gy-h,p.w-6,h,'#ff8a2a');px(x-3,gy-h,6,h,'#ffd84a');for(let i=0;i<4;i++)px(x-p.w/2+rnd(0,p.w-3),gy-h-rnd(0,8),3,3,pick(['#ff8a2a','#ffd84a']))}break}
  case 'paint':{const a=Math.min(1,p.life/1.2);ctx.globalAlpha=.85*a;px(x-p.r,y-2,p.r*2,2,'#c8402a');px(x-p.r+3,y-3,p.r*2-6,1,'#e8503a');px(x-p.r+5,y-3,3,1,'#ff9a7a');ctx.globalAlpha=1;break}
- case 'zone':if(!p.on){ctx.globalAlpha=.25+.25*Math.sin(p.t*24);px(p.x0-cx,y-6,p.x1-p.x0,6,'#ff5a4a');ctx.globalAlpha=1}else if(useSpr&&sprReady('proj_zone')){ctx.save();ctx.beginPath();ctx.rect(p.x0-cx,y-12,p.x1-p.x0,12);ctx.clip();for(let zx=p.x0;zx<p.x1;zx+=32)sprFrame('proj_zone',Math.floor(p.t*10),zx+16-cx,y,1);ctx.restore()}else{px(p.x0-cx,y-5,p.x1-p.x0,5,'#d8584a');for(let xx=p.x0;xx<p.x1;xx+=10)px(xx-cx,y-8-((xx+Math.floor(p.t*20))%3),3,3,'#ffd84a')}break;
+ case 'zone':if(p.style==='clay'){if(!p.on){ctx.globalAlpha=.3+.3*Math.sin(p.t*24);px(p.x0-cx,y-3,p.x1-p.x0,3,'#e8783a');ctx.globalAlpha=1}else{const k=Math.min(1,(p.t-p.warn)/.08);for(let xx=p.x0;xx<p.x1;xx+=7){const h=R((8+((xx*13)%7))*k);px(xx-cx,y-h,6,h,'#c8955a');px(xx-cx+1,y-h,3,2,'#f0c890');px(xx-cx+2,y-h-2,2,2,'#e8783a')}}break}
+ if(!p.on){ctx.globalAlpha=.25+.25*Math.sin(p.t*24);px(p.x0-cx,y-6,p.x1-p.x0,6,'#ff5a4a');ctx.globalAlpha=1}else if(useSpr&&sprReady('proj_zone')){ctx.save();ctx.beginPath();ctx.rect(p.x0-cx,y-12,p.x1-p.x0,12);ctx.clip();for(let zx=p.x0;zx<p.x1;zx+=32)sprFrame('proj_zone',Math.floor(p.t*10),zx+16-cx,y,1);ctx.restore()}else{px(p.x0-cx,y-5,p.x1-p.x0,5,'#d8584a');for(let xx=p.x0;xx<p.x1;xx+=10)px(xx-cx,y-8-((xx+Math.floor(p.t*20))%3),3,3,'#ffd84a')}break;
  }}}
 // ===== 敌人 =====
 const enemies=[];// poise：韧性。出招（前摇/冲刺）时只有打空韧性才能打断；普通状态下挨打会小硬直
@@ -1057,6 +1091,7 @@ function drawPickups(cx,cy,t){let near=null;for(const k of pickups){const x=R(k.
  else if(k.k==='tdoor'){px(x-12,y-38,24,38,'#2a2d36');px(x-10,y-36,20,36,k.used?'#5a5a5a':k.open?'#5ab85a':'#8a3a3a');px(x-8,y-30,16,8,'#f4f1ea');px(x-6,y-28,12,1,'#3a3a46');px(x-6,y-26,8,1,'#3a3a46');if(k.open&&!k.used){ctx.globalAlpha=.25+.15*Math.sin(t*5);px(x-14,y-40,28,40,'#bde986');ctx.globalAlpha=1}px(x+5,y-18,2,2,'#ffd84a')}
  else if(k.k==='wireterm'){px(x-7,y-20,14,20,'#2a2d36');px(x-6,y-19,12,9,k.used?'#1a3a2a':'#0e2a3a');if(!k.used){ctx.fillStyle='#7fd8ff';ctx.fillRect(x-4,y-17,8,1);ctx.fillRect(x-4,y-14,5,1);if(Math.floor(t*3)%2)ctx.fillRect(x+2,y-14,2,1)}else{px(x-3,y-16,6,3,'#5af08a')}px(x-5,y-8,10,2,'#5a5e68')}
  else if(k.k==='rush'){if(!k.used){const b=Math.sin(t*4)*2;ctx.globalAlpha=.35+.2*Math.sin(t*6);pcirc(x,y-12+b,10,'#ff5a4a');ctx.globalAlpha=1;px(x-6,y-18+b,12,14,'#f4f1ea');px(x-6,y-18+b,12,3,'#d8483a');px(x-4,y-13+b,8,1,'#3a3a46');px(x-4,y-11+b,6,1,'#3a3a46');pnum('!',x,y-30+b,'#ff5a4a',1)}}
+ else if(k.k==='gymlift'){ctx.globalAlpha=.2+.15*Math.sin(t*3);px(x-18,y-66,36,66,'#c87aff');ctx.globalAlpha=1;ctx.font='bold 8px sans-serif';ctx.textAlign='center';const s='天台 · 健身房 ↑',tw=ctx.measureText(s).width+8;px(x-tw/2,y-78,tw,12,'#14121a');px(x-tw/2+1,y-77,tw-2,10,'#3a1a4a');ctx.fillStyle='#ffd84a';ctx.fillText(s,x,y-69);ctx.textAlign='left'}
  else if(k.k==='intern'&&pk('intern')){sprFrame('pk_intern',Math.floor(t*3)%Math.max(1,sprN('pk_intern')),x,y,1)}
  else if(k.k==='intern'){ctx.save();ctx.translate(x,y);ctx.scale(1.3,1.3);ctx.translate(-x,-y);const b=Math.floor(t*2)%2;px(x-5,y-4,3,4,'#14121a');px(x+2,y-4,3,4,'#14121a');px(x-7,y-21,14,18,'#14121a');px(x-6,y-20,12,16,'#f4f1ea');px(x-1,y-20,2,12,'#3a8ad8');px(x-2,y-9,4,3,'#3a8ad8');
   px(x-6,y-31,12,11,'#14121a');px(x-5,y-30,10,9,'#f0c8a0');px(x-5,y-31,10,3,'#e8a040');px(x-3,y-26,2,2,'#14121a');px(x+1,y-26,2,2,'#14121a');px(x-1,y-23,3,1,'#c86a5a');px(x+6,y-18+b,3,6,'#f0c8a0');
@@ -1071,7 +1106,7 @@ function drawPickups(cx,cy,t){let near=null;for(const k of pickups){const x=R(k.
    else{px(x-5,iy-5,10,10,'#14121a');px(x-4,iy-4,8,8,'#6a3a8a');ctx.font='bold 8px sans-serif';ctx.textAlign='center';ctx.fillStyle='#ffd84a';ctx.fillText('?',x,iy+3);ctx.textAlign='left'}}
   ctx.font='bold 7px sans-serif';ctx.textAlign='center';const s=k.sold?'已售':'✦'+k.c;ctx.fillStyle='#14121a';ctx.fillText(s,x+1,y+9);ctx.fillStyle=k.sold?'#9aa0a8':P.cells>=k.c?'#ffd84a':'#ff7a6a';ctx.fillText(s,x,y+8);ctx.textAlign='left'}
  else if(k.k==='door'){px(x-12,y-40,24,40,'#3a3a46');px(x-10,y-38,20,38,k.open?'#f2d27a':'#6a5a4a');if(k.open){ctx.globalAlpha=.3+.2*Math.sin(t*4);px(x-14,y-42,28,42,'#fff2a0');ctx.globalAlpha=1}px(x+5,y-20,2,2,'#2a2a2a')}
- if((k.k==='weapon'||k.k==='chest'&&!k.open||k.k==='cchest'&&!k.open||k.k==='door'&&k.open||k.k==='tdoor'&&k.open&&!k.used||(k.k==='wireterm'||k.k==='rush')&&!k.used||k.k==='ware'&&!k.sold)&&Math.abs(k.x-P.x)<18&&Math.abs(k.y-P.y)<24)near=k}
+ if((k.k==='weapon'||k.k==='chest'&&!k.open||k.k==='cchest'&&!k.open||k.k==='door'&&k.open||k.k==='tdoor'&&k.open&&!k.used||(k.k==='wireterm'||k.k==='rush')&&!k.used||k.k==='ware'&&!k.sold||k.k==='gymlift')&&Math.abs(k.x-P.x)<18&&Math.abs(k.y-P.y)<24)near=k}
  return near}
 function drawIcon(w,x,y){if(useSpr&&sprReady('icon_'+w)){sprFrame('icon_'+w,0,x,y,1,false,'center');return}
  if(w==='whip'){px(x-7,y+3,4,3,'#5a3a2a');ctx.strokeStyle='#7fd8ff';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(x-4,y+3);ctx.quadraticCurveTo(x+8,y+4,x+2,y-4);ctx.quadraticCurveTo(x-4,y-9,x+7,y-7);ctx.stroke();px(x+6,y-8,2,2,'#fff');return}
@@ -1093,16 +1128,18 @@ let boss=null;
 const BOSSDEF={
  ad:{name:'主美 · 改稿大师',hp:950,w:22,h:60,quote:'“这版不行，再改一版。”',p2:'“这是终稿……的第二版！”',dead:'“……这版，过了。”',contact:16},
  pd:{name:'制作人 · 需求变更',hp:1250,w:22,h:52,quote:'“需求有一点点小调整……”',p2:'“上线前再加个功能！”',dead:'“需求……冻结。”',contact:16},
- ceo:{name:'老板 · 画大饼',hp:2200,w:34,h:64,quote:'“年轻人，项目做成了，大家都有饼吃！”',p2:'“这个饼，可大了！”',dead:'“好吧……今天准时下班。”',contact:20}};
+ ceo:{name:'老板 · 画大饼',hp:2200,w:34,h:64,quote:'“年轻人，项目做成了，大家都有饼吃！”',p2:'“这个饼，可大了！”',dead:'“好吧……今天准时下班。”',contact:20},
+ ljy:{name:'隐藏大佬 · 刘敬阳',hp:3400,w:30,h:60,quote:'“这么晚还在公司？来，陪我练两组。”',p2:'“炎龙铠甲——合体！”',p3:'“龙魂，燃烧吧！”',dead:'“……好小子。明早七点，健身房见。”',contact:22}};
 function bsp(b){return(b.phase===3?1.5:b.phase===2?1.3:1)*(G.hard?1.15:1)}
 function spawnBoss(kind){const d=BOSSDEF[kind],hp=Math.round(d.hp*(G.hard?1.4:1));boss={kind,isBoss:true,name:d.name,x:LV.arenaX+LV.arenaW-80,y:19*TS,w:d.w,h:d.h,vx:0,vy:0,face:-1,hp,max:hp,state:'intro',t:0,anim:0,flash:0,phase:1,onGround:true,drop:false,cd:0,idleT:1,contactCd:0,pen:-.4,alpha:1,minions:0,seq:0,stag:0,stagMax:Math.round(hp*.25),stagPend:false,phasePend:0,closeT:0,hitLog:[]};
  bossBanner(d.name,d.quote);Snd.play('boss');SFX.boss()}
 // 近身反击：玩家贴身太久，或短时间连砍太多刀，Boss 用一招快速近身技把人打开
 function bossCounterDue(b){const recent=b.hitLog.filter(t=>T-t<1.5).length;return b.closeT>(b.phase>=3?.5:.7)||recent>=5}
-const COUNTER={ad:'sweep_wind',pd:'shove_wind',ceo:'belly_wind'};
+const COUNTER={ad:'sweep_wind',pd:'shove_wind',ceo:'belly_wind',ljy:'curl_wind'};
 function bossChoose(){const b=boss,dx=P.x-b.x,dist=Math.abs(dx),sp=bsp(b);b.t=0;b.seq++;const prev=b.last;
- if(bossCounterDue(b)){b.state=COUNTER[b.kind];b.closeT=0;b.hitLog.length=0;b.last=b.state;b.sp=sp;SFX.warn();return}
+ if(bossCounterDue(b)){b.state=b.kind==='ljy'&&b.phase>=2?'upper_wind':COUNTER[b.kind];b.closeT=0;b.hitLog.length=0;b.last=b.state;b.sp=sp;SFX.warn();return}
  // 玩家贴得近时优先用近身招（不对着空气扔东西）
+ if(b.kind==='ljy'){b.state=dist<70&&Math.random()<.6?pick(LJY_NEAR[b.phase>=2?2:1]):ljyChoose(b,dist,prev);b.last=b.state;b.sp=sp;if(b.state.endsWith('_wind'))SFX.warn();return}
  if(dist<70&&Math.random()<.65){const near={ad:['sweep_wind','stamp_up','sweep_wind','dash_wind'],pd:['shove_wind','tele','change'],ceo:['pound','belly_wind','pound']}[b.kind];b.state=pick(near);if(b.state===prev)b.state=pick(near);b.last=b.state;b.sp=sp;if(b.state.endsWith('_wind'))SFX.warn();return}
  for(let tries=0;tries<3;tries++){
  if(b.kind==='ad'){const r=Math.random();b.state=dist>140?(r<.55?'dash_wind':'notes'):(r<.4?'dash_wind':r<.7?'stamp_up':'notes');if(b.seq%4===0)b.state='stamp_up';if(b.phase>=2&&b.seq%5===2)b.state='rain'}
@@ -1115,16 +1152,16 @@ function bossUpdate(dtA){const b=boss;if(!b)return;if(b.state!=='dead'){tickStat
  if(!['intro','stagger','roar','tele','tele_in'].includes(b.state)&&Math.abs(dx)<44&&Math.abs((P.y-17)-(b.y-b.h/2))<b.h/2+20&&P.rollT<=0)b.closeT+=dt;else b.closeT=Math.max(0,b.closeT-dt*.6);
  if(b.state==='recover'&&b.t>.25&&bossCounterDue(b)){bossChoose()}
  // 放远程招的时候被贴脸狂砍：中断施法，直接近身反击
- if(['pie','kpi','bigpie','pierain','notes','rain','doc','change','laser','call'].includes(b.state)&&b.t>.35&&(b.hitLog.filter(t=>T-t<1.5).length>=8||b.closeT>1.2)){b.thrown=false;bossChoose()}
+ if(['pie','kpi','bigpie','pierain','notes','rain','doc','change','laser','call','cube','bell','breath','pillars','meteor'].includes(b.state)&&b.t>.35&&(b.hitLog.filter(t=>T-t<1.5).length>=8||b.closeT>1.2)){b.thrown=false;bossChoose()}
  // 破绽槽：持续输出会攒满，满了 Boss 原地失衡，受到伤害提高
  if(b.state!=='stagger')b.stag=Math.max(0,b.stag-b.stagMax*.05*dt);
- const grounded=['idle','recover','dash_wind','notes','doc','change','laser','pie','kpi','bigpie','rain','call','pierain'].includes(b.state)&&b.onGround!==false;
+ const grounded=['idle','recover','dash_wind','notes','doc','change','laser','pie','kpi','bigpie','rain','call','pierain','cube','bell','breath','pillars','meteor','brush_wind','fdash_wind'].includes(b.state)&&b.onGround!==false;
  if(b.stagPend&&grounded){b.stagPend=false;b.stag=0;b.state='stagger';b.t=0;b.vx=-b.face*120;b.thrown=false;b.jumped=false;SFX.parry();SFX.stamp();shake=6;hitstop=Math.max(hitstop,.12);toast('破绽！趁现在猛攻',1400);burst(b.x,b.y-b.h,24,['#ffd84a','#fff'],220,.5,3,0)}
  // 转阶段：等 Boss 落地空闲时才怒吼，把玩家震开
  if(!b.phasePend&&b.phase===1&&b.hp<b.max*.5)b.phasePend=2;
  if(!b.phasePend&&b.phase===2&&b.hp<b.max*.25)b.phasePend=3;
  if(b.phasePend&&(b.state==='idle'||b.state==='recover')){const np=b.phasePend;b.phasePend=0;b.phase=np;b.state='roar';b.t=0;b.vx=0;
-  toast(np===2?BOSSDEF[b.kind].name.split(' · ')[0]+'：'+BOSSDEF[b.kind].p2:BOSSDEF[b.kind].name.split(' · ')[0]+' 狂暴了！',2400);shake=7;SFX.boss();burst(b.x,b.y-b.h/2,np===2?30:40,np===2?['#ff5a4a','#ffd84a']:['#ff3a3a','#fff'],280,.6,3,100);sfx('fx_roar',b.x,b.y-b.h/2,1,12);
+  {const D=BOSSDEF[b.kind],nm=b.kind==='ljy'?'刘敬阳':D.name.split(' · ')[0];toast(np===2?nm+'：'+D.p2:D.p3?nm+'：'+D.p3:nm+' 狂暴了！',2400)}if(b.kind==='ljy'&&np===2){b.state='transform';b.t=0}shake=7;SFX.boss();burst(b.x,b.y-b.h/2,np===2?30:40,np===2?['#ff5a4a','#ffd84a']:['#ff3a3a','#fff'],280,.6,3,100);sfx('fx_roar',b.x,b.y-b.h/2,1,12);
   for(const p of projs)if(p.from==='e'&&p.isProj){p.life=0;burst(p.x,p.y,4,'#fff',60,.2)}
   if(Math.abs(P.x-b.x)<110&&!P.dead){P.vx=sign(P.x-b.x||1)*280;P.vy=-220;P.hurtT=.2;P.atk=null}
   if(np===2&&b.kind==='ceo'){for(const s of[-1,1])spawnEnemy({type:'kpi',x:clamp(b.x+s*120,LV.arenaX+60,LV.arenaX+LV.arenaW-60),y:19*TS},true)}}
@@ -1133,7 +1170,7 @@ function bossUpdate(dtA){const b=boss;if(!b)return;if(b.state!=='dead'){tickStat
  case 'roar':b.vx=0;b.face=sign(dx)||b.face;if(Math.random()<.6)part(b.x+rnd(-20,20),b.y-b.h-rnd(0,10),rnd(-60,60),-rnd(40,100),'#ff5a4a',.4,2,0);if(b.t>1.0){b.state='idle';b.t=0;b.idleT=.3}break;
  case 'stagger':b.vx*=.88;if(Math.random()<.3)part(b.x+rnd(-8,8),b.y-b.h-6,rnd(-30,30),-30,'#ffd84a',.4,2,0);if(b.t>1.8){b.state='idle';b.t=0;b.idleT=.25}break;
  case 'intro':b.vx=0;b.face=sign(dx)||-1;if(b.t>2.2){b.state='idle';b.t=0;b.idleT=.6}break;
- case 'idle':{b.face=sign(dx)||b.face;const walk=b.kind==='pd'?0:b.kind==='ceo'?55:60;b.vx=Math.abs(dx)>70?b.face*walk:0;b.pen=lerp(b.pen,-.4,.1);if(b.t>b.idleT/sp)bossChoose();break}
+ case 'idle':{b.face=sign(dx)||b.face;const walk=b.kind==='pd'?0:b.kind==='ceo'?55:b.kind==='ljy'?(b.armor?85:65):60;b.vx=Math.abs(dx)>70?b.face*walk:0;b.pen=lerp(b.pen,-.4,.1);if(b.t>b.idleT/sp)bossChoose();break}
  // ---- 近身反击 ----
  case 'sweep_wind':b.vx=0;b.face=sign(dx)||b.face;if(b.t>(b.phase>=3?.3:.38)){b.state='sweep';b.t=0;SFX.heavy();shake=Math.max(shake,3)}break;
  case 'sweep':{b.vx=0;const ax=P.x-b.x;if(!b.hitDone&&((ax*b.face>-18&&ax*b.face<48)&&Math.abs((P.y-17)-(b.y-30))<40)){if(hurtPlayer(26,sign(ax)||b.face,b)){P.vx=(sign(ax)||b.face)*300;P.vy=-240}b.hitDone=true}
@@ -1170,25 +1207,99 @@ function bossUpdate(dtA){const b=boss;if(!b)return;if(b.state!=='dead'){tickStat
  case 'pie':b.vx=0;b.face=sign(dx)||b.face;if(b.t>.5&&!b.thrown){b.thrown=true;SFX.throw();const n=b.phase>=2?4:3;for(let i=0;i<n;i++)eproj({kind:'pie',x:b.x+b.face*16,y:b.y-34,vx:b.face*rnd(110,260),vy:-rnd(220,360),grav:700,r:6,dmg:12,life:4.5,pierce:true})}if(b.t>1){b.thrown=false;b.state='idle';b.t=0;b.idleT=.55}break;
  case 'pound':if(b.t<.3){b.vx=0}else if(!b.jumped){b.jumped=true;b.vy=-520;b.vx=clamp(dx/1.0,-260,260);SFX.jump()}else if(b.onGround&&b.t>.45){b.jumped=false;SFX.stamp();shake=7;for(const d of[-1,1])eproj({kind:'wave',x:b.x+d*14,y:b.y,vx:d*200*sp,vy:0,r:6,dmg:16,life:2,col:'#e8b060'});b.landT=.36;if(Math.abs(dx)<34)hurtPlayer(26,sign(dx)||1,b);b.poundN=(b.poundN||0)+1;if(b.phase>=3&&b.poundN<3){b.state='pound';b.t=.15}else{b.poundN=0;b.state='recover';b.t=0;b.rec=.9}}break;
  case 'kpi':b.vx=0;if(b.t<.05){toast('KPI 上涨！',1000);const n=b.phase>=2?6:5;for(let i=0;i<n;i++){const x=i===0?P.x:LV.arenaX+40+((i*137+Math.floor(Math.random()*90))%(LV.arenaW-80));projs.push({kind:'kpi',x,y:19*TS,t:-i*.22,warn:.6,w:22,hgt:70+i*6,dmg:16,col:pick(['#d8584a','#f2c14e','#5ab85a']),life:9,follow:b.phase>=3})}}if(b.t>1.8){b.state='idle';b.t=0;b.idleT=.6}break;
+ default:if(b.kind==='ljy')grav=ljyUpdate(b,dt,dx,sp);break;
  case 'bigpie':b.vx=0;if(b.t<.05){toast('画大饼！',1200);SFX.boss()}if(b.t>.7&&!b.thrown){b.thrown=true;eproj({kind:'bigpie',x:b.x+b.face*20,y:19*TS-22,vx:b.face*230,vy:0,r:22,dmg:22,life:4,pierce:true})}if(b.t>1.8){b.thrown=false;b.state='idle';b.t=0;b.idleT=.8}break;
  }
  if(grav&&b.state!=='stamp_fall'){b.vy=Math.min(MAXF,b.vy+GRAV*dt)}
  if(b.state==='stamp_fall'){b.y+=b.vy*dt;const gy=19*TS;if(b.y>=gy){b.y=gy;b.vy=0;b.state='recover';b.t=0;b.rec=.85;b.landT=.36;SFX.stamp();shake=8;splats.push({x:b.x-12,y:gy,w:24,col:'#c8302a',life:5});
    for(const d of[-1,1])eproj({kind:'wave',x:b.x+d*10,y:gy,vx:d*210*sp,vy:0,r:6,dmg:15,life:2,col:'#e8483a'});if(Math.abs(dx)<24)hurtPlayer(22,sign(dx)||1,b);
    if(b.phase>=2&&b.minions<4&&enemies.filter(e=>e.minion).length<2){b.minions++;spawnEnemy({type:'crumple',x:clamp(b.x+pick([-80,80]),LV.arenaX+40,LV.arenaX+LV.arenaW-40),y:gy},true)}}}
- else if(!['stamp_up','stamp_hover','tele'].includes(b.state)){b.drop=b.kind!=='pd';moveBody(b,dt)}// 主美和老板穿过单向平台落回地面，免得卡在高台上
+ else if(!['stamp_up','stamp_hover','tele','dive_up','dive_hover','dive_fall'].includes(b.state)){b.drop=b.kind!=='pd';moveBody(b,dt)}// 主美和老板穿过单向平台落回地面，免得卡在高台上
  b.x=clamp(b.x,LV.arenaX+3*TS,LV.arenaX+LV.arenaW-2*TS);
  // 接触伤害
  // 被动碰撞伤害只在冲撞类动作里生效；平时贴身不扣血，贴脸交给近身反击来惩罚
- if(['dash','belly'].includes(b.state)&&b.alpha>.5&&b.contactCd<=0&&Math.abs(dx)<b.w/2+P.w/2&&P.y>b.y-b.h&&P.y-P.h<b.y){if(hurtPlayer(BOSSDEF[b.kind].contact,sign(dx)||1,b))b.contactCd=.65}}
+ if(['dash','belly','brush','fdash'].includes(b.state)&&b.alpha>.5&&b.contactCd<=0&&Math.abs(dx)<b.w/2+P.w/2&&P.y>b.y-b.h&&P.y-P.h<b.y){if(hurtPlayer(BOSSDEF[b.kind].contact,sign(dx)||1,b))b.contactCd=.65}}
 function bossDie(){const b=boss;if(b.state==='dead')return;b.hp=0;b.state='dead';b.t=0;slowmo=.25;slowT=.9;SFX.boom();shake=10;hitstop=.2;toast(b.name.split(' · ')[0]+'：'+BOSSDEF[b.kind].dead,3000);$('bossbar').classList.remove('show');for(const e of enemies)if(e.minion)e.hp=0}
 function bossGone(){const b=boss;burst(b.x,b.y-b.h/2,60,['#ffd84a','#fff','#d8584a','#7fd8ff'],320,.8,3,200);for(let i=0;i<20;i++)pickups.push({k:'cell',x:b.x,y:b.y-20,vx:rnd(-160,160),vy:rnd(-300,-100)});
- pickups.push({k:'door',x:LV.exitX,y:19*TS,open:true});dropBP(b.x,b.y-20);boss=null;G.bossDone=true;Snd.play(LV.th.song);SFX.win();banner(LV.floor<3?'本层通关！去右边的门':'老板被说服了！去下班吧','',2600)}
+ pickups.push({k:'door',x:LV.exitX,y:19*TS,open:true});dropBP(b.x,b.y-20);boss=null;G.bossDone=true;Snd.play(LV.th.song);SFX.win();banner(LV.floor<3?'本层通关！去右边的门':LV.floor===3?'老板被说服了！去下班吧':'刘敬阳认可了你！去下班吧',LV.floor===3?'……那部货梯，好像能上天台？':'',3200);
+ if(LV.floor===3){const lx=LV.arenaX+14*TS;LV.decor.push({k:'elevator',x:lx-20,y:19*TS-64,gy:19*TS,s:0,lift:1});pickups.push({k:'gymlift',x:lx,y:19*TS})}
+ if(LV.floor===4){SAVE.ljy=(SAVE.ljy||0)+1;saveGame()}}
 function drawBossExtras(cx,cy){const b=boss;if(!b)return;
  if(b.state==='stagger'){const x=R(b.x-cx),y=R(b.y-cy-b.h-8);for(let i=0;i<3;i++){const a=b.anim*5+i*2.1;px(x+Math.cos(a)*10-1,y+Math.sin(a)*3-1,3,3,'#ffd84a');px(x+Math.cos(a)*10,y+Math.sin(a)*3,1,1,'#fff')}}
  if(b.state==='roar'){ctx.globalAlpha=Math.max(0,.5-b.t*.5);pring(R(b.x-cx),R(b.y-cy-b.h/2),R(20+b.t*120),'#ff5a4a',2);ctx.globalAlpha=1}
+ if(b.state==='dive_hover'||b.state==='dive_fall'){const gy=19*TS-cy,x=R(b.x-cx);ctx.globalAlpha=.35+.25*Math.sin(b.anim*30);px(x-28,gy-3,56,3,'#ff8a2a');ctx.globalAlpha=1;pnum('!',x,gy-24,'#ff5a4a',2)}
  if(b.state==='stamp_hover'||b.state==='stamp_fall'){const gy=19*TS-cy,x=R(b.x-cx);ctx.globalAlpha=.35+.25*Math.sin(b.anim*30);px(x-16,gy-3,32,3,'#ff3a3a');ctx.globalAlpha=1;pnum('!',x,gy-24,'#ff5a4a',2)}
- if(['dash_wind','sweep_wind','shove_wind','belly_wind'].includes(b.state)&&Math.floor(b.anim*14)%2===0)pnum('!',R(b.x-cx),R(b.y-cy-b.h-14),'#ff5a4a',2)}
+ if(['dash_wind','sweep_wind','shove_wind','belly_wind','brush_wind','curl_wind','fdash_wind','upper_wind'].includes(b.state)&&Math.floor(b.anim*14)%2===0)pnum('!',R(b.x-cx),R(b.y-cy-b.h-14),'#ff5a4a',2)}
+// ===== 隐藏 Boss：刘敬阳（天台健身房）=====
+// 一阶段中山装：扔方块、雕刻笔刷、哑铃；二阶段炎龙铠甲：烈焰冲刺、龙炎吐息、烈焰柱、炎龙天降、升龙拳；三阶段加天火
+function ljyChoose(b,dist,prev){let s;
+ if(b.phase===1){const o=dist>150?['cube','cube','bell','brush_wind']:['brush_wind','slam','cube','bell'];s=pick(o);if(b.seq%4===0)s='slam'}
+ else{const o=dist>150?['fdash_wind','breath','pillars','dive_up','pillars']:['fdash_wind','breath','pillars','dive_up','upper_wind'];s=pick(o);if(b.phase>=3&&b.seq%3===0)s='meteor'}
+ if(s===prev)s=b.phase===1?pick(['cube','brush_wind','bell']):pick(['fdash_wind','pillars','breath']);return s}
+const LJY_NEAR={1:['curl_wind','slam','brush_wind'],2:['upper_wind','breath','fdash_wind']};
+function ljyFireTrail(x){projs.push({kind:'fireg',from:'x',x,y:19*TS,r:9,t:0,life:2.4,dmg:9})}
+function ljyUpdate(b,dt,dx,sp){const gy=19*TS,AX0=LV.arenaX+3*TS,AX1=LV.arenaX+LV.arenaW-2*TS;let grav=true;
+ if(b.armor&&Math.random()<.35)part(b.x+rnd(-14,14),b.y-rnd(10,b.h),rnd(-20,20),-rnd(40,90),pick(['#ff8a2a','#ffd84a','#c8281e']),.4,2,-60);
+ const done=(idle)=>{b.thrown=false;b.state='idle';b.t=0;b.idleT=idle};
+ switch(b.state){
+ // ---- 一阶段：中山装 ----
+ case 'cube':b.vx=0;b.face=sign(dx)||b.face;if(b.t>.45&&!b.thrown){b.thrown=true;SFX.throw();for(let i=0;i<3;i++){const vy=-300-i*50,g=760,h=56-7,T=(-vy+Math.sqrt(vy*vy+2*g*h))/g,x0=b.x+b.face*12,tx=P.x+(i-1)*44+P.vx*.3;eproj({kind:'cube',x:x0,y:b.y-56,vx:(tx-x0)/T,vy,grav:g,r:7,dmg:16,life:4,breakable:true})}}if(b.t>1.15)done(.5);break;
+ case 'bell':b.vx=0;b.face=sign(dx)||b.face;if(b.t>.4&&!b.thrown){b.thrown=true;SFX.throw();eproj({kind:'bell',x:b.x+b.face*16,y:b.y-34,vx:b.face*340,vy:0,r:9,dmg:18,life:3,owner:b,pierce:true})}if(b.t>1.3)done(.45);break;
+ case 'brush_wind':b.vx=0;b.face=sign(dx)||b.face;if(b.t<.05)SFX.warn();if(b.t>.5/sp){b.state='brush';b.t=0;b.bx0=b.x;SFX.heavy()}break;
+ case 'brush':b.vx=b.face*330*sp;if(Math.random()<.9)part(b.x-b.face*10,gy-2,-b.face*rnd(20,60),-rnd(10,50),pick(['#e8783a','#c8955a','#ffb84a']),.35,2,200);
+  if(b.t>.42||b.hitWall){const x0=Math.min(b.bx0,b.x),x1=Math.max(b.bx0,b.x);projs.push({kind:'zone',style:'clay',x0:x0-6,x1:x1+6,y:gy,t:0,warn:.35,dur:.45,dmg:16,life:3});b.state='recover';b.t=0;b.rec=.6}break;
+ case 'curl_wind':b.vx=0;b.face=sign(dx)||b.face;if(b.t>(b.phase>=3?.3:.38)){b.state='curl';b.t=0;SFX.heavy();shake=Math.max(shake,4)}break;
+ case 'curl':{b.vx=0;const ax=(P.x-b.x)*b.face;if(!b.hitDone&&ax>-12&&ax<52&&Math.abs((P.y-17)-(b.y-34))<46){if(hurtPlayer(24,b.face,b)){P.vx=b.face*180;P.vy=-400}b.hitDone=true}if(b.t>.3){b.hitDone=false;b.state='recover';b.t=0;b.rec=.55}break}
+ case 'slam':if(b.t<.32){b.vx=0}else if(!b.jumped){b.jumped=true;b.vy=-540;b.vx=clamp(dx/0.95,-280,280);SFX.jump()}else if(b.onGround&&b.t>.45){b.jumped=false;SFX.stamp();shake=7;b.landT=.36;for(const d of[-1,1])eproj({kind:'wave',x:b.x+d*16,y:b.y,vx:d*210*sp,vy:0,r:6,dmg:16,life:2,col:'#9aa0a8'});burst(b.x,b.y-4,16,['#9aa0a8','#fff'],180,.4);if(Math.abs(dx)<36)hurtPlayer(24,sign(dx)||1,b);b.state='recover';b.t=0;b.rec=.8}break;
+ // ---- 变身 ----
+ case 'transform':b.vx=0;b.face=sign(dx)||b.face;if(Math.random()<.9)part(b.x+rnd(-20,20),b.y-rnd(0,b.h),rnd(-40,40),-rnd(60,160),pick(['#ff8a2a','#ffd84a','#c8281e','#fff']),.5,3,-40);
+  if(b.t>.9&&!b.armor){b.armor=true;b.h=66;b.flash=.3;SFX.boom();shake=9;hitstop=Math.max(hitstop,.12);burst(b.x,b.y-34,50,['#ff8a2a','#ffd84a','#c8281e','#fff'],320,.7,3,0);ringFx(b.x,b.y-34,'#ff8a2a');if(Math.abs(P.x-b.x)<120&&!P.dead){P.vx=sign(P.x-b.x||1)*300;P.vy=-240}}
+  if(b.t>1.8)done(.3);break;
+ // ---- 二阶段：炎龙铠甲 ----
+ case 'fdash_wind':b.vx=0;b.face=sign(dx)||b.face;if(b.t<.05)SFX.warn();if(Math.random()<.6)part(b.x-b.face*10,b.y-rnd(0,30),-b.face*60,-20,'#ff8a2a',.3,2,0);if(b.t>.48/sp){b.state='fdash';b.t=0;b.trailX=b.x;SFX.heavy()}break;
+ case 'fdash':b.vx=b.face*430*sp;if(Math.abs(b.x-b.trailX)>16){b.trailX=b.x;ljyFireTrail(b.x)}if(Math.random()<.9)part(b.x-b.face*12,b.y-rnd(10,50),-b.face*rnd(60,140),rnd(-30,30),pick(['#ff8a2a','#ffd84a']),.3,2,0);
+  if(b.t>.5||b.hitWall){if(b.hitWall){shake=5;SFX.stamp()}b.dashN=(b.dashN||0)+1;if(b.phase>=3&&b.dashN<2){b.state='fdash_wind';b.t=.22;b.face=sign(dx)||-b.face}else{b.dashN=0;b.state='recover';b.t=0;b.rec=.6}}break;
+ case 'breath':{b.vx=0;if(b.t<.55){b.face=sign(dx)||b.face;if(b.t<.05){SFX.warn();toast('龙炎吐息！',900)}if(Math.random()<.6)part(b.x+b.face*16,b.y-52,b.face*20,-10,'#ffd84a',.25,2,0)}
+  else if(b.t<1.5){b.breathT=(b.breathT||0)-dt;if(b.breathT<=0){b.breathT=.05;const k=(b.t-.55)/.95,ang=(b.phase>=3?-.35+k*.75:-.15+k*.45)+rnd(-.08,.08);SFX.shoot&&Math.random()<.2&&SFX.shoot();eproj({kind:'fireball',x:b.x+b.face*18,y:b.y-52,vx:b.face*Math.cos(ang)*280,vy:Math.sin(ang)*280+60,r:5,dmg:10,life:1})}}
+  else done(.5);break}
+ case 'pillars':b.vx=0;b.face=sign(dx)||b.face;if(b.t<.05){SFX.warn();toast('烈焰柱！',900);const n=b.phase>=3?7:5,dir=b.face;for(let i=0;i<n;i++){const x=b.x+dir*(46+i*42);if(x>AX0-20&&x<AX1+20)projs.push({kind:'pillar',from:'x',x,y:gy,t:-i*.16,warn:.5,w:22,hgt:96,dmg:18,life:4})}
+   if(b.phase>=3)for(let i=0;i<3;i++)projs.push({kind:'pillar',from:'x',x:clamp(P.x+(i-1)*70,AX0,AX1),y:gy,t:-.6-i*.12,warn:.5,w:22,hgt:96,dmg:18,life:4})}
+  if(b.t>1.6)done(.5);break;
+ case 'dive_up':b.vx=0;grav=false;if(b.t<.28){if(Math.random()<.7)part(b.x+rnd(-10,10),b.y-2,rnd(-40,40),-rnd(20,60),'#ff8a2a',.3,2,0)}else{b.vy=-900;b.y+=b.vy*dt;if(b.y<-90){b.state='dive_hover';b.t=0;b.y=-90}}break;
+ case 'dive_hover':grav=false;b.vy=0;b.x=lerp(b.x,clamp(P.x,AX0,AX1),.1);if(b.t>.85/sp){b.state='dive_fall';b.t=0;b.vy=300}break;
+ case 'dive_fall':grav=false;b.vy=1100;b.y+=b.vy*dt;if(b.y>=gy){b.y=gy;b.vy=0;SFX.boom();shake=9;b.landT=.4;burst(b.x,gy-10,40,['#ff8a2a','#ffd84a','#c8281e','#fff'],300,.6,3,200);
+   if(Math.abs(P.x-b.x)<58&&P.y>gy-60)hurtPlayer(28,sign(P.x-b.x)||1,b);for(let i=-3;i<=3;i++)if(i)ljyFireTrail(b.x+i*20);for(const d of[-1,1])eproj({kind:'wave',x:b.x+d*16,y:gy,vx:d*230*sp,vy:0,r:6,dmg:16,life:2,col:'#ff8a2a'});b.state='recover';b.t=0;b.rec=.85}break;
+ case 'upper_wind':b.vx=0;b.face=sign(dx)||b.face;if(Math.random()<.7)part(b.x+b.face*10,b.y-20,0,-80,'#ff8a2a',.3,2,0);if(b.t>(b.phase>=3?.3:.36)){b.state='upper';b.t=0;b.vy=-560;b.vx=b.face*120;SFX.heavy();shake=Math.max(shake,4)}break;
+ case 'upper':{if(Math.random()<.9)part(b.x+rnd(-8,8),b.y-rnd(0,40),rnd(-30,30),60,pick(['#ff8a2a','#ffd84a']),.3,2,0);const ax=(P.x-b.x)*b.face;if(!b.hitDone&&ax>-14&&ax<46&&P.y>b.y-b.h-30&&P.y-P.h<b.y+10){if(hurtPlayer(26,b.face,b)){P.vx=b.face*160;P.vy=-420}b.hitDone=true}
+  if(b.t>.2&&b.onGround){b.hitDone=false;b.vx=0;SFX.stamp();shake=4;b.landT=.3;b.state='recover';b.t=0;b.rec=.55}break}
+ case 'meteor':b.vx=0;b.face=sign(dx)||b.face;if(b.t<.05){toast('天火！',1000);SFX.boss();const n=10,xs=[P.x];for(let i=1;i<n;i++)xs.push(AX0+Math.random()*(AX1-AX0));xs.forEach((x,i)=>projs.push({kind:'drop',from:'x',x,gy,y:-999,t:-i*.11,warn:.7,dmg:16,img:'fire',life:6,isProj:true}))}
+  if(b.t>1.5)done(.5);break;
+ }
+ return grav}
+function drawLJY(b,t,c){const A=!!b.armor,st=b.state,bob=st==='idle'||st==='recover'?Math.round(Math.sin(t*4)):0;
+ const S=A?'#c8281e':'#4a5058',SD=A?'#7a1410':'#353a42',SL=A?'#e8483a':'#5e6670',G=A?'#f2c14e':'#c8b070',K='#14121a';
+ // 腿
+ const walk=Math.abs(b.vx)>10&&b.onGround!==false?Math.sin(t*12)*2:0;px(-10,-15,8,13,c(SD));px(2,-15,8,13,c(SD));px(-10+walk,-3,9,3,c(A?'#3a0a08':'#141418'));px(2-walk,-3,9,3,c(A?'#3a0a08':'#141418'));
+ if(A){px(-10,-10,8,2,c(G));px(2,-10,8,2,c(G))}
+ // 躯干（壮）
+ px(-13,-40+bob,26,26,c(K));px(-12,-39+bob,24,24,c(S));px(-12,-39+bob,24,2,c(SL));px(-12,-17+bob,24,2,c(SD));
+ if(!A){for(let i=0;i<5;i++)px(-1,-36+bob+i*4,2,1,c(G));px(-10,-35+bob,6,4,c(SD));px(4,-35+bob,6,4,c(SD));px(-10,-35+bob,6,1,c(SL));px(4,-35+bob,6,1,c(SL));px(-10,-24+bob,7,5,c(SD));px(3,-24+bob,7,5,c(SD))}
+ else{pcirc(0,-29+bob,6,c(G));pcirc(0,-29+bob,4,c('#ff8a2a'));px(-2,-31+bob,4,2,c('#fff2a0'));px(-12,-20+bob,24,3,c(G))}
+ // 南瓜肩
+ for(const s of[-1,1]){pcirc(s*13,-36+bob,A?9:8,c(K));pcirc(s*13,-36+bob,A?8:7,c(S));pcirc(s*13-2,-38+bob,3,c(SL));if(A){px(s*13-7,-31+bob,14,2,c(G));px(s*13-1,-45+bob,2,3,c(G))}}
+ // 领子、脖子、头
+ if(!A){px(-5,-42+bob,10,3,c(S));px(-4,-41+bob,8,1,c(SD));px(-4,-44+bob,8,2,c('#d8a880'));px(-6,-55+bob,12,12,c('#e8bf9a'));px(-7,-57+bob,14,4,c('#1a1a1e'));px(-7,-55+bob,2,5,c('#1a1a1e'));px(1,-50+bob,2,2,c(K));px(4,-50+bob,2,2,c(K));px(1,-53+bob,3,1,c('#1a1a1e'));px(4,-53+bob,2,1,c('#1a1a1e'));px(1,-46+bob,4,1,c('#a05040'))}
+ else{px(-7,-58+bob,14,15,c(K));px(-6,-57+bob,12,13,c(S));px(-6,-57+bob,12,2,c(SL));px(0,-52+bob,6,3,c(K));px(1,-51+bob,4,1,c(st.endsWith('_wind')||st==='breath'?'#fff':'#ffd84a'));px(-6,-46+bob,12,2,c(G));
+  pline(-4,-57+bob,-9,-64+bob,2,c(G));pline(2,-57+bob,6,-65+bob,2,c(G));px(-1,-60+bob,2,3,c(G));if(st==='breath'&&b.t>.5){ctx.globalAlpha=.8;pcirc(8,-50+bob,3,'#ffd84a');ctx.globalAlpha=1}}
+ // 后手
+ px(-20,-34+bob,7,15,c(K));px(-19,-33+bob,5,13,c(S));px(-19,-21+bob,5,4,c(A?G:'#e8bf9a'));
+ // 前手 + 道具
+ let hx=16,hy=-24+bob;if(st.endsWith('_wind')||st==='cube'&&b.t<.45||st==='bell'&&b.t<.4||st==='dive_up')hy=-50;if(['brush','curl','upper','fdash'].includes(st)){hx=22;hy=st==='curl'||st==='upper'?-48:-30}
+ pline(10,-34+bob,hx,hy,6,c(K));pline(10,-34+bob,hx,hy,4,c(S));px(hx-2,hy-2,5,5,c(A?G:'#e8bf9a'));
+ if(!A){if(st.startsWith('brush')){pline(hx,hy,hx+18,hy-8,3,c(K));pline(hx,hy,hx+17,hy-8,2,c('#2a2a32'));px(hx+16,hy-10,4,4,c('#ff9a3a'))}
+  else if(st==='cube'&&b.t<.5){px(hx-6,hy-14,12,12,c(K));px(hx-5,hy-13,10,10,c('#c8ccd6'));px(hx-5,hy-13,10,2,c('#f4f4f8'));pline(hx-5,hy-13,hx+4,hy-4,1,c('#5ab85a'))}
+  else if(st!=='bell'||b.t<.4){px(hx-1,hy-8,3,16,c('#3a3a46'));px(hx-4,hy-10,9,4,c(K));px(hx-4,hy+6,9,4,c(K));px(hx-3,hy-9,7,2,c('#6a6e78'));px(hx-3,hy+7,7,2,c('#6a6e78'))}}
+ else{ctx.globalAlpha=.5+.3*Math.sin(t*20);pcirc(hx,hy,5,'#ff8a2a');ctx.globalAlpha=1;px(hx-3,hy-3,6,6,c(G))}}
 
 // ===== 游戏流程 =====
 // ===== 存档（局外进度）=====
@@ -1222,11 +1333,11 @@ function banner(a,b,ms=2200){$('bn1').textContent=a;$('bn2').textContent=b||'';c
 function bossBanner(name,quote){banner(name,quote,2600);$('bossname').textContent=name;$('bossbar').classList.add('show')}
 function show(id,v){$(id).classList.toggle('show',v)}
 // ===== 楼层 =====
-function loadFloor(n,fromRetry){G.floor=n;G.rush=null;genLevel(n);LV.tlimit=[0,110,140,160][n]*(G.hard?.8:1);G.floorT=0;enemies.length=0;projs.length=0;pickups.length=0;parts.length=0;fxs.length=0;corpses.length=0;splats.length=0;nums.length=0;boss=null;G.bossDone=false;G.bossLock=false;
+function loadFloor(n,fromRetry){G.floor=n;G.rush=null;genLevel(n);LV.tlimit=[0,110,140,160,90][n]*(G.hard?.8:1);G.floorT=0;enemies.length=0;projs.length=0;pickups.length=0;parts.length=0;fxs.length=0;corpses.length=0;splats.length=0;nums.length=0;boss=null;G.bossDone=false;G.bossLock=false;
  const keepHp=P.hp;resetPlayer(true);P.hp=G.lvl>=5&&!fromRetry&&n>1?Math.min(P.maxHp,keepHp+P.maxHp*.5):P.maxHp;P.flasks=P.maxFlasks;
  for(const s of LV.spawns)spawnEnemy(s);for(const k of LV.pick)pickups.push(Object.assign({vy:0},k));
  G.snap=JSON.stringify({prim:P.prim,sec:P.sec,primLv:P.primLv,primAff:P.primAff,secLv:P.secLv,secAff:P.secAff,stat:P.stat,cells:P.cells,dmgMul:P.dmgMul,spdMul:P.spdMul,rollMul:P.rollMul,cdMul:P.cdMul,airJumps:P.airJumps,steal:P.steal,critMul:P.critMul,maxHp:P.maxHp,maxFlasks:P.maxFlasks,upg:P.upg,bps:P.bps||[],curse:P.curse||0,primBag:P.primBag,secBag:P.secBag,primIdx:P.primIdx,secIdx:P.secIdx});
- cam.x=0;cam.y=8;G.state='play';Snd.play(LV.th.song);$('floor').textContent=LV.th.name;banner(LV.th.name,['','赶在下班前，穿过美术部','Bug 满地爬的研发部','最后一关：老板办公室'][n],2400);hud()}
+ cam.x=0;cam.y=8;G.state='play';Snd.play(LV.th.song);$('floor').textContent=LV.th.name;banner(LV.th.name,['','赶在下班前，穿过美术部','Bug 满地爬的研发部','最后一关：老板办公室','隐藏关卡：有人还在举铁'][n],2400);hud()}
 function exitFloor(){if(G.state!=='play')return;SFX.door();if(G.floor<3){G.state='rest';openRest()}else{G.state='end';openEnd()}}
 function playerDie(){G.deaths++;G.state='dead';Snd.play('rest');$('dcause').textContent=P.lastHit?'击倒你的是：'+P.lastHit:'';setTimeout(()=>{show('dead',true)},900)}
 function retry(){show('dead',false);const s=JSON.parse(G.snap);Object.assign(P,s);P.cells=Math.floor(s.cells*.5);loadFloor(G.floor,true)}
@@ -1238,7 +1349,7 @@ function openScroll(){G.prev=G.state==='scroll'?G.prev:G.state;G.state='scroll';
 function chooseScroll(i){if(G.state!=='scroll')return;const k=scrollOpts[i];P.stat[k]++;const add=k==='body'?25:10;P.maxHp+=add;P.hp+=add;SFX.heal();show('scroll',false);G.state=G.prev||'play';hud.p=hud.s=null;hud();if(G.state==='rest')rollShop();toast(STATS[k].n+' +1');}
 // 茶水间
 let restOpts=[];
-function openRest(){Snd.play('rest');P.hp=G.lvl>=5?Math.min(P.maxHp,P.hp+P.maxHp*.5):P.maxHp;$('resttxt').textContent=G.lvl>=5?'喝口水，回了一半血，便当补满了。':'喝口水，生命和便当都补满了。';$('restbp').textContent=commitBP();P.flasks=P.maxFlasks;P.rally=0;rollRest();rollShop();show('rest',true)}
+function openRest(){Snd.play('rest');P.hp=G.lvl>=5?Math.min(P.maxHp,P.hp+P.maxHp*.5):P.maxHp;$('resttxt').textContent=(G.floor===3?'货梯缓缓上升，天台上传来杠铃落地的声音……最后整备一下。':'')+(G.lvl>=5?'喝口水，回了一半血，便当补满了。':'喝口水，生命和便当都补满了。');$('restbp').textContent=commitBP();P.flasks=P.maxFlasks;P.rally=0;rollRest();rollShop();show('rest',true)}
 const SHOP=[{id:'flask',n:'加大便当盒',d:'便当上限 +1',c:55},{id:'scroll',n:'灵感卷轴',d:'选一项属性 +1',c:45},{id:'sharpen',n:'武器打磨',d:'主武器等级 +1',c:40},{id:'reforge',n:'重铸词缀',d:'重新随机主武器词缀',c:30}];
 function rollShop(){const box=$('shop');box.innerHTML='';SHOP.forEach((s,i)=>{const b=document.createElement('button');b.className='sitem';const bought=P.bought&&P.bought.includes(s.id)&&s.id!=='scroll';b.disabled=P.cells<s.c||bought||(s.id==='sharpen'&&P.primLv>=5);b.innerHTML=`<b>${s.n}</b><span>${s.d}</span><i>✦ ${s.c}</i>`;b.onclick=()=>buy(s);box.appendChild(b)});$('reroll').disabled=P.cells<25;$('reroll').textContent=`花 25 灵感换一批升级（现有 ${P.cells}）`}
 function buy(s){if(P.cells<s.c||G.state!=='rest')return;P.cells-=s.c;P.bought=(P.bought||[]).concat(s.id);SFX.pick();
@@ -1250,12 +1361,12 @@ function rollRest(){const pool=UPG.filter(u=>!(u.id==='jump'&&P.airJumps>=3)&&!(
 function chooseRest(i){if(G.state!=='rest')return;applyUpg(restOpts[i].id);SFX.pick();show('rest',false);P.bought=[];loadFloor(G.floor+1)}
 $('reroll').onclick=()=>{if(P.cells>=25){P.cells-=25;SFX.select();rollRest();rollShop();hudCells()}};
 // 结局
-function openEnd(){Snd.play('end');show('hud',false);const t=G.time;const bpMsg=commitBP();SAVE.clears++;let lvMsg='';if(G.lvl>=SAVE.maxLvl&&G.lvl<5){SAVE.maxLvl=G.lvl+1;lvMsg='解锁了加班等级 '+SAVE.maxLvl}saveGame();
- $('estat').innerHTML=(G.lvl?'<b style="color:#ff7a6a">加班等级 '+G.lvl+' 通关</b><br>':'')+(lvMsg?'<b style="color:#ffd84a">'+lvMsg+'</b><br>':'')+(bpMsg?'<b style="color:#7fd8ff">'+bpMsg+'</b><br>':'')+`用时 <b>${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}</b>　击败 <b>${G.kills}</b>　倒下 <b>${G.deaths}</b> 次<br>灵感 <b>${P.cells}</b>　升级 ${P.upg.map(id=>UPG.find(u=>u.id===id).ic).join(' ')||'无'}`;setTimeout(()=>show('end',true),1800);G.endT=0}
-function startGame(lvl){Snd.unlock();G.lvl=clamp(lvl|0,0,SAVE.maxLvl);G.hard=G.lvl>=1;show('title',false);show('hud',true);resetPlayer(false);if(G.lvl>=3)P.maxFlasks=P.flasks=1;P.bought=[];P.bps=[];P.curse=0;G.time=0;G.kills=0;G.deaths=0;$('mode').textContent=G.lvl?'加班等级 '+G.lvl:'';loadFloor(1)}
+function openEnd(){Snd.play('end');show('hud',false);const tru=G.floor===4;$('etitle').textContent=tru?'真 · 下班了。':'下班了。';$('esub').textContent=tru?'连隐藏大佬都认可了你。明早七点，健身房见。':'踏实做事，好好生活。';const t=G.time;const bpMsg=commitBP();SAVE.clears++;let lvMsg='';if(G.lvl>=SAVE.maxLvl&&G.lvl<5){SAVE.maxLvl=G.lvl+1;lvMsg='解锁了加班等级 '+SAVE.maxLvl}saveGame();
+ $('estat').innerHTML=(G.lvl?'<b style="color:#ff7a6a">加班等级 '+G.lvl+' 通关</b><br>':'')+(lvMsg?'<b style="color:#ffd84a">'+lvMsg+'</b><br>':'')+(bpMsg?'<b style="color:#7fd8ff">'+bpMsg+'</b><br>':'')+(!tru&&!SAVE.ljy?'<span style="opacity:.7">天台的灯还亮着……（打败老板后，Boss 房里的货梯能上天台）</span><br>':'')+`用时 <b>${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}</b>　击败 <b>${G.kills}</b>　倒下 <b>${G.deaths}</b> 次<br>灵感 <b>${P.cells}</b>　升级 ${P.upg.map(id=>UPG.find(u=>u.id===id).ic).join(' ')||'无'}`;setTimeout(()=>show('end',true),1800);G.endT=0}
+function startGame(lvl){G.extra=false;Snd.unlock();G.lvl=clamp(lvl|0,0,SAVE.maxLvl);G.hard=G.lvl>=1;show('title',false);show('hud',true);resetPlayer(false);if(G.lvl>=3)P.maxFlasks=P.flasks=1;P.bought=[];P.bps=[];P.curse=0;G.time=0;G.kills=0;G.deaths=0;$('mode').textContent=G.lvl?'加班等级 '+G.lvl:'';loadFloor(1)}
 let selLvl=SAVE.maxLvl;
 function setLvl(v){selLvl=clamp(v,0,SAVE.maxLvl);$('lvln').textContent=selLvl;$('lvld').textContent=LVLS.slice(1,selLvl+1).join(' ')||LVLS[0];$('lvlm').disabled=selLvl<=0;$('lvlp').disabled=selLvl>=SAVE.maxLvl;$('bstart').textContent=selLvl?'开始加班':'开始上班';
- $('meta').textContent=`图纸 ${SAVE.bp.length}/${BP_ALL.length} 已解锁 · 通关 ${SAVE.clears} 次`+(SAVE.maxLvl<5?` · 通关加班等级 ${SAVE.maxLvl} 可解锁下一级`:'')}
+ $('meta').textContent=`图纸 ${SAVE.bp.length}/${BP_ALL.length} 已解锁 · 通关 ${SAVE.clears} 次`+(SAVE.ljy?` · ★ 击败刘敬阳 ${SAVE.ljy} 次`:'')+(SAVE.maxLvl<5?` · 通关加班等级 ${SAVE.maxLvl} 可解锁下一级`:'')}
 $('lvlm').onclick=()=>{setLvl(selLvl-1);SFX.select()};$('lvlp').onclick=()=>{setLvl(selLvl+1);SFX.select()};setLvl(selLvl);
 $('bstart').onclick=()=>startGame(selLvl);
 // 服装：素材到了才显示切换按钮（标题画面按 C 也能换）
@@ -1370,7 +1481,7 @@ function render(){const th=LV.th,cx=R(cam.x+(Math.random()-.5)*shake*2),cy=R(cam
  if(flashRed>0){ctx.fillStyle=`rgba(216,40,40,${flashRed*.6})`;ctx.fillRect(0,0,VW,VH)}
  if(slowT>0){ctx.fillStyle='rgba(255,255,255,.06)';ctx.fillRect(0,0,VW,VH)}
  // 提示
- const pr=$('prompt');if(near&&!G.wheel){let s='';if(near.k==='weapon'){const W=WEAPONS[near.w],old=W.slot===1?P.prim:P.sec,af=(near.aff||[]).map(a=>`<em>${AFF[a].n}</em>${AFF[a].d}`).join('　');{const bag=W.slot===1?P.primBag:P.secBag,room=bag.length<BAG_MAX;s=`<b>E</b> 拾取 ${wname(near.w,near.lv)}<small>${W.desc}　（${room?'放进背包 '+(bag.length+1)+'/'+BAG_MAX:'替换当前的'+WEAPONS[old].name}）</small>${af?'<small class=af>'+af+'</small>':''}`}}else if(near.k==='ware'){const W=WARES[near.item];s=`<b>E</b> 买下 ${W.n}　✦ ${near.c}<small>${W.d}${P.cells<near.c?'　（灵感不够，现有 '+P.cells+'）':''}</small>`}else if(near.k==='chest')s='<b>E</b> 打开宝箱';else if(near.k==='cchest')s=`<b>E</b> 签加班合同<small>奖励一把高级武器 + 卷轴 + 灵感；但击败 ${8+LV.floor*3} 个敌人之前，受到的伤害翻倍</small>`;else if(near.k==='tdoor')s='<b>E</b> 打开准时下班门';else if(near.k==='wireterm')s='<b>E</b> 补模型<small>这里有一段没做完的场景，地编的活儿</small>';else if(near.k==='rush')s=`<b>E</b> 接下加急任务<small>限时清掉刷出来的怪，奖励高级武器</small>`;else s=`<b>E</b> ${G.floor<3?'进入茶水间':'下班！'}`;if(pr.dataset.s!==s){pr.innerHTML=s;pr.dataset.s=s}pr.classList.add('show')}else pr.classList.remove('show')}
+ const pr=$('prompt');if(near&&!G.wheel){let s='';if(near.k==='weapon'){const W=WEAPONS[near.w],old=W.slot===1?P.prim:P.sec,af=(near.aff||[]).map(a=>`<em>${AFF[a].n}</em>${AFF[a].d}`).join('　');{const bag=W.slot===1?P.primBag:P.secBag,room=bag.length<BAG_MAX;s=`<b>E</b> 拾取 ${wname(near.w,near.lv)}<small>${W.desc}　（${room?'放进背包 '+(bag.length+1)+'/'+BAG_MAX:'替换当前的'+WEAPONS[old].name}）</small>${af?'<small class=af>'+af+'</small>':''}`}}else if(near.k==='gymlift'){s='<b>E</b> 坐货梯上天台<small>隐藏关卡：先在茶水间整备，再去天台挑战隐藏大佬。走右边的门就是正常下班</small>'}else if(near.k==='ware'){const W=WARES[near.item];s=`<b>E</b> 买下 ${W.n}　✦ ${near.c}<small>${W.d}${P.cells<near.c?'　（灵感不够，现有 '+P.cells+'）':''}</small>`}else if(near.k==='chest')s='<b>E</b> 打开宝箱';else if(near.k==='cchest')s=`<b>E</b> 签加班合同<small>奖励一把高级武器 + 卷轴 + 灵感；但击败 ${8+LV.floor*3} 个敌人之前，受到的伤害翻倍</small>`;else if(near.k==='tdoor')s='<b>E</b> 打开准时下班门';else if(near.k==='wireterm')s='<b>E</b> 补模型<small>这里有一段没做完的场景，地编的活儿</small>';else if(near.k==='rush')s=`<b>E</b> 接下加急任务<small>限时清掉刷出来的怪，奖励高级武器</small>`;else s=`<b>E</b> ${G.floor<3?'进入茶水间':'下班！'}`;if(pr.dataset.s!==s){pr.innerHTML=s;pr.dataset.s=s}pr.classList.add('show')}else pr.classList.remove('show')}
 function updCamera(dt){let tx=P.x-VW/2+P.face*36,ty=P.y-175;
  if(boss||G.bossLock){tx=LV.arenaX}
  tx=clamp(tx,0,LV.w*TS-VW);ty=clamp(ty,0,LV.h*TS-VH);cam.x=lerp(cam.x,tx,1-Math.exp(-6*dt));cam.y=lerp(cam.y,ty,1-Math.exp(-6*dt))}

@@ -2,7 +2,7 @@
 const HT=23,CW=48;
 let LV=null;
 function genLevel(floor){
- const th=THEME[floor],nCh=4,arenaW=30,startW=26,w=startW+nCh*CW+arenaW;
+ const th=THEME[floor],nCh=floor===4?2:4,arenaW=30,startW=26,w=startW+nCh*CW+arenaW;
  const T=new Uint8Array(w*HT);const set=(x,y,v)=>{if(x>=0&&x<w&&y>=0&&y<HT)T[y*w+x]=v};
  const spawns=[],decor=[],pks=[],signs=[];
  // 天花板
@@ -31,7 +31,7 @@ function genLevel(floor){
   const nsegs=segs.filter(s=>!s.room);for(let k=0;k<n;k++){const s=nsegs[irnd(c===0&&nsegs.length>1?1:0,nsegs.length-1)];const type=pick_(th.enemies,k);const ex=(s.x+irnd(1,Math.max(1,s.len-2)))*TS;
    const fly=type==='sticky'||type==='popup';spawns.push({type,x:ex,y:fly?(s.g-irnd(5,8))*TS:s.g*TS})}
   // 图钉陷阱（地面上方一格，宽 2-3 格，避开地图块开头）
-  const spikeP=[.3,.5,.65][floor-1];
+  const spikeP=[.3,.5,.65,.45][floor-1];
   for(const s of segs){if(s.room||s.x<x0+3||s.len<5||Math.random()>spikeP)continue;const sw=irnd(2,3),sx=s.x+irnd(1,s.len-sw-1);let ok=true;for(let i=0;i<sw;i++)if(T[(s.g-1)*w+sx+i]!==0||T[(s.g-4)*w+sx+i]===2||T[(s.g-5)*w+sx+i]===2)ok=false;if(ok)for(let i=0;i<sw;i++)set(sx+i,s.g-1,3)}
   // 纸箱
   for(let k=0;k<irnd(1,2);k++){const s=nsegs[irnd(0,nsegs.length-1)];const cx=s.x+irnd(0,s.len-1);if(T[(s.g-1)*w+cx]===0)pks.push({k:'crate',x:cx*TS+8,y:s.g*TS,hp:14})}
@@ -42,7 +42,7 @@ function genLevel(floor){
   // 加班合同（诅咒宝箱）：第 3 块，一半概率
   if(c===2&&Math.random()<.5){const ss=segs.filter(s=>s.len>=4);if(ss.length){const s=pick(ss),cx=s.x+Math.floor(s.len/2);if(T[(s.g-1)*w+cx]===0)pks.push({k:'cchest',x:cx*TS+8,y:s.g*TS})}}
   // 实习生小卖部：第 3 块，60% 概率。一个实习生 + 三件商品，用灵感买
-  if(c===2&&Math.random()<.6){const ss=segs.filter(s=>!s.room&&s.len>=9&&s.x>x0+2);if(ss.length){const s=pick(ss);let ok=true;for(let i=1;i<9;i++)for(let y=s.g-3;y<s.g;y++)if(T[y*w+s.x+i]!==0&&T[y*w+s.x+i]!==3)ok=false;
+  if(c===2&&Math.random()<.6||floor===4&&c===0){const ss=segs.filter(s=>!s.room&&s.len>=9&&s.x>x0+2);if(ss.length){const s=pick(ss);let ok=true;for(let i=1;i<9;i++)for(let y=s.g-3;y<s.g;y++)if(T[y*w+s.x+i]!==0&&T[y*w+s.x+i]!==3)ok=false;
    if(ok){for(let i=0;i<10;i++)for(let y=s.g-3;y<s.g;y++)if(T[y*w+s.x+i]===3)set(s.x+i,y,0);pks.push({k:'intern',x:(s.x+1)*TS+8,y:s.g*TS});const ws=Object.keys(WARES).sort(()=>Math.random()-.5).slice(0,3);
     ws.forEach((it,i)=>pks.push({k:'ware',item:it,c:Math.round(WARES[it].c*(1+.2*(floor-1))/5)*5,x:(s.x+3.5+i*2.2)*TS,y:s.g*TS}))}}}
   // 加急任务：第 2 块
@@ -72,7 +72,9 @@ function genLevel(floor){
  for(let i=spawns.length-1;i>=0;i--)if(spawns[i].x>=(ax-3)*TS)spawns.splice(i,1);
  const gate={x:ax+2,active:false};
  for(let i=pks.length-1;room&&i>=0;i--){const tx=pks[i].x/TS;if(tx>=room.tx-1&&tx<=room.tx+room.len+1)pks.splice(i,1)}
- LV={floor,th,w,h:HT,T,spawns,decor,pick:pks,signs,boxes:[],room:room&&{x0:room.tx*TS,x1:(room.tx+room.len)*TS,tx:room.tx,len:room.len,g:room.g,state:0,cells:[]},arenaX:ax*TS,arenaW:arenaW*TS,gate,exitX:(w-6)*TS};
+ // 天台：开头送一个高级宝箱
+ if(floor===4){let gy=19;for(let y=2;y<HT;y++)if(T[y*w+(startW-8)]===1){gy=y;break}pks.push({k:'chest',x:(startW-8)*TS+8,y:gy*TS,bonus:true})}
+ LV={floor,af:floor===4&&!(typeof sprReady==='function'&&(sprReady('bg_f4_mid')||sprReady('tiles_f4')))?3:floor,th,w,h:HT,T,spawns,decor,pick:pks,signs,boxes:[],room:room&&{x0:room.tx*TS,x1:(room.tx+room.len)*TS,tx:room.tx,len:room.len,g:room.g,state:0,cells:[]},arenaX:ax*TS,arenaW:arenaW*TS,gate,exitX:(w-6)*TS};
  return LV}
 function pick_(a,i){return a[(i+Math.floor(Math.random()*a.length))%a.length]}
 function tileAt(tx,ty){if(tx<0||tx>=LV.w)return 1;if(ty<0)return 1;if(ty>=LV.h)return 1;if(LV.gate.active&&tx===LV.gate.x)return 1;return LV.T[ty*LV.w+tx]}
@@ -97,8 +99,8 @@ function tileIdx(v,tx,ty){const h=(tx*7+ty*13)%3;
  return {3:18,4:21,5:19}[v]}
 // 平台瓦片素材顶部有几像素透明，画的时候往上挪，让木板上沿和碰撞线对齐（不然人看起来悬空）
 const PLAT_OFF={1:4.5,2:3,3:4.5};
-function drawTilesSpr(cx,cy){const n='tiles_f'+LV.floor;if(!useSpr||!sprReady(n))return false;const im=SPR[n],s=SPRS[n]||1,ts=16*s,x0=Math.max(0,Math.floor(cx/TS)),x1=Math.min(LV.w-1,Math.floor((cx+VW)/TS)),y0=Math.max(0,Math.floor(cy/TS)),y1=Math.min(LV.h-1,Math.floor((cy+VH)/TS));
- for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){const v=LV.T[ty*LV.w+tx];if(!v)continue;const i=tileIdx(v,tx,ty);if(i===undefined)continue;if(v===5)ctx.globalAlpha=.55+.25*Math.sin(T*6+tx);ctx.drawImage(im,(i%8)*ts,Math.floor(i/8)*ts,ts,ts,tx*TS-cx,ty*TS-cy-(v===2?PLAT_OFF[LV.floor]||0:0),TS,TS);ctx.globalAlpha=1}
+function drawTilesSpr(cx,cy){const n='tiles_f'+LV.af;if(!useSpr||!sprReady(n))return false;const im=SPR[n],s=SPRS[n]||1,ts=16*s,x0=Math.max(0,Math.floor(cx/TS)),x1=Math.min(LV.w-1,Math.floor((cx+VW)/TS)),y0=Math.max(0,Math.floor(cy/TS)),y1=Math.min(LV.h-1,Math.floor((cy+VH)/TS));
+ for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){const v=LV.T[ty*LV.w+tx];if(!v)continue;const i=tileIdx(v,tx,ty);if(i===undefined)continue;if(v===5)ctx.globalAlpha=.55+.25*Math.sin(T*6+tx);ctx.drawImage(im,(i%8)*ts,Math.floor(i/8)*ts,ts,ts,tx*TS-cx,ty*TS-cy-(v===2?PLAT_OFF[LV.af]||0:0),TS,TS);ctx.globalAlpha=1}
  if(LV.gate.active){const sx=LV.gate.x*TS-cx;for(let ty=2;ty<LV.h;ty++)ctx.drawImage(im,(20%8)*ts,Math.floor(20/8)*ts,ts,ts,sx,ty*TS-cy,TS,TS)}
  return true}
 function drawTiles(cx,cy){if(drawTilesSpr(cx,cy))return;const th=LV.th,x0=Math.max(0,Math.floor(cx/TS)),x1=Math.min(LV.w-1,Math.floor((cx+VW)/TS)),y0=Math.max(0,Math.floor(cy/TS)),y1=Math.min(LV.h-1,Math.floor((cy+VH)/TS));
@@ -128,10 +130,10 @@ function farCanvas(f){if(FAR[f])return FAR[f];const c=document.createElement('ca
    for(let wy=base-h+5;wy<base-4;wy+=6)for(let wx=x+ox+3;wx<x+ox+w-3;wx+=5){const on=((wx*7+wy*13+f)%11)/11<lit;if(on||f===1){g.fillStyle=f===1?'rgba(255,255,255,.35)':win;g.fillRect(wx,wy,2,3)}}}
   x+=w+Math.floor(rr()*4)}});
  return FAR[f]=c}
-function drawFar(cx,cy){const n='bg_f'+LV.floor+'_far',ox=Math.floor(cx*.15),oy=R(-cy*.12)-12;
+function drawFar(cx,cy){const n='bg_f'+LV.af+'_far',ox=Math.floor(cx*.15),oy=R(-cy*.12)-12;
  if(sprReady(n)){const im=SPR[n],s=SPRS[n]||1,W=im.naturalWidth/s,H=im.naturalHeight/s;for(let x=-(ox%W);x<VW;x+=W)ctx.drawImage(im,x,oy,W,H);return}
- const c=farCanvas(LV.floor);for(let x=-(ox%480);x<VW;x+=480)ctx.drawImage(c,x,oy,480,300)}
-function drawBackground(cx,cy,t){const th=LV.th,f=LV.floor,mid='bg_f'+f+'_mid',arena='bg_f'+f+'_arena';
+ const c=farCanvas(LV.af);for(let x=-(ox%480);x<VW;x+=480)ctx.drawImage(c,x,oy,480,300)}
+function drawBackground(cx,cy,t){const th=LV.th,f=LV.af,mid='bg_f'+f+'_mid',arena='bg_f'+f+'_arena';
  if(sprReady(mid)){drawFar(cx,cy);const im=SPR[mid],s=SPRS[mid]||1,W=im.naturalWidth/s,H=im.naturalHeight/s,y0=R(2*TS-cy);
   const hasA=sprReady(arena),ax0=R(LV.arenaX-cx),ax1=ax0+LV.arenaW;
   // Boss 房那段不画普通墙面，让 Boss 房墙面的窗户透出窗外景色
@@ -146,7 +148,7 @@ function drawBackground(cx,cy,t){const th=LV.th,f=LV.floor,mid='bg_f'+f+'_mid',a
  px(0,R(15*TS-cy),VW,R(2*TS),'rgba(0,0,0,.06)');px(0,R(15*TS-cy),VW,1,th.trim);px(0,R(17*TS-cy),VW,2,th.trim);
  for(const d of LV.decor)if(d.k==='window'||d.k==='lamp'||d.k==='sign')drawDecor(d,cx,cy,th,t)}
 // 灯光：只照背景和装饰（在地面、角色之前画），让前景更突出
-function drawLights(cx,cy,t){const f=LV.floor,th=LV.th;
+function drawLights(cx,cy,t){const f=LV.af,th=LV.th;
  const scene=sprReady('bg_f'+f+'_mid');const amb=scene?{1:0,2:.06,3:.12}[f]:{1:0,2:.16,3:.45}[f];if(amb){ctx.fillStyle=f===2?`rgba(20,24,64,${amb})`:`rgba(8,6,26,${amb})`;ctx.fillRect(0,0,VW,VH)}
  ctx.save();ctx.globalCompositeOperation='lighter';
  for(const d of LV.decor){const x=R(d.x-cx),y=R(d.y-cy);if(x<-120||x>VW+120)continue;
@@ -158,4 +160,4 @@ function drawLights(cx,cy,t){const f=LV.floor,th=LV.th;
  ctx.restore()}
 // 近景剪影层：试玩反馈说像奇怪的影子，默认关闭
 const SHOW_NEAR=false;
-function drawNear(cx,cy){if(!SHOW_NEAR)return;const n='bg_f'+LV.floor+'_near';if(!sprReady(n))return;const im=SPR[n],s=SPRS[n]||1,W=im.naturalWidth/s,H=im.naturalHeight/s;for(let x=-(Math.floor(cx*1.3)%W);x<VW;x+=W)ctx.drawImage(im,x,VH-H,W,H)}
+function drawNear(cx,cy){if(!SHOW_NEAR)return;const n='bg_f'+LV.af+'_near';if(!sprReady(n))return;const im=SPR[n],s=SPRS[n]||1,W=im.naturalWidth/s,H=im.naturalHeight/s;for(let x=-(Math.floor(cx*1.3)%W);x<VW;x+=W)ctx.drawImage(im,x,VH-H,W,H)}

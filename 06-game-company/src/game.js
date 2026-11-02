@@ -15,7 +15,7 @@ const UPG=[{id:'dmg',n:'灵感爆发',d:'所有伤害 +20%',ic:'💡'},{id:'hp',
  {id:'flask',n:'多带个便当',d:'便当上限 +1',ic:'🍱'},{id:'steal',n:'落笔有神',d:'击败敌人回复 4 生命',ic:'🖌️'},{id:'jump',n:'人体工学椅',d:'空中跳跃 +1',ic:'🪑'},{id:'crit',n:'甲方满意',d:'暴击伤害 +60%',ic:'⭐'},{id:'cd',n:'快捷键大师',d:'副武器冷却 -30%',ic:'⌨️'}];
 function applyUpg(id){P.upg.push(id);if(id==='dmg')P.dmgMul*=1.2;if(id==='hp'){P.maxHp+=30}if(id==='roll')P.rollMul*=.65;if(id==='spd')P.spdMul*=1.18;if(id==='flask')P.maxFlasks++;if(id==='steal')P.steal+=4;if(id==='jump')P.airJumps++;if(id==='crit')P.critMul+=.6;if(id==='cd')P.cdMul*=.7}
 // ===== HUD =====
-function slotIcon(cv,w){const c=cv.getContext('2d');c.imageSmoothingEnabled=false;ctx.clearRect(0,0,24,24);ctx.fillStyle='rgba(0,0,0,0)';drawIcon(w,12,12);c.clearRect(0,0,cv.width,cv.height);c.drawImage(buf,0,0,24,24,0,0,cv.width,cv.height)}
+function slotIcon(cv,w){const c=cv.getContext('2d');c.imageSmoothingEnabled=false;ctx.clearRect(0,0,24,24);ctx.fillStyle='rgba(0,0,0,0)';drawIcon(w,12,12);c.clearRect(0,0,cv.width,cv.height);c.drawImage(buf,0,0,24*RES,24*RES,0,0,cv.width,cv.height)}
 function hud(){$('hpfill').style.width=(P.hp/P.maxHp*100)+'%';$('hprally').style.width=((P.hp+P.rally)/P.maxHp*100)+'%';$('hptxt').textContent=Math.ceil(P.hp)+' / '+P.maxHp;$('flasks').textContent='🍱'.repeat(P.flasks)+'▫'.repeat(Math.max(0,P.maxFlasks-P.flasks));
  $('stats').innerHTML=`<span class=s1>建模 ${P.stat.line}</span><span class=s2>地编 ${P.stat.color}</span><span class=s3>体力 ${P.stat.body}</span>`;
  const k1=P.prim+P.primLv+P.primAff.join(),k2=P.sec+P.secLv+P.secAff.join();if(hud.p!==k1){hud.p=k1;slotIcon($('ic1'),P.prim);$('n1').textContent=wname(P.prim,P.primLv);$('a1').textContent=P.primAff.map(a=>AFF[a].n).join(' · ')}if(hud.s!==k2){hud.s=k2;slotIcon($('ic2'),P.sec);$('n2').textContent=wname(P.sec,P.secLv);$('a2').textContent=P.secAff.map(a=>AFF[a].n).join(' · ')}hudCells()}
@@ -101,7 +101,7 @@ function drawPlayer(cx,cy){
  else if(P.parryT>0){px(h.hx-3,h.hy-8,7,12,'#f2a0b0');px(h.hx-3,h.hy-8,7,4,'#3a6ad8')}
  else drawWeaponAt(kind,h.hx,h.hy,.5,P.face)}
 // 每帧前手位置来自 art/**/anchors.json（帧左上角为原点），换算成相对脚底中心
-function handOf(n,fi){const a=(typeof ART_ANCHOR!=='undefined'?ART_ANCHOR:{})[n];const c=sprReady(n)?Math.floor(SPR[n].naturalWidth/48):1;fi=((fi%c)+c)%c;return a&&a[fi]?[a[fi][0]-24,a[fi][1]-48]:null}
+function handOf(n,fi){const a=(typeof ART_ANCHOR!=='undefined'?ART_ANCHOR:{})[n];if(!a||!sprReady(n))return null;const c=sprN(n),s=SPRS[n]||1,L=SPR[n].naturalHeight/s;fi=((fi%c)+c)%c;return a[fi]?[a[fi][0]/s-L/2,a[fi][1]/s-L]:null}
 // 没有专属连击素材的武器借用雕刻笔：连击段 → 雕刻笔第几刀
 const ATK_SEG={stylus:[0,1,2],marker:[2,1],ruler:[0,0,2],knife:[0,1,0,2]};
 function drawPlayerSpr(x,y,flash){let n='player_idle',fi=Math.floor(P.anim*5),hand=[5,-20],wang=.5,noW=false;const W=WEAPONS[P.prim];
@@ -119,7 +119,7 @@ function drawPlayerSpr(x,y,flash){let n='player_idle',fi=Math.floor(P.anim*5),ha
  else if(P.atk){const a=P.atk,d=a.def,k=a.phase==='su'?0:a.phase==='ac'?(a.t<d.ac/2?1:2):3;
   wang=d.thrust?1.57:a.phase==='su'?d.arc[0]:a.phase==='ac'?lerp(d.arc[0],d.arc[1],Math.min(1,a.t/d.ac)):d.arc[1];
   if(d.dash&&has('player_atk_dash')){n='player_atk_dash';fi=a.phase==='su'?0:a.phase==='ac'?(a.t<d.ac/2?1:2):(a.t<d.re/2?3:4)}
-  else if(has('player_atk_'+P.prim)){n='player_atk_'+P.prim;fi=Math.min(a.idx,Math.floor(SPR[n].naturalWidth/48/4)-1)*4+k}
+  else if(has('player_atk_'+P.prim)){n='player_atk_'+P.prim;fi=Math.min(a.idx,Math.floor(sprN(n)/4)-1)*4+k}
   else if(has('player_atk_stylus')){const segs=ATK_SEG[P.prim]||[0,1,2];n='player_atk_stylus';fi=segs[Math.min(a.idx,segs.length-1)]*4+k}
   hand=handOf(n,fi)||hand}
  else if(!P.onGround&&P.vy<0&&has('player_jump')){n='player_jump';fi=P.anim-(P.jumpAt||0)<.07?0:1}
@@ -130,7 +130,7 @@ function drawPlayerSpr(x,y,flash){let n='player_idle',fi=Math.floor(P.anim*5),ha
  if(flash)ctx.globalAlpha=.5;
  sprFrame(n,fi,x,y,P.face);
  // 武器：雕刻笔用素材，其他武器暂用代码画；格挡、喷涂等道具已画在人物图里
- if(!noW&&hand){const hx=x+hand[0]*P.face,hy=y+hand[1];if(P.prim==='stylus'&&has('weapon_stylus')){const g=(ART_ANCHOR.weapon_stylus||{}).grip||[8,7];ctx.save();ctx.translate(R(hx),R(hy));ctx.scale(P.face,1);ctx.rotate(-(wang-2.36));ctx.drawImage(SPR.weapon_stylus,-g[0],-g[1]);ctx.restore()}else drawWeaponAt(P.prim,hx,hy,wang,P.face)}
+ if(!noW&&hand){const hx=x+hand[0]*P.face,hy=y+hand[1];if(P.prim==='stylus'&&has('weapon_stylus')){const im=SPR.weapon_stylus,s=SPRS.weapon_stylus||1,g=(ART_ANCHOR.weapon_stylus||{}).grip||[8,7];ctx.save();ctx.translate(R(hx),R(hy));ctx.scale(P.face,1);ctx.rotate(-(wang-2.36));ctx.drawImage(im,-g[0]/s,-g[1]/s,im.naturalWidth/s,im.naturalHeight/s);ctx.restore()}else drawWeaponAt(P.prim,hx,hy,wang,P.face)}
  ctx.globalAlpha=1;
  if(P.atk&&P.atk.phase==='ac'){const d=P.atk.def;ctx.globalAlpha=.75;if(d.thrust){pline(x+P.face*6,y-26,x+P.face*(d.rng+4),y-26,2,W.col);px(x+P.face*(d.rng+4)-1,y-27,3,3,'#fff')}else smear(x,y-26,Math.max(10,d.rng-6),d.rng+6,d.arc[0],lerp(d.arc[0],d.arc[1],Math.min(1,P.atk.t/d.ac)),P.face,W.col);ctx.globalAlpha=1}
  if(P.dive){ctx.globalAlpha=.5;pline(x,y-40,x,y-58,2,W.col);ctx.globalAlpha=1}

@@ -13,7 +13,7 @@
 | 瓦片 | 16×16 |
 | 描边 | 外轮廓统一用 `#14121a`，1 像素 |
 | 光源 | 左上方 |
-| 背景 | **纯品红 `#FF00FF` 纯色背景**，不要黑色或白色背景（马楠的夹克接近黑色，黑背景抠图会把衣服一起抠掉），不要阴影和地面 |
+| 背景 | **优先透明背景**；无法生成干净透明通道时，使用纯品红 `#FF00FF` 作为备用抠图背景。不要黑色或白色背景，不要阴影和地面 |
 | 格式 | PNG 优先；JPG 也能用，但边缘会有杂色 |
 | 排版 | 每张图只放一个动作，所有帧**一行等宽排开**，帧与帧之间留足空隙、互不重叠 |
 | 比例 | 同一个角色的所有图里人物大小必须一致：**站立时人物高度约等于图片高度的 80%**，脚底贴近底边 |
@@ -30,7 +30,7 @@
 
 参考 `assets/character/design-sheet.jpg`：寸头、深灰连帽夹克（胸口白色小 logo、拉链）、黑色工装裤（侧口袋）、白色厚底运动鞋，体型偏壮，表情踏实。
 
-- 判定框 10×26，**每帧画布 32×32**，人物站立高约 28 像素，脚底贴在画布底边中点
+- 判定框 10×26，**每帧画布 48×48**，人物站立高约 42 像素，脚底贴在画布底边中点
 - 配色：皮肤 `#e3b48e`／`#c4906b`，头发 `#1c1a19`，夹克 `#262a33`／`#363b46`／`#17191f`，裤子 `#2e2f28`／`#3d3e34`，鞋 `#f4f2ec`／`#a8a69e`
 
 ### 1.1 身体动画（不含武器，手部空出握持位置）
@@ -67,7 +67,7 @@
 
 ### 1.3 武器（拿在手上的样子）
 
-每把画两张：手持图（朝右、刀尖朝右上 45°，握持点在图片里用 1 个 `#ff00ff` 像素标出，我读完会删掉）和 24×24 图标。
+每把画两张：手持图（朝右、刀尖朝右上 45°，握持点另附坐标标明；透明背景下也可用 1 个 `#ff00ff` 像素标出，导入时删除；使用品红备用背景时不要用同色像素标记）和 24×24 图标。
 
 | 武器 | 手持图尺寸 | 外观 |
 |---|---|---|
@@ -240,13 +240,13 @@
 
 ## 短提示词模板（每次只贴这一段，替换方括号）
 
-> 像素风游戏角色序列帧，侧面朝右。角色：[马楠：寸头年轻男人，深灰色连帽拉链夹克，胸口白色小 logo，黑色工装裤带侧口袋，白色厚底运动鞋]。动作：[跑步循环]，共 [8] 帧，一行等宽排开，帧之间留空不重叠。纯品红 #FF00FF 背景，无阴影无地面。每一帧人物大小一致，脚底对齐同一条水平线。
+> 像素风游戏角色序列帧，侧面朝右。角色：[马楠：寸头年轻男人，深灰色连帽拉链夹克，胸口白色小 logo，黑色工装裤带侧口袋，白色厚底运动鞋]。动作：[跑步循环]，共 [8] 帧，一行等宽排开，帧之间留空不重叠。透明背景；若无法生成干净的透明通道，使用纯品红 #FF00FF 背景作为抠图备用。无阴影无地面。每一帧人物大小一致，脚底对齐同一条水平线。
 
 ## 提示词示例
 
 **马楠跑步**
 
-> pixel art, 1x scale, crisp pixels, no anti-aliasing, transparent background, side view facing right, 1px dark outline #14121a, top-left lighting, Dead Cells style. Sprite strip of 8 frames, each 32x32, run cycle of a stocky young Chinese man with a buzz cut, dark grey zip-up hoodie jacket with small white logo, black cargo pants, chunky white sneakers, determined calm face, feet at bottom center of each frame.
+> pixel art, 1x scale, crisp pixels, no anti-aliasing, transparent background, side view facing right, 1px dark outline #14121a, top-left lighting, Dead Cells style. Sprite strip of 8 frames, each 48x48, run cycle of a stocky young Chinese man with a buzz cut, dark grey zip-up hoodie jacket with small white logo, black cargo pants, chunky white sneakers, determined calm face, feet at bottom center of each frame.
 
 **穿模怪前摇**
 

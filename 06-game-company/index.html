@@ -95,6 +95,10 @@ const ART_GAP={"boss_ceo_pound": [0.0, 0.0, 4.0, 11.0, 13.0, 6.0, 0.0, 0.0], "en
 // 发新版本时：在 CHANGELOG 最前面加一条，build.py 重新生成 index.html，合并到 main 即可。
 // 标题画面会显示最新版本号；玩家没看过的新版本，“更新内容”按钮上会亮“新”字。
 const CHANGELOG=[
+ {v:'v1.5',date:'2026-11-02',items:[
+  '书架、酒柜加了下柜，机柜、奖杯柜加了底座，都到人那么高',
+  '咖啡机缩小放到台面上',
+  '研发部的看板和白板去掉支架，挂在墙上']},
  {v:'v1.4',date:'2026-11-02',items:[
   '装饰物按马楠的身高调整比例：数位板缩小并放到桌子上，1F、2F 吊灯和废纸篓缩小一半，鱼缸放到柜子上']},
  {v:'v1.3',date:'2026-11-02',items:[
@@ -373,16 +377,21 @@ function drawDecorSpr(d,cx,cy){if(!useSpr||d.gy===undefined)return false;let nam
  if(d.fit===undefined||d.fitN!==n)decorFit(d,n,name);if(d.fit===null)return true;
  const st=DECOR_STYLE[name]||{},b=decorBox(n,name),x=R(d.x+12+d.fit-cx),bot=R(d.gy-(DECOR_WALL.includes(name)?34:0)-cy);
  let top=bot;if(st.base){drawDecorBase(st.base,x,bot);top=bot-st.base.h}
- const im=SPR[n],s=SPRS[n]||1,k=st.scale||1,W=im.naturalWidth/s*k,H=im.naturalHeight/s*k;
- ctx.drawImage(im,R(x-W/2),R(top-H),W,H);return true}
+ const im=SPR[n],s=SPRS[n]||1,k=st.scale||1,W=im.naturalWidth/s*k,sh=st.clip?st.clip*s:im.naturalHeight,H=sh/s*k;
+ ctx.drawImage(im,0,0,im.naturalWidth,sh,R(x-W/2),R(top-H),W,H);return true}
 // 装饰物比例：以马楠（42 像素≈175 厘米，1 像素≈4 厘米）为尺子。
 // scale：缩放（只用 0.5 这类和 2 倍素材对齐的值，像素不糊）；base：垫在下面的家具（代码画）
-const DECOR_STYLE={drawingdesk:{scale:.5,base:{k:'desk',w:34,h:17}},wastebasket:{scale:.5},aquarium:{base:{k:'cabinet',w:34,h:14}}};
-function decorBox(n,name){const im=SPR[n],s=SPRS[n]||1,st=DECOR_STYLE[name]||{},k=st.scale||1,W=im.naturalWidth/s*k,H=im.naturalHeight/s*k;return{w:Math.max(W,st.base?st.base.w:0),h:H+(st.base?st.base.h:0)}}
+const DECOR_STYLE={drawingdesk:{scale:.5,base:{k:'desk',w:34,h:17}},wastebasket:{scale:.5},aquarium:{base:{k:'cabinet',w:34,h:14}},
+ bookshelf:{base:{k:'cabinet',w:32,h:12}},coffee:{scale:.5,base:{k:'desk',w:20,h:18}},
+ winecabinet:{base:{k:'cabinet',w:24,h:18}},server:{base:{k:'plinth',w:20,h:10}},trophycase:{base:{k:'plinth',w:32,h:6}},
+ // 带支架腿的看板 / 白板挂到墙上：只画上半部分（clip=保留的高度，逻辑像素）
+ whiteboard:{clip:21},board:{clip:20}};
+function decorBox(n,name){const im=SPR[n],s=SPRS[n]||1,st=DECOR_STYLE[name]||{},k=st.scale||1,W=im.naturalWidth/s*k,H=(st.clip||im.naturalHeight/s)*k;return{w:Math.max(W,st.base?st.base.w:0),h:H+(st.base?st.base.h:0)}}
 function drawDecorBase(b,x,bot){const f=LV.floor,L=R(x-b.w/2);
  if(b.k==='desk'){const top=f===1?'#a87a58':f===2?'#5a6070':'#6a3a2a',side=f===1?'#7a5238':f===2?'#3a3e4a':'#4a2418';
   px(L,bot-b.h,b.w,3,top);px(L,bot-b.h+3,b.w,1,side);px(L+2,bot-b.h+4,2,b.h-4,side);px(L+b.w-4,bot-b.h+4,2,b.h-4,side);px(L+b.w-14,bot-b.h+4,10,6,side);px(L+b.w-13,bot-b.h+6,8,1,top);px(L,bot-b.h,b.w,1,'rgba(255,255,255,.18)')}
- else if(b.k==='cabinet'){px(L,bot-b.h,b.w,b.h,'#3a2018');px(L,bot-b.h,b.w,2,'#c8a050');px(L+2,bot-b.h+4,b.w/2-3,b.h-6,'#4a2820');px(L+b.w/2+1,bot-b.h+4,b.w/2-3,b.h-6,'#4a2820');px(L+b.w/2-3,bot-b.h+8,2,2,'#c8a050');px(L+b.w/2+1,bot-b.h+8,2,2,'#c8a050');px(L,bot-1,b.w,1,'rgba(0,0,0,.35)')}}
+ else if(b.k==='cabinet'){const c=f===1?['#6a4028','#8a5a38','#c8a070','#5a3420']:f===2?['#2e323e','#3a3e4a','#8a90a0','#262a34']:['#3a2018','#4a2820','#c8a050','#3a2018'];px(L,bot-b.h,b.w,b.h,c[0]);px(L,bot-b.h,b.w,2,c[2]);px(L+2,bot-b.h+4,b.w/2-3,b.h-6,c[1]);px(L+b.w/2+1,bot-b.h+4,b.w/2-3,b.h-6,c[1]);px(L+b.w/2-3,bot-b.h+Math.floor(b.h/2),2,2,c[2]);px(L+b.w/2+1,bot-b.h+Math.floor(b.h/2),2,2,c[2]);px(L,bot-1,b.w,1,'rgba(0,0,0,.35)')}
+ else if(b.k==='plinth'){const c=f===2?['#1e222c','#4a5060']:['#2a1810','#b08a48'];px(L-1,bot-b.h,b.w+2,b.h,c[0]);px(L-1,bot-b.h,b.w+2,1,c[1]);px(L-1,bot-1,b.w+2,1,'rgba(0,0,0,.4)')}}
 function decorFit(d,n,name){const bx=decorBox(n,name),W=bx.w,H=bx.h,wall=DECOR_WALL.includes(name),bot=d.gy-(wall?34:0);d.fitN=n;
  const ok=cx=>{for(let x=Math.floor((cx-W/2+1)/TS);x<=Math.floor((cx+W/2-1)/TS);x++){for(let y=Math.floor((bot-H+1)/TS);y<=Math.floor((bot-1)/TS);y++)if(isSolid(x,y)||tileAt(x,y)===3)return false;
    if(!wall&&!isSolid(x,Math.floor(bot/TS)))return false}return true};

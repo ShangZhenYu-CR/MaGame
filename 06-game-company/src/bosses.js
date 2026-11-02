@@ -6,7 +6,7 @@ const BOSSDEF={
  ceo:{name:'老板 · 画大饼',hp:2200,w:34,h:64,quote:'“年轻人，项目做成了，大家都有饼吃！”',p2:'“这个饼，可大了！”',dead:'“好吧……今天准时下班。”',contact:20},
  ljy:{name:'隐藏大佬 · 刘敬阳',hp:3400,w:22,h:72,quote:'“这么晚还在公司？来，陪我练两组。”',p2:'“炎龙铠甲——合体！”',p3:'“龙魂，燃烧吧！”',dead:'“……好小子。明早七点，健身房见。”',contact:22}};
 function bsp(b){return(b.phase===3?1.5:b.phase===2?1.3:1)*(G.hard?1.15:1)}
-function spawnBoss(kind){const d=BOSSDEF[kind],hp=Math.round(d.hp*(G.hard?1.4:1));boss={kind,isBoss:true,name:d.name,x:LV.arenaX+LV.arenaW-80,y:19*TS,w:d.w,h:d.h,vx:0,vy:0,face:-1,hp,max:hp,state:'intro',t:0,anim:0,flash:0,phase:1,onGround:true,drop:false,cd:0,idleT:1,contactCd:0,pen:-.4,alpha:1,minions:0,seq:0,stag:0,stagMax:Math.round(hp*.25),stagPend:false,phasePend:0,closeT:0,hitLog:[]};
+function spawnBoss(kind){if(kind==='ljy'&&!SAVE.ljyMet){SAVE.ljyMet=1;saveGame()}const d=BOSSDEF[kind],hp=Math.round(d.hp*(G.hard?1.4:1));boss={kind,isBoss:true,name:d.name,x:LV.arenaX+LV.arenaW-80,y:19*TS,w:d.w,h:d.h,vx:0,vy:0,face:-1,hp,max:hp,state:'intro',t:0,anim:0,flash:0,phase:1,onGround:true,drop:false,cd:0,idleT:1,contactCd:0,pen:-.4,alpha:1,minions:0,seq:0,stag:0,stagMax:Math.round(hp*.25),stagPend:false,phasePend:0,closeT:0,hitLog:[]};
  bossBanner(d.name,d.quote);Snd.play('boss');SFX.boss()}
 // 近身反击：玩家贴身太久，或短时间连砍太多刀，Boss 用一招快速近身技把人打开
 function bossCounterDue(b){const recent=b.hitLog.filter(t=>T-t<1.5).length;return b.closeT>(b.phase>=3?.5:.7)||recent>=5}

@@ -59,7 +59,12 @@
 #artfail{position:fixed;left:8px;right:8px;top:8px;color:#fff;background:#a33;padding:6px 10px;font:13px system-ui,sans-serif;z-index:98;border-radius:4px}#artfail:empty{display:none}
 #verw{margin-top:.6em;font-size:1.15em;display:flex;align-items:center;gap:.6em;opacity:.85}#ver{font-weight:800;color:#ffd84a}
 #bchg{font-size:.9em;position:relative}#vnew{display:none;font-style:normal;background:#d8483a;color:#fff;font-size:.7em;padding:0 .3em;margin-left:.3em;border-radius:.2em}#bchg.new #vnew{display:inline}
-#chg{background:rgba(14,10,24,.82);z-index:5}.chgbox{max-width:34em;max-height:80%;overflow:auto;padding:1em 1.6em;text-align:left;pointer-events:auto}.chgbox h2{margin:.1em 0 .4em;font-size:2.2em}
+#chg{background:rgba(14,10,24,.82);z-index:5}#codex{background:rgba(14,10,24,.86);z-index:5}.cdxbox{font-size:1.3em;width:min(52em,94%);max-height:90%;display:flex;flex-direction:column;padding:.8em 1.4em 1em;pointer-events:auto}.cdxbox h2{margin:.1em 0 .3em;font-size:2.2em}
+#cdxtabs{display:flex;gap:.4em;justify-content:center;flex-wrap:wrap}#cdxtabs .lb{font-size:1.05em;padding:.15em .7em}#cdxtabs .lb.on{background:#ffd84a;color:#14121a}
+#cdxlist{overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(17em,1fr));gap:.5em;text-align:left;margin-top:.7em;padding-right:.3em}.cdx{display:flex;gap:.6em;align-items:flex-start;background:rgba(255,255,255,.05);border:.15em solid #3a3458;padding:.45em}
+.cdx canvas{width:4.2em;height:4.2em;image-rendering:pixelated;flex:none;background:rgba(0,0,0,.28)}.cdx .emo{width:2.1em;height:2.1em;font-size:2em;flex:none;text-align:center;background:rgba(0,0,0,.28)}.cdx b{display:block;color:#ffd84a;font-size:1.02em}.cdx small{display:block;font-size:.82em;opacity:.88;line-height:1.45;margin-top:.15em}
+.cdx .tag{font-style:normal;font-size:.68em;background:#3a3458;color:#fff;padding:0 .4em;margin-left:.4em;vertical-align:middle;font-weight:400}.cdx.lock{opacity:.55}.cdxhint{font-size:.8em;opacity:.6;margin-top:.5em}.cdxbox .btn{font-size:1.2em;display:block;margin:.5em auto 0}
+.btn.btn2{background:#3a3458;color:#fff}.chgbox{max-width:34em;max-height:80%;overflow:auto;padding:1em 1.6em;text-align:left;pointer-events:auto}.chgbox h2{margin:.1em 0 .4em;font-size:2.2em}
 #chglist h3{margin:.8em 0 .2em;color:#ffd84a;font-size:1.15em}#chglist h3 small{color:#bbb;font-weight:400;margin-left:.6em;font-size:.75em}#chglist ul{margin:.2em 0;padding-left:1.3em;line-height:1.6;font-size:.95em}.chgbox .btn{font-size:1.2em;display:block;margin:.8em auto 0}
 #screen{transition:filter .12s}#screen.blur{filter:blur(4px) brightness(.6) saturate(.7)}
 #wheel{position:absolute;left:0;right:0;top:22%;display:flex;flex-direction:column;align-items:center;opacity:0;visibility:hidden;transition:opacity .12s}#wheel.show{opacity:1;visibility:visible}
@@ -84,13 +89,14 @@
  <button id="bmute">🔊</button>
  <div id="title" class="ov show"><h1 class="k">马楠<br>通关游戏公司</h1><div class="sub k">一个建模师兼地编的下班之路</div>
   <div class="ctl"><b>A D</b>移动　<b>空格</b>跳 / 二段跳　<b>S+空格</b>跳下平台<br><b>J</b>建模工具（主武器）　<b>K</b>地编工具（副武器）　<b>Shift</b>翻滚（无敌）<br><b>Q</b>吃便当回血　<b>E</b>拾取武器 / 开宝箱　<b>R / F</b>按住切换武器　<b>Esc</b>暂停<br>鼠标左键 = J，右键 = K</div>
-  <div id="lvlsel"><button class="lb" id="lvlm">◀</button><span>加班等级 <b id="lvln">0</b></span><button class="lb" id="lvlp">▶</button></div><div id="lvld" class="ctl"></div><button class="lb" id="bskin" style="display:none;margin-top:.3em"></button><div><button class="btn" id="bstart">开始上班</button></div><div id="meta" class="ctl"></div><div id="verw"><span id="ver"></span><button id="bchg" class="lb">更新内容<i id="vnew">新</i></button></div></div>
- <div id="pause" class="ov"><h2 class="k" style="font-size:3.6em;margin:0">暂停</h2><div id="pstat"></div><div class="ctl" style="margin-top:1em"><b>A D</b>移动　<b>空格</b>跳　<b>J</b>攻击　<b>K</b>副武器　<b>Shift</b>翻滚　<b>Q</b>回血　<b>E</b>拾取</div><button class="btn" id="bresume">继续</button></div>
- <div id="dead" class="ov"><h2 class="k" style="font-size:4em;margin:0">需求太多，先躺一会儿……</h2><div id="dcause"></div><div style="font-size:1.2em;margin-top:.6em">重新挑战本层（保留武器和升级，灵感减半）</div><button class="btn" id="bretry">再来（Enter）</button></div>
+  <div id="lvlsel"><button class="lb" id="lvlm">◀</button><span>加班等级 <b id="lvln">0</b></span><button class="lb" id="lvlp">▶</button></div><div id="lvld" class="ctl"></div><button class="lb" id="bskin" style="display:none;margin-top:.3em"></button><div><button class="btn" id="bstart">开始上班</button></div><div id="meta" class="ctl"></div><div id="verw"><span id="ver"></span><button id="bcdx" class="lb">图鉴</button><button id="bchg" class="lb">更新内容<i id="vnew">新</i></button></div></div>
+ <div id="pause" class="ov"><h2 class="k" style="font-size:3.6em;margin:0">暂停</h2><div id="pstat"></div><div class="ctl" style="margin-top:1em"><b>A D</b>移动　<b>空格</b>跳　<b>J</b>攻击　<b>K</b>副武器　<b>Shift</b>翻滚　<b>Q</b>回血　<b>E</b>拾取</div><div><button class="btn" id="bresume">继续</button> <button class="btn btn2" id="bhome2">回到主页</button></div></div>
+ <div id="dead" class="ov"><h2 class="k" style="font-size:4em;margin:0">需求太多，先躺一会儿……</h2><div id="dcause"></div><div style="font-size:1.2em;margin-top:.6em">重新挑战本层（保留武器和升级，灵感减半）</div><div><button class="btn" id="bretry">再来（Enter）</button> <button class="btn btn2" id="bhome3">回到主页</button></div></div>
  <div id="rest" class="ov"><h2 class="k" style="font-size:3.8em;margin:0">☕ 茶水间</h2><div style="font-size:1.2em;margin-top:.4em"><span id="resttxt">喝口水，生命和便当都补满了。</span>选一个升级（按 1 / 2 / 3）</div><div id="restbp"></div><div id="cards"></div><div class="shopt">🥤 自动售货机（用灵感购买，每样每层一次）</div><div id="shop"></div><button class="btn" id="reroll" style="font-size:1.1em">花 25 灵感换一批</button></div>
  <div id="scroll" class="ov"><h2 class="k" style="font-size:3.6em;margin:0">✦ 灵感卷轴</h2><div style="font-size:1.2em;margin-top:.4em">选一项属性提升（按 1 / 2）</div><div id="scards" style="display:flex;gap:1.6em;margin-top:1.2em"></div></div>
+ <div id="codex" class="ov"><div class="pane cdxbox"><h2 class="k">图鉴</h2><div id="cdxtabs"></div><div id="cdxlist"></div><div class="cdxhint">← → 切换分类　Esc 返回</div><button class="btn" id="bcdxx">返回</button></div></div>
  <div id="chg" class="ov"><div class="pane chgbox"><h2 class="k">更新内容</h2><div id="chglist"></div><button class="btn" id="bchgx">知道了</button></div></div>
- <div id="end" class="ov"><h2 class="k" id="etitle">下班了。</h2><div class="k" id="esub" style="font-size:1.8em;color:#ffd84a">踏实做事，好好生活。</div><div id="estat"></div><button class="btn" id="bagain">再上一次班</button></div>
+ <div id="end" class="ov"><h2 class="k" id="etitle">下班了。</h2><div class="k" id="esub" style="font-size:1.8em;color:#ffd84a">踏实做事，好好生活。</div><div id="estat"></div><div><button class="btn" id="bagain">再上一次班</button> <button class="btn btn2" id="bhome">回到主页</button></div></div>
 </div>
 <pre id="err"></pre><div id="artfail"></div>
 <script>window.__e=0;function __err(x){if(__e++)return;const d=document.getElementById('err');d.style.display='block';d.textContent='出错了：'+(x&&x.message||x)+'\n'+(x&&x.stack||'')}addEventListener('error',e=>{if(e.target&&e.target.tagName==='LINK')return;__err(e.error||e.message)},true);</script>
@@ -103,6 +109,10 @@ const ART_GAP={"boss_ceo_pound": [0.0, 0.0, 4.0, 11.0, 13.0, 6.0, 0.0, 0.0], "en
 // 发新版本时：在 CHANGELOG 最前面加一条，build.py 重新生成 index.html，合并到 main 即可。
 // 标题画面会显示最新版本号；玩家没看过的新版本，“更新内容”按钮上会亮“新”字。
 const CHANGELOG=[
+ {v:'v2.3',date:'2026-11-02',items:[
+  '标题画面新增图鉴：建模工具、地编工具、道具与事件、敌人、Boss、升级与天赋六个分类，配图并介绍用法（← → 切换分类）',
+  '图纸还没解锁的武器和升级在图鉴里会标出来；隐藏大佬和货梯要先遇到才会显示',
+  '通关画面、暂停画面和倒下画面都可以“回到主页”']},
  {v:'v2.2',date:'2026-11-02',items:[
   '换上正式美术：喷漆罐、合并冲突、项目经理三种新敌人，实习生和小卖部五件商品',
   '法线鞭、剪切刀、渲染大剑的手持图，六把新武器的图标',
@@ -988,7 +998,7 @@ const BOSSDEF={
  ceo:{name:'老板 · 画大饼',hp:2200,w:34,h:64,quote:'“年轻人，项目做成了，大家都有饼吃！”',p2:'“这个饼，可大了！”',dead:'“好吧……今天准时下班。”',contact:20},
  ljy:{name:'隐藏大佬 · 刘敬阳',hp:3400,w:22,h:72,quote:'“这么晚还在公司？来，陪我练两组。”',p2:'“炎龙铠甲——合体！”',p3:'“龙魂，燃烧吧！”',dead:'“……好小子。明早七点，健身房见。”',contact:22}};
 function bsp(b){return(b.phase===3?1.5:b.phase===2?1.3:1)*(G.hard?1.15:1)}
-function spawnBoss(kind){const d=BOSSDEF[kind],hp=Math.round(d.hp*(G.hard?1.4:1));boss={kind,isBoss:true,name:d.name,x:LV.arenaX+LV.arenaW-80,y:19*TS,w:d.w,h:d.h,vx:0,vy:0,face:-1,hp,max:hp,state:'intro',t:0,anim:0,flash:0,phase:1,onGround:true,drop:false,cd:0,idleT:1,contactCd:0,pen:-.4,alpha:1,minions:0,seq:0,stag:0,stagMax:Math.round(hp*.25),stagPend:false,phasePend:0,closeT:0,hitLog:[]};
+function spawnBoss(kind){if(kind==='ljy'&&!SAVE.ljyMet){SAVE.ljyMet=1;saveGame()}const d=BOSSDEF[kind],hp=Math.round(d.hp*(G.hard?1.4:1));boss={kind,isBoss:true,name:d.name,x:LV.arenaX+LV.arenaW-80,y:19*TS,w:d.w,h:d.h,vx:0,vy:0,face:-1,hp,max:hp,state:'intro',t:0,anim:0,flash:0,phase:1,onGround:true,drop:false,cd:0,idleT:1,contactCd:0,pen:-.4,alpha:1,minions:0,seq:0,stag:0,stagMax:Math.round(hp*.25),stagPend:false,phasePend:0,closeT:0,hitLog:[]};
  bossBanner(d.name,d.quote);Snd.play('boss');SFX.boss()}
 // 近身反击：玩家贴身太久，或短时间连砍太多刀，Boss 用一招快速近身技把人打开
 function bossCounterDue(b){const recent=b.hitLog.filter(t=>T-t<1.5).length;return b.closeT>(b.phase>=3?.5:.7)||recent>=5}
@@ -1382,7 +1392,8 @@ function frame(ts){requestAnimationFrame(frame);try{let dt=Math.min(.05,(ts-last
  if(G.state==='scroll'){if(pressed('opt1'))chooseScroll(0);else if(pressed('opt2'))chooseScroll(1)}
  if(G.state==='rest'){if(pressed('opt1'))chooseRest(0);else if(pressed('opt2'))chooseRest(1);else if(pressed('opt3'))chooseRest(2)}
  if(G.state==='dead'&&(pressed('confirm')||KP['Space'])&&$('dead').classList.contains('show'))retry();
- if(G.state==='title'&&$('chg').classList.contains('show')){if(pressed('confirm')||pressed('pause'))showChanges(false)}
+ if(G.state==='title'&&$('codex').classList.contains('show')){if(pressed('confirm')||pressed('pause'))showCodex(false);else if(pressed('left')||pressed('right')){const i=CDX_TABS.findIndex(t=>t[0]===cdxTab),n=CDX_TABS.length;cdxTab=CDX_TABS[(i+(pressed('left')?n-1:1))%n][0];SFX.select();cdxDraw()}}
+ else if(G.state==='title'&&$('chg').classList.contains('show')){if(pressed('confirm')||pressed('pause'))showChanges(false)}
  else if(G.state==='title'){if(!skinBtn.ok&&sprReady('player_summer_idle')){skinBtn.ok=1;skinBtn()}if(pressed('skin'))nextSkin();if(pressed('confirm'))startGame(selLvl);if(pressed('left'))setLvl(selLvl-1);if(pressed('right'))setLvl(selLvl+1)}
  if(KP['KeyM'])$('bmute').textContent=Snd.toggle()?'🔇':'🔊';
  if(G.state==='title'){T+=dt;renderTitle()}
@@ -1391,5 +1402,61 @@ function frame(ts){requestAnimationFrame(frame);try{let dt=Math.min(.05,(ts-last
  else{let d=dt*slowmo;if(G.wheel)d=dt*.12;if(hitstop>0){hitstop-=dt;d*=.04}step(d);render()}
  uiTick();present();clearPressed()}catch(e){__err(e)}}
 requestAnimationFrame(frame);
+// ===== 回到主页 =====
+function goHome(){for(const id of['end','dead','pause','rest','scroll','hud','wheel','prompt'])show(id,false);$('bossbar').classList.remove('show');$('screen').classList.remove('blur');
+ G.wheel=null;G.state='title';G.rush=null;boss=null;enemies.length=0;projs.length=0;pickups.length=0;parts.length=0;fxs.length=0;corpses.length=0;splats.length=0;nums.length=0;
+ LV=null;genLevel(1);renderTitle.gy=undefined;T=0;setLvl(Math.min(selLvl,SAVE.maxLvl));show('title',true);Snd.play('rest');SFX.select()}
+$('bhome').onclick=goHome;$('bhome2').onclick=goHome;$('bhome3').onclick=goHome;
+// ===== 图鉴 =====
+// 缩略图：取素材第一帧，等比缩放放进方框
+function cdxThumb(cv,n,fi=0){const c=cv.getContext('2d');c.imageSmoothingEnabled=false;c.clearRect(0,0,cv.width,cv.height);if(!sprReady(n))return;const im=SPR[n],fw=sprFW(n),fh=im.naturalHeight;let x0=0,y0=0,x1=fw,y1=fh;
+ // 裁掉透明边，人物显得大一些
+ try{const t=document.createElement('canvas');t.width=fw;t.height=fh;const g=t.getContext('2d');g.drawImage(im,fi*fw,0,fw,fh,0,0,fw,fh);const d=g.getImageData(0,0,fw,fh).data;x0=fw;y0=fh;x1=0;y1=0;
+  for(let y=0;y<fh;y++)for(let x=0;x<fw;x++)if(d[(y*fw+x)*4+3]>20){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}if(x1<x0){x0=0;y0=0;x1=fw-1;y1=fh-1}x1++;y1++}catch(e){}
+ const w=x1-x0,h=y1-y0,k=Math.min((cv.width-8)/w,(cv.height-8)/h,4),dw=w*k,dh=h*k;c.drawImage(im,fi*fw+x0,y0,w,h,(cv.width-dw)/2,(cv.height-dh)/2,dw,dh)}
+const CDX_ENEMY={
+ crumple:['1F','缩成一团后向前猛扑。看到它缩起来就翻滚。'],sticky:['1F','飞在头顶，抖一抖就俯冲下来。'],printer:['1F','远处吐纸，纸可以被打碎。'],spray:['1F','保持距离喷漆，地上的油漆会让你减速。'],
+ bug:['2F','成群乱跳，会扑到脸上。'],popup:['2F','飞在空中发射红叉，红叉能被打碎。'],firewall:['2F · 顶层','正面能挡下大部分伤害。冲撞完会喘气，趁这时候或从背后打。'],merge:['2F','原地闪烁后瞬移到你身后砍。头上闪“！”时回身或翻滚。'],
+ kpi:['顶层','走得慢，砸地放出两道冲击波，跳起来躲。'],invite:['顶层','追着你飞，碰到会被“拉进会议”定身一下。'],pm:['顶层','自己不打人：给周围的怪加速，身边没怪时召唤会议邀请。优先解决他。']};
+const CDX_BOSS={
+ ad:['1F','红笔冲刺、扔修改意见、跳起来盖章；二阶段满屏批注。贴身太久会被红笔横扫。'],
+ pd:['2F','到处瞬移，扔会飞回来的文件，划出“需求变更”区域；二阶段加激光和拉人开会。贴身会被冲击波推开。'],
+ ceo:['顶层','扔饼、跳起来砸地、KPI 柱；二阶段巨饼和饼雨，三阶段 KPI 柱追着你长。贴身会被肚子顶开。'],
+ ljy:['天台','一阶段穿中山装：扔方块、巨型雕刻笔贴地横扫、回旋哑铃、哑铃砸地。半血变身炎龙铠甲：烈焰冲刺、龙炎吐息、烈焰柱、炎龙天降、升龙拳，四分之一血召唤天火。']};
+const CDX_ITEM=[
+ ['pk_cell','灵感','击败敌人、打碎纸箱掉落。在实习生小卖部、茶水间售货机花，也能刷新升级。'],
+ ['pk_food','便当','按 Q 吃，回复一半生命；每层开始补满。地上捡到的便当直接回复 25 生命。'],
+ ['pk_scroll','灵感卷轴','三选一提升一项属性：建模（主武器伤害）、地编（副武器伤害和冷却）、体力（最大生命）。'],
+ ['pk_bp','图纸','解锁新武器和升级。拾到后要活着走到茶水间或通关才算入库，倒下就丢了。'],
+ ['pk_chest','宝箱','按 E 打开，多半是一把武器，也可能是两个便当。'],
+ ['pk_cchest','加班合同','紫色宝箱：高级武器 + 卷轴 + 灵感；代价是击败一定数量的敌人前，受到的伤害翻倍。'],
+ ['pk_crate','纸箱','打碎掉 2～4 个灵感，有时有便当，偶尔有武器。'],
+ ['pk_rush','加急任务','接下后限时清掉刷出来的怪，完成奖励高级武器和灵感。'],
+ ['pk_wireterm','补模型终端','按 E 把线框台阶补成实体，爬上去有隐藏宝箱。'],
+ ['pk_tdoor','准时下班门','在限时内赶到才能打开，奖励高级武器和灵感。'],
+ ['pk_intern','实习生小卖部','每层中段可能出现，用灵感买热咖啡、便当盒、卷轴、武器打磨、神秘武器。'],
+ ['','评审会','走进去两侧封门，撑过两轮（第二轮有精英）才放行，奖励高级武器、卷轴、便当和灵感。'],
+ ['','精英怪','红光包围，头顶写着词缀：赶工（更快）、返工护甲（减伤）、拆需求（死后分裂）、带薪摸鱼（回血）、甩锅（死后爆炸）。必掉武器。'],
+ ['','货梯','？？？','ljy']];
+const CDX_TABS=[['weapon','建模工具'],['skill','地编工具'],['item','道具与事件'],['enemy','敌人'],['boss','Boss'],['upg','升级与天赋']];
+let cdxTab='weapon';
+function cdxSeenLjy(){return !!(SAVE.ljy||SAVE.ljyMet)}
+function cdxCards(){const out=[];
+ if(cdxTab==='weapon'||cdxTab==='skill'){for(const w of(cdxTab==='weapon'?PRIM:SECN)){const W=WEAPONS[w],lock=!unlocked(w);out.push({img:'icon_'+w,n:W.name,d:W.desc+(W.cd?`（冷却 ${W.cd} 秒）`:''),tag:lock?'图纸未解锁':BP_ALL.includes(w)?'图纸':'',lock})}}
+ else if(cdxTab==='item'){for(const [img,n,d,hid] of CDX_ITEM){if(hid&&!cdxSeenLjy()){out.push({img:'',n:'？？？',d:'打败老板以后，好像还有什么地方能去……',lock:true});continue}
+   out.push({img,n,d:hid?'打败老板后，Boss 房里出现的货梯。坐上去先在茶水间整备，再上天台挑战隐藏大佬。':d})}}
+ else if(cdxTab==='enemy'){for(const t in CDX_ENEMY)out.push({img:'enemy_'+t+'_idle',n:NAMES[t],d:CDX_ENEMY[t][1],tag:CDX_ENEMY[t][0]})}
+ else if(cdxTab==='boss'){for(const k in CDX_BOSS){const D=BOSSDEF[k];if(k==='ljy'&&!cdxSeenLjy()){out.push({img:'boss_ljy_idle',n:'？？？',d:'传说公司里还有一位深藏不露的大佬。',lock:true,sil:true});continue}
+   out.push({img:'boss_'+k+'_idle',n:D.name,d:CDX_BOSS[k][1]+'　'+D.quote,tag:CDX_BOSS[k][0]})}}
+ else{for(const k in STATS)out.push({img:'pk_scroll',n:STATS[k].n+' +1',d:STATS[k].d,tag:'卷轴'});for(const u of UPG){const lock=!unlocked('upg:'+u.id);out.push({emoji:u.ic,n:u.n,d:u.d,tag:lock?'图纸未解锁':u.t?'天赋':'升级',lock})}}
+ return out}
+function cdxDraw(){const tabs=$('cdxtabs');tabs.innerHTML='';for(const [k,n] of CDX_TABS){const b=document.createElement('button');b.className='lb'+(k===cdxTab?' on':'');b.textContent=n;b.onclick=()=>{cdxTab=k;SFX.select();cdxDraw()};tabs.appendChild(b)}
+ const list=$('cdxlist');list.innerHTML='';list.scrollTop=0;
+ for(const c of cdxCards()){const d=document.createElement('div');d.className='cdx'+(c.lock?' lock':'');
+  if(c.emoji){const e=document.createElement('div');e.className='emo';e.textContent=c.emoji;d.appendChild(e)}else{const cv=document.createElement('canvas');cv.width=96;cv.height=96;d.appendChild(cv);if(c.img)cdxThumb(cv,c.img);else{const g=cv.getContext('2d');g.fillStyle='#ffd84a';g.font='bold 48px sans-serif';g.textAlign='center';g.fillText('?',48,64)}
+   if(c.sil){const g=cv.getContext('2d');g.globalCompositeOperation='source-in';g.fillStyle='#14121a';g.fillRect(0,0,96,96)}}
+  const t=document.createElement('div');t.innerHTML=`<b>${c.n}${c.tag?`<i class=tag>${c.tag}</i>`:''}</b><small>${c.d}</small>`;d.appendChild(t);list.appendChild(d)}}
+function showCodex(v){show('codex',v);if(v)cdxDraw()}
+$('bcdx').onclick=()=>{SFX.select();showCodex(true)};$('bcdxx').onclick=()=>showCodex(false);
 
 }catch(e){__err(e)}</script></body></html>

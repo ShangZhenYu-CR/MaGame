@@ -213,7 +213,8 @@ function frame(ts){requestAnimationFrame(frame);try{let dt=Math.min(.05,(ts-last
  if(G.state==='scroll'){if(pressed('opt1'))chooseScroll(0);else if(pressed('opt2'))chooseScroll(1)}
  if(G.state==='rest'){if(pressed('opt1'))chooseRest(0);else if(pressed('opt2'))chooseRest(1);else if(pressed('opt3'))chooseRest(2)}
  if(G.state==='dead'&&(pressed('confirm')||KP['Space'])&&$('dead').classList.contains('show'))retry();
- if(G.state==='title'&&$('chg').classList.contains('show')){if(pressed('confirm')||pressed('pause'))showChanges(false)}
+ if(G.state==='title'&&$('codex').classList.contains('show')){if(pressed('confirm')||pressed('pause'))showCodex(false);else if(pressed('left')||pressed('right')){const i=CDX_TABS.findIndex(t=>t[0]===cdxTab),n=CDX_TABS.length;cdxTab=CDX_TABS[(i+(pressed('left')?n-1:1))%n][0];SFX.select();cdxDraw()}}
+ else if(G.state==='title'&&$('chg').classList.contains('show')){if(pressed('confirm')||pressed('pause'))showChanges(false)}
  else if(G.state==='title'){if(!skinBtn.ok&&sprReady('player_summer_idle')){skinBtn.ok=1;skinBtn()}if(pressed('skin'))nextSkin();if(pressed('confirm'))startGame(selLvl);if(pressed('left'))setLvl(selLvl-1);if(pressed('right'))setLvl(selLvl+1)}
  if(KP['KeyM'])$('bmute').textContent=Snd.toggle()?'🔇':'🔊';
  if(G.state==='title'){T+=dt;renderTitle()}
@@ -222,3 +223,59 @@ function frame(ts){requestAnimationFrame(frame);try{let dt=Math.min(.05,(ts-last
  else{let d=dt*slowmo;if(G.wheel)d=dt*.12;if(hitstop>0){hitstop-=dt;d*=.04}step(d);render()}
  uiTick();present();clearPressed()}catch(e){__err(e)}}
 requestAnimationFrame(frame);
+// ===== 回到主页 =====
+function goHome(){for(const id of['end','dead','pause','rest','scroll','hud','wheel','prompt'])show(id,false);$('bossbar').classList.remove('show');$('screen').classList.remove('blur');
+ G.wheel=null;G.state='title';G.rush=null;boss=null;enemies.length=0;projs.length=0;pickups.length=0;parts.length=0;fxs.length=0;corpses.length=0;splats.length=0;nums.length=0;
+ LV=null;genLevel(1);renderTitle.gy=undefined;T=0;setLvl(Math.min(selLvl,SAVE.maxLvl));show('title',true);Snd.play('rest');SFX.select()}
+$('bhome').onclick=goHome;$('bhome2').onclick=goHome;$('bhome3').onclick=goHome;
+// ===== 图鉴 =====
+// 缩略图：取素材第一帧，等比缩放放进方框
+function cdxThumb(cv,n,fi=0){const c=cv.getContext('2d');c.imageSmoothingEnabled=false;c.clearRect(0,0,cv.width,cv.height);if(!sprReady(n))return;const im=SPR[n],fw=sprFW(n),fh=im.naturalHeight;let x0=0,y0=0,x1=fw,y1=fh;
+ // 裁掉透明边，人物显得大一些
+ try{const t=document.createElement('canvas');t.width=fw;t.height=fh;const g=t.getContext('2d');g.drawImage(im,fi*fw,0,fw,fh,0,0,fw,fh);const d=g.getImageData(0,0,fw,fh).data;x0=fw;y0=fh;x1=0;y1=0;
+  for(let y=0;y<fh;y++)for(let x=0;x<fw;x++)if(d[(y*fw+x)*4+3]>20){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}if(x1<x0){x0=0;y0=0;x1=fw-1;y1=fh-1}x1++;y1++}catch(e){}
+ const w=x1-x0,h=y1-y0,k=Math.min((cv.width-8)/w,(cv.height-8)/h,4),dw=w*k,dh=h*k;c.drawImage(im,fi*fw+x0,y0,w,h,(cv.width-dw)/2,(cv.height-dh)/2,dw,dh)}
+const CDX_ENEMY={
+ crumple:['1F','缩成一团后向前猛扑。看到它缩起来就翻滚。'],sticky:['1F','飞在头顶，抖一抖就俯冲下来。'],printer:['1F','远处吐纸，纸可以被打碎。'],spray:['1F','保持距离喷漆，地上的油漆会让你减速。'],
+ bug:['2F','成群乱跳，会扑到脸上。'],popup:['2F','飞在空中发射红叉，红叉能被打碎。'],firewall:['2F · 顶层','正面能挡下大部分伤害。冲撞完会喘气，趁这时候或从背后打。'],merge:['2F','原地闪烁后瞬移到你身后砍。头上闪“！”时回身或翻滚。'],
+ kpi:['顶层','走得慢，砸地放出两道冲击波，跳起来躲。'],invite:['顶层','追着你飞，碰到会被“拉进会议”定身一下。'],pm:['顶层','自己不打人：给周围的怪加速，身边没怪时召唤会议邀请。优先解决他。']};
+const CDX_BOSS={
+ ad:['1F','红笔冲刺、扔修改意见、跳起来盖章；二阶段满屏批注。贴身太久会被红笔横扫。'],
+ pd:['2F','到处瞬移，扔会飞回来的文件，划出“需求变更”区域；二阶段加激光和拉人开会。贴身会被冲击波推开。'],
+ ceo:['顶层','扔饼、跳起来砸地、KPI 柱；二阶段巨饼和饼雨，三阶段 KPI 柱追着你长。贴身会被肚子顶开。'],
+ ljy:['天台','一阶段穿中山装：扔方块、巨型雕刻笔贴地横扫、回旋哑铃、哑铃砸地。半血变身炎龙铠甲：烈焰冲刺、龙炎吐息、烈焰柱、炎龙天降、升龙拳，四分之一血召唤天火。']};
+const CDX_ITEM=[
+ ['pk_cell','灵感','击败敌人、打碎纸箱掉落。在实习生小卖部、茶水间售货机花，也能刷新升级。'],
+ ['pk_food','便当','按 Q 吃，回复一半生命；每层开始补满。地上捡到的便当直接回复 25 生命。'],
+ ['pk_scroll','灵感卷轴','三选一提升一项属性：建模（主武器伤害）、地编（副武器伤害和冷却）、体力（最大生命）。'],
+ ['pk_bp','图纸','解锁新武器和升级。拾到后要活着走到茶水间或通关才算入库，倒下就丢了。'],
+ ['pk_chest','宝箱','按 E 打开，多半是一把武器，也可能是两个便当。'],
+ ['pk_cchest','加班合同','紫色宝箱：高级武器 + 卷轴 + 灵感；代价是击败一定数量的敌人前，受到的伤害翻倍。'],
+ ['pk_crate','纸箱','打碎掉 2～4 个灵感，有时有便当，偶尔有武器。'],
+ ['pk_rush','加急任务','接下后限时清掉刷出来的怪，完成奖励高级武器和灵感。'],
+ ['pk_wireterm','补模型终端','按 E 把线框台阶补成实体，爬上去有隐藏宝箱。'],
+ ['pk_tdoor','准时下班门','在限时内赶到才能打开，奖励高级武器和灵感。'],
+ ['pk_intern','实习生小卖部','每层中段可能出现，用灵感买热咖啡、便当盒、卷轴、武器打磨、神秘武器。'],
+ ['','评审会','走进去两侧封门，撑过两轮（第二轮有精英）才放行，奖励高级武器、卷轴、便当和灵感。'],
+ ['','精英怪','红光包围，头顶写着词缀：赶工（更快）、返工护甲（减伤）、拆需求（死后分裂）、带薪摸鱼（回血）、甩锅（死后爆炸）。必掉武器。'],
+ ['','货梯','？？？','ljy']];
+const CDX_TABS=[['weapon','建模工具'],['skill','地编工具'],['item','道具与事件'],['enemy','敌人'],['boss','Boss'],['upg','升级与天赋']];
+let cdxTab='weapon';
+function cdxSeenLjy(){return !!(SAVE.ljy||SAVE.ljyMet)}
+function cdxCards(){const out=[];
+ if(cdxTab==='weapon'||cdxTab==='skill'){for(const w of(cdxTab==='weapon'?PRIM:SECN)){const W=WEAPONS[w],lock=!unlocked(w);out.push({img:'icon_'+w,n:W.name,d:W.desc+(W.cd?`（冷却 ${W.cd} 秒）`:''),tag:lock?'图纸未解锁':BP_ALL.includes(w)?'图纸':'',lock})}}
+ else if(cdxTab==='item'){for(const [img,n,d,hid] of CDX_ITEM){if(hid&&!cdxSeenLjy()){out.push({img:'',n:'？？？',d:'打败老板以后，好像还有什么地方能去……',lock:true});continue}
+   out.push({img,n,d:hid?'打败老板后，Boss 房里出现的货梯。坐上去先在茶水间整备，再上天台挑战隐藏大佬。':d})}}
+ else if(cdxTab==='enemy'){for(const t in CDX_ENEMY)out.push({img:'enemy_'+t+'_idle',n:NAMES[t],d:CDX_ENEMY[t][1],tag:CDX_ENEMY[t][0]})}
+ else if(cdxTab==='boss'){for(const k in CDX_BOSS){const D=BOSSDEF[k];if(k==='ljy'&&!cdxSeenLjy()){out.push({img:'boss_ljy_idle',n:'？？？',d:'传说公司里还有一位深藏不露的大佬。',lock:true,sil:true});continue}
+   out.push({img:'boss_'+k+'_idle',n:D.name,d:CDX_BOSS[k][1]+'　'+D.quote,tag:CDX_BOSS[k][0]})}}
+ else{for(const k in STATS)out.push({img:'pk_scroll',n:STATS[k].n+' +1',d:STATS[k].d,tag:'卷轴'});for(const u of UPG){const lock=!unlocked('upg:'+u.id);out.push({emoji:u.ic,n:u.n,d:u.d,tag:lock?'图纸未解锁':u.t?'天赋':'升级',lock})}}
+ return out}
+function cdxDraw(){const tabs=$('cdxtabs');tabs.innerHTML='';for(const [k,n] of CDX_TABS){const b=document.createElement('button');b.className='lb'+(k===cdxTab?' on':'');b.textContent=n;b.onclick=()=>{cdxTab=k;SFX.select();cdxDraw()};tabs.appendChild(b)}
+ const list=$('cdxlist');list.innerHTML='';list.scrollTop=0;
+ for(const c of cdxCards()){const d=document.createElement('div');d.className='cdx'+(c.lock?' lock':'');
+  if(c.emoji){const e=document.createElement('div');e.className='emo';e.textContent=c.emoji;d.appendChild(e)}else{const cv=document.createElement('canvas');cv.width=96;cv.height=96;d.appendChild(cv);if(c.img)cdxThumb(cv,c.img);else{const g=cv.getContext('2d');g.fillStyle='#ffd84a';g.font='bold 48px sans-serif';g.textAlign='center';g.fillText('?',48,64)}
+   if(c.sil){const g=cv.getContext('2d');g.globalCompositeOperation='source-in';g.fillStyle='#14121a';g.fillRect(0,0,96,96)}}
+  const t=document.createElement('div');t.innerHTML=`<b>${c.n}${c.tag?`<i class=tag>${c.tag}</i>`:''}</b><small>${c.d}</small>`;d.appendChild(t);list.appendChild(d)}}
+function showCodex(v){show('codex',v);if(v)cdxDraw()}
+$('bcdx').onclick=()=>{SFX.select();showCodex(true)};$('bcdxx').onclick=()=>showCodex(false);

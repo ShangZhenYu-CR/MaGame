@@ -59,6 +59,9 @@ function genLevel(floor){
  for(let i=0;i<6;i++){set(ax+5+i,14,2);set(ax+arenaW-11+i,14,2)}for(let i=0;i<6;i++)set(ax+12+i,10,2);
  for(let k=ax+4;k<w-3;k+=8)decor.push({k:'window',x:k*TS,y:Math.round(6.6*TS),s:irnd(0,99)});decor.push({k:'lamp',x:(ax+8)*TS,y:6*TS,s:0});decor.push({k:'lamp',x:(ax+22)*TS,y:6*TS,s:0});
  {let gy=19;for(let y=2;y<HT;y++)if(T[y*w+ax-6]===1){gy=y;break}for(let i=-8;i<=-3;i++)if(T[(gy-1)*w+ax+i]===3)set(ax+i,gy-1,0);pks.push({k:'tdoor',x:(ax-6)*TS+8,y:gy*TS})}
+ // 收尾清理：拾取物和互动物件脚下及两侧不留图钉；Boss 房入口附近不放普通怪（那段地面已被铺平）
+ for(const k of pks){if(k.k==='cell'||k.k==='food')continue;const tx=Math.floor(k.x/TS);for(let y=2;y<HT;y++)for(let dx=-2;dx<=2;dx++)if(T[y*w+tx+dx]===3)set(tx+dx,y,0)}
+ for(let i=spawns.length-1;i>=0;i--)if(spawns[i].x>=(ax-3)*TS)spawns.splice(i,1);
  const gate={x:ax+2,active:false};
  LV={floor,th,w,h:HT,T,spawns,decor,pick:pks,signs,boxes:[],arenaX:ax*TS,arenaW:arenaW*TS,gate,exitX:(w-6)*TS};
  return LV}

@@ -58,7 +58,7 @@ function bossUpdate(dtA){const b=boss;if(!b)return;if(b.state!=='dead'){tickStat
  if(b.state==='stamp_fall'){b.y+=b.vy*dt;const gy=19*TS;if(b.y>=gy){b.y=gy;b.vy=0;b.state='recover';b.t=0;b.rec=.85;b.landT=.36;SFX.stamp();shake=8;splats.push({x:b.x-12,y:gy,w:24,col:'#c8302a',life:5});
    for(const d of[-1,1])eproj({kind:'wave',x:b.x+d*10,y:gy,vx:d*210*sp,vy:0,r:6,dmg:15,life:2,col:'#e8483a'});if(Math.abs(dx)<24)hurtPlayer(22,sign(dx)||1,b);
    if(b.phase>=2&&b.minions<4&&enemies.filter(e=>e.minion).length<2){b.minions++;spawnEnemy({type:'crumple',x:clamp(b.x+pick([-80,80]),LV.arenaX+40,LV.arenaX+LV.arenaW-40),y:gy},true)}}}
- else if(!['stamp_up','stamp_hover','tele'].includes(b.state))moveBody(b,dt);
+ else if(!['stamp_up','stamp_hover','tele'].includes(b.state)){b.drop=b.kind!=='pd';moveBody(b,dt)}// 主美和老板穿过单向平台落回地面，免得卡在高台上
  b.x=clamp(b.x,LV.arenaX+3*TS,LV.arenaX+LV.arenaW-2*TS);
  // 接触伤害
  if(b.state!=='intro'&&b.state!=='tele'&&b.state!=='stagger'&&b.state!=='roar'&&b.alpha>.5&&b.contactCd<=0&&Math.abs(dx)<b.w/2+P.w/2&&P.y>b.y-b.h&&P.y-P.h<b.y){if(hurtPlayer(BOSSDEF[b.kind].contact,sign(dx)||1,b))b.contactCd=.8}}

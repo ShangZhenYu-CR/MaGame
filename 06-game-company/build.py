@@ -25,7 +25,41 @@ anc = {}
 for p in sorted((here / 'art').rglob('anchors.json')):
     anc.update(json.loads(p.read_text(encoding='utf-8')))
 
-js = ('const ART_SRC=' + json.dumps(art) + ';\nconst ART_ANCHOR=' + json.dumps(anc) + ';\n'
+# 非正方形帧的帧宽（逻辑像素），按名字前缀匹配
+fw_table = json.loads((here / 'art' / 'frames.json').read_text(encoding='utf-8'))
+
+def frame_w(name, height, scale):
+    for k, v in fw_table.items():
+        if name.startswith(k):
+            return v * scale
+    return height
+
+# 每帧底部透明行数（逻辑像素）：以脚底为锚点的素材画的时候往下补，避免悬空。
+# 有 Pillow 就重新量并写进 art/gaps.json；没有就沿用上次量好的文件。
+gaps_file = here / 'art' / 'gaps.json'
+try:
+    from PIL import Image
+    gaps = {}
+    for p in sorted((here / 'art').rglob('*.png')):
+        name = p.stem.replace('@2x', '')
+        if not name.startswith(('player_', 'enemy_', 'boss_', 'pk_', 'decor_')):
+            continue
+        scale = 2 if '@2x' in p.stem else 1
+        im = Image.open(p).convert('RGBA')
+        w = frame_w(name, im.height, scale)
+        alpha = im.getchannel('A')
+        row = []
+        for i in range(max(1, im.width // w)):
+            bb = alpha.crop((i * w, 0, i * w + w, im.height)).getbbox()
+            row.append(round((im.height - bb[3]) / scale, 1) if bb else 0)
+        if any(row):
+            gaps[name] = row
+    gaps_file.write_text(json.dumps(gaps, ensure_ascii=False), encoding='utf-8')
+except ImportError:
+    gaps = json.loads(gaps_file.read_text(encoding='utf-8')) if gaps_file.exists() else {}
+
+js = ('const ART_SRC=' + json.dumps(art) + ';\nconst ART_ANCHOR=' + json.dumps(anc) + ';\nconst ART_FW=' + json.dumps(fw_table)
+      + ';\nconst ART_GAP=' + json.dumps(gaps) + ';\n'
       + '\n'.join((here / 'src' / f'{m}.js').read_text(encoding='utf-8') for m in order))
 shell = (here / 'src' / 'shell.html').read_text(encoding='utf-8')
 (here / 'index.html').write_text(shell.replace('__JS__', js), encoding='utf-8')

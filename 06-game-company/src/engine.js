@@ -21,6 +21,8 @@ addEventListener('keydown',e=>{if(!K[e.code])KP[e.code]=1;K[e.code]=1;if(/Space|
 addEventListener('keyup',e=>{K[e.code]=0});addEventListener('blur',()=>{for(const k in K)K[k]=0});
 screen.addEventListener('mousedown',e=>{const c='Mouse'+e.button;if(!K[c])KP[c]=1;K[c]=1;Snd.unlock()});addEventListener('mouseup',e=>{K['Mouse'+e.button]=0});
 screen.addEventListener('contextmenu',e=>e.preventDefault());
+// 点完界面按钮立刻取消焦点，避免之后按 Enter / 空格又触发同一个按钮
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button');if(b)setTimeout(()=>b.blur(),0)},true);
 function clearPressed(){for(const k in KP)delete KP[k]}
 // 手柄
 let padOn=false;

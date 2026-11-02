@@ -11,14 +11,16 @@ for(const k in (typeof ART_SRC!=='undefined'?ART_SRC:{})){const v=ART_SRC[k],im=
  im.addEventListener('load',()=>{const i=ART_FAIL.indexOf(k);if(i>=0){ART_FAIL.splice(i,1);artFailNote()}});if(k.startsWith('icon_'))im.onload=()=>{if(typeof hud==='function'&&G.state!=='title'){hud.p=hud.s=null;hud()}};im.src=src0;SPR[k]=im;SPRS[k]=typeof v==='string'?1:(v.s||1)}
 function sprReady(n){const im=SPR[n];return !!(im&&im.complete&&im.naturalWidth)}
 // 帧默认是正方形（边长 = 图片高度）；不是正方形的在这里写逻辑帧宽（按名字前缀匹配）
-const FRAME_W={enemy_printer:40,enemy_popup:40,enemy_bug:24,enemy_firewall:28,enemy_invite:32,enemy_kpi:28,boss_ad:72,boss_pd:64,boss_ceo:80,proj_paper:16,proj_doc:16,proj_kpi_bar:24,proj_laser:32,proj_x:12,proj_zone:32,fx_dive:64,fx_djump:24,fx_dust:16,pk_bp:16,pk_cchest:24,pk_chest:24,pk_door:28,pk_food:16,pk_rush:16,pk_scroll:16,pk_tdoor:28,pk_wireterm:16,tiles_:8};
+// 非正方形帧的逻辑帧宽在 art/frames.json（build.py 内嵌为 ART_FW），按名字前缀匹配
+const FRAME_W=(typeof ART_FW!=='undefined'?ART_FW:{});
 function sprFW(n){const im=SPR[n],s=SPRS[n]||1;for(const k in FRAME_W)if(n.startsWith(k))return FRAME_W[k]*s;return im.naturalHeight}
 function sprN(n){const im=SPR[n];return im&&im.naturalWidth?Math.max(1,Math.round(im.naturalWidth/sprFW(n))):1}
 // 被打闪白：缓存一张纯白剪影
 const WHITE={};function whiteOf(n){if(WHITE[n])return WHITE[n];const im=SPR[n],c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const g=c.getContext('2d');g.drawImage(im,0,0);g.globalCompositeOperation='source-in';g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);return WHITE[n]=c}
 // 画一帧：横向序列帧，脚底中心对齐 (x,y)，朝左时水平翻转；mode='center' 时 (x,y) 是帧中心
 function sprFrame(n,i,x,y,face,white,mode){if(!sprReady(n))return false;const im=SPR[n],s=SPRS[n]||1,fw=sprFW(n),fh=im.naturalHeight,W=fw/s,H=fh/s,c=sprN(n);i=((i%c)+c)%c;
- ctx.save();ctx.translate(R(x),R(y));ctx.scale(face,1);ctx.drawImage(white?whiteOf(n):im,i*fw,0,fw,fh,-W/2,mode==='center'?-H/2:-H,W,H);ctx.restore();return true}
+ const gp=mode==='center'?0:((typeof ART_GAP!=='undefined'&&ART_GAP[n])?ART_GAP[n][i]||0:0);
+ ctx.save();ctx.translate(R(x),R(y+gp));ctx.scale(face,1);ctx.drawImage(white?whiteOf(n):im,i*fw,0,fw,fh,-W/2,mode==='center'?-H/2:-H,W,H);ctx.restore();return true}
 // 序列帧特效（命中火花等）
 const fxs=[];function sfx(n,x,y,face=1,fps=20){if(sprReady(n))fxs.push({n,x,y,face,t:0,fps})}
 function updFx(dt){for(let i=fxs.length-1;i>=0;i--){fxs[i].t+=dt;if(fxs[i].t*fxs[i].fps>=sprN(fxs[i].n))fxs.splice(i,1)}}

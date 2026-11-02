@@ -118,10 +118,13 @@ function drawFar(cx,cy){const n='bg_f'+LV.floor+'_far',ox=Math.floor(cx*.15),oy=
  if(sprReady(n)){const im=SPR[n],s=SPRS[n]||1,W=im.naturalWidth/s,H=im.naturalHeight/s;for(let x=-(ox%W);x<VW;x+=W)ctx.drawImage(im,x,oy,W,H);return}
  const c=farCanvas(LV.floor);for(let x=-(ox%480);x<VW;x+=480)ctx.drawImage(c,x,oy,480,300)}
 function drawBackground(cx,cy,t){const th=LV.th,f=LV.floor,mid='bg_f'+f+'_mid',arena='bg_f'+f+'_arena';
- if(sprReady(mid)){drawFar(cx,cy);const im=SPR[mid],s=SPRS[mid]||1,W=im.naturalWidth/s,H=im.naturalHeight/s,y0=R(19*TS+60-H-cy);
-  for(let x=-(Math.floor(cx*.5)%W);x<VW;x+=W)ctx.drawImage(im,x,y0,W,H);
-  if(sprReady(arena)){const a=SPR[arena],sa=SPRS[arena]||1;ctx.drawImage(a,R(LV.arenaX-cx),R(19*TS+60-a.naturalHeight/sa-cy),a.naturalWidth/sa,a.naturalHeight/sa)}
-  return}
+ if(sprReady(mid)){drawFar(cx,cy);const im=SPR[mid],s=SPRS[mid]||1,W=im.naturalWidth/s,H=im.naturalHeight/s,y0=R(2*TS-cy);
+  const hasA=sprReady(arena),ax0=R(LV.arenaX-cx),ax1=ax0+LV.arenaW;
+  // Boss 房那段不画普通墙面，让 Boss 房墙面的窗户透出窗外景色
+  ctx.save();if(hasA&&ax0<VW){ctx.beginPath();ctx.rect(-10,-10,Math.max(0,ax0+10),VH+20);ctx.rect(ax1,-10,Math.max(0,VW-ax1+10),VH+20);ctx.clip()}
+  for(let x=-(Math.floor(cx*.5)%W);x<VW;x+=W)ctx.drawImage(im,x,y0,W,H);ctx.restore();
+  if(hasA){const a=SPR[arena],sa=SPRS[arena]||1;ctx.drawImage(a,ax0,y0,a.naturalWidth/sa,a.naturalHeight/sa)}
+  for(const d of LV.decor)if(d.k==='lamp')drawDecor(d,cx,cy,th,t);return}
  ctx.fillStyle=th.wall;ctx.fillRect(0,0,VW,VH);
  // 墙面竖条纹（视差）+ 墙裙
  const o=Math.floor(cx*.5)%64;for(let x=-o;x<VW;x+=64){px(x,0,32,VH,th.wall2);px(x+31,0,1,VH,'rgba(0,0,0,.05)')}
@@ -133,10 +136,10 @@ function drawLights(cx,cy,t){const f=LV.floor,th=LV.th;
  const scene=sprReady('bg_f'+f+'_mid');const amb=scene?{1:0,2:.06,3:.12}[f]:{1:0,2:.16,3:.45}[f];if(amb){ctx.fillStyle=f===2?`rgba(20,24,64,${amb})`:`rgba(8,6,26,${amb})`;ctx.fillRect(0,0,VW,VH)}
  ctx.save();ctx.globalCompositeOperation='lighter';
  for(const d of LV.decor){const x=R(d.x-cx),y=R(d.y-cy);if(x<-120||x>VW+120)continue;
-  if(scene&&(d.k==='window'||d.k==='lamp'))continue;
+  if(scene&&d.k==='window')continue;
   if(d.k==='window'&&f===1){ctx.fillStyle='rgba(255,226,160,.07)';ctx.beginPath();ctx.moveTo(x+2,y+2);ctx.lineTo(x+38,y+2);ctx.lineTo(x+110,y+190);ctx.lineTo(x+60,y+190);ctx.fill();ctx.fillStyle='rgba(255,226,160,.05)';ctx.fillRect(x+2,y+2,36,32)}
   if(d.k==='window'&&f===2){ctx.fillStyle='rgba(255,150,90,.06)';ctx.beginPath();ctx.moveTo(x+2,y+2);ctx.lineTo(x+38,y+2);ctx.lineTo(x+120,y+190);ctx.lineTo(x+40,y+190);ctx.fill()}
-  if(d.k==='lamp'){const g=ctx.createRadialGradient(x,y+12,2,x,y+12,f===3?130:80);g.addColorStop(0,th.light+(f===3?'.6)':'.14)'));g.addColorStop(1,th.light+'0)');ctx.fillStyle=g;ctx.fillRect(x-135,y-120,270,270)}
+  if(d.k==='lamp'){const ly=y+(scene?20:12),g=ctx.createRadialGradient(x,ly,2,x,ly,f===3?130:80);g.addColorStop(0,th.light+(f===3?'.6)':'.14)'));g.addColorStop(1,th.light+'0)');ctx.fillStyle=g;ctx.fillRect(x-135,ly-132,270,270)}
   if(d.k==='monitor'||d.k==='server'){ctx.fillStyle='rgba(90,200,255,.06)';ctx.beginPath();ctx.arc(x+11,y+8,22,0,7);ctx.fill()}}
  ctx.restore()}
 function drawNear(cx,cy){const n='bg_f'+LV.floor+'_near';if(!sprReady(n))return;const im=SPR[n],s=SPRS[n]||1,W=im.naturalWidth/s,H=im.naturalHeight/s;for(let x=-(Math.floor(cx*1.3)%W);x<VW;x+=W)ctx.drawImage(im,x,VH-H,W,H)}

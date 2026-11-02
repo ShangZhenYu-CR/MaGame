@@ -20,7 +20,9 @@ function sprN(n){const im=SPR[n];return im&&im.naturalWidth?Math.max(1,Math.roun
 // 被打闪白：缓存一张纯白剪影
 const WHITE={};function whiteOf(n){if(WHITE[n])return WHITE[n];const im=SPR[n],c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const g=c.getContext('2d');g.drawImage(im,0,0);g.globalCompositeOperation='source-in';g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);return WHITE[n]=c}
 // 画一帧：横向序列帧，脚底中心对齐 (x,y)，朝左时水平翻转；mode='center' 时 (x,y) 是帧中心
-function sprFrame(n,i,x,y,face,white,mode){if(!sprReady(n))return false;const im=SPR[n],s=SPRS[n]||1,fw=sprFW(n),fh=im.naturalHeight,W=fw/s,H=fh/s,c=sprN(n);i=((i%c)+c)%c;
+// 换装：选了夏季服装且有对应素材时，player_xxx 换成 player_summer_xxx（动作、帧数、挂点和原版一致）
+let SKIN='';function skinOf(n){if(SKIN&&n.startsWith('player_')){const m='player_'+SKIN+'_'+n.slice(7);if(sprReady(m))return m}return n}
+function sprFrame(n,i,x,y,face,white,mode){n=skinOf(n);if(!sprReady(n))return false;const im=SPR[n],s=SPRS[n]||1,fw=sprFW(n),fh=im.naturalHeight,W=fw/s,H=fh/s,c=sprN(n);i=((i%c)+c)%c;
  const gp=mode==='center'?0:((typeof ART_GAP!=='undefined'&&ART_GAP[n])?ART_GAP[n][i]||0:0);
  ctx.save();ctx.translate(R(x),R(y+gp));ctx.scale(face,1);ctx.drawImage(white?whiteOf(n):im,i*fw,0,fw,fh,-W/2,mode==='center'?-H/2:-H,W,H);ctx.restore();return true}
 // 序列帧特效（命中火花等）

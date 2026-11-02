@@ -16,7 +16,7 @@ function present(){sctx.fillStyle='#000';sctx.fillRect(0,0,screen.width,screen.h
 // ===== 输入 =====
 const K={},KP={};
 const BIND={left:['KeyA','ArrowLeft','PadL'],right:['KeyD','ArrowRight','PadR'],up:['KeyW','ArrowUp','PadU'],down:['KeyS','ArrowDown','PadD'],jump:['Space','KeyW','ArrowUp','Pad0'],atk:['KeyJ','Mouse0','Pad2'],skill:['KeyK','Mouse2','Pad3'],roll:['KeyL','ShiftLeft','ShiftRight','Pad1','Pad7'],use:['KeyE','Pad4'],heal:['KeyQ','Pad5'],pause:['Escape','KeyP','Pad9'],opt1:['Digit1','Numpad1'],opt2:['Digit2','Numpad2'],opt3:['Digit3','Numpad3'],confirm:['Enter','Pad0'],
- wheel1:['KeyR','Pad6'],wheel2:['KeyF','Pad8'],wl:['KeyJ','ArrowLeft','KeyA','PadL'],wr:['KeyL','ArrowRight','KeyD','PadR']};
+ skin:['KeyC'],wheel1:['KeyR','Pad6'],wheel2:['KeyF','Pad8'],wl:['KeyJ','ArrowLeft','KeyA','PadL'],wr:['KeyL','ArrowRight','KeyD','PadR']};
 const down=a=>BIND[a].some(k=>K[k]),pressed=a=>BIND[a].some(k=>KP[k]);
 addEventListener('keydown',e=>{if(!K[e.code])KP[e.code]=1;K[e.code]=1;if(/Space|Arrow/.test(e.code))e.preventDefault();Snd.unlock()});
 addEventListener('keyup',e=>{K[e.code]=0});addEventListener('blur',()=>{for(const k in K)K[k]=0});

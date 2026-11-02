@@ -49,7 +49,16 @@ function drawEnemySpr(e,cx,cy){const b='enemy_'+e.type;if(!useSpr||!sprReady(b+'
 function drawBossSpr(b,cx,cy){const p='boss_'+b.kind;if(!useSpr||!sprReady(p+'_idle'))return false;let n=p+'_idle',fi=Math.floor(b.anim*5);const has=k=>sprReady(p+'_'+k),st=b.state,set=(k,f)=>{if(has(k)){n=p+'_'+k;fi=f}};
  if((st==='tele'||st==='tele_in')&&has('tele_out'))ctx.globalAlpha=1;
  // 制作人
- if(st==='tele')set('tele_out',Math.min(3,Math.floor(b.t/.3*4)));
+ // 近身反击和新招（复用现有动作帧）
+ if(st==='sweep_wind')set('dash_wind',Math.min(2,Math.floor(b.t*8)));
+ else if(st==='sweep')set('dash',2);
+ else if(st==='shove_wind'||st==='call')set('change',Math.min(3,Math.floor(b.t*8)));
+ else if(st==='shove')set('change',3);
+ else if(st==='belly_wind')set('pound',Math.min(2,Math.floor(b.t*7)));
+ else if(st==='belly')set('pound',3);
+ else if(st==='rain')set('notes',Math.min(3,Math.floor(b.t*5)));
+ else if(st==='pierain')set('kpi',Math.floor(b.t*6)%4);
+ else if(st==='tele')set('tele_out',Math.min(3,Math.floor(b.t/.3*4)));
  else if(st==='tele_in')set('tele_in',Math.min(3,Math.floor(b.t/.3*4)));
  else if(st==='doc')set('doc',Math.min(3,Math.floor(b.t/.55*4)));
  else if(st==='change')set('change',Math.min(3,Math.floor(b.t/.8*4)));

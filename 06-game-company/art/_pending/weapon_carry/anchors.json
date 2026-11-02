@@ -1,0 +1,107 @@
+{
+  "weapon_shears_rest": {
+    "mount": [
+      33,
+      32
+    ],
+    "layer": "behind"
+  },
+  "weapon_shears_hold": {
+    "grip1": [
+      [
+        14,
+        32
+      ],
+      [
+        14,
+        32
+      ],
+      [
+        14,
+        32
+      ],
+      [
+        14,
+        32
+      ]
+    ],
+    "grip2": [
+      [
+        14,
+        43
+      ],
+      [
+        14,
+        43
+      ],
+      [
+        14,
+        43
+      ],
+      [
+        14,
+        43
+      ]
+    ]
+  },
+  "weapon_marker_rest": {
+    "mount": [
+      32,
+      32
+    ],
+    "layer": "behind"
+  },
+  "weapon_ruler_rest": {
+    "mount": [
+      48,
+      48
+    ],
+    "layer": "behind"
+  },
+  "weapon_knife_rest": {
+    "mount": [
+      12,
+      12
+    ],
+    "layer": "front"
+  },
+  "weapon_stylus_rest": {
+    "mount": [
+      16,
+      8
+    ],
+    "layer": "front"
+  },
+  "weapon_whip_rest": {
+    "mount": [
+      16,
+      8
+    ],
+    "layer": "front"
+  },
+  "weapon_render_rest": {
+    "mount": [
+      40,
+      40
+    ],
+    "layer": "behind"
+  },
+  "weapon_knife_reverse": {
+    "grip": [
+      23,
+      9
+    ]
+  },
+  "weapon_whip_hang": {
+    "grip": [
+      16,
+      8
+    ]
+  },
+  "weapon_render_charge": {
+    "grip": [
+      10,
+      53
+    ]
+  }
+}

@@ -31,5 +31,11 @@
 "pk_rush": 16,
 "pk_scroll": 16,
 "pk_tdoor": 28,
-"pk_wireterm": 16
+"pk_wireterm": 16,
+"fx_bool_crater": 48,
+"fx_extrude": 64,
+"fx_eyedrop": 64,
+"fx_render_slash": 96,
+"fx_whip_": 96,
+"weapon_render_charge": 32
 }

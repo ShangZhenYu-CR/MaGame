@@ -13,7 +13,7 @@ embed = '--embed' in sys.argv
 
 # 文件名带 @2x 的是两倍精度素材，同名时优先用 @2x
 art = {}
-for p in sorted((here / 'art').rglob('*.png'), key=lambda p: ('@2x' in p.stem, str(p))):
+for p in sorted((p for p in (here / 'art').rglob('*.png') if '_pending' not in p.parts), key=lambda p: ('@2x' in p.stem, str(p))):
     if embed:
         src = 'data:image/png;base64,' + base64.b64encode(p.read_bytes()).decode()
     else:
@@ -22,7 +22,7 @@ for p in sorted((here / 'art').rglob('*.png'), key=lambda p: ('@2x' in p.stem, s
     art[p.stem.replace('@2x', '')] = {'src': src, 's': 2} if '@2x' in p.stem else src
 
 anc = {}
-for p in sorted((here / 'art').rglob('anchors.json')):
+for p in sorted(p for p in (here / 'art').rglob('anchors.json') if '_pending' not in p.parts):
     anc.update(json.loads(p.read_text(encoding='utf-8')))
 
 # 非正方形帧的帧宽（逻辑像素），按名字前缀匹配
@@ -30,11 +30,11 @@ fw_table = json.loads((here / 'art' / 'frames.json').read_text(encoding='utf-8')
 
 def frame_w(name, height, scale, width=None):
     # 单张图（装饰物、武器、图标）整张就是一帧
-    if width is not None and name.startswith(('decor_', 'weapon_', 'icon_')):
-        return width
     for k, v in fw_table.items():
         if name.startswith(k):
             return v * scale
+    if width is not None and name.startswith(('decor_', 'weapon_', 'icon_')):
+        return width
     return height
 
 # 每帧底部透明行数（逻辑像素）：以脚底为锚点的素材画的时候往下补，避免悬空。
@@ -43,7 +43,7 @@ gaps_file = here / 'art' / 'gaps.json'
 try:
     from PIL import Image
     gaps = {}
-    for p in sorted((here / 'art').rglob('*.png')):
+    for p in sorted(p for p in (here / 'art').rglob('*.png') if '_pending' not in p.parts):
         name = p.stem.replace('@2x', '')
         if not name.startswith(('player_', 'enemy_', 'boss_', 'pk_', 'decor_')):
             continue

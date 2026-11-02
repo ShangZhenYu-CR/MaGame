@@ -15,7 +15,7 @@ function sprReady(n){const im=SPR[n];return !!(im&&im.complete&&im.naturalWidth)
 const FRAME_W=(typeof ART_FW!=='undefined'?ART_FW:{});
 // 单张图（装饰物、武器、图标）整张就是一帧，不能按“正方形帧”切，否则宽图会被裁掉一截
 const SINGLE_PREFIX=['decor_','weapon_','icon_'];
-function sprFW(n){const im=SPR[n],s=SPRS[n]||1;if(SINGLE_PREFIX.some(p=>n.startsWith(p)))return im.naturalWidth;for(const k in FRAME_W)if(n.startsWith(k))return FRAME_W[k]*s;return im.naturalHeight}
+function sprFW(n){const im=SPR[n],s=SPRS[n]||1;for(const k in FRAME_W)if(n.startsWith(k))return FRAME_W[k]*s;if(SINGLE_PREFIX.some(p=>n.startsWith(p)))return im.naturalWidth;return im.naturalHeight}
 function sprN(n){const im=SPR[n];return im&&im.naturalWidth?Math.max(1,Math.round(im.naturalWidth/sprFW(n))):1}
 // 被打闪白：缓存一张纯白剪影
 const WHITE={};function whiteOf(n){if(WHITE[n])return WHITE[n];const im=SPR[n],c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const g=c.getContext('2d');g.drawImage(im,0,0);g.globalCompositeOperation='source-in';g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);return WHITE[n]=c}
@@ -34,6 +34,8 @@ const corpses=[];
 function updCorpses(dt){for(let i=corpses.length-1;i>=0;i--){corpses[i].t+=dt;if(corpses[i].t>sprN(corpses[i].n)*.08+.25)corpses.splice(i,1)}}
 function drawCorpses(cx,cy){for(const c of corpses){const k=Math.min(sprN(c.n)-1,Math.floor(c.t/.08));ctx.globalAlpha=Math.min(1,(sprN(c.n)*.08+.25-c.t)*4);sprFrame(c.n,k,c.x-cx,c.y-cy,c.face,false,c.fly?'center':'');ctx.globalAlpha=1}}
 // 敌人素材：按状态挑动画
+// 项目经理素材里人物只有约 32 高，放大到和马楠差不多
+const ENEMY_SPR_SCALE={pm:1.25};
 function drawEnemySpr(e,cx,cy){const b='enemy_'+e.type;if(!useSpr||!sprReady(b+'_idle'))return false;let n=b+'_idle',fi=Math.floor(e.anim*6);
  const has=k=>sprReady(b+'_'+k);
  if(e.state==='stun'&&has('stun')){n=b+'_stun';fi=Math.floor(e.anim*5)}
@@ -43,7 +45,7 @@ function drawEnemySpr(e,cx,cy){const b='enemy_'+e.type;if(!useSpr||!sprReady(b+'
  else if((['lunge','swoop','bash','slam','spray','slash','rally'].includes(e.state)||e.atkT>0||(e.type==='bug'&&!e.onGround&&e.cd>.6))&&has('attack')){n=b+'_attack';fi=e.atkT>0?Math.floor((1-e.atkT/.3)*3):Math.min(2,Math.floor(e.anim*10)%3)}
  const x=e.x-cx,y=e.y-cy;
  if(e.fly){sprFrame(n,fi,x,y-e.h/2,e.face,false,'center');if(e.flash>0)sprFrame(n,fi,x,y-e.h/2,e.face,true,'center')}
- else{sprFrame(n,fi,x,y,e.face);if(e.flash>0)sprFrame(n,fi,x,y,e.face,true)}
+ else{const k=ENEMY_SPR_SCALE[e.type]||1;if(k!==1){ctx.save();ctx.translate(x,y);ctx.scale(k,k);ctx.translate(-x,-y)}sprFrame(n,fi,x,y,e.face);if(e.flash>0)sprFrame(n,fi,x,y,e.face,true);if(k!==1)ctx.restore()}
  if(e.bleedT>0&&Math.floor(e.anim*8)%2)px(x+rnd(-4,4),y-e.h*rnd(.3,1.1),1,2,pick(['#ff6a2a','#ffb84a']));
  if(e.slowT>0){for(let i=0;i<3;i++){const vx=x-e.w/2+((i*7+Math.floor(e.anim*3))%Math.max(1,e.w));pline(vx,y,vx+2,y-6,1,'#3a8a3a');px(vx+1,y-5,2,1,'#9ad870')}}
  if((e.state==='wind'||e.state==='slashw')&&e.windT>0&&Math.floor(e.anim*12)%2===0)pnum('!',R(x),R(y-e.h-12),'#ff5a4a',2);
@@ -205,9 +207,11 @@ const THEME={
 const DECOR_MAP={1:{easel:['easel'],frame:['artwall'],plant:['plant','sculpture'],board:['drawingdesk'],shelf:['bookshelf'],cooler:['watercooler','wastebasket']},
  2:{monitor:['workstation'],server:['server'],board:['board','whiteboard'],poster:['poster'],plant:['coffee','beanbag','cables']},
  3:{trophy:['trophycase'],plant:['moneytree','globe'],frame:['portrait'],poster:['statue','winecabinet'],monitor:['aquarium','sofa']},
- 4:{trophy:['dumbbellrack','barbellrack'],plant:['plant','punchbag'],frame:['neon'],poster:['mirror','lockers'],monitor:['treadmill','bench']}};
+ 4:{trophy:['dumbbellrack','barbellrack'],plant:['plant','bench'],frame:['neon'],poster:['lockers','mirror'],monitor:['treadmill','bench']}};
 const DECOR_WALL=['artwall','board','whiteboard','poster','portrait','neon'];
-function drawDecorSpr(d,cx,cy){if(!useSpr||d.gy===undefined)return false;let name=d.k==='elevator'?'elevator':null;const m=DECOR_MAP[LV.af]&&DECOR_MAP[LV.af][d.k];if(m)name=m[d.s%m.length];if(!name)return false;const n='decor_f'+LV.af+'_'+name;if(!sprReady(n))return false;
+// 天台（第 4 层）：健身房陈设单独到位了就先用，墙面、地面还没到时继续用顶层的；没到位的陈设不画，免得冒出总裁办的东西
+function decorFloor(){return LV.floor===4&&sprReady('decor_f4_dumbbellrack')?4:LV.af}
+function drawDecorSpr(d,cx,cy){if(!useSpr||d.gy===undefined)return false;const F=d.k==='elevator'?LV.af:decorFloor();let name=d.k==='elevator'?'elevator':null;const m=DECOR_MAP[F]&&DECOR_MAP[F][d.k];if(m)name=m[d.s%m.length];if(!name)return false;const n='decor_f'+F+'_'+name;if(!sprReady(n))return F===4;
  // 第一次画的时候检查摆不摆得下：不能被地面挡住，落地的物件下面要全是地面；放不下就左右挪，挪不开就不放
  if(d.fit===undefined||d.fitN!==n)decorFit(d,n,name);if(d.fit===null)return true;
  const st=DECOR_STYLE[name]||{},b=decorBox(n,name),x=R(d.x+12+d.fit-cx),bot=R(d.gy-(DECOR_WALL.includes(name)?34:0)-cy);
@@ -242,7 +246,7 @@ function drawDecor(d,cx,cy,th,t){const x=R(d.x-cx),y=R(d.y-cy);if(x<-120||x>VW+1
  case 'board':px(x,y,46,28,'#9aa0a8');px(x+2,y+2,42,24,'#f8f8fa');for(let i=0;i<4;i++)px(x+5,y+6+i*5,10+((i*11+d.s)%26),1,['#3a6ad8','#d8584a','#3a3a46'][i%3]);break;
  case 'poster':px(x,y,18,24,['#d8584a','#3a6ad8','#f2c14e'][d.s%3]);px(x+3,y+3,12,10,'#f4f1ea');px(x+3,y+16,12,2,'#fff');px(x+3,y+19,8,1,'#fff');break;
  case 'trophy':px(x+4,y+16,8,4,'#6a5a4a');px(x+6,y+12,4,4,'#e8b84a');px(x+2,y+2,12,10,'#e8b84a');px(x,y+3,2,5,'#e8b84a');px(x+14,y+3,2,5,'#e8b84a');px(x+4,y+4,2,4,'#fff2c0');break;
- case 'lamp':{const ln=sprReady('decor_f'+LV.af+'_chandelier')?'decor_f'+LV.af+'_chandelier':'decor_f'+LV.af+'_lamp';if(useSpr&&sprReady(ln)){const im=SPR[ln],k=ln.endsWith('chandelier')?1:.5,W=im.naturalWidth/(SPRS[ln]||1)*k,H=im.naturalHeight/(SPRS[ln]||1)*k,top=R(2*TS-cy);px(x,top,1,y+3-top,'#2a2a34');px(x-2,top,5,2,'#2a2a34');ctx.drawImage(im,R(x-W/2),R(y+2),W,H);ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.5+.08*Math.sin(t*3+d.x);pcirc(x,R(y+2+H),2,'#ffe6a0');ctx.restore();break}}px(x,y-40,1,40,'#3a3a46');px(x-1,y,2,6,'#3a3a46');px(x-6,y+6,12,3,'#3a3a46');ctx.fillStyle=th.light+'0.07)';ctx.beginPath();ctx.moveTo(x-5,y+9);ctx.lineTo(x+5,y+9);ctx.lineTo(x+30,y+130);ctx.lineTo(x-30,y+130);ctx.fill();px(x-4,y+9,8,1,'#fff6d0');break;
+ case 'lamp':{const LF=decorFloor(),ln=sprReady('decor_f'+LF+'_chandelier')?'decor_f'+LF+'_chandelier':'decor_f'+LF+'_lamp';if(useSpr&&sprReady(ln)){const im=SPR[ln],k=ln.endsWith('chandelier')?1:.5,W=im.naturalWidth/(SPRS[ln]||1)*k,H=im.naturalHeight/(SPRS[ln]||1)*k,top=R(2*TS-cy);px(x,top,1,y+3-top,'#2a2a34');px(x-2,top,5,2,'#2a2a34');ctx.drawImage(im,R(x-W/2),R(y+2),W,H);ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.5+.08*Math.sin(t*3+d.x);pcirc(x,R(y+2+H),2,'#ffe6a0');ctx.restore();break}}px(x,y-40,1,40,'#3a3a46');px(x-1,y,2,6,'#3a3a46');px(x-6,y+6,12,3,'#3a3a46');ctx.fillStyle=th.light+'0.07)';ctx.beginPath();ctx.moveTo(x-5,y+9);ctx.lineTo(x+5,y+9);ctx.lineTo(x+30,y+130);ctx.lineTo(x-30,y+130);ctx.fill();px(x-4,y+9,8,1,'#fff6d0');break;
  case 'sign':px(x,y,64,16,'#2a2d36');px(x+1,y+1,62,14,th.trim);break;
  case 'cooler':px(x,y,12,8,'#9fd3f0');px(x+1,y+8,10,22,'#e8e8ee');px(x+3,y+14,2,2,'#5ab0f0');px(x+7,y+14,2,2,'#d8584a');break;
  case 'shelf':px(x,y,30,3,'#8a6248');px(x,y+16,30,3,'#8a6248');for(let i=0;i<5;i++)px(x+2+i*5,y-9+((i*7+d.s)%4),4,9+((i*3)%3),['#d8584a','#3a6ad8','#f2c14e','#5ab85a','#9a6ad8'][(i+d.s)%5]);break;

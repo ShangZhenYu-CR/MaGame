@@ -80,7 +80,7 @@ function playerUpdate(dt){
  if(pressed('atk')&&!P.onGround&&down('down')&&!P.dive&&P.rollT<=0&&groundBelow(P.x,P.y)-P.y>28){P.dive=true;P.diveAt=P.anim;P.atk=null;P.atkQueued=0;P.vy=520;SFX.heavy();KP['KeyJ']=0;KP['Mouse0']=0;KP['Pad2']=0}
  if(P.dive){P.vx=0;P.vy=Math.max(P.vy,560);for(const e of targets()){if(Math.abs(e.x-P.x)<e.w/2+P.w/2&&P.y>e.y-e.h&&P.y-8<e.y){damage(e,18,P.face,0,false,false,'dive');e.state=e.isBoss?e.state:'stun';e.timer=.6;P.dive=false;P.vy=-330;P.jumps=P.airJumps;P.cut=true;hitstop=.07;shake=4;break}}}
  // 渲染大剑：按住攻击键蓄力，松开打出重斩
- if(P.prim==='render'){if(down('atk')&&!(P.atk&&P.atk.def===WEAPONS.render.charged)&&P.onGround&&P.rollT<=0&&!P.dive&&P.healT<=0){const was=P.chargeT;P.chargeT+=dt;P.vx*=.8;if(Math.random()<.4+P.chargeT)part(P.x+P.face*rnd(4,14),P.y-rnd(10,30),rnd(-20,20),-rnd(20,60),pick(['#ffd84a','#fff6c0']),.3,P.chargeT>=.55?2:1,-20);if(was<.55&&P.chargeT>=.55){SFX.select();ringFx(P.x,P.y-18,'#ffd84a')}}
+ if(P.prim==='render'){if(down('atk')&&!(P.atk&&P.atk.def===WEAPONS.render.charged)&&P.onGround&&P.rollT<=0&&!P.dive&&P.healT<=0){const was=P.chargeT;P.chargeT+=dt;P.vx*=.8;if(Math.random()<.4+P.chargeT)part(P.x+P.face*rnd(4,14),P.y-rnd(10,30),rnd(-20,20),-rnd(20,60),pick(['#ffd84a','#fff6c0']),.3,P.chargeT>=.55?2:1,-20);if(was<.55&&P.chargeT>=.55){SFX.select();ringFx(P.x,P.y-18,'#ffd84a')}if(Math.random()<dt*10)sfx('fx_spark',P.x+P.face*rnd(10,22),P.y-rnd(2,6),P.face,14);}
   else if(!down('atk')&&P.chargeT>0){if(P.chargeT>=.55&&!(P.atk&&P.atk.def===WEAPONS.render.charged)){const def=WEAPONS.render.charged;P.atk={def,t:0,phase:'su',hit:new Set(),idx:2};P.combo=0;P.comboT=0;P.atkQueued=0;SFX.heavy();shake=Math.max(shake,3)}P.chargeT=0}}
  if(pressed('atk')&&!P.dive)P.atkQueued=.18;else P.atkQueued=(P.atkQueued||0)-dt;
  if(P.atkQueued>0&&P.rollT<=0&&!P.dive){const can=!P.atk||(P.atk.phase==='re'&&P.atk.t>P.atk.def.re*.25);if(can){const W=WEAPONS[P.prim];if(P.comboT<=0)P.combo=0;if(ix)P.face=ix;
@@ -91,7 +91,7 @@ function playerUpdate(dt){
    if(!P.onGround&&!P.airStall){P.airStall=true;P.vy=Math.min(P.vy,-60)}
    P.atk={def,t:0,phase:'su',hit:new Set(),idx};P.combo++;P.comboT=.5;P.atkQueued=0;(def.heavy||def.dash?SFX.heavy:SFX.swing)()}}
  if(P.atk){const a=P.atk,d=a.def,sp=P.spdMul*(hasAff(1,'speed')?1.15:1);a.t+=dt*sp;
-  if(a.phase==='su'&&a.t>=d.su){a.phase='ac';a.t=0;P.vx+=P.face*d.lunge}
+  if(a.phase==='su'&&a.t>=d.su){a.phase='ac';a.t=0;P.vx+=P.face*d.lunge;atkFx(a)}
   else if(a.phase==='ac'){doHit(a);if(a.t>=d.ac){a.phase='re';a.t=0}}
   if(P.atk&&!P.onGround&&P.atk.phase!=='re'&&P.vy>40)P.vy=40;
   else if(a.phase==='re'&&a.t>=d.re){P.atk=null;if(P.combo>=WEAPONS[P.prim].combo.length)P.combo=0}}
@@ -128,14 +128,23 @@ function ringFx(x,y,col){for(let i=0;i<10;i++){const a=i/10*Math.PI*2;part(x,y,M
 function atkBox(a){const d=a.def,f=P.face;if(d.thrust)return{x0:P.x+(f>0?2:-d.rng),x1:P.x+(f>0?d.rng:-2),y0:P.y-18-d.hh/2,y1:P.y-18+d.hh/2};return{x0:P.x+(f>0?-4:-d.rng),x1:P.x+(f>0?d.rng:4),y0:P.y-16-d.hh/2-4,y1:P.y-16+d.hh/2+2}}
 function overlapE(b,e){return b.x1>e.x-e.w/2&&b.x0<e.x+e.w/2&&b.y1>e.y-e.h&&b.y0<e.y}
 function targets(){const t=enemies.filter(e=>e.hp>0);if(boss&&boss.hp>0&&boss.state!=='intro'&&boss.state!=='tele_out')t.push(boss);return t}
+// 招式特效（第十批素材）：出招瞬间
+function atkFx(a){const d=a.def,f=P.face,w=P.prim;
+ if(w==='whip')sfx('fx_whip_'+(Math.min(2,a.idx||0)+1),P.x+f*52,P.y-20,f,22);
+ else if(w==='ruler')sfx('fx_extrude',P.x+f*(d.rng-6),P.y-18,f,22);
+ else if(w==='render'&&d.charged)sfx('fx_render_slash',P.x+f*30,P.y-24,f,18);
+ else if(w==='marker'&&d.crit){const gy=groundBelow(P.x+f*26,P.y-8);sfx('fx_bool_crater',P.x+f*26,gy-12,f,14)}
+ else if(w==='stylus'&&d.crit)sfx('fx_sculpt',P.x+f*20,P.y-22,f,20)}
+// 命中特效
+function hitFx(e,w,d){const ex=e.x+rnd(-3,3),ey=e.y-e.h*.55;if(w==='shears')sfx('fx_snip',ex,ey,P.face,20);else if(w==='knife')sfx('fx_grid_slash',ex,ey,P.face,24);else if(w==='stylus')sfx('fx_clay',ex,ey,P.face,20)}
 function doHit(a){const b=atkBox(a),d=a.def;let any=false;
  for(const e of targets()){if(a.hit.has(e)||!overlapE(b,e))continue;a.hit.add(e);any=true;let crit=!!d.crit;
   if(!crit&&(P.pdT>0||d.dash))crit=true;
   const swap=P.swapBuff>0;if(swap)crit=true;
   if(!crit){if(P.prim==='marker'&&(e.state==='stun'||e.slowT>0||e.bleedT>0))crit=true;else if(P.prim==='knife'&&e.bleedT>0)crit=true;else if(P.prim==='ruler'&&Math.abs(e.x-P.x)>d.rng*.62)crit=true;else if(hasAff(1,'critc')&&Math.random()<.15)crit=true}
-  damage(e,d.dmg*(swap&&hasU('hotkey')?1.5:1),P.face,d.kb*(swap?1.6:1),crit,false,'prim');if(swap){dmgNum(e.x,e.y-e.h-16,'换手斩','#7fd8ff',true);ringFx(e.x,e.y-e.h/2,'#7fd8ff')}if(hasAff(1,'bleed'))applyStatus(e,'bleed');if(hasAff(1,'slow'))applyStatus(e,'slow');
+  damage(e,d.dmg*(swap&&hasU('hotkey')?1.5:1),P.face,d.kb*(swap?1.6:1),crit,false,'prim');hitFx(e,P.prim,d);if(swap){dmgNum(e.x,e.y-e.h-16,'换手斩','#7fd8ff',true);ringFx(e.x,e.y-e.h/2,'#7fd8ff')}if(hasAff(1,'bleed'))applyStatus(e,'bleed');if(hasAff(1,'slow'))applyStatus(e,'slow');
   if(d.pull&&e.hp>0){applyStatus(e,'slow');if(!e.isBoss)e.vy=Math.min(e.vy,-80)}
-  if(d.cut&&e.hp>0){e.cutN=(e.cutN||0)+1;if(e.cutN>=3){e.cutN=0;SFX.crit();burst(e.x,e.y-e.h/2,16,['#ff7ab0','#fff','#d83a7a'],200,.4);damage(e,18+6*P.primLv,P.face,80,true,false,'prim')}}
+  if(d.cut&&e.hp>0){e.cutN=(e.cutN||0)+1;if(e.cutN>=3){e.cutN=0;SFX.crit();sfx('fx_snip_burst',e.x,e.y-e.h/2,P.face,16);burst(e.x,e.y-e.h/2,16,['#ff7ab0','#fff','#d83a7a'],200,.4);damage(e,18+6*P.primLv,P.face,80,true,false,'prim')}}
   if(d.charged&&e.hp>0){if(!e.isBoss){e.poise=0;e.state='stun';e.timer=1.1}else{e.stag=(e.stag||0)+e.stagMax*.15;if(e.stag>=e.stagMax)e.stagPend=true}}}
  for(const k of pickups)if(k.k==='crate'&&!a.hit.has(k)&&b.x1>k.x-8&&b.x0<k.x+8&&b.y1>k.y-14&&b.y0<k.y){a.hit.add(k);hitCrate(k,d.dmg)}
  for(const pr of projs)if(pr.from==='e'&&pr.breakable&&b.x1>pr.x-pr.r&&b.x0<pr.x+pr.r&&b.y1>pr.y-pr.r&&b.y0<pr.y+pr.r){pr.life=0;burst(pr.x,pr.y,6,'#fff',90,.25)}
@@ -165,10 +174,10 @@ function useSkill(){const k=P.sec,dbl=hasAff(2,'double');P.skillCd=secCd();
  else if(k==='boxcol'){if(!placeBox(dbl)){P.skillCd=.2;toast('这里放不下',800)}}
  else if(k==='turret'){const gy=groundBelow(P.x+P.face*12,P.y-4);projs.push({kind:'turret',from:'p',x:P.x+P.face*12,y:gy,life:dbl?13:9,max:dbl?13:9,t:0,cd:.3,ang:P.face>0?0:Math.PI});SFX.door();burst(P.x+P.face*12,gy-6,10,['#9fd8ff','#fff'],80,.3)}
  else if(k==='eyedrop'){let best=null,bd=150;for(const e of targets()){const dx=e.x-P.x;if(dx*P.face<-10)continue;const d=Math.hypot(dx,(e.y-e.h/2)-(P.y-17));if(d<bd){bd=d;best=e}}
-  if(!best){P.skillCd=.3;toast('前面没有可以吸的东西',700);return}SFX.throw();const sx=best.x,sy=best.y-best.h/2;for(let i=0;i<8;i++){const t=i/8;part(lerp(P.x+P.face*8,sx,t),lerp(P.y-17,sy,t),0,0,'#7af0a0',.35,2,0)}
+  if(!best){P.skillCd=.3;toast('前面没有可以吸的东西',700);return}SFX.throw();sfx('fx_eyedrop',P.x+P.face*34,P.y-17,P.face,16);const sx=best.x,sy=best.y-best.h/2;for(let i=0;i<8;i++){const t=i/8;part(lerp(P.x+P.face*8,sx,t),lerp(P.y-17,sy,t),0,0,'#7af0a0',.35,2,0)}
   if(best.isBoss){damage(best,14,P.face,0,false,false,'sec')}else{best.x=clamp(P.x+P.face*18,best.x-200,best.x+200);if(!best.fly)best.y=Math.min(best.y,groundBelow(best.x,P.y-30));best.vx=0;best.state='stun';best.timer=dbl?1.6:1;damage(best,8,P.face,0,false,false,'sec')}}
- else if(k==='keyframe'){if(!P.kfMark){P.kfMark={x:P.x,y:P.y,t:dbl?9:6};P.skillCd=.3;SFX.select();ringFx(P.x,P.y-18,'#c8a0ff');toast('关键帧已记录，6 秒内再按 K 回来',1000)}
-  else{burst(P.x,P.y-17,14,['#c8a0ff','#fff'],140,.35);P.x=P.kfMark.x;P.y=P.kfMark.y;P.vx=P.vy=0;P.inv=Math.max(P.inv,.35);P.kfMark=null;SFX.djump();burst(P.x,P.y-17,18,['#c8a0ff','#fff'],160,.4);ringFx(P.x,P.y-18,'#c8a0ff')}}
+ else if(k==='keyframe'){if(!P.kfMark){P.kfMark={x:P.x,y:P.y,t:dbl?9:6};P.skillCd=.3;SFX.select();ringFx(P.x,P.y-18,'#c8a0ff');sfx('fx_keyframe',P.x,P.y-18,1,14);toast('关键帧已记录，6 秒内再按 K 回来',1000)}
+  else{burst(P.x,P.y-17,14,['#c8a0ff','#fff'],140,.35);P.x=P.kfMark.x;P.y=P.kfMark.y;P.vx=P.vy=0;P.inv=Math.max(P.inv,.35);P.kfMark=null;SFX.djump();burst(P.x,P.y-17,18,['#c8a0ff','#fff'],160,.4);ringFx(P.x,P.y-18,'#c8a0ff');sfx('fx_keyframe',P.x,P.y-18,1,14)}}
  else if(k==='array'){for(let i=-1;i<=1;i++){const ang=(P.face>0?0:Math.PI)+i*.22;projs.push({kind:'bolt',from:'p',x:P.x+P.face*8,y:P.y-18,vx:Math.cos(ang)*360,vy:Math.sin(ang)*360,r:3,dmg:dbl?12:9,life:.7,t:0,isProj:true})}SFX.shoot()}
  else if(k==='inkbomb'){projs.push({kind:'ink',from:'p',x:P.x+P.face*6,y:P.y-20,vx:P.face*190+P.vx*.3,vy:-260,r:4,dmg:30,life:3,t:0,grav:700});if(dbl)projs.push({kind:'ink',from:'p',x:P.x+P.face*6,y:P.y-20,vx:P.face*120+P.vx*.3,vy:-320,r:4,dmg:30,life:3,t:0,grav:700});SFX.throw()}}
 function hurtPlayer(dmg,dir,src,name){if(P.dead||G.state!=='play')return false;

@@ -3,12 +3,53 @@ const R=Math.round;
 // ===== 外部美术素材（art/ 下的 png，由 build.py 内嵌）=====
 // ART_SRC 的值是 dataURI，或 {src,s}：s=2 表示 @2x 素材（每帧像素是逻辑尺寸的 2 倍）
 const SPR={},SPRS={};let useSpr=true;
-for(const k in (typeof ART_SRC!=='undefined'?ART_SRC:{})){const v=ART_SRC[k],im=new Image();im.src=typeof v==='string'?v:v.src;SPR[k]=im;SPRS[k]=typeof v==='string'?1:(v.s||1)}
+for(const k in (typeof ART_SRC!=='undefined'?ART_SRC:{})){const v=ART_SRC[k],im=new Image();if(k.startsWith('icon_'))im.onload=()=>{if(typeof hud==='function'&&G.state!=='title'){hud.p=hud.s=null;hud()}};im.src=typeof v==='string'?v:v.src;SPR[k]=im;SPRS[k]=typeof v==='string'?1:(v.s||1)}
 function sprReady(n){const im=SPR[n];return !!(im&&im.complete&&im.naturalWidth)}
-// 序列帧都是正方形帧，帧边长 = 图片高度
-function sprN(n){const im=SPR[n];return im?Math.max(1,Math.round(im.naturalWidth/im.naturalHeight)):1}
-// 画一帧：横向序列帧，脚底中心对齐 (x,y)，朝左时水平翻转
-function sprFrame(n,i,x,y,face){if(!sprReady(n))return false;const im=SPR[n],fs=im.naturalHeight,L=fs/(SPRS[n]||1),c=sprN(n);i=((i%c)+c)%c;ctx.save();ctx.translate(R(x),R(y));ctx.scale(face,1);ctx.drawImage(im,i*fs,0,fs,fs,-L/2,-L,L,L);ctx.restore();return true}
+// 帧默认是正方形（边长 = 图片高度）；不是正方形的在这里写逻辑帧宽（按名字前缀匹配）
+const FRAME_W={enemy_printer:40,enemy_popup:40,enemy_bug:24,enemy_firewall:28,boss_ad:72,proj_paper:16};
+function sprFW(n){const im=SPR[n],s=SPRS[n]||1;for(const k in FRAME_W)if(n.startsWith(k))return FRAME_W[k]*s;return im.naturalHeight}
+function sprN(n){const im=SPR[n];return im&&im.naturalWidth?Math.max(1,Math.round(im.naturalWidth/sprFW(n))):1}
+// 被打闪白：缓存一张纯白剪影
+const WHITE={};function whiteOf(n){if(WHITE[n])return WHITE[n];const im=SPR[n],c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const g=c.getContext('2d');g.drawImage(im,0,0);g.globalCompositeOperation='source-in';g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);return WHITE[n]=c}
+// 画一帧：横向序列帧，脚底中心对齐 (x,y)，朝左时水平翻转；mode='center' 时 (x,y) 是帧中心
+function sprFrame(n,i,x,y,face,white,mode){if(!sprReady(n))return false;const im=SPR[n],s=SPRS[n]||1,fw=sprFW(n),fh=im.naturalHeight,W=fw/s,H=fh/s,c=sprN(n);i=((i%c)+c)%c;
+ ctx.save();ctx.translate(R(x),R(y));ctx.scale(face,1);ctx.drawImage(white?whiteOf(n):im,i*fw,0,fw,fh,-W/2,mode==='center'?-H/2:-H,W,H);ctx.restore();return true}
+// 序列帧特效（命中火花等）
+const fxs=[];function sfx(n,x,y,face=1,fps=20){if(sprReady(n))fxs.push({n,x,y,face,t:0,fps})}
+function updFx(dt){for(let i=fxs.length-1;i>=0;i--){fxs[i].t+=dt;if(fxs[i].t*fxs[i].fps>=sprN(fxs[i].n))fxs.splice(i,1)}}
+function drawFx(cx,cy){for(const f of fxs)sprFrame(f.n,Math.floor(f.t*f.fps),f.x-cx,f.y-cy,f.face,false,'center')}
+// 敌人尸体（播放死亡动画）
+const corpses=[];
+function updCorpses(dt){for(let i=corpses.length-1;i>=0;i--){corpses[i].t+=dt;if(corpses[i].t>sprN(corpses[i].n)*.08+.25)corpses.splice(i,1)}}
+function drawCorpses(cx,cy){for(const c of corpses){const k=Math.min(sprN(c.n)-1,Math.floor(c.t/.08));ctx.globalAlpha=Math.min(1,(sprN(c.n)*.08+.25-c.t)*4);sprFrame(c.n,k,c.x-cx,c.y-cy,c.face,false,c.fly?'center':'');ctx.globalAlpha=1}}
+// 敌人素材：按状态挑动画
+function drawEnemySpr(e,cx,cy){const b='enemy_'+e.type;if(!useSpr||!sprReady(b+'_idle'))return false;let n=b+'_idle',fi=Math.floor(e.anim*6);
+ const has=k=>sprReady(b+'_'+k);
+ if(e.state==='stun'&&has('stun')){n=b+'_stun';fi=Math.floor(e.anim*5)}
+ else if(e.state==='tired'&&has('tired')){n=b+'_tired';fi=Math.floor(e.anim*4)}
+ else if(e.state==='wind'&&has('wind')){n=b+'_wind';fi=Math.floor((1-Math.max(0,e.timer)/(e.windT||.5))*3)}
+ else if((['lunge','swoop','bash','slam'].includes(e.state)||e.atkT>0||(e.type==='bug'&&!e.onGround&&e.cd>.6))&&has('attack')){n=b+'_attack';fi=e.atkT>0?Math.floor((1-e.atkT/.3)*3):Math.min(2,Math.floor(e.anim*10)%3)}
+ const x=e.x-cx,y=e.y-cy;
+ if(e.fly){sprFrame(n,fi,x,y-e.h/2,e.face,false,'center');if(e.flash>0)sprFrame(n,fi,x,y-e.h/2,e.face,true,'center')}
+ else{sprFrame(n,fi,x,y,e.face);if(e.flash>0)sprFrame(n,fi,x,y,e.face,true)}
+ if(e.bleedT>0&&Math.floor(e.anim*8)%2)px(x+rnd(-4,4),y-e.h*rnd(.3,1.1),1,2,pick(['#ff6a2a','#ffb84a']));
+ if(e.slowT>0){for(let i=0;i<3;i++){const vx=x-e.w/2+((i*7+Math.floor(e.anim*3))%Math.max(1,e.w));pline(vx,y,vx+2,y-6,1,'#3a8a3a');px(vx+1,y-5,2,1,'#9ad870')}}
+ if(e.state==='wind'&&e.windT>0&&Math.floor(e.anim*12)%2===0)pnum('!',R(x),R(y-e.h-12),'#ff5a4a',2);
+ return true}
+// Boss 素材
+function drawBossSpr(b,cx,cy){const p='boss_'+b.kind;if(!useSpr||!sprReady(p+'_idle'))return false;let n=p+'_idle',fi=Math.floor(b.anim*5);const has=k=>sprReady(p+'_'+k),st=b.state,set=(k,f)=>{if(has(k)){n=p+'_'+k;fi=f}};
+ if(st==='intro')set('intro',Math.min(5,Math.floor(b.t/2.2*6)));
+ else if(st==='dead')set('die',Math.min(7,Math.floor(b.t/1.6*8)));
+ else if(st==='stagger')set('stagger',Math.min(3,Math.floor(b.t*4)));
+ else if(st==='roar')set('roar',Math.floor(b.t*6)%6);
+ else if(st==='dash_wind')set('dash_wind',Math.min(2,Math.floor(b.t*6)));
+ else if(st==='dash')set('dash',Math.floor(b.anim*12));
+ else if(st==='notes')set('notes',Math.min(3,Math.floor(b.t/.8*4)));
+ else if(st==='stamp_up')set('stamp',b.t<.25?Math.min(2,Math.floor(b.t*12)):2);
+ else if(st==='stamp_hover'||st==='stamp_fall')set('stamp',3+(Math.floor(b.anim*6)%2));
+ else if(st==='recover'){if(b.landT>0)set('stamp',5+Math.min(2,Math.floor((.36-b.landT)/.12)));else set('recover',Math.floor(b.anim*3)%2)}
+ else if(st==='idle'&&Math.abs(b.vx)>5)set('walk',Math.floor(b.anim*8));
+ const x=b.x-cx,y=b.y-cy;sprFrame(n,fi,x,y,b.face);if(b.flash>0)sprFrame(n,fi,x,y,b.face,true);return true}
 function px(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(R(x),R(y),w,h)}
 function pline(x0,y0,x1,y1,w,c){ctx.fillStyle=c;const d=Math.max(Math.abs(x1-x0),Math.abs(y1-y0)),n=Math.max(1,Math.ceil(d));const o=Math.floor(w/2);for(let i=0;i<=n;i++){const t=i/n;ctx.fillRect(R(x0+(x1-x0)*t)-o,R(y0+(y1-y0)*t)-o,w,w)}}
 function pcirc(cx,cy,r,c){ctx.fillStyle=c;for(let y=-r;y<=r;y++){const w=Math.round(Math.sqrt(r*r-y*y));ctx.fillRect(R(cx-w),R(cy+y),w*2+1,1)}}
@@ -54,8 +95,8 @@ function drawWeaponAt(kind,hx,hy,ang,face){
 function smear(x,y,r0,r1,a0,a1,face,col){ctx.fillStyle=col;const n=Math.ceil(Math.abs(a1-a0)*r1/1.5);for(let i=0;i<=n;i++){const t=a0+(a1-a0)*i/n,c=Math.cos(t),s=Math.sin(t);for(let r=r0;r<=r1;r+=1.5)ctx.fillRect(R(x+s*r*face),R(y+c*r),2,2)}}
 // ===== 敌人 =====
 function eyes(x,y,face,ang,col='#14121a'){px(x+(face>0?1:-3),y,2,2,'#fff');px(x+(face>0?4:-6),y,2,2,'#fff');px(x+(face>0?2:-2),y+(ang?1:0),1,1,col);px(x+(face>0?5:-5),y+(ang?1:0),1,1,col);if(ang){px(x+(face>0?1:-3),y-1,2,1,col);px(x+(face>0?4:-6),y-1,2,1,col)}}
-function drawEnemy(e,cx,cy){const x=R(e.x-cx),y=R(e.y-cy),f=e.face,t=e.anim,fl=e.flash>0;const W=fl?'#fff':null;
- if(e.elite){ctx.globalAlpha=.35+.2*Math.sin(t*8);pcirc(x,y-e.h/2,Math.max(e.w,e.h)*.75,'#ff5a4a');ctx.globalAlpha=1}
+function drawEnemy(e,cx,cy){if(e.elite){ctx.globalAlpha=.35+.2*Math.sin(e.anim*8);pcirc(R(e.x-cx),R(e.y-cy-e.h/2),Math.max(e.w,e.h)*.75,'#ff5a4a');ctx.globalAlpha=1}if(drawEnemySpr(e,cx,cy))return;const x=R(e.x-cx),y=R(e.y-cy),f=e.face,t=e.anim,fl=e.flash>0;const W=fl?'#fff':null;
+ 
  if(e.type==='crumple'){const sq=e.state==='wind'?2:0;px(x-6,y-12+sq,12,11-sq,W||'#f050c8');for(let i=0;i<3;i++)for(let j=0;j<3;j++)if((i+j)%2)px(x-6+i*4,y-12+sq+j*4,4,Math.min(4,11-sq-j*4),W||'#1a1420');
   pline(x+5,y-10+sq,x+9,y-14+sq,1,W||'#9fd8ff');pline(x-6,y-6+sq,x-10,y-9+sq,1,W||'#9fd8ff');pline(x-2,y-12+sq,x-3,y-16+sq,1,W||'#9fd8ff');
   const l=Math.sin(t*14)*2;px(x-3+l,y-1,2,1,'#3a3540');px(x+1-l,y-1,2,1,'#3a3540');eyes(x-2,y-9+sq,f,true,e.state==='wind'?'#d8584a':'#14121a')}
@@ -72,7 +113,7 @@ function drawEnemy(e,cx,cy){const x=R(e.x-cx),y=R(e.y-cy),f=e.face,t=e.anim,fl=e
  if(e.state==='stun'&&Math.floor(t*6)%2){px(x-4,y-e.h-6,2,2,'#ffd84a');px(x+3,y-e.h-8,2,2,'#ffd84a')}
  if(e.state==='wind'&&e.windT>0&&Math.floor(e.anim*12)%2===0){pnum('!',x,y-e.h-12,'#ff5a4a',2)}}
 // ===== Boss =====
-function drawBoss(b,cx,cy){const x=R(b.x-cx),y=R(b.y-cy),f=b.face,t=b.anim,fl=b.flash>0;const c=(v)=>fl?'#fff':v;
+function drawBoss(b,cx,cy){if(drawBossSpr(b,cx,cy))return;const x=R(b.x-cx),y=R(b.y-cy),f=b.face,t=b.anim,fl=b.flash>0;const c=(v)=>fl?'#fff':v;
  ctx.save();ctx.translate(x,y);ctx.scale(f,1);
  if(b.kind==='ad'){ // 主美：贝雷帽、围巾、长风衣、大红笔
   const bob=Math.sin(t*4)*1;px(-6,-4,4,4,c('#2a2230'));px(2,-4,4,4,c('#2a2230'));px(-8,-26+bob,16,22,c('#5a3a6a'));px(-8,-26+bob,16,2,c('#6a4a7a'));px(-1,-25+bob,2,20,c('#4a2a5a'));

@@ -128,9 +128,9 @@ function damage(e,dmg,dir,kb,crit,quiet,src='prim'){if(e.hp<=0)return;let mul=P.
  if(e.affix==='armor')v*=.7;e.sinceHit=0;
  e.hp-=v;e.flash=.08;
  const W=WEAPONS[P.prim];if(!quiet){burst(e.x,e.y-e.h/2,crit?14:8,W.ink||['#fff'],crit?220:150,.4,2,350);splat(e.x,groundBelow(e.x,e.y-2),pick(W.ink||['#888']),crit?5:3);(crit?SFX.crit:SFX.hit)()}
- dmgNum(e.x+rnd(-4,4),e.y-e.h-6,v,crit?'#ffd84a':'#fff',crit);
+ dmgNum(e.x+rnd(-4,4),e.y-e.h-6,v,crit?'#ffd84a':'#fff',crit);sfx(crit?'fx_crit':'fx_hit',e.x-dir*e.w*.2+rnd(-3,3),e.y-e.h*.55+rnd(-4,4),dir||1,crit?22:26);
  if(e.isBoss){e.vx+=dir*kb*.05}else{const res=e.elite?.4:1;e.vx=dir*kb*res;if(e.type!=='printer'&&e.type!=='popup'&&e.type!=='sticky')e.vy=Math.min(e.vy,-60*res);const pd=dmg*(crit?1.4:1)+kb*.04;e.poise-=pd;e.poiseT=1.4;
-  if(e.poise<=0){e.poise=e.maxPoise;if(e.state!=='stun'){e.state='stun';e.timer=e.elite?.9:.5;e.windT=0;e.vx=dir*kb*res*1.2;burst(e.x,e.y-e.h,8,['#ffd84a','#fff'],120,.3,2,0);if(e.elite||e.maxPoise>=24)dmgNum(e.x,e.y-e.h-14,'!','#ffd84a',true)}}
+  if(e.poise<=0){e.poise=e.maxPoise;if(e.state!=='stun'){e.state='stun';e.timer=e.elite?.9:.5;e.windT=0;e.vx=dir*kb*res*1.2;burst(e.x,e.y-e.h,8,['#ffd84a','#fff'],120,.3,2,0);if(e.elite||e.maxPoise>=24)dmgNum(e.x,e.y-e.h-14,'!','#ffd84a',true);sfx('fx_poise_break',e.x,e.y-e.h*.6,1,18)}}
   else if(ATK_STATES.includes(e.state)){e.vx*=.25}
   else if(e.state==='idle'||e.state==='move'){e.state='stun';e.timer=e.elite?.08:.2}}
  if(e.hp<=0)e.isBoss?bossDie():enemyDie(e)}
@@ -214,10 +214,10 @@ function drawProjs(cx,cy){for(const p of projs){const x=R(p.x-cx),y=R(p.y-cy);
  case 'bolt':px(x-2,y-1,4,2,'#9fd8ff');px(x-1,y-1,2,2,'#fff');break;
  case 'turret':{const k=p.life/p.max;pline(x-5,y,x,y-7,1,'#5a5e68');pline(x+5,y,x,y-7,1,'#5a5e68');px(x-4,y-14,8,7,'#d0d6e0');px(x-4,y-14,8,1,'#fff');pline(x,y-11,x+Math.cos(p.ang)*9,y-11+Math.sin(p.ang)*9,2,'#3a8ad8');px(x-1,y-12,2,2,p.cd>.3?'#ff9a4a':'#7af0a0');px(x-6,y+2,12,1,'#2a2030');px(x-6,y+2,Math.round(12*k),1,'#7af0a0');break}
  case 'pool':ctx.globalAlpha=Math.min(1,p.life);px(x-p.r,y-2,p.r*2,3,'#c8401a');px(x-p.r+4,y-3,p.r*2-8,1,'#ff9a3a');for(let i=0;i<3;i++)px(x-p.r+((i*17+Math.floor(p.t*20))%(p.r*2)),y-3,2,1,'#fff0a0');ctx.globalAlpha=1;break;
- case 'paper':px(x-5,y-3,10,7,'#f4f1ea');px(x-5,y-3,10,1,'#c8c4ba');px(x-3,y-1,6,1,'#9aa0a8');px(x-3,y+1,4,1,'#9aa0a8');break;
- case 'note':ctx.save();ctx.translate(x,y);ctx.rotate(p.t*6);px(-5,-5,10,10,'#f4f1ea');px(-4,-2,8,1,'#e8483a');px(-4,1,6,1,'#e8483a');ctx.restore();break;
+ case 'paper':if(useSpr&&sprFrame('proj_paper',Math.floor(p.t*8),x,y,sign(p.vx)||1,false,'center'))break;px(x-5,y-3,10,7,'#f4f1ea');px(x-5,y-3,10,1,'#c8c4ba');px(x-3,y-1,6,1,'#9aa0a8');px(x-3,y+1,4,1,'#9aa0a8');break;
+ case 'note':if(useSpr&&sprFrame('proj_note',Math.floor(p.t*12),x,y,1,false,'center'))break;ctx.save();ctx.translate(x,y);ctx.rotate(p.t*6);px(-5,-5,10,10,'#f4f1ea');px(-4,-2,8,1,'#e8483a');px(-4,1,6,1,'#e8483a');ctx.restore();break;
  case 'x':px(x-4,y-4,8,8,'#ff5a4a');pline(x-2,y-2,x+2,y+2,1,'#fff');pline(x+2,y-2,x-2,y+2,1,'#fff');break;
- case 'wave':px(x-5,y-8,10,8,p.col||'#e8d8b8');px(x-3,y-11,6,3,p.col||'#e8d8b8');break;
+ case 'wave':if(useSpr&&sprFrame('proj_wave',Math.floor(p.t*10),x,y+2,sign(p.vx)||1))break;px(x-5,y-8,10,8,p.col||'#e8d8b8');px(x-3,y-11,6,3,p.col||'#e8d8b8');break;
  case 'doc':ctx.save();ctx.translate(x,y);ctx.rotate(p.t*14);px(-6,-8,12,16,'#f4f4f8');px(-6,-8,12,3,'#5ab0d8');for(let i=0;i<3;i++)px(-4,-3+i*3,8,1,'#9aa0a8');ctx.restore();break;
  case 'pie':case 'bigpie':ctx.save();ctx.translate(x,y);ctx.rotate(p.rot||0);pcirc(0,0,p.r,'#e8b060');pring(0,0,p.r,'#c88a3a',2);for(let i=0;i<4;i++){const a=i*1.57;pline(0,0,Math.cos(a)*p.r*.8,Math.sin(a)*p.r*.8,1,'#c88a3a')}px(-2,-2,4,4,'#fff2c0');ctx.restore();break;
  case 'kpi':{const prog=p.up?Math.min(1,(p.t-p.warn)/.12)*(p.t>p.warn+1.1?Math.max(0,1-(p.t-p.warn-1.1)/.2):1):0;
@@ -229,7 +229,7 @@ function drawProjs(cx,cy){for(const p of projs){const x=R(p.x-cx),y=R(p.y-cy);
  }}}
 // ===== 敌人 =====
 const enemies=[];// poise：韧性。出招（前摇/冲刺）时只有打空韧性才能打断；普通状态下挨打会小硬直
-const EDEF={crumple:{hp:30,w:14,h:14,dmg:12,poise:16},sticky:{hp:18,w:12,h:12,dmg:10,fly:1,poise:10},printer:{hp:40,w:20,h:16,dmg:10,poise:24},bug:{hp:22,w:12,h:9,dmg:9,poise:8},popup:{hp:26,w:22,h:16,dmg:10,fly:1,poise:16},kpi:{hp:56,w:14,h:22,dmg:14,poise:40},firewall:{hp:64,w:14,h:22,dmg:14,poise:44},invite:{hp:14,w:16,h:14,dmg:4,fly:1,poise:4}};
+const EDEF={crumple:{hp:30,w:22,h:26,dmg:12,poise:16},sticky:{hp:18,w:18,h:18,dmg:10,fly:1,poise:10},printer:{hp:40,w:30,h:28,dmg:10,poise:24},bug:{hp:22,w:18,h:14,dmg:9,poise:8},popup:{hp:26,w:30,h:24,dmg:10,fly:1,poise:16},kpi:{hp:56,w:14,h:22,dmg:14,poise:40},firewall:{hp:64,w:20,h:34,dmg:14,poise:44},invite:{hp:14,w:16,h:14,dmg:4,fly:1,poise:4}};
 const ATK_STATES=['wind','lunge','bash','swoop','slam'];
 // 出招名额：同一时间最多几只怪在出招，避免围殴时无从闪避
 function atkToken(e,ranged){let n=0;for(const o of enemies)if(o!==e&&o.hp>0&&!!o.ranged===ranged&&ATK_STATES.includes(o.state)&&Math.abs(o.x-P.x)<300)n++;const max=ranged?2:2+(G.hard?1:0)+(G.lvl>=4?1:0);if(n>=max){e.cd=rnd(.25,.6);return false}return true}
@@ -238,7 +238,7 @@ function spawnEnemy(s,minion){const d=EDEF[s.type],m=s.elite?2.6:1;const e={type
 // 精英词缀
 const EAFFIX={fast:{n:'赶工',c:'#ffd84a'},armor:{n:'返工护甲',c:'#9fd8ff'},split:{n:'拆需求',c:'#7af07a'},regen:{n:'带薪摸鱼',c:'#f2a0b0'},bomb:{n:'甩锅',c:'#ff7a4a'}};
 const AFFIX_POOL={1:['fast','armor','split'],2:['fast','armor','split','regen','bomb'],3:['fast','armor','split','regen','bomb']};
-function enemyDie(e){e.hp=0;SFX.die();shake=Math.max(shake,2.5);burst(e.x,e.y-e.h/2,18,['#14121a','#3a3a46',e.elite?'#ff5a4a':'#9aa0a8'],180,.5,3,300);splat(e.x,groundBelow(e.x,e.y-2),'#3a3a46',5);G.kills++;
+function enemyDie(e){e.hp=0;if(useSpr&&sprReady('enemy_'+e.type+'_die'))corpses.push({n:'enemy_'+e.type+'_die',x:e.x,y:e.fly?e.y-e.h/2:e.y,face:e.face,t:0,fly:e.fly});SFX.die();shake=Math.max(shake,2.5);burst(e.x,e.y-e.h/2,18,['#14121a','#3a3a46',e.elite?'#ff5a4a':'#9aa0a8'],180,.5,3,300);splat(e.x,groundBelow(e.x,e.y-2),'#3a3a46',5);G.kills++;
  const n=e.elite?8:irnd(1,3);for(let i=0;i<n;i++)pickups.push({k:'cell',x:e.x,y:e.y-e.h/2,vx:rnd(-80,80),vy:rnd(-200,-80)});if(e.elite)dropWeapon(e.x,e.y-10);if(Math.random()<.08)pickups.push({k:'food',x:e.x,y:e.y-6,vy:-120});
  if(e.affix==='split'){const t={1:'sticky',2:'bug',3:'invite'}[LV.floor]||'bug';for(const d of[-1,1]){const m=spawnEnemy({type:t,x:e.x+d*10,y:EDEF[t].fly?e.y-20:e.y},e.minion);m.aggro=true;m.vx=d*120}toast('需求被拆成了两个！',900)}
  if(e.affix==='bomb'){projs.push({kind:'ebomb',from:'x',x:e.x,y:e.y-e.h/2,t:0,warn:.9,r:46,dmg:e.dmg+4,life:2,isProj:true})}
@@ -247,7 +247,7 @@ function enemyDie(e){e.hp=0;SFX.die();shake=Math.max(shake,2.5);burst(e.x,e.y-e.
  if(P.steal)P.hp=Math.min(P.maxHp,P.hp+P.steal);if(hasAff(1,'steal'))P.hp=Math.min(P.maxHp,P.hp+3);hud()}
 function updEnemies(dtA){for(let i=enemies.length-1;i>=0;i--){const e=enemies[i];if(e.hp<=0){enemies.splice(i,1);continue}tickStatus(e,dtA);if(e.hp<=0)continue;const dt=dtA*(e.slowT>0?.5:1)*(e.affix==='fast'?1.35:1);
  if(e.affix==='regen'){e.sinceHit=(e.sinceHit||0)+dtA;if(e.sinceHit>2&&e.hp<e.max){e.hp=Math.min(e.max,e.hp+e.max*.04*dtA);if(Math.random()<.2)part(e.x+rnd(-6,6),e.y-rnd(0,e.h),0,-30,'#7af07a',.4,1,-20)}}
- e.anim+=dt;e.flash-=dt;e.timer-=dt;e.cd-=dt;if(e.poiseT>0)e.poiseT-=dt;else e.poise=Math.min(e.maxPoise,e.poise+e.maxPoise*.8*dt);separate(e,dt);const dx=P.x-e.x,dy=(P.y-13)-(e.y-e.h/2),dist=Math.hypot(dx,dy);
+ e.anim+=dt;e.flash-=dt;e.timer-=dt;e.cd-=dt;if(e.atkT>0)e.atkT-=dt;if(e.poiseT>0)e.poiseT-=dt;else e.poise=Math.min(e.maxPoise,e.poise+e.maxPoise*.8*dt);separate(e,dt);const dx=P.x-e.x,dy=(P.y-13)-(e.y-e.h/2),dist=Math.hypot(dx,dy);
  if(!e.aggro&&dist<200&&Math.abs(dx)<220)e.aggro=true;if(!e.aggro){e.idleT=(e.idleT||0)+dt;}
  if(e.state==='stun'){if(e.fly){const nx=e.x+e.vx*dt;if(!isSolid(Math.floor(nx/TS),Math.floor((e.y-6)/TS)))e.x=nx;e.vx*=.88;e.vy*=.88}
   else{const sv=e.vx;e.vy=Math.min(MAXF,e.vy+GRAV*dt);moveBody(e,dt);e.vx*=.88;
@@ -272,10 +272,10 @@ function updEnemies(dtA){for(let i=enemies.length-1;i>=0;i--){const e=enemies[i]
   e.x+=e.vx*dt;e.y+=e.vy*dt;if(isSolid(Math.floor(e.x/TS),Math.floor((e.y-6)/TS))){e.x-=e.vx*dt;e.y-=e.vy*dt;e.vx*=-.5;e.vy*=-.5}break}
  case 'printer':{e.vy=Math.min(MAXF,e.vy+GRAV*dt);e.vx*=.8;moveBody(e,dt);e.face=sign(dx)||e.face;
   if(e.state==='idle'&&e.aggro&&Math.abs(dy)<60&&Math.abs(dx)<260&&e.cd<=0&&atkToken(e,true)){e.state='wind';e.timer=.5;e.windT=.5}
-  else if(e.state==='wind'&&e.timer<=0){e.state='idle';e.cd=1.8;SFX.shoot();eproj({kind:'paper',x:e.x+e.face*10,y:e.y-9,vx:e.face*190,vy:0,r:5,dmg:e.dmg,life:3,breakable:true})}break}
+  else if(e.state==='wind'&&e.timer<=0){e.state='idle';e.cd=1.8;e.atkT=.3;SFX.shoot();eproj({kind:'paper',x:e.x+e.face*10,y:e.y-9,vx:e.face*190,vy:0,r:5,dmg:e.dmg,life:3,breakable:true})}break}
  case 'popup':{const want=P.x-sign(dx)*120,tY=P.y-55;e.vx+=((e.aggro?want:e.hx)-e.x)*1.5*dt-e.vx*2*dt;e.vy+=((e.aggro?tY:e.hy)-e.y)*1.5*dt-e.vy*2*dt;e.x+=e.vx*dt;e.y+=e.vy*dt;e.face=sign(dx)||1;
   if(e.state==='idle'&&e.aggro&&e.cd<=0&&dist<240&&atkToken(e,true)){e.state='wind';e.timer=.45;e.windT=.45}
-  else if(e.state==='wind'&&e.timer<=0){e.state='idle';e.cd=2.1;const d=dist||1;SFX.shoot();eproj({kind:'x',x:e.x,y:e.y-8,vx:dx/d*160,vy:dy/d*160,r:4,dmg:e.dmg,life:3,breakable:true})}break}
+  else if(e.state==='wind'&&e.timer<=0){e.state='idle';e.cd=2.1;e.atkT=.3;const d=dist||1;SFX.shoot();eproj({kind:'x',x:e.x,y:e.y-8,vx:dx/d*160,vy:dy/d*160,r:4,dmg:e.dmg,life:3,breakable:true})}break}
  case 'firewall':{e.vy=Math.min(MAXF,e.vy+GRAV*dt);
   if(e.state==='idle'||e.state==='move'){if(e.aggro){e.face=sign(dx)||e.face;e.state='move';e.vx=e.face*36;if(Math.abs(dx)<46&&Math.abs(dy)<22&&e.cd<=0&&atkToken(e,false)){e.state='wind';e.timer=.6;e.windT=.6;e.vx=0;SFX.warn()}}else e.vx=0}
   else if(e.state==='wind'){e.vx=0;if(e.timer<=0){e.state='bash';e.timer=.26;e.vx=e.face*270}}
@@ -314,7 +314,7 @@ function drawPickups(cx,cy,t){let near=null;for(const k of pickups){const x=R(k.
  else if(k.k==='door'){px(x-12,y-40,24,40,'#3a3a46');px(x-10,y-38,20,38,k.open?'#f2d27a':'#6a5a4a');if(k.open){ctx.globalAlpha=.3+.2*Math.sin(t*4);px(x-14,y-42,28,42,'#fff2a0');ctx.globalAlpha=1}px(x+5,y-20,2,2,'#2a2a2a')}
  if((k.k==='weapon'||k.k==='chest'&&!k.open||k.k==='cchest'&&!k.open||k.k==='door'&&k.open||k.k==='tdoor'&&k.open&&!k.used||(k.k==='wireterm'||k.k==='rush')&&!k.used)&&Math.abs(k.x-P.x)<18&&Math.abs(k.y-P.y)<24)near=k}
  return near}
-function drawIcon(w,x,y){
+function drawIcon(w,x,y){if(useSpr&&sprReady('icon_'+w)){sprFrame('icon_'+w,0,x,y,1,false,'center');return}
  if(w==='stylus')drawWeaponAt('stylus',x-4,y+5,2.4,1);else if(w==='marker')drawWeaponAt('marker',x-4,y+5,2.4,1);else if(w==='ruler')drawWeaponAt('ruler',x-9,y+7,2.2,1);else if(w==='knife')drawWeaponAt('knife',x-4,y+5,2.4,1);
  else if(w==='palette'){pline(x,y,x+7,y,2,'#e8483a');pline(x,y,x,y-7,2,'#5ab85a');pline(x,y,x-5,y+5,2,'#3a8ad8');px(x-1,y-1,3,3,'#fff')}
  else if(w==='airbrush'){px(x-6,y-1,10,3,'#8a6248');px(x+3,y-3,5,7,'#5a3a2a');for(let i=0;i<5;i++)px(x+8,y-3+i,2,1,'#5ab85a');px(x-8,y-5,4,4,'#5ab85a');px(x-6,y-7,3,3,'#9ad870')}

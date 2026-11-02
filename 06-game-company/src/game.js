@@ -26,7 +26,7 @@ function banner(a,b,ms=2200){$('bn1').textContent=a;$('bn2').textContent=b||'';c
 function bossBanner(name,quote){banner(name,quote,2600);$('bossname').textContent=name;$('bossbar').classList.add('show')}
 function show(id,v){$(id).classList.toggle('show',v)}
 // ===== 楼层 =====
-function loadFloor(n,fromRetry){G.floor=n;G.rush=null;genLevel(n);LV.tlimit=[0,110,140,160][n]*(G.hard?.8:1);G.floorT=0;enemies.length=0;projs.length=0;pickups.length=0;parts.length=0;splats.length=0;nums.length=0;boss=null;G.bossDone=false;G.bossLock=false;
+function loadFloor(n,fromRetry){G.floor=n;G.rush=null;genLevel(n);LV.tlimit=[0,110,140,160][n]*(G.hard?.8:1);G.floorT=0;enemies.length=0;projs.length=0;pickups.length=0;parts.length=0;fxs.length=0;corpses.length=0;splats.length=0;nums.length=0;boss=null;G.bossDone=false;G.bossLock=false;
  const keepHp=P.hp;resetPlayer(true);P.hp=G.lvl>=5&&!fromRetry&&n>1?Math.min(P.maxHp,keepHp+P.maxHp*.5):P.maxHp;P.flasks=P.maxFlasks;
  for(const s of LV.spawns)spawnEnemy(s);for(const k of LV.pick)pickups.push(Object.assign({vy:0},k));
  G.snap=JSON.stringify({prim:P.prim,sec:P.sec,primLv:P.primLv,primAff:P.primAff,secLv:P.secLv,secAff:P.secAff,stat:P.stat,cells:P.cells,dmgMul:P.dmgMul,spdMul:P.spdMul,rollMul:P.rollMul,cdMul:P.cdMul,airJumps:P.airJumps,steal:P.steal,critMul:P.critMul,maxHp:P.maxHp,maxFlasks:P.maxFlasks,upg:P.upg,bps:P.bps||[],curse:P.curse||0});
@@ -130,7 +130,7 @@ function drawPlayerSpr(x,y,flash){let n='player_idle',fi=Math.floor(P.anim*5),ha
  if(flash)ctx.globalAlpha=.5;
  sprFrame(n,fi,x,y,P.face);
  // 武器：雕刻笔用素材，其他武器暂用代码画；格挡、喷涂等道具已画在人物图里
- if(!noW&&hand){const hx=x+hand[0]*P.face,hy=y+hand[1];if(P.prim==='stylus'&&has('weapon_stylus')){const im=SPR.weapon_stylus,s=SPRS.weapon_stylus||1,g=(ART_ANCHOR.weapon_stylus||{}).grip||[8,7];ctx.save();ctx.translate(R(hx),R(hy));ctx.scale(P.face,1);ctx.rotate(-(wang-2.36));ctx.drawImage(im,-g[0]/s,-g[1]/s,im.naturalWidth/s,im.naturalHeight/s);ctx.restore()}else drawWeaponAt(P.prim,hx,hy,wang,P.face)}
+ if(!noW&&hand){const hx=x+hand[0]*P.face,hy=y+hand[1];const wn='weapon_'+P.prim;if(has(wn)){const im=SPR[wn],s=SPRS[wn]||1,g=(ART_ANCHOR[wn]||{}).grip||[im.naturalWidth/2,im.naturalHeight/2],base=P.prim==='ruler'?1.57:2.36;ctx.save();ctx.translate(R(hx),R(hy));ctx.scale(P.face,1);ctx.rotate(-(wang-base));ctx.drawImage(im,-g[0]/s,-g[1]/s,im.naturalWidth/s,im.naturalHeight/s);ctx.restore()}else drawWeaponAt(P.prim,hx,hy,wang,P.face)}
  ctx.globalAlpha=1;
  if(P.atk&&P.atk.phase==='ac'){const d=P.atk.def;ctx.globalAlpha=.75;if(d.thrust){pline(x+P.face*6,y-26,x+P.face*(d.rng+4),y-26,2,W.col);px(x+P.face*(d.rng+4)-1,y-27,3,3,'#fff')}else smear(x,y-26,Math.max(10,d.rng-6),d.rng+6,d.arc[0],lerp(d.arc[0],d.arc[1],Math.min(1,P.atk.t/d.ac)),P.face,W.col);ctx.globalAlpha=1}
  if(P.dive){ctx.globalAlpha=.5;pline(x,y-40,x,y-58,2,W.col);ctx.globalAlpha=1}
@@ -146,9 +146,9 @@ function render(){const th=LV.th,cx=R(cam.x+(Math.random()-.5)*shake*2),cy=R(cam
  for(const e of enemies)if(Math.abs(e.x-cx-VW/2)<VW)drawEnemy(e,cx,cy);
  ctx.font='bold 8px sans-serif';ctx.textAlign='center';for(const e of enemies)if(e.affix&&e.hp>0&&Math.abs(e.x-cx-VW/2)<VW/2+20){const a=EAFFIX[e.affix],x=R(e.x-cx),y=R(e.y-cy-e.h-10);ctx.fillStyle='#14121a';ctx.fillText(a.n,x+1,y+1);ctx.fillStyle=a.c;ctx.fillText(a.n,x,y)}ctx.textAlign='left';
  for(const e of enemies)if(e.hp<e.max&&e.hp>0){const x=R(e.x-cx-8),y=R(e.y-cy-e.h-6);px(x,y,16,2,'#2a2030');px(x,y,R(16*e.hp/e.max),2,e.elite?'#ffb84a':'#ff5a4a')}
- drawProjs(cx,cy);
+ drawCorpses(cx,cy);drawProjs(cx,cy);
  if(G.state!=='dead'||Math.floor(T*8)%2||(useSpr&&sprReady('player_die')))drawPlayer(cx,cy);
- drawParts(cx,cy);drawNums(cx,cy);
+ drawFx(cx,cy);drawParts(cx,cy);drawNums(cx,cy);
  ctx.drawImage(VIG,0,0);
  if(flashRed>0){ctx.fillStyle=`rgba(216,40,40,${flashRed*.6})`;ctx.fillRect(0,0,VW,VH)}
  if(slowT>0){ctx.fillStyle='rgba(255,255,255,.06)';ctx.fillRect(0,0,VW,VH)}
@@ -167,7 +167,7 @@ function step(dt){T+=dt;
   if(boss){const b=$('bossfill');b.style.width=Math.max(0,boss.hp/boss.max*100)+'%';const s=$('bossstag');s.style.width=(boss.state==='stagger'?Math.max(0,1-boss.t/2.3):Math.min(1,boss.stag/boss.stagMax))*100+'%';s.classList.toggle('on',boss.state==='stagger'||boss.stagPend)}
   for(const s of splats)s.life-=dt*.15}
  else if(G.state==='dead'){updProjs(dt);P.vy=Math.min(MAXF,P.vy+GRAV*dt);P.vx*=.9;moveBody(P,dt)}
- updParts(dt);updNums(dt);if(LV)updCamera(dt)}
+ updParts(dt);updNums(dt);updFx(dt);updCorpses(dt);if(LV)updCamera(dt)}
 // 标题画面
 function renderTitle(){if(!LV)genLevel(1);const th=THEME[1],sx=(T*20)%(LV.arenaX-VW),sy=98;drawBackground(sx,sy,T);for(const d of LV.decor)if(d.k!=='window'&&d.k!=='lamp'&&d.k!=='sign')drawDecor(d,sx,sy,th,T);drawTiles(sx,sy);
  ctx.save();ctx.translate(360,groundBelow(sx+360,120)-98);ctx.scale(3,3);const ph=T*10;if(useSpr&&sprReady('player_run')){sprFrame('player_run',Math.floor(T*12),0,0,-1);ctx.restore();ctx.drawImage(VIG,0,0);return}drawMan(0,0,-1,{legA:Math.sin(ph)*.8,legB:-Math.sin(ph)*.8,kneeA:Math.max(0,-Math.cos(ph)),kneeB:Math.max(0,Math.cos(ph)),armF:-Math.sin(ph)*.7,armB:Math.sin(ph)*.7,elbF:.6,elbB:.6,lean:1,bob:Math.abs(Math.sin(ph))>.7?-1:0,blink:(T%3)<.12},false);drawWeaponAt('stylus',-3,-12,.5,-1);ctx.restore();ctx.drawImage(VIG,0,0)}

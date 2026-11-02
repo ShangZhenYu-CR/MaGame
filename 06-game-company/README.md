@@ -32,4 +32,4 @@
 | `game.js` | 流程、镜头、HUD、菜单 |
 | `shell.html` | 页面外壳与 UI 样式 |
 
-改完源码后运行 `python build.py`，会重新生成 `index.html`。目前美术全部是代码画的占位像素图，后续会替换成正式素材，需求清单见 [ART_SPEC.md](ART_SPEC.md)。
+改完源码后运行 `python build.py`，会重新生成 `index.html`。正式美术放在 `art/`（马楠、1F/2F 敌人、主美、武器、图标、特效已替换），build.py 会把 png 和 anchors.json 内嵌进 `index.html`；还没有素材的部分（KPI 表、会议邀请、制作人、老板、场景）仍是代码画的像素图。游戏里按 T 切换新旧美术。需求清单见 [ART_SPEC.md](ART_SPEC.md)。

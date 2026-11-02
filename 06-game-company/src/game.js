@@ -125,7 +125,9 @@ function drawPlayerSpr(x,y,flash){let n='player_idle',fi=Math.floor(P.anim*5),ha
  else if(!P.onGround&&P.vy<0&&has('player_jump')){n='player_jump';fi=P.anim-(P.jumpAt||0)<.07?0:1}
  else if(!P.onGround&&has('player_fall')){n='player_fall';fi=groundBelow(P.x,P.y)-P.y<26?1:0;hand=[14,-28];wang=1.6}
  else if(P.landT>0&&has('player_land')){n='player_land';fi=P.landT>.06?0:1;hand=[8,-14]}
- else if(P.onGround&&Math.abs(P.vx)>20){n='player_run';P.runD=(P.runD||0)+Math.abs(P.vx)/60;fi=Math.floor(P.runD*.21);hand=[10,-24];wang=1.2}
+ else if(P.onGround&&Math.abs(P.vx)>20){n='player_run';P.runD=(P.runD||0)+Math.abs(P.vx)/60;fi=Math.floor(P.runD*.21);hand=[10,-24];wang=P.prim==='ruler'?1.45:2.3}
+ // 跑步、待机、跳跃等动作也按每帧手的位置挂武器，武器跟着手动
+ if(!noW&&!P.atk&&!P.dive&&!(P.diveLandT>0)){const ha=handOf(n,fi);if(ha)hand=ha}
  if(LV.floor!==1){ctx.globalAlpha=.3;for(const[ox,oy]of[[-1,0],[1,0],[0,-1],[0,1]])sprFrame(n,fi,x+ox,y+oy,P.face);ctx.globalAlpha=1}
  if(flash)ctx.globalAlpha=.5;
  sprFrame(n,fi,x,y,P.face);

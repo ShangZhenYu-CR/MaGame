@@ -100,29 +100,38 @@ function drawPlayer(cx,cy){
  else if(P.sprayT>0){drawIcon('airbrush',h.hx+P.face*3,h.hy)}
  else if(P.parryT>0){px(h.hx-3,h.hy-8,7,12,'#f2a0b0');px(h.hx-3,h.hy-8,7,4,'#3a6ad8')}
  else drawWeaponAt(kind,h.hx,h.hy,.5,P.face)}
-// 雕刻笔连击 12 帧里前手的位置（相对脚底中心，朝右）
-const HAND_ATK=[[9,-28],[12,-21],[5,-27],[7,-27],[-4,-41],[11,-17],[7,-20],[4,-17],[6,-25],[8,-29],[19,-29],[6,-29]];
-// 每把武器的连击段 → 素材里第几刀（0 上撩、1 下劈、2 横扫）
+// 每帧前手位置来自 art/**/anchors.json（帧左上角为原点），换算成相对脚底中心
+function handOf(n,fi){const a=(typeof ART_ANCHOR!=='undefined'?ART_ANCHOR:{})[n];const c=sprReady(n)?Math.floor(SPR[n].naturalWidth/48):1;fi=((fi%c)+c)%c;return a&&a[fi]?[a[fi][0]-24,a[fi][1]-48]:null}
+// 没有专属连击素材的武器借用雕刻笔：连击段 → 雕刻笔第几刀
 const ATK_SEG={stylus:[0,1,2],marker:[2,1],ruler:[0,0,2],knife:[0,1,0,2]};
-function drawPlayerSpr(x,y,flash){let n='player_idle',fi=Math.floor(P.anim*5),hand=[5,-20],wang=.5;const W=WEAPONS[P.prim];
- const has=k=>sprReady(k);
- if(P.rollT>0&&has('player_roll')){n='player_roll';fi=Math.min(5,Math.floor((ROLLT-P.rollT)/ROLLT*6));hand=null}
- else if(P.djT>0&&!P.atk&&P.hurtT<=0&&has('player_roll')){n='player_roll';fi=1+Math.min(3,Math.floor((1-P.djT/.3)*4));hand=null}
+function drawPlayerSpr(x,y,flash){let n='player_idle',fi=Math.floor(P.anim*5),hand=[5,-20],wang=.5,noW=false;const W=WEAPONS[P.prim];
+ const has=k=>sprReady(k),prog=(t,d)=>Math.max(0,Math.min(.999,t/d));
+ if(P.dead&&has('player_die')){n='player_die';const t=T-(P.deadAt||T);fi=Math.min(5,Math.floor(t/.14));if(fi>=3)fi=5;noW=true}
+ else if(P.mantle&&has('player_mantle')){n='player_mantle';fi=Math.floor(prog(P.mantle.t,.17)*4);noW=true}
+ else if(P.rollT>0&&has('player_roll')){n='player_roll';fi=Math.floor(prog(ROLLT-P.rollT,ROLLT)*6);noW=true}
+ else if(P.djT>0&&!P.atk&&P.hurtT<=0&&has('player_djump')){n='player_djump';fi=Math.floor(prog(.3-P.djT,.3)*4);noW=true}
  else if(P.hurtT>0&&has('player_hurt')){n='player_hurt';fi=P.hurtT>.17?0:1}
- else if(P.atk&&has('player_atk_stylus')){const a=P.atk,d=a.def,segs=ATK_SEG[P.prim]||[0,1,2],seg=d.dash?2:segs[Math.min(a.idx,segs.length-1)];
-  const k=a.phase==='su'?0:a.phase==='ac'?(a.t<d.ac/2?1:2):3;fi=seg*4+k;n='player_atk_stylus';hand=HAND_ATK[fi];
-  wang=d.thrust?1.57:a.phase==='su'?d.arc[0]:a.phase==='ac'?lerp(d.arc[0],d.arc[1],Math.min(1,a.t/d.ac)):d.arc[1]}
- else if(P.dive){n=has('player_fall')?'player_fall':'player_run';fi=1;hand=[4,-14];wang=0}
+ else if(P.healT>0&&has('player_heal')){n='player_heal';fi=Math.floor(prog(.45-P.healT,.45)*4);noW=true}
+ else if(P.parryT>0&&has('player_parry')){n='player_parry';fi=P.parryT>.2?0:1;noW=true}
+ else if(P.sprayT>0&&has('player_spray')){n='player_spray';fi=1;noW=true}
+ else if(P.dive&&has('player_dive')){n='player_dive';fi=Math.min(2,Math.floor((P.anim-(P.diveAt||0))/.06));wang=0;hand=handOf(n,fi)}
+ else if(P.diveLandT>0&&has('player_dive_land')){n='player_dive_land';fi=Math.floor(prog(.3-P.diveLandT,.3)*3);wang=0;hand=handOf(n,fi)}
+ else if(P.atk){const a=P.atk,d=a.def,k=a.phase==='su'?0:a.phase==='ac'?(a.t<d.ac/2?1:2):3;
+  wang=d.thrust?1.57:a.phase==='su'?d.arc[0]:a.phase==='ac'?lerp(d.arc[0],d.arc[1],Math.min(1,a.t/d.ac)):d.arc[1];
+  if(d.dash&&has('player_atk_dash')){n='player_atk_dash';fi=a.phase==='su'?0:a.phase==='ac'?(a.t<d.ac/2?1:2):(a.t<d.re/2?3:4)}
+  else if(has('player_atk_'+P.prim)){n='player_atk_'+P.prim;fi=Math.min(a.idx,Math.floor(SPR[n].naturalWidth/48/4)-1)*4+k}
+  else if(has('player_atk_stylus')){const segs=ATK_SEG[P.prim]||[0,1,2];n='player_atk_stylus';fi=segs[Math.min(a.idx,segs.length-1)]*4+k}
+  hand=handOf(n,fi)||hand}
  else if(!P.onGround&&P.vy<0&&has('player_jump')){n='player_jump';fi=P.anim-(P.jumpAt||0)<.07?0:1}
  else if(!P.onGround&&has('player_fall')){n='player_fall';fi=groundBelow(P.x,P.y)-P.y<26?1:0;hand=[14,-28];wang=1.6}
  else if(P.landT>0&&has('player_land')){n='player_land';fi=P.landT>.06?0:1;hand=[8,-14]}
- else if(P.onGround&&Math.abs(P.vx)>20&&P.healT<=0){n='player_run';P.runD=(P.runD||0)+Math.abs(P.vx)/60;fi=Math.floor(P.runD*.21);hand=[10,-24];wang=1.2}
+ else if(P.onGround&&Math.abs(P.vx)>20){n='player_run';P.runD=(P.runD||0)+Math.abs(P.vx)/60;fi=Math.floor(P.runD*.21);hand=[10,-24];wang=1.2}
  if(LV.floor!==1){ctx.globalAlpha=.3;for(const[ox,oy]of[[-1,0],[1,0],[0,-1],[0,1]])sprFrame(n,fi,x+ox,y+oy,P.face);ctx.globalAlpha=1}
  if(flash)ctx.globalAlpha=.5;
- const hx=hand?x+hand[0]*P.face:0,hy=hand?y+hand[1]:0;
- // 武器：雕刻笔有素材，其他武器暂用代码画
- const drawW=()=>{if(!hand)return;if(P.prim==='stylus'&&has('weapon_stylus')){ctx.save();ctx.translate(R(hx),R(hy));ctx.scale(P.face,1);ctx.rotate(-(wang-2.36));ctx.drawImage(SPR.weapon_stylus,-8,-7);ctx.restore()}else drawWeaponAt(P.prim,hx,hy,wang,P.face)};
- sprFrame(n,fi,x,y,P.face);drawW();ctx.globalAlpha=1;
+ sprFrame(n,fi,x,y,P.face);
+ // 武器：雕刻笔用素材，其他武器暂用代码画；格挡、喷涂等道具已画在人物图里
+ if(!noW&&hand){const hx=x+hand[0]*P.face,hy=y+hand[1];if(P.prim==='stylus'&&has('weapon_stylus')){const g=(ART_ANCHOR.weapon_stylus||{}).grip||[8,7];ctx.save();ctx.translate(R(hx),R(hy));ctx.scale(P.face,1);ctx.rotate(-(wang-2.36));ctx.drawImage(SPR.weapon_stylus,-g[0],-g[1]);ctx.restore()}else drawWeaponAt(P.prim,hx,hy,wang,P.face)}
+ ctx.globalAlpha=1;
  if(P.atk&&P.atk.phase==='ac'){const d=P.atk.def;ctx.globalAlpha=.75;if(d.thrust){pline(x+P.face*6,y-26,x+P.face*(d.rng+4),y-26,2,W.col);px(x+P.face*(d.rng+4)-1,y-27,3,3,'#fff')}else smear(x,y-26,Math.max(10,d.rng-6),d.rng+6,d.arc[0],lerp(d.arc[0],d.arc[1],Math.min(1,P.atk.t/d.ac)),P.face,W.col);ctx.globalAlpha=1}
  if(P.dive){ctx.globalAlpha=.5;pline(x,y-40,x,y-58,2,W.col);ctx.globalAlpha=1}
  return true}
@@ -138,7 +147,7 @@ function render(){const th=LV.th,cx=R(cam.x+(Math.random()-.5)*shake*2),cy=R(cam
  ctx.font='bold 8px sans-serif';ctx.textAlign='center';for(const e of enemies)if(e.affix&&e.hp>0&&Math.abs(e.x-cx-VW/2)<VW/2+20){const a=EAFFIX[e.affix],x=R(e.x-cx),y=R(e.y-cy-e.h-10);ctx.fillStyle='#14121a';ctx.fillText(a.n,x+1,y+1);ctx.fillStyle=a.c;ctx.fillText(a.n,x,y)}ctx.textAlign='left';
  for(const e of enemies)if(e.hp<e.max&&e.hp>0){const x=R(e.x-cx-8),y=R(e.y-cy-e.h-6);px(x,y,16,2,'#2a2030');px(x,y,R(16*e.hp/e.max),2,e.elite?'#ffb84a':'#ff5a4a')}
  drawProjs(cx,cy);
- if(G.state!=='dead'||Math.floor(T*8)%2)drawPlayer(cx,cy);
+ if(G.state!=='dead'||Math.floor(T*8)%2||(useSpr&&sprReady('player_die')))drawPlayer(cx,cy);
  drawParts(cx,cy);drawNums(cx,cy);
  ctx.drawImage(VIG,0,0);
  if(flashRed>0){ctx.fillStyle=`rgba(216,40,40,${flashRed*.6})`;ctx.fillRect(0,0,VW,VH)}

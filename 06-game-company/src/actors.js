@@ -32,7 +32,7 @@ function resetPlayer(keep){Object.assign(P,{x:6*TS,y:19*TS,w:10,h:34,vx:0,vy:0,f
  if(!keep)Object.assign(P,{hp:100,maxHp:100,flasks:2,maxFlasks:2,prim:'stylus',sec:'palette',primLv:0,primAff:[],secLv:0,secAff:[],stat:{line:0,color:0,body:0},cells:0,dmgMul:1,spdMul:1,rollMul:1,cdMul:1,airJumps:1,steal:0,critMul:1.5,upg:[]})}
 const RUN=150,ACC=1800,AACC=1100,GRAV=1350,JV=420,DJV=410,MAXF=520,ROLLV=290,ROLLT=.3;
 function playerUpdate(dt){
- P.anim+=dt;P.djT=(P.djT||0)-dt;P.inv-=dt;P.hurtT-=dt;P.rollCd-=dt;P.skillCd-=dt;P.comboT-=dt;P.dropT-=dt;P.landT-=dt;if(P.dropT<=0)P.drop=false;P.parryT-=dt;
+ P.anim+=dt;P.djT=(P.djT||0)-dt;if(P.diveLandT>0)P.diveLandT-=dt;P.inv-=dt;P.hurtT-=dt;P.rollCd-=dt;P.skillCd-=dt;P.comboT-=dt;P.dropT-=dt;P.landT-=dt;if(P.dropT<=0)P.drop=false;P.parryT-=dt;
  P.blinkT-=dt;if(P.blinkT<-.12)P.blinkT=rnd(2,4);
  P.rootT-=dt;const rooted=P.rootT>0;if(P.flowT>0){P.flowT-=dt;if(P.flowT<=0)P.flow=0}if(rooted&&Math.random()<.3)part(P.x+rnd(-8,8),P.y-rnd(10,26),0,-20,'#3a6ad8',.4,2,-20);
  if(P.rally>0){P.rallyT-=dt;if(P.rallyT<=0)P.rally=Math.max(0,P.rally-14*dt);P.rally=Math.min(P.rally,P.maxHp-P.hp)}
@@ -61,7 +61,7 @@ function playerUpdate(dt){
  const apex=!P.onGround&&Math.abs(P.vy)<55&&down('jump')?.55:1;
  P.vy=Math.min(MAXF,P.vy+GRAV*dt*(P.vy>0?1.15:1)*apex);
  // 攻击
- if(pressed('atk')&&!P.onGround&&down('down')&&!P.dive&&P.rollT<=0&&groundBelow(P.x,P.y)-P.y>28){P.dive=true;P.atk=null;P.atkQueued=0;P.vy=520;SFX.heavy();KP['KeyJ']=0;KP['Mouse0']=0;KP['Pad2']=0}
+ if(pressed('atk')&&!P.onGround&&down('down')&&!P.dive&&P.rollT<=0&&groundBelow(P.x,P.y)-P.y>28){P.dive=true;P.diveAt=P.anim;P.atk=null;P.atkQueued=0;P.vy=520;SFX.heavy();KP['KeyJ']=0;KP['Mouse0']=0;KP['Pad2']=0}
  if(P.dive){P.vx=0;P.vy=Math.max(P.vy,560);for(const e of targets()){if(Math.abs(e.x-P.x)<e.w/2+P.w/2&&P.y>e.y-e.h&&P.y-8<e.y){damage(e,18,P.face,0,false,false,'dive');e.state=e.isBoss?e.state:'stun';e.timer=.6;P.dive=false;P.vy=-330;P.jumps=P.airJumps;P.cut=true;hitstop=.07;shake=4;break}}}
  if(pressed('atk')&&!P.dive)P.atkQueued=.18;else P.atkQueued=(P.atkQueued||0)-dt;
  if(P.atkQueued>0&&P.rollT<=0&&!P.dive){const can=!P.atk||(P.atk.phase==='re'&&P.atk.t>P.atk.def.re*.25);if(can){const W=WEAPONS[P.prim];if(P.comboT<=0)P.combo=0;if(ix)P.face=ix;
@@ -85,7 +85,7 @@ function playerUpdate(dt){
  // 互动
  if(pressed('use'))interact();
  moveBody(P,dt);
- if(P.onGround&&P.dive){P.dive=false;P.landT=.22;SFX.stamp();shake=Math.max(shake,5);hitstop=Math.max(hitstop,.05);for(let i=0;i<14;i++){const s=i<7?-1:1;part(P.x,P.y-2,s*rnd(60,180),-rnd(20,120),pick(WEAPONS[P.prim].ink),.4,2,300)}
+ if(P.onGround&&P.dive){P.dive=false;P.landT=.22;P.diveLandT=.3;SFX.stamp();shake=Math.max(shake,5);hitstop=Math.max(hitstop,.05);for(let i=0;i<14;i++){const s=i<7?-1:1;part(P.x,P.y-2,s*rnd(60,180),-rnd(20,120),pick(WEAPONS[P.prim].ink),.4,2,300)}
   for(const e of targets())if(Math.abs(e.x-P.x)<42&&Math.abs(e.y-P.y)<30){damage(e,22,sign(e.x-P.x)||1,140,false,false,'dive');if(!e.isBoss){e.state='stun';e.timer=.7}}
   for(const k of pickups)if(k.k==='crate'&&Math.abs(k.x-P.x)<40&&Math.abs(k.y-P.y)<30)hitCrate(k,99)}
  else if(P.onGround&&P.lastAir>.25){SFX.land();burst(P.x,P.y,6,'#cfc6b8',70,.3,2,120);P.landT=.12}
@@ -146,7 +146,7 @@ function hurtPlayer(dmg,dir,src,name){if(P.dead||G.state!=='play')return false;
  if(P.mantle)P.mantle=null;if(G.hard)dmg=Math.round(dmg*1.3);if(P.curse>0)dmg*=2;
  if(P.parryT>0){SFX.parry();hitstop=.1;if(P.sec==='eraser'&&P.rally>0){P.hp=Math.min(P.maxHp,P.hp+P.rally);dmgNum(P.x,P.y-44,'+'+Math.round(P.rally),'#7af07a');P.rally=0;hud()}burst(P.x+P.face*10,P.y-16,16,['#fff','#f2a0b0'],200,.35);dmgNum(P.x,P.y-34,'0','#9fd3f0');if(src&&src.isProj&&src.vx!==undefined){src.from='p';src.vx=-(src.vx||P.face*100)*1.3;src.vy=-Math.abs(src.vy||0);src.dmg=(src.dmg||10)*2;src.owner=null}else if(src&&src.isBoss){damage(src,25,P.face,0,true,false,'sec')}else if(src&&EDEF[src.type]&&src.hp>0){src.state='stun';src.timer=1.5;damage(src,20,P.face,120,true,false,'sec')}P.inv=.3;return false}
  if((P.flow||0)>=10)toast('心流中断',900);P.flow=0;P.hp-=dmg;P.rally=Math.min(P.maxHp-Math.max(0,P.hp),P.rally+dmg*.6);P.rallyT=1.6;P.lastHit=name||(src&&src.isBoss?src.name:src&&src.type?NAMES[src.type]:src&&src.kind?KIND_NAME[src.kind]||'':'')||'意外';P.inv=.9;P.dive=false;P.hurtT=.35;P.vx=dir*160;P.vy=-180;P.atk=null;P.sprayT=0;P.healT=0;shake=Math.max(shake,5);hitstop=Math.max(hitstop,.08);flashRed=.25;SFX.hurt();burst(P.x,P.y-14,12,['#d8584a','#fff'],160,.4);dmgNum(P.x,P.y-36,dmg,'#ff5a4a');hud();
- if(P.hp<=0){P.hp=0;P.dead=true;playerDie()}return true}
+ if(P.hp<=0){P.hp=0;P.dead=true;P.deadAt=T;playerDie()}return true}
 function interact(){
  for(const pk of pickups){if(Math.abs(pk.x-P.x)>18||Math.abs(pk.y-P.y)>24)continue;
   if(pk.k==='wireterm'&&!pk.used){pk.used=true;buildWire();return}

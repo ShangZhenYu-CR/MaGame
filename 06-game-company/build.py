@@ -5,7 +5,9 @@ here=pathlib.Path(__file__).parent
 order=['engine','art','level','actors','bosses','game']
 import base64,json
 art={p.stem:'data:image/png;base64,'+base64.b64encode(p.read_bytes()).decode() for p in sorted((here/'art').rglob('*.png'))}
-js='const ART_SRC='+json.dumps(art)+';\n'+'\n'.join((here/'src'/f'{m}.js').read_text(encoding='utf-8') for m in order)
+anc={}
+for p in sorted((here/'art').rglob('anchors.json')):anc.update(json.loads(p.read_text(encoding='utf-8')))
+js='const ART_SRC='+json.dumps(art)+';\nconst ART_ANCHOR='+json.dumps(anc)+';\n'+'\n'.join((here/'src'/f'{m}.js').read_text(encoding='utf-8') for m in order)
 shell=(here/'src'/'shell.html').read_text(encoding='utf-8')
 (here/'index.html').write_text(shell.replace('__JS__',js),encoding='utf-8')
 print('已生成 index.html，', len(js), '字符')

@@ -20,9 +20,9 @@
 
 仓库 Settings → Pages → Source 选 `Deploy from a branch`，分支选 `main`、目录选 `/ (root)`。几分钟后访问：
 
-`https://shangzhenyu-cr.github.io/MAGAME/`
+`https://shangzhenyu-cr.github.io/MaGame/`
 
-首页是游戏选择页，每个游戏的地址是 `.../MAGAME/文件夹名/`。
+首页是游戏选择页，每个游戏的地址是 `.../MaGame/文件夹名/`。
 
 ## 约定
 

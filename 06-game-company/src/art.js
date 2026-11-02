@@ -143,8 +143,7 @@ const THEME={
 // 背景装饰
 function drawDecor(d,cx,cy,th,t){const x=R(d.x-cx),y=R(d.y-cy);if(x<-80||x>VW+80)return;
  switch(d.k){
- case 'window':px(x,y,40,36,th.trim);const g=ctx.createLinearGradient(0,y,0,y+32);g.addColorStop(0,th.sky[0]);g.addColorStop(1,th.sky[1]);ctx.fillStyle=g;ctx.fillRect(x+2,y+2,36,32);px(x+19,y+2,2,32,th.trim);px(x+2,y+17,36,2,th.trim);
-  if(th===THEME[3]||th===THEME[2]){for(let i=0;i<8;i++){const bx=x+3+((i*37+d.s)%32),bh=6+((i*13+d.s)%14);px(bx,y+34-bh,4,bh,'#14182a');if((i+Math.floor(t))%3)px(bx+1,y+34-bh+2,1,1,'#f2d27a')}}else{px(x+6,y+8,8,3,'#fff');px(x+24,y+12,10,3,'#fff')}break;
+ case 'window':{px(x-1,y-1,42,38,'rgba(0,0,0,.15)');px(x,y,40,36,th.trim);ctx.save();ctx.beginPath();ctx.rect(x+2,y+2,36,32);ctx.clip();drawFar(cx,cy);ctx.fillStyle='rgba(255,255,255,.08)';ctx.beginPath();ctx.moveTo(x+6,y+2);ctx.lineTo(x+16,y+2);ctx.lineTo(x+4,y+34);ctx.lineTo(x-6,y+34);ctx.fill();ctx.restore();px(x+19,y+2,2,32,th.trim);px(x+2,y+17,36,2,th.trim);px(x-3,y+36,46,3,th.trim);px(x-3,y+39,46,1,'rgba(0,0,0,.2)');break}
  case 'easel':pline(x+2,y+30,x+10,y,2,'#8a6248');pline(x+18,y+30,x+10,y,2,'#8a6248');px(x+1,y+4,18,16,'#f4f1ea');px(x+3,y+6,14,12,['#9fd3f0','#f2a0b0','#bde986'][d.s%3]);px(x+5,y+12,6,4,'#5a7a9a');px(x+1,y+20,18,2,'#8a6248');break;
  case 'frame':px(x,y,20,16,'#8a6248');px(x+2,y+2,16,12,'#f4f1ea');pline(x+4,y+11,x+9,y+5,1,'#3a3a46');pline(x+9,y+5,x+15,y+11,1,'#3a3a46');pcirc(x+14,y+5,1,'#d8584a');break;
  case 'plant':px(x+2,y+18,10,8,'#c86a4a');px(x+1,y+18,12,2,'#d87a5a');pcirc(x+7,y+12,6,'#4f8a3f');pcirc(x+4,y+8,4,'#5f9a4f');pcirc(x+10,y+9,4,'#6aaa5a');break;

@@ -138,6 +138,7 @@ function drawPlayerSpr(x,y,flash){let n='player_idle',fi=Math.floor(P.anim*5),ha
 function render(){const th=LV.th,cx=R(cam.x+(Math.random()-.5)*shake*2),cy=R(cam.y+(Math.random()-.5)*shake*2);
  drawBackground(cx,cy,T);
  for(const d of LV.decor)if(d.k!=='window'&&d.k!=='lamp'&&d.k!=='sign')drawDecor(d,cx,cy,th,T);
+ drawLights(cx,cy,T);
  for(const s of LV.signs){const x=R(s.x-cx),y=R(s.y-cy);if(x>-100&&x<VW+100){}}
  for(const s of splats){ctx.globalAlpha=Math.min(1,s.life);px(s.x-cx,s.y-cy-1,s.w,2,s.col);ctx.globalAlpha=1}
  const near=drawPickups(cx,cy,T);
@@ -148,7 +149,7 @@ function render(){const th=LV.th,cx=R(cam.x+(Math.random()-.5)*shake*2),cy=R(cam
  for(const e of enemies)if(e.hp<e.max&&e.hp>0){const x=R(e.x-cx-8),y=R(e.y-cy-e.h-6);px(x,y,16,2,'#2a2030');px(x,y,R(16*e.hp/e.max),2,e.elite?'#ffb84a':'#ff5a4a')}
  drawCorpses(cx,cy);drawProjs(cx,cy);
  if(G.state!=='dead'||Math.floor(T*8)%2||(useSpr&&sprReady('player_die')))drawPlayer(cx,cy);
- drawFx(cx,cy);drawParts(cx,cy);drawNums(cx,cy);
+ drawFx(cx,cy);drawParts(cx,cy);drawNear(cx,cy);drawNums(cx,cy);
  ctx.drawImage(VIG,0,0);
  if(flashRed>0){ctx.fillStyle=`rgba(216,40,40,${flashRed*.6})`;ctx.fillRect(0,0,VW,VH)}
  if(slowT>0){ctx.fillStyle='rgba(255,255,255,.06)';ctx.fillRect(0,0,VW,VH)}

@@ -13,7 +13,9 @@ function sprReady(n){const im=SPR[n];return !!(im&&im.complete&&im.naturalWidth)
 // 帧默认是正方形（边长 = 图片高度）；不是正方形的在这里写逻辑帧宽（按名字前缀匹配）
 // 非正方形帧的逻辑帧宽在 art/frames.json（build.py 内嵌为 ART_FW），按名字前缀匹配
 const FRAME_W=(typeof ART_FW!=='undefined'?ART_FW:{});
-function sprFW(n){const im=SPR[n],s=SPRS[n]||1;for(const k in FRAME_W)if(n.startsWith(k))return FRAME_W[k]*s;return im.naturalHeight}
+// 单张图（装饰物、武器、图标）整张就是一帧，不能按“正方形帧”切，否则宽图会被裁掉一截
+const SINGLE_PREFIX=['decor_','weapon_','icon_'];
+function sprFW(n){const im=SPR[n],s=SPRS[n]||1;if(SINGLE_PREFIX.some(p=>n.startsWith(p)))return im.naturalWidth;for(const k in FRAME_W)if(n.startsWith(k))return FRAME_W[k]*s;return im.naturalHeight}
 function sprN(n){const im=SPR[n];return im&&im.naturalWidth?Math.max(1,Math.round(im.naturalWidth/sprFW(n))):1}
 // 被打闪白：缓存一张纯白剪影
 const WHITE={};function whiteOf(n){if(WHITE[n])return WHITE[n];const im=SPR[n],c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const g=c.getContext('2d');g.drawImage(im,0,0);g.globalCompositeOperation='source-in';g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);return WHITE[n]=c}

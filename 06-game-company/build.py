@@ -28,7 +28,10 @@ for p in sorted((here / 'art').rglob('anchors.json')):
 # 非正方形帧的帧宽（逻辑像素），按名字前缀匹配
 fw_table = json.loads((here / 'art' / 'frames.json').read_text(encoding='utf-8'))
 
-def frame_w(name, height, scale):
+def frame_w(name, height, scale, width=None):
+    # 单张图（装饰物、武器、图标）整张就是一帧
+    if width is not None and name.startswith(('decor_', 'weapon_', 'icon_')):
+        return width
     for k, v in fw_table.items():
         if name.startswith(k):
             return v * scale
@@ -46,7 +49,7 @@ try:
             continue
         scale = 2 if '@2x' in p.stem else 1
         im = Image.open(p).convert('RGBA')
-        w = frame_w(name, im.height, scale)
+        w = frame_w(name, im.height, scale, im.width)
         alpha = im.getchannel('A')
         row = []
         for i in range(max(1, im.width // w)):

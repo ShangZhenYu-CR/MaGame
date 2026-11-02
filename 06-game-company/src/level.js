@@ -13,27 +13,30 @@ function genLevel(floor){
  signs.push({x:8*TS,y:(g-6)*TS,text:th.name});decor.push({k:'elevator',x:3*TS,y:g*TS-64,gy:g*TS,s:0});
  
  // 普通地图块
- let x=startW,secretDone=false;
+ let x=startW,secretDone=false,room=null;
+ // 评审会：第 4 块里的封闭挑战房，进去后两侧封门，打完两轮才开
+ const wantRoom=Math.random()<(floor===1?.5:.75);
  for(let c=0;c<nCh;c++){const x0=x;let segs=[];let cx=x0;
-  while(cx<x0+CW){const len=Math.min(irnd(6,12),x0+CW-cx);let dg=0;if(cx>x0+2){const r=Math.random();dg=r<.35?0:r<.6?-irnd(1,3):r<.85?irnd(1,3):-irnd(4,5)}
+  while(cx<x0+CW){if(c===3&&wantRoom&&!room&&cx>=x0+12&&x0+CW-cx>=22){const len=18;g=clamp(g,13,18);room={tx:cx,len,g};segs.push({x:cx,len,g,room:true});for(let i=0;i<len;i++)for(let y=g;y<HT;y++)set(cx+i,y,1);cx+=len;continue}
+   const len=Math.min(irnd(6,12),x0+CW-cx);let dg=0;if(cx>x0+2){const r=Math.random();dg=r<.35?0:r<.6?-irnd(1,3):r<.85?irnd(1,3):-irnd(4,5)}
    g=clamp(g+dg,12,19);segs.push({x:cx,len,g});for(let i=0;i<len;i++)for(let y=g;y<HT;y++)set(cx+i,y,1);cx+=len}
   // 平台
-  for(const s of segs){if(s.len>=6&&Math.random()<.75){const pw=irnd(4,Math.min(7,s.len-1)),px0=s.x+irnd(0,s.len-pw),py=s.g-irnd(4,5);if(py>3){for(let i=0;i<pw;i++)set(px0+i,py,2);
+  for(const s of segs){if(!s.room&&s.len>=6&&Math.random()<.75){const pw=irnd(4,Math.min(7,s.len-1)),px0=s.x+irnd(0,s.len-pw),py=s.g-irnd(4,5);if(py>3){for(let i=0;i<pw;i++)set(px0+i,py,2);
     if(Math.random()<.45&&py-4>3){const p2=irnd(3,5),px2=px0+irnd(-2,pw-2);for(let i=0;i<p2;i++)if(T[(py-4)*w+px2+i]===0)set(px2+i,py-4,2);if(Math.random()<.5)pks.push({k:'cell',x:(px2+1)*TS,y:(py-5)*TS})}
     if(Math.random()<.25)pks.push({k:Math.random()<.4?'food':'cell',x:(px0+pw/2)*TS,y:(py-1)*TS})}}}
   // 高台阶补平台：前后落差>=4时放一块过渡平台
   for(let i=1;i<segs.length;i++){const a=segs[i-1],b=segs[i];if(a.g-b.g>=4){for(let k=-3;k<0;k++)set(b.x+k,b.g+2,2)}}
   // 敌人
   const n=irnd(3,4)+(floor>1?1:0)+(G.lvl>=4?1:0);
-  for(let k=0;k<n;k++){const s=segs[irnd(c===0?1:0,segs.length-1)];const type=pick_(th.enemies,k);const ex=(s.x+irnd(1,Math.max(1,s.len-2)))*TS;
+  const nsegs=segs.filter(s=>!s.room);for(let k=0;k<n;k++){const s=nsegs[irnd(c===0&&nsegs.length>1?1:0,nsegs.length-1)];const type=pick_(th.enemies,k);const ex=(s.x+irnd(1,Math.max(1,s.len-2)))*TS;
    const fly=type==='sticky'||type==='popup';spawns.push({type,x:ex,y:fly?(s.g-irnd(5,8))*TS:s.g*TS})}
   // 图钉陷阱（地面上方一格，宽 2-3 格，避开地图块开头）
   const spikeP=[.3,.5,.65][floor-1];
-  for(const s of segs){if(s.x<x0+3||s.len<5||Math.random()>spikeP)continue;const sw=irnd(2,3),sx=s.x+irnd(1,s.len-sw-1);let ok=true;for(let i=0;i<sw;i++)if(T[(s.g-1)*w+sx+i]!==0||T[(s.g-4)*w+sx+i]===2||T[(s.g-5)*w+sx+i]===2)ok=false;if(ok)for(let i=0;i<sw;i++)set(sx+i,s.g-1,3)}
+  for(const s of segs){if(s.room||s.x<x0+3||s.len<5||Math.random()>spikeP)continue;const sw=irnd(2,3),sx=s.x+irnd(1,s.len-sw-1);let ok=true;for(let i=0;i<sw;i++)if(T[(s.g-1)*w+sx+i]!==0||T[(s.g-4)*w+sx+i]===2||T[(s.g-5)*w+sx+i]===2)ok=false;if(ok)for(let i=0;i<sw;i++)set(sx+i,s.g-1,3)}
   // 纸箱
-  for(let k=0;k<irnd(1,2);k++){const s=segs[irnd(0,segs.length-1)];const cx=s.x+irnd(0,s.len-1);if(T[(s.g-1)*w+cx]===0)pks.push({k:'crate',x:cx*TS+8,y:s.g*TS,hp:14})}
+  for(let k=0;k<irnd(1,2);k++){const s=nsegs[irnd(0,nsegs.length-1)];const cx=s.x+irnd(0,s.len-1);if(T[(s.g-1)*w+cx]===0)pks.push({k:'crate',x:cx*TS+8,y:s.g*TS,hp:14})}
   // 补模型：线框台阶通往高处宝箱（第 3、4 块里找一处）
-  if((c===2||c===3)&&!secretDone){const cand=segs.filter(s=>s.len>=6&&s.g>=13).sort((a,b)=>b.len-a.len);
+  if((c===2||c===3)&&!secretDone){const cand=segs.filter(s=>!s.room&&s.len>=6&&s.g>=13).sort((a,b)=>b.len-a.len);
    for(const best of cand){const bx=best.x,g0=best.g;let ok=true;for(let y=g0-11;y<g0;y++)for(let x=bx;x<bx+6;x++)if(T[y*w+x]===1)ok=false;
     if(ok){for(let y=g0-11;y<g0;y++)for(let x=bx-1;x<bx+7;x++)if(T[y*w+x]===2||T[y*w+x]===3)set(x,y,0);for(let i=pks.length-1;i>=0;i--){const k=pks[i];if(k.x>=(bx-1)*TS&&k.x<=(bx+7)*TS&&k.y<g0*TS-2)pks.splice(i,1)}for(let i=0;i<3;i++)set(bx+i,g0-4,5);for(let i=0;i<3;i++)set(bx+3+i,g0-7,5);for(let i=0;i<3;i++)set(bx+i,g0-10,5);pks.push({k:'wireterm',x:(bx+4)*TS+8,y:g0*TS});pks.push({k:'chest',x:(bx+1)*TS+8,y:(g0-10)*TS,bonus:true,secret:true});secretDone=true;break}}}
   // 加班合同（诅咒宝箱）：第 3 块，一半概率
@@ -41,14 +44,15 @@ function genLevel(floor){
   // 加急任务：第 2 块
   if(c===1){const s=segs[irnd(0,segs.length-1)];pks.push({k:'rush',x:(s.x+Math.floor(s.len/2))*TS+8,y:s.g*TS})}
   // 卷轴：第 2、4 块各一个
-  if(c===1||c===3){const s=segs[irnd(1,segs.length-1)];const cx=s.x+Math.floor(s.len/2);let gy=s.g;for(let y=s.g-1;y>2;y--)if(T[y*w+cx]===2){gy=y;break}pks.push({k:'scroll',x:cx*TS+8,y:gy*TS})}
+  if(c===1||c===3){const s=nsegs[irnd(Math.min(1,nsegs.length-1),nsegs.length-1)];const cx=s.x+Math.floor(s.len/2);let gy=s.g;for(let y=s.g-1;y>2;y--)if(T[y*w+cx]===2){gy=y;break}pks.push({k:'scroll',x:cx*TS+8,y:gy*TS})}
   // 装饰
   for(let k=x0;k<x0+CW;k+=irnd(9,13))decor.push({k:'window',x:k*TS,y:Math.round(6.6*TS),s:irnd(0,99)});
   for(let k=x0+4;k<x0+CW;k+=irnd(10,14))decor.push({k:'lamp',x:k*TS,y:6*TS,s:0});
-  for(const s of segs){if(Math.random()<.8){const kinds=floor===1?['easel','frame','plant','board','shelf','cooler']:floor===2?['monitor','server','board','poster','plant']:['trophy','plant','frame','poster','monitor'];
+  for(const s of segs){if(!s.room&&Math.random()<.8){const kinds=floor===1?['easel','frame','plant','board','shelf','cooler']:floor===2?['monitor','server','board','poster','plant']:['trophy','plant','frame','poster','monitor'];
    const k=pick(kinds),dx=(s.x+irnd(0,Math.max(0,s.len-3)))*TS;const hgt={easel:30,frame:16,plant:26,board:28,shelf:19,cooler:30,monitor:20,server:46,poster:24,trophy:20}[k];
    decor.push({k,x:dx,y:(k==='frame'||k==='poster'||k==='board'?s.g*TS-hgt-30:s.g*TS-hgt),gy:s.g*TS,s:irnd(0,99)})}}
   x+=CW}
+ if(room){const {tx,len,g:rg}=room;for(let i=0;i<len;i++)for(let y=2;y<rg;y++)set(tx+i,y,0);for(let i=0;i<4;i++){set(tx+3+i,rg-4,2);set(tx+len-7+i,rg-4,2)}for(let i=0;i<4;i++)set(tx+7+i,rg-8,2);}
  // 宝箱（精英掉落武器 + 一个宝箱）
  // 精英：楼层越高越多，加班等级 2 以上再多两只
  const cs=spawns.filter(s=>s.type!=='sticky'&&s.type!=='popup').sort(()=>Math.random()-.5);for(let i=0;i<Math.min(cs.length,floor+(G.lvl>=2?2:0));i++)cs[i].elite=true;
@@ -63,7 +67,8 @@ function genLevel(floor){
  for(const k of pks){if(k.k==='cell'||k.k==='food')continue;const tx=Math.floor(k.x/TS);for(let y=2;y<HT;y++)for(let dx=-2;dx<=2;dx++)if(T[y*w+tx+dx]===3)set(tx+dx,y,0)}
  for(let i=spawns.length-1;i>=0;i--)if(spawns[i].x>=(ax-3)*TS)spawns.splice(i,1);
  const gate={x:ax+2,active:false};
- LV={floor,th,w,h:HT,T,spawns,decor,pick:pks,signs,boxes:[],arenaX:ax*TS,arenaW:arenaW*TS,gate,exitX:(w-6)*TS};
+ for(let i=pks.length-1;room&&i>=0;i--){const tx=pks[i].x/TS;if(tx>=room.tx-1&&tx<=room.tx+room.len+1)pks.splice(i,1)}
+ LV={floor,th,w,h:HT,T,spawns,decor,pick:pks,signs,boxes:[],room:room&&{x0:room.tx*TS,x1:(room.tx+room.len)*TS,tx:room.tx,len:room.len,g:room.g,state:0,cells:[]},arenaX:ax*TS,arenaW:arenaW*TS,gate,exitX:(w-6)*TS};
  return LV}
 function pick_(a,i){return a[(i+Math.floor(Math.random()*a.length))%a.length]}
 function tileAt(tx,ty){if(tx<0||tx>=LV.w)return 1;if(ty<0)return 1;if(ty>=LV.h)return 1;if(LV.gate.active&&tx===LV.gate.x)return 1;return LV.T[ty*LV.w+tx]}

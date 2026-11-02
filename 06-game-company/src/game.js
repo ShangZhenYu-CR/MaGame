@@ -12,7 +12,11 @@ function commitBP(){const b=P.bps||[];P.bps=[];const nw=b.filter(x=>!SAVE.bp.inc
 const G={state:'title',lvl:0,floor:1,time:0,kills:0,deaths:0,bossDone:false,snap:null,hard:false,floorT:0,prev:null};
 let hitstop=0,shake=0,slowmo=1,slowT=0,flashRed=0,T=0;const cam={x:0,y:0};
 const UPG=[{id:'dmg',n:'灵感爆发',d:'所有伤害 +20%',ic:'💡'},{id:'hp',n:'加班体质',d:'最大生命 +30',ic:'💪'},{id:'roll',n:'摸鱼大师',d:'翻滚冷却 -35%，无敌更久',ic:'🐟'},{id:'spd',n:'速写手',d:'攻击速度 +18%',ic:'✍️'},
- {id:'flask',n:'多带个便当',d:'便当上限 +1',ic:'🍱'},{id:'steal',n:'落笔有神',d:'击败敌人回复 4 生命',ic:'🖌️'},{id:'jump',n:'人体工学椅',d:'空中跳跃 +1',ic:'🪑'},{id:'crit',n:'甲方满意',d:'暴击伤害 +60%',ic:'⭐'},{id:'cd',n:'快捷键大师',d:'副武器冷却 -30%',ic:'⌨️'}];
+ {id:'flask',n:'多带个便当',d:'便当上限 +1',ic:'🍱'},{id:'steal',n:'落笔有神',d:'击败敌人回复 4 生命',ic:'🖌️'},{id:'jump',n:'人体工学椅',d:'空中跳跃 +1',ic:'🪑'},{id:'crit',n:'甲方满意',d:'暴击伤害 +60%',ic:'⭐'},{id:'cd',n:'快捷键大师',d:'副武器冷却 -30%',ic:'⌨️'},
+ {id:'backup',t:1,n:'自动保存',d:'每层第一次受到致命伤害时保留 1 点生命，短暂无敌',ic:'💾'},{id:'chain',t:1,n:'连锁报错',d:'带灼烧的敌人死亡时爆炸，炸伤周围敌人并传染灼烧',ic:'💥'},
+ {id:'hotkey',t:1,n:'热切换',d:'切换武器后副武器冷却立刻转好，换手斩伤害 +50%',ic:'🔁'},{id:'deadline',t:1,n:'截稿冲刺',d:'生命低于 35% 时伤害 +45%',ic:'⏰'},
+ {id:'ghost',t:1,n:'甩锅',d:'完美闪避时原地爆炸，伤害并晕住周围敌人',ic:'🫥'},{id:'critheal',t:1,n:'甲方好评',d:'每次暴击回复 2 生命',ic:'👍'},
+ {id:'overtime',t:1,n:'加班费',d:'每击败 10 个敌人，最大生命 +5',ic:'💰'},{id:'thorns',t:1,n:'反向需求',d:'受伤时震开并伤害身边的敌人',ic:'🌵'}];
 function applyUpg(id){P.upg.push(id);if(id==='dmg')P.dmgMul*=1.2;if(id==='hp'){P.maxHp+=30}if(id==='roll')P.rollMul*=.65;if(id==='spd')P.spdMul*=1.18;if(id==='flask')P.maxFlasks++;if(id==='steal')P.steal+=4;if(id==='jump')P.airJumps++;if(id==='crit')P.critMul+=.6;if(id==='cd')P.cdMul*=.7}
 // ===== HUD =====
 function slotIcon(cv,w){const c=cv.getContext('2d');c.imageSmoothingEnabled=false;ctx.clearRect(0,0,24,24);ctx.fillStyle='rgba(0,0,0,0)';drawIcon(w,12,12);c.clearRect(0,0,cv.width,cv.height);c.drawImage(buf,0,0,24*RES,24*RES,0,0,cv.width,cv.height)}
@@ -48,8 +52,8 @@ function rollShop(){const box=$('shop');box.innerHTML='';SHOP.forEach((s,i)=>{co
 function buy(s){if(P.cells<s.c||G.state!=='rest')return;P.cells-=s.c;P.bought=(P.bought||[]).concat(s.id);SFX.pick();
  if(s.id==='flask'){P.maxFlasks++;P.flasks++}else if(s.id==='sharpen')P.primLv++;else if(s.id==='reforge'){const n=Math.max(1,P.primAff.length);P.primAff=rollAff(1,n)}else if(s.id==='scroll'){hudCells();openScroll();return}
  hud.p=hud.s=null;hud();rollShop();toast('买到了：'+s.n)}
-function rollRest(){const pool=UPG.filter(u=>!(u.id==='jump'&&P.airJumps>=3)&&unlocked('upg:'+u.id));restOpts=pool.sort(()=>Math.random()-.5).slice(0,3);const box=$('cards');box.innerHTML='';
- restOpts.forEach((u,i)=>{const d=document.createElement('button');d.className='card';d.innerHTML=`<div class="ci">${u.ic}</div><div class="cn">${u.n}</div><div class="cd">${u.d}</div><div class="ck">${i+1}</div>`;d.onclick=()=>chooseRest(i);box.appendChild(d)});
+function rollRest(){const pool=UPG.filter(u=>!(u.id==='jump'&&P.airJumps>=3)&&!(u.t&&P.upg.includes(u.id))&&unlocked('upg:'+u.id)).sort(()=>Math.random()-.5);const tal=pool.find(u=>u.t);restOpts=tal?[tal,...pool.filter(u=>u!==tal).slice(0,2)].sort(()=>Math.random()-.5):pool.slice(0,3);const box=$('cards');box.innerHTML='';
+ restOpts.forEach((u,i)=>{const d=document.createElement('button');d.className='card';d.innerHTML=`<div class="ci">${u.ic}</div><div class="cn">${u.n}${u.t?'<span class=tal>天赋</span>':''}</div><div class="cd">${u.d}</div><div class="ck">${i+1}</div>`;d.onclick=()=>chooseRest(i);box.appendChild(d)});
  }
 function chooseRest(i){if(G.state!=='rest')return;applyUpg(restOpts[i].id);SFX.pick();show('rest',false);P.bought=[];loadFloor(G.floor+1)}
 $('reroll').onclick=()=>{if(P.cells>=25){P.cells-=25;SFX.select();rollRest();rollShop();hudCells()}};
@@ -144,6 +148,9 @@ function drawPlayerSpr(x,y,flash){let n='player_idle',fi=Math.floor(P.anim*5),ha
  if(P.atk&&P.atk.phase==='ac'){const d=P.atk.def;ctx.globalAlpha=.75;if(d.thrust){pline(x+P.face*6,y-26,x+P.face*(d.rng+4),y-26,2,W.col);px(x+P.face*(d.rng+4)-1,y-27,3,3,'#fff')}else smear(x,y-26,Math.max(10,d.rng-6),d.rng+6,d.arc[0],lerp(d.arc[0],d.arc[1],Math.min(1,P.atk.t/d.ac)),P.face,W.col);ctx.globalAlpha=1}
  if(P.dive){ctx.globalAlpha=.5;pline(x,y-40,x,y-58,2,W.col);ctx.globalAlpha=1}
  return true}
+function drawRoom(cx,cy){const r=LV.room;if(!r)return;const mx=R((r.x0+r.x1)/2-cx),gy=R(r.g*TS-cy);if(mx<-200||mx>VW+200)return;
+ const by=gy-7*TS-20;px(mx-30,by,60,16,'#2a2030');px(mx-29,by+1,58,14,r.state===2?'#3a6a3a':r.state===1?'#8a2a2a':'#3a3458');ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.fillStyle='#14121a';ctx.fillText('评审会',mx+1,by+12);ctx.fillStyle='#fff6c0';ctx.fillText('评审会',mx,by+11);ctx.textAlign='left';
+ if(r.state===1){ctx.globalAlpha=.35+.2*Math.sin(T*8);for(const c of[r.tx,r.tx+r.len-1])px(c*TS-cx,2*TS-cy,TS,(r.g-2)*TS,'#ff3a3a');ctx.globalAlpha=1}}
 function render(){const th=LV.th,cx=R(cam.x+(Math.random()-.5)*shake*2),cy=R(cam.y+(Math.random()-.5)*shake*2);
  drawBackground(cx,cy,T);
  for(const d of LV.decor)if(d.k!=='window'&&d.k!=='lamp'&&d.k!=='sign')drawDecor(d,cx,cy,th,T);
@@ -151,7 +158,7 @@ function render(){const th=LV.th,cx=R(cam.x+(Math.random()-.5)*shake*2),cy=R(cam
  for(const s of LV.signs){const x=R(s.x-cx),y=R(s.y-cy);if(x>-100&&x<VW+100){}}
  for(const s of splats){ctx.globalAlpha=Math.min(1,s.life);px(s.x-cx,s.y-cy-1,s.w,2,s.col);ctx.globalAlpha=1}
  const near=drawPickups(cx,cy,T);
- drawTiles(cx,cy);
+ drawTiles(cx,cy);drawRoom(cx,cy);
  if(boss){ctx.globalAlpha=boss.alpha===undefined?1:clamp(boss.alpha,0,1);drawBoss(boss,cx,cy);ctx.globalAlpha=1;drawBossExtras(cx,cy)}
  for(const e of enemies)if(Math.abs(e.x-cx-VW/2)<VW)drawEnemy(e,cx,cy);
  ctx.font='bold 8px sans-serif';ctx.textAlign='center';for(const e of enemies)if(e.affix&&e.hp>0&&Math.abs(e.x-cx-VW/2)<VW/2+20){const a=EAFFIX[e.affix],x=R(e.x-cx),y=R(e.y-cy-e.h-10);ctx.fillStyle='#14121a';ctx.fillText(a.n,x+1,y+1);ctx.fillStyle=a.c;ctx.fillText(a.n,x,y)}ctx.textAlign='left';
@@ -174,7 +181,7 @@ function step(dt){T+=dt;
  shake=Math.max(0,shake-dt*20);flashRed=Math.max(0,flashRed-dt*2);
  for(let i=ghosts.length-1;i>=0;i--){ghosts[i].t-=dt;if(ghosts[i].t<=0)ghosts.splice(i,1)}
  if(G.state==='play'){G.time+=dt;G.floorT+=dt;
-  if(!P.dead)playerUpdate(dt);updEnemies(dt);bossUpdate(dt);updProjs(dt);updPickups(dt);updBoxes(dt);updRush(dt);
+  if(!P.dead)playerUpdate(dt);updEnemies(dt);bossUpdate(dt);updProjs(dt);updPickups(dt);updBoxes(dt);updRush(dt);updRoom(dt);
   if(!boss&&!G.bossDone&&P.x>LV.arenaX+4*TS){LV.gate.active=true;G.bossLock=true;spawnBoss(LV.th.boss)}
   if(boss){const b=$('bossfill');b.style.width=Math.max(0,boss.hp/boss.max*100)+'%';const s=$('bossstag');s.style.width=(boss.state==='stagger'?Math.max(0,1-boss.t/2.3):Math.min(1,boss.stag/boss.stagMax))*100+'%';s.classList.toggle('on',boss.state==='stagger'||boss.stagPend)}
   for(const s of splats)s.life-=dt*.15}
@@ -192,14 +199,14 @@ function renderEnd(){G.endT=(G.endT||0)+1/60;const t=G.endT,gy=Math.round(VH*.83
  ctx.save();ctx.translate(Math.round(VW*.16+((t*14)%(VW*.1))),gy);ctx.scale(2,2);const ph=t*9;if(useSpr&&sprReady('player_run')){sprFrame('player_run',Math.floor(t*10),0,0,1);ctx.restore();return}drawMan(0,0,1,{legA:Math.sin(ph)*.6,legB:-Math.sin(ph)*.6,kneeA:Math.max(0,-Math.cos(ph))*.8,kneeB:Math.max(0,Math.cos(ph))*.8,armF:-Math.sin(ph)*.5,armB:Math.sin(ph)*.5,elbF:.4,elbB:.4,bob:Math.abs(Math.sin(ph))>.7?-1:0},false);ctx.restore()}
 function uiTick(){if(G.state!=='play')return;const fl=P.flow||0,fe=$('flow');if(fl>=3){const tier=fl>=50?3:fl>=25?2:fl>=10?1:0;fe.innerHTML=`心流 ×${fl}${tier?` <i>+${tier*10}%</i>`:''}`;fe.className='t'+tier}else fe.innerHTML='';
  $('curse').textContent=P.curse>0?`加班合同：再击败 ${P.curse} 个，受到伤害 ×2`:'';
- const re=$('rush');if(G.rush){const left=G.rush.list.filter(e=>e.hp>0).length;re.textContent=`加急任务 ${Math.ceil(G.rush.t)}s · 剩 ${left}/${G.rush.total}`}else re.textContent='';
+ const re=$('rush');if(LV.room&&LV.room.state===1){const r=LV.room;re.textContent=r.delay>0&&r.wave>0?'评审会 · 第二轮马上开始':`评审会 · 第 ${Math.max(1,r.wave)}/2 轮 · 剩 ${r.list?r.list.filter(e=>e.hp>0).length:0}`}else if(G.rush){const left=G.rush.list.filter(e=>e.hp>0).length;re.textContent=`加急任务 ${Math.ceil(G.rush.t)}s · 剩 ${left}/${G.rush.total}`}else re.textContent='';
  const cd=secCd();$('hprally').style.width=((P.hp+P.rally)/P.maxHp*100)+'%';
  const td=$('tdoor'),left=LV.tlimit-G.floorT,tdk=LV.pick&&pickups.find(k=>k.k==='tdoor');if(tdk&&!tdk.used&&left>0&&!boss&&!G.bossDone){td.textContent='准时下班门 '+Math.floor(left/60)+':'+String(Math.floor(left%60)).padStart(2,'0');td.className=left<20?'warn':''}else td.textContent='';$('cd2').style.height=(Math.max(0,P.skillCd)/cd*100)+'%';const t=G.time;$('timer').textContent=Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0');
  if(Math.floor(T*10)!==uiTick.k){uiTick.k=Math.floor(T*10);$('hpfill').style.width=(P.hp/P.maxHp*100)+'%';$('hptxt').textContent=Math.ceil(P.hp)+' / '+P.maxHp}}
 // ===== 武器轮盘：按住 R / F 打开，J/L 或 ←/→ 选择，松开切换；打开时背景模糊、慢动作 =====
 function wheelOpen(slot){const bag=slot===1?P.primBag:P.secBag;G.wheel={slot,sel:slot===1?P.primIdx:P.secIdx};$('screen').classList.add('blur');wheelDraw();show('wheel',true);SFX.select()}
 function wheelClose(apply){const w=G.wheel;if(!w)return;G.wheel=null;$('screen').classList.remove('blur');show('wheel',false);
- const cur=w.slot===1?P.primIdx:P.secIdx;if(apply&&w.sel!==cur){equipFromBag(w.slot,w.sel);hud();SFX.pick();toast('换上了 '+(w.slot===1?wname(P.prim,P.primLv):wname(P.sec,P.secLv)),1000)}}
+ const cur=w.slot===1?P.primIdx:P.secIdx;if(apply&&w.sel!==cur){equipFromBag(w.slot,w.sel);hud();SFX.pick();if(P.swapCd<=0){P.swapCd=4;if(w.slot===1)P.swapBuff=3;if(hasU('hotkey')){P.skillCd=0;P.kfMark=null;if(w.slot===2)P.swapBuff=3}ringFx(P.x,P.y-18,'#7fd8ff')}toast('换上了 '+(w.slot===1?wname(P.prim,P.primLv):wname(P.sec,P.secLv)),1000)}}
 function wheelDraw(){const w=G.wheel,bag=w.slot===1?P.primBag:P.secBag,cur=w.slot===1?P.primIdx:P.secIdx;
  // 先把当前装备同步回背包，显示的等级、词缀才是最新的
  if(w.slot===1)P.primBag[P.primIdx]={w:P.prim,lv:P.primLv,aff:P.primAff};else P.secBag[P.secIdx]={w:P.sec,lv:P.secLv,aff:P.secAff};

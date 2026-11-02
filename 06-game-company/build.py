@@ -8,7 +8,7 @@
 import base64, hashlib, json, pathlib, sys
 
 here = pathlib.Path(__file__).parent
-order = ['engine', 'art', 'level', 'actors', 'bosses', 'game']
+order = ['version', 'engine', 'art', 'level', 'actors', 'bosses', 'game']
 embed = '--embed' in sys.argv
 
 # 文件名带 @2x 的是两倍精度素材，同名时优先用 @2x

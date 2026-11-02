@@ -61,8 +61,15 @@ let selLvl=SAVE.maxLvl;
 function setLvl(v){selLvl=clamp(v,0,SAVE.maxLvl);$('lvln').textContent=selLvl;$('lvld').textContent=LVLS.slice(1,selLvl+1).join(' ')||LVLS[0];$('lvlm').disabled=selLvl<=0;$('lvlp').disabled=selLvl>=SAVE.maxLvl;$('bstart').textContent=selLvl?'开始加班':'开始上班';
  $('meta').textContent=`图纸 ${SAVE.bp.length}/${BP_ALL.length} 已解锁 · 通关 ${SAVE.clears} 次`+(SAVE.maxLvl<5?` · 通关加班等级 ${SAVE.maxLvl} 可解锁下一级`:'')}
 $('lvlm').onclick=()=>{setLvl(selLvl-1);SFX.select()};$('lvlp').onclick=()=>{setLvl(selLvl+1);SFX.select()};setLvl(selLvl);
-$('bstart').onclick=()=>startGame(selLvl);$('bretry').onclick=retry;$('bagain').onclick=()=>{show('end',false);setLvl(SAVE.maxLvl);startGame(G.lvl<SAVE.maxLvl?G.lvl+1:G.lvl)};$('bresume').onclick=()=>togglePause(false);$('bmute').onclick=()=>{$('bmute').textContent=Snd.toggle()?'🔇':'🔊'};
-function togglePause(v){if(G.state!=='play'&&G.state!=='pause')return;if(v)$('pstat').innerHTML=pauseStats();G.state=v?'pause':'play';show('pause',v)}
+$('bstart').onclick=()=>startGame(selLvl);
+// 版本号与更新内容
+$('ver').textContent=VERSION;
+$('chglist').innerHTML=CHANGELOG.map(c=>`<h3>${c.v}<small>${c.date}</small></h3><ul>${c.items.map(i=>'<li>'+i+'</li>').join('')}</ul>`).join('');
+const seenVer=(()=>{try{return localStorage.getItem('magame06_ver')}catch(e){return null}})();
+if(seenVer!==VERSION)$('bchg').classList.add('new');
+function showChanges(v){show('chg',v);if(v){$('bchg').classList.remove('new');try{localStorage.setItem('magame06_ver',VERSION)}catch(e){}}}
+$('bchg').onclick=()=>{SFX.select();showChanges(true)};$('bchgx').onclick=()=>showChanges(false);$('bretry').onclick=retry;$('bagain').onclick=()=>{show('end',false);setLvl(SAVE.maxLvl);startGame(G.lvl<SAVE.maxLvl?G.lvl+1:G.lvl)};$('bresume').onclick=()=>togglePause(false);$('bmute').onclick=()=>{$('bmute').textContent=Snd.toggle()?'🔇':'🔊'};
+function togglePause(v){if(G.state!=='play'&&G.state!=='pause')return;if(v)$('pstat').innerHTML=pauseStats()+`<br><small style="opacity:.6">${VERSION}</small>`;G.state=v?'pause':'play';show('pause',v)}
 function pauseStats(){const r=[];r.push(`主武器 <b>${wname(P.prim,P.primLv)}</b> ${P.primAff.map(a=>'<em>'+AFF[a].n+'</em>').join(' ')}`);r.push(`副武器 <b>${wname(P.sec,P.secLv)}</b> ${P.secAff.map(a=>'<em>'+AFF[a].n+'</em>').join(' ')}`);
  r.push(`属性　建模 ${P.stat.line} · 地编 ${P.stat.color} · 体力 ${P.stat.body}`);if(P.upg.length)r.push('升级　'+P.upg.map(id=>{const u=UPG.find(q=>q.id===id);return u.ic+u.n}).join('　'));return r.join('<br>')}
 // ===== 渲染 =====
@@ -191,7 +198,8 @@ function frame(ts){requestAnimationFrame(frame);try{let dt=Math.min(.05,(ts-last
  if(G.state==='scroll'){if(pressed('opt1'))chooseScroll(0);else if(pressed('opt2'))chooseScroll(1)}
  if(G.state==='rest'){if(pressed('opt1'))chooseRest(0);else if(pressed('opt2'))chooseRest(1);else if(pressed('opt3'))chooseRest(2)}
  if(G.state==='dead'&&(pressed('confirm')||KP['Space'])&&$('dead').classList.contains('show'))retry();
- if(G.state==='title'){if(pressed('confirm'))startGame(selLvl);if(pressed('left'))setLvl(selLvl-1);if(pressed('right'))setLvl(selLvl+1)}
+ if(G.state==='title'&&$('chg').classList.contains('show')){if(pressed('confirm')||pressed('pause'))showChanges(false)}
+ else if(G.state==='title'){if(pressed('confirm'))startGame(selLvl);if(pressed('left'))setLvl(selLvl-1);if(pressed('right'))setLvl(selLvl+1)}
  // 调试用：Shift+F8 切换新旧美术（以前是 T，太容易误按）
  if(KP['F8']&&(K['ShiftLeft']||K['ShiftRight'])&&G.state==='play'){useSpr=!useSpr;toast(useSpr?'新美术':'旧美术（代码像素），再按 Shift+F8 切回',1500)}
  if(KP['KeyM'])$('bmute').textContent=Snd.toggle()?'🔇':'🔊';

@@ -57,6 +57,10 @@
 #restbp{color:#7fd8ff;font-weight:800;margin-top:.3em;min-height:1.2em}
 #curse{position:absolute;left:50%;top:4em;transform:translateX(-50%);font-weight:900;font-size:1em;color:#c87aff;text-shadow:0 .12em 0 #000}
 #artfail{position:fixed;left:8px;right:8px;top:8px;color:#fff;background:#a33;padding:6px 10px;font:13px system-ui,sans-serif;z-index:98;border-radius:4px}#artfail:empty{display:none}
+#verw{margin-top:.6em;font-size:1.15em;display:flex;align-items:center;gap:.6em;opacity:.85}#ver{font-weight:800;color:#ffd84a}
+#bchg{font-size:.9em;position:relative}#vnew{display:none;font-style:normal;background:#d8483a;color:#fff;font-size:.7em;padding:0 .3em;margin-left:.3em;border-radius:.2em}#bchg.new #vnew{display:inline}
+#chg{background:rgba(14,10,24,.82);z-index:5}.chgbox{max-width:34em;max-height:80%;overflow:auto;padding:1em 1.6em;text-align:left;pointer-events:auto}.chgbox h2{margin:.1em 0 .4em;font-size:2.2em}
+#chglist h3{margin:.8em 0 .2em;color:#ffd84a;font-size:1.15em}#chglist h3 small{color:#bbb;font-weight:400;margin-left:.6em;font-size:.75em}#chglist ul{margin:.2em 0;padding-left:1.3em;line-height:1.6;font-size:.95em}.chgbox .btn{font-size:1.2em;display:block;margin:.8em auto 0}
 #err{position:fixed;left:8px;right:8px;bottom:8px;color:#fff;background:#a33;padding:8px;font:12px monospace;white-space:pre-wrap;z-index:99;display:none;max-height:40vh;overflow:auto}
 </style></head><body>
 <canvas id="screen"></canvas>
@@ -72,11 +76,12 @@
  <button id="bmute">🔊</button>
  <div id="title" class="ov show"><h1 class="k">马楠<br>通关游戏公司</h1><div class="sub k">一个建模师兼地编的下班之路</div>
   <div class="ctl"><b>A D</b>移动　<b>空格</b>跳 / 二段跳　<b>S+空格</b>跳下平台<br><b>J</b>建模工具（主武器）　<b>K</b>地编工具（副武器）　<b>Shift</b>翻滚（无敌）<br><b>Q</b>吃便当回血　<b>E</b>拾取武器 / 开宝箱　<b>Esc</b>暂停<br>鼠标左键 = J，右键 = K</div>
-  <div id="lvlsel"><button class="lb" id="lvlm">◀</button><span>加班等级 <b id="lvln">0</b></span><button class="lb" id="lvlp">▶</button></div><div id="lvld" class="ctl"></div><div><button class="btn" id="bstart">开始上班</button></div><div id="meta" class="ctl"></div></div>
+  <div id="lvlsel"><button class="lb" id="lvlm">◀</button><span>加班等级 <b id="lvln">0</b></span><button class="lb" id="lvlp">▶</button></div><div id="lvld" class="ctl"></div><div><button class="btn" id="bstart">开始上班</button></div><div id="meta" class="ctl"></div><div id="verw"><span id="ver"></span><button id="bchg" class="lb">更新内容<i id="vnew">新</i></button></div></div>
  <div id="pause" class="ov"><h2 class="k" style="font-size:3.6em;margin:0">暂停</h2><div id="pstat"></div><div class="ctl" style="margin-top:1em"><b>A D</b>移动　<b>空格</b>跳　<b>J</b>攻击　<b>K</b>副武器　<b>Shift</b>翻滚　<b>Q</b>回血　<b>E</b>拾取</div><button class="btn" id="bresume">继续</button></div>
  <div id="dead" class="ov"><h2 class="k" style="font-size:4em;margin:0">需求太多，先躺一会儿……</h2><div id="dcause"></div><div style="font-size:1.2em;margin-top:.6em">重新挑战本层（保留武器和升级，灵感减半）</div><button class="btn" id="bretry">再来（Enter）</button></div>
  <div id="rest" class="ov"><h2 class="k" style="font-size:3.8em;margin:0">☕ 茶水间</h2><div style="font-size:1.2em;margin-top:.4em"><span id="resttxt">喝口水，生命和便当都补满了。</span>选一个升级（按 1 / 2 / 3）</div><div id="restbp"></div><div id="cards"></div><div class="shopt">🥤 自动售货机（用灵感购买，每样每层一次）</div><div id="shop"></div><button class="btn" id="reroll" style="font-size:1.1em">花 25 灵感换一批</button></div>
  <div id="scroll" class="ov"><h2 class="k" style="font-size:3.6em;margin:0">✦ 灵感卷轴</h2><div style="font-size:1.2em;margin-top:.4em">选一项属性提升（按 1 / 2）</div><div id="scards" style="display:flex;gap:1.6em;margin-top:1.2em"></div></div>
+ <div id="chg" class="ov"><div class="pane chgbox"><h2 class="k">更新内容</h2><div id="chglist"></div><button class="btn" id="bchgx">知道了</button></div></div>
  <div id="end" class="ov"><h2 class="k">下班了。</h2><div class="k" style="font-size:1.8em;color:#ffd84a">踏实做事，好好生活。</div><div id="estat"></div><button class="btn" id="bagain">再上一次班</button></div>
 </div>
 <pre id="err"></pre><div id="artfail"></div>
@@ -86,6 +91,28 @@ const ART_SRC={"boss_ad_dash": {"src": "art/boss/boss_ad_dash@2x.png?v=e2de7447"
 const ART_ANCHOR={"boss_ad_dash": [[128, 111], [130, 110], [129, 109], [138, 116]], "boss_ad_dash_wind": [[116, 127], [11, 67], [15, 39]], "boss_ad_die": [[123, 141], [124, 141], [122, 142], [119, 146], [128, 159], [124, 159], [136, 159], [124, 159]], "boss_ad_idle": [[116, 128], [115, 128], [116, 128], [114, 128]], "boss_ad_intro": [[114, 129], [114, 128], [116, 129], [117, 129], [123, 125], [119, 129]], "boss_ad_notes": [[105, 138], [79, 134], [77, 137], [80, 139]], "boss_ad_recover": [[117, 130], [110, 149]], "boss_ad_roar": [[115, 131], [116, 133], [118, 132], [119, 132], [118, 134], [117, 131]], "boss_ad_stagger": [[77, 151], [77, 158], [72, 159], [88, 159]], "boss_ad_stamp": [[136, 140], [126, 61], [115, 42], [92, 33], [131, 123], [126, 159], [126, 159], [132, 143]], "boss_ad_walk": [[117, 130], [117, 129], [120, 128], [119, 130], [120, 128], [118, 131]], "boss_pd_doc": [[30, 88], [25, 58], [105, 62], [91, 67]], "boss_pd_laser": [[106, 62], [104, 62], [100, 62], [99, 62], [99, 62], [99, 62]], "boss_ceo_pie": [[30, 56], [142, 74], [128, 76], [127, 96]], "boss_ceo_bigpie": [[124, 88], [139, 82], [145, 78], [151, 74], [128, 82], [122, 88]], "enemy_printer_idle": [[51, 40], [49, 40], [51, 40], [50, 40]], "enemy_printer_wind": [[53, 44], [52, 45], [51, 46]], "enemy_printer_attack": [[45, 48], [35, 48], [35, 48]], "enemy_printer_stun": [[50, 43], [45, 50]], "enemy_printer_die": [[51, 41], [50, 43], [49, 48], null, null], "player_atk_stylus": [[46, 56], [70, 36], [68, 16], [50, 56], [36, 16], [36, 34], [58, 68], [54, 60], [38, 50], [52, 38], [80, 36], [44, 46]], "player_dive": [[48, 24], [64, 18], [58, 60]], "player_dive_land": [[56, 78], [54, 82], [60, 56]], "player_parry": [[64, 34], [62, 34]], "player_spray": [[56, 30], [64, 32]], "player_atk_marker": [[30, 44], [72, 50], [74, 46], [72, 56], [38, 18], [42, 16], [70, 70], [64, 84]], "player_atk_ruler": [[62, 42], [75, 49], [84, 50], [62, 42], [59, 50], [80, 49], [86, 49], [59, 50], [60, 38], [82, 46], [90, 50], [59, 38]], "player_atk_knife": [[48, 52], [46, 42], [84, 40], [88, 42], [52, 48], [80, 32], [84, 20], [84, 28], [50, 50], [42, 24], [80, 66], [82, 64], [56, 46], [34, 42], [80, 46], [84, 42]], "player_atk_dash": [[18, 68], [24, 54], [84, 46], [36, 52], [62, 60]], "weapon_stylus": {"grip": [16, 14]}, "weapon_marker": {"grip": [10, 36]}, "weapon_ruler": {"grip": [18, 11]}, "weapon_knife": {"grip": [10, 22]}, "player_run": [[74, 46], [76, 46], [74, 46], [73, 45], [75, 43], [73, 49], [75, 43], [77, 45]], "player_idle": [[40, 61], [39, 61], [40, 60], [40, 62]], "player_jump": [[27, 68], [28, 65]], "player_fall": [[74, 38], [76, 52]], "player_land": [[73, 80], [67, 63]], "player_hurt": [[61, 38], [69, 55]]};
 const ART_FW={"enemy_printer": 40, "enemy_popup": 40, "enemy_bug": 24, "enemy_firewall": 28, "enemy_invite": 32, "enemy_kpi": 28, "boss_ad": 72, "boss_pd": 64, "boss_ceo": 80, "proj_paper": 16, "proj_doc": 16, "proj_kpi_bar": 24, "proj_laser": 32, "proj_x": 12, "proj_zone": 32, "fx_dive": 64, "fx_djump": 24, "fx_dust": 16, "pk_bp": 16, "pk_cchest": 24, "pk_chest": 24, "pk_door": 28, "pk_food": 16, "pk_rush": 16, "pk_scroll": 16, "pk_tdoor": 28, "pk_wireterm": 16};
 const ART_GAP={"boss_ceo_pound": [0.0, 0.0, 4.0, 11.0, 13.0, 6.0, 0.0, 0.0], "enemy_invite_attack": [6.0, 7.5, 7.5], "enemy_invite_die": [6.0, 5.5, 4.5, 2.5, 3.5], "enemy_invite_idle": [7.5, 7.5, 6.0, 7.5], "enemy_invite_stun": [4.0, 4.0], "enemy_invite_wind": [7.0, 6.0, 5.5], "enemy_popup_attack": [6.0, 6.0, 6.5], "enemy_popup_die": [2.5, 1.5, 0.5, 1.0, 0.5], "enemy_popup_idle": [1.0, 1.0, 0.5, 1.0], "enemy_popup_stun": [2.5, 0.5], "enemy_popup_wind": [4.5, 0.5, 3.5], "pk_bp": [1.0, 0.5, 1.0, 1.5], "pk_cchest": [2.0, 0.5], "pk_cell": [1.0, 1.0, 1.0, 1.0], "pk_chest": [1.5, 0.5], "pk_crate": [2.5, 2.5], "pk_door": [2.0, 0.5], "pk_food": [1.5], "pk_rush": [1.0, 1.0], "pk_scroll": [1.0, 0.5, 0.5, 1.0], "pk_tdoor": [0.5, 0.5, 0.5], "pk_wireterm": [4.5, 4.5], "decor_f1_artwall": [2.0, 0.0], "decor_f2_workstation": [0.5]};
+// ===== 版本号与更新内容 =====
+// 发新版本时：在 CHANGELOG 最前面加一条，build.py 重新生成 index.html，合并到 main 即可。
+// 标题画面会显示最新版本号；玩家没看过的新版本，“更新内容”按钮上会亮“新”字。
+const CHANGELOG=[
+ {v:'v1.1',date:'2026-11-02',items:[
+  '跑步、待机、跳跃时武器会跟着手一起动，跑步时武器斜扛在肩上',
+  '修正马楠站在平台上像悬空的问题',
+  '吊灯改成从天花板垂下，灯下有光',
+  '去掉地面上跟着镜头移动的怪影子',
+  '宝箱、纸箱、门、补模型终端等物件贴地摆放，不再悬空',
+  '宝箱、卷轴、加急任务单旁边不再生成图钉',
+  '主美和老板不会再卡在 Boss 房的高台上',
+  '图片加载失败会自动重试，不再突然变回旧画面',
+  '修正倒下画面血量显示为负数、结局画面人物是旧图、点过静音后按 Enter 误触发',
+  '新增标题画面的版本号和更新内容']},
+ {v:'v1.0',date:'2026-11-02',items:[
+  '动作：攀边、翻滚接冲刺斩、完美闪避、空中连段',
+  '战斗：敌人韧性与破防、Boss 破绽槽、转阶段怒吼和新连招',
+  '重玩：精英词缀、加班合同、图纸解锁、加班等级 0–5',
+  '美术：马楠、武器、敌人、三个 Boss、拾取物、特效、三层场景全部换成正式像素素材']}];
+const VERSION=CHANGELOG[0].v;
+
 'use strict';
 // ===== 引擎 =====
 const VW=480,VH=270,TS=16;
@@ -977,8 +1004,15 @@ let selLvl=SAVE.maxLvl;
 function setLvl(v){selLvl=clamp(v,0,SAVE.maxLvl);$('lvln').textContent=selLvl;$('lvld').textContent=LVLS.slice(1,selLvl+1).join(' ')||LVLS[0];$('lvlm').disabled=selLvl<=0;$('lvlp').disabled=selLvl>=SAVE.maxLvl;$('bstart').textContent=selLvl?'开始加班':'开始上班';
  $('meta').textContent=`图纸 ${SAVE.bp.length}/${BP_ALL.length} 已解锁 · 通关 ${SAVE.clears} 次`+(SAVE.maxLvl<5?` · 通关加班等级 ${SAVE.maxLvl} 可解锁下一级`:'')}
 $('lvlm').onclick=()=>{setLvl(selLvl-1);SFX.select()};$('lvlp').onclick=()=>{setLvl(selLvl+1);SFX.select()};setLvl(selLvl);
-$('bstart').onclick=()=>startGame(selLvl);$('bretry').onclick=retry;$('bagain').onclick=()=>{show('end',false);setLvl(SAVE.maxLvl);startGame(G.lvl<SAVE.maxLvl?G.lvl+1:G.lvl)};$('bresume').onclick=()=>togglePause(false);$('bmute').onclick=()=>{$('bmute').textContent=Snd.toggle()?'🔇':'🔊'};
-function togglePause(v){if(G.state!=='play'&&G.state!=='pause')return;if(v)$('pstat').innerHTML=pauseStats();G.state=v?'pause':'play';show('pause',v)}
+$('bstart').onclick=()=>startGame(selLvl);
+// 版本号与更新内容
+$('ver').textContent=VERSION;
+$('chglist').innerHTML=CHANGELOG.map(c=>`<h3>${c.v}<small>${c.date}</small></h3><ul>${c.items.map(i=>'<li>'+i+'</li>').join('')}</ul>`).join('');
+const seenVer=(()=>{try{return localStorage.getItem('magame06_ver')}catch(e){return null}})();
+if(seenVer!==VERSION)$('bchg').classList.add('new');
+function showChanges(v){show('chg',v);if(v){$('bchg').classList.remove('new');try{localStorage.setItem('magame06_ver',VERSION)}catch(e){}}}
+$('bchg').onclick=()=>{SFX.select();showChanges(true)};$('bchgx').onclick=()=>showChanges(false);$('bretry').onclick=retry;$('bagain').onclick=()=>{show('end',false);setLvl(SAVE.maxLvl);startGame(G.lvl<SAVE.maxLvl?G.lvl+1:G.lvl)};$('bresume').onclick=()=>togglePause(false);$('bmute').onclick=()=>{$('bmute').textContent=Snd.toggle()?'🔇':'🔊'};
+function togglePause(v){if(G.state!=='play'&&G.state!=='pause')return;if(v)$('pstat').innerHTML=pauseStats()+`<br><small style="opacity:.6">${VERSION}</small>`;G.state=v?'pause':'play';show('pause',v)}
 function pauseStats(){const r=[];r.push(`主武器 <b>${wname(P.prim,P.primLv)}</b> ${P.primAff.map(a=>'<em>'+AFF[a].n+'</em>').join(' ')}`);r.push(`副武器 <b>${wname(P.sec,P.secLv)}</b> ${P.secAff.map(a=>'<em>'+AFF[a].n+'</em>').join(' ')}`);
  r.push(`属性　建模 ${P.stat.line} · 地编 ${P.stat.color} · 体力 ${P.stat.body}`);if(P.upg.length)r.push('升级　'+P.upg.map(id=>{const u=UPG.find(q=>q.id===id);return u.ic+u.n}).join('　'));return r.join('<br>')}
 // ===== 渲染 =====
@@ -1107,7 +1141,8 @@ function frame(ts){requestAnimationFrame(frame);try{let dt=Math.min(.05,(ts-last
  if(G.state==='scroll'){if(pressed('opt1'))chooseScroll(0);else if(pressed('opt2'))chooseScroll(1)}
  if(G.state==='rest'){if(pressed('opt1'))chooseRest(0);else if(pressed('opt2'))chooseRest(1);else if(pressed('opt3'))chooseRest(2)}
  if(G.state==='dead'&&(pressed('confirm')||KP['Space'])&&$('dead').classList.contains('show'))retry();
- if(G.state==='title'){if(pressed('confirm'))startGame(selLvl);if(pressed('left'))setLvl(selLvl-1);if(pressed('right'))setLvl(selLvl+1)}
+ if(G.state==='title'&&$('chg').classList.contains('show')){if(pressed('confirm')||pressed('pause'))showChanges(false)}
+ else if(G.state==='title'){if(pressed('confirm'))startGame(selLvl);if(pressed('left'))setLvl(selLvl-1);if(pressed('right'))setLvl(selLvl+1)}
  // 调试用：Shift+F8 切换新旧美术（以前是 T，太容易误按）
  if(KP['F8']&&(K['ShiftLeft']||K['ShiftRight'])&&G.state==='play'){useSpr=!useSpr;toast(useSpr?'新美术':'旧美术（代码像素），再按 Shift+F8 切回',1500)}
  if(KP['KeyM'])$('bmute').textContent=Snd.toggle()?'🔇':'🔊';

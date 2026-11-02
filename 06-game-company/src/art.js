@@ -173,7 +173,7 @@ function drawEnemy(e,cx,cy){if(e.elite){ctx.globalAlpha=.35+.2*Math.sin(e.anim*8
 // ===== Boss =====
 function drawBoss(b,cx,cy){if(drawBossSpr(b,cx,cy))return;const x=R(b.x-cx),y=R(b.y-cy),f=b.face,t=b.anim,fl=b.flash>0;const c=(v)=>fl?'#fff':v;
  ctx.save();ctx.translate(x,y);ctx.scale(f,1);
- if(b.kind==='ljy')drawLJY(b,t,c);
+ if(b.kind==='ljy'){ctx.scale(1.2,1.2);drawLJY(b,t,c)}
  else if(b.kind==='ad'){ // 主美：贝雷帽、围巾、长风衣、大红笔
   const bob=Math.sin(t*4)*1;px(-6,-4,4,4,c('#2a2230'));px(2,-4,4,4,c('#2a2230'));px(-8,-26+bob,16,22,c('#5a3a6a'));px(-8,-26+bob,16,2,c('#6a4a7a'));px(-1,-25+bob,2,20,c('#4a2a5a'));
   px(-7,-29+bob,14,4,c('#e8b84a'));px(4,-27+bob,4,8,c('#e8b84a'));

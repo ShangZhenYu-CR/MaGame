@@ -24,7 +24,7 @@ function genLevel(floor){
   // 高台阶补平台：前后落差>=4时放一块过渡平台
   for(let i=1;i<segs.length;i++){const a=segs[i-1],b=segs[i];if(a.g-b.g>=4){for(let k=-3;k<0;k++)set(b.x+k,b.g+2,2)}}
   // 敌人
-  const n=irnd(3,4)+(floor>1?1:0);
+  const n=irnd(3,4)+(floor>1?1:0)+(G.lvl>=4?1:0);
   for(let k=0;k<n;k++){const s=segs[irnd(c===0?1:0,segs.length-1)];const type=pick_(th.enemies,k);const ex=(s.x+irnd(1,Math.max(1,s.len-2)))*TS;
    const fly=type==='sticky'||type==='popup';spawns.push({type,x:ex,y:fly?(s.g-irnd(5,8))*TS:s.g*TS})}
   // 图钉陷阱（地面上方一格，宽 2-3 格，避开地图块开头）
@@ -36,6 +36,8 @@ function genLevel(floor){
   if((c===2||c===3)&&!secretDone){const cand=segs.filter(s=>s.len>=6&&s.g>=13).sort((a,b)=>b.len-a.len);
    for(const best of cand){const bx=best.x,g0=best.g;let ok=true;for(let y=g0-11;y<g0;y++)for(let x=bx;x<bx+6;x++)if(T[y*w+x]===1)ok=false;
     if(ok){for(let y=g0-11;y<g0;y++)for(let x=bx-1;x<bx+7;x++)if(T[y*w+x]===2||T[y*w+x]===3)set(x,y,0);for(let i=pks.length-1;i>=0;i--){const k=pks[i];if(k.x>=(bx-1)*TS&&k.x<=(bx+7)*TS&&k.y<g0*TS-2)pks.splice(i,1)}for(let i=0;i<3;i++)set(bx+i,g0-4,5);for(let i=0;i<3;i++)set(bx+3+i,g0-7,5);for(let i=0;i<3;i++)set(bx+i,g0-10,5);pks.push({k:'wireterm',x:(bx+4)*TS+8,y:g0*TS});pks.push({k:'chest',x:(bx+1)*TS+8,y:(g0-10)*TS,bonus:true,secret:true});secretDone=true;break}}}
+  // 加班合同（诅咒宝箱）：第 3 块，一半概率
+  if(c===2&&Math.random()<.5){const ss=segs.filter(s=>s.len>=4);if(ss.length){const s=pick(ss),cx=s.x+Math.floor(s.len/2);if(T[(s.g-1)*w+cx]===0)pks.push({k:'cchest',x:cx*TS+8,y:s.g*TS})}}
   // 加急任务：第 2 块
   if(c===1){const s=segs[irnd(0,segs.length-1)];pks.push({k:'rush',x:(s.x+Math.floor(s.len/2))*TS+8,y:s.g*TS})}
   // 卷轴：第 2、4 块各一个
@@ -48,7 +50,8 @@ function genLevel(floor){
    decor.push({k,x:dx,y:(k==='frame'||k==='poster'||k==='board'?s.g*TS-hgt-30:s.g*TS-hgt),s:irnd(0,99)})}}
   x+=CW}
  // 宝箱（精英掉落武器 + 一个宝箱）
- const cs=spawns.filter(s=>s.type!=='sticky'&&s.type!=='popup');if(cs.length)pick_(cs,0).elite=true;
+ // 精英：楼层越高越多，加班等级 2 以上再多两只
+ const cs=spawns.filter(s=>s.type!=='sticky'&&s.type!=='popup').sort(()=>Math.random()-.5);for(let i=0;i<Math.min(cs.length,floor+(G.lvl>=2?2:0));i++)cs[i].elite=true;
  {const cx=startW+CW+irnd(10,30);let gy=0;for(let y=2;y<HT;y++)if(T[y*w+cx]===1){gy=y;break}pks.push({k:'chest',x:cx*TS+8,y:gy*TS})}
  // 过渡到 Boss 房：平地
  const ax=x;g=19;for(let i=0;i<arenaW;i++)for(let y=2;y<HT;y++)set(ax+i,y,y>=g?1:0);

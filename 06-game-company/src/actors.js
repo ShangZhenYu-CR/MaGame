@@ -27,7 +27,7 @@ function applyStatus(e,k){if(e.hp<=0)return;if(k==='bleed'){e.bleedT=3;e.bleedDp
 function tickStatus(e,dt){if(e.slowT>0)e.slowT-=dt;if(e.bleedT>0){e.bleedT-=dt;e.bleedAcc=(e.bleedAcc||0)+dt;if(e.bleedAcc>=.5){e.bleedAcc-=.5;damage(e,e.bleedDps*.5,0,0,false,true,'dot')}if(e.bleedT<=0)e.bleedDps=0}}
 // ===== 玩家 =====
 const P={};
-function resetPlayer(keep){Object.assign(P,{x:6*TS,y:19*TS,w:10,h:26,vx:0,vy:0,face:1,onGround:true,drop:false,dropT:0,coyote:0,buffer:0,jumps:0,rollT:0,rollCd:0,inv:0,hurtT:0,cut:false,
+function resetPlayer(keep){Object.assign(P,{x:6*TS,y:19*TS,w:10,h:34,vx:0,vy:0,face:1,onGround:true,drop:false,dropT:0,coyote:0,buffer:0,jumps:0,rollT:0,rollCd:0,inv:0,hurtT:0,cut:false,
  atk:null,combo:0,comboT:0,skillCd:0,parryT:0,sprayT:0,healT:0,anim:0,blinkT:2,stepT:0,dead:false,landT:0,rally:0,rallyT:0,rootT:0,dive:false,lastHit:'',rollBuf:0,rollEnd:-9,airStall:false,mantle:null,pdT:0,pdUsed:false,atkQueued:0});
  if(!keep)Object.assign(P,{hp:100,maxHp:100,flasks:2,maxFlasks:2,prim:'stylus',sec:'palette',primLv:0,primAff:[],secLv:0,secAff:[],stat:{line:0,color:0,body:0},cells:0,dmgMul:1,spdMul:1,rollMul:1,cdMul:1,airJumps:1,steal:0,critMul:1.5,upg:[]})}
 const RUN=150,ACC=1800,AACC=1100,GRAV=1350,JV=420,DJV=410,MAXF=520,ROLLV=290,ROLLT=.3;
@@ -98,7 +98,7 @@ function playerUpdate(dt){
 function tryMantle(ix){if(P.vy<-260||P.atk||P.dive||P.rollT>0||P.healT>0||P.hurtT>0)return false;
  const fx=Math.floor((P.x+ix*(P.w/2+2))/TS),cx=Math.floor(P.x/TS);
  for(let ty=Math.floor((P.y-22)/TS);ty<=Math.floor((P.y-1)/TS);ty++){const ly=ty*TS,d=P.y-ly;if(d<1||d>22)continue;
-  if(isSolid(fx,ty)&&!isSolid(fx,ty-1)&&!isSolid(fx,ty-2)&&!isSolid(cx,ty-1)&&!isSolid(cx,ty-2)){
+  if(isSolid(fx,ty)&&!isSolid(fx,ty-1)&&!isSolid(fx,ty-2)&&!isSolid(fx,ty-3)&&!isSolid(cx,ty-1)&&!isSolid(cx,ty-2)&&!isSolid(cx,ty-3)){
    P.mantle={x0:P.x,y0:P.y,x1:ix>0?fx*TS+P.w/2+1:(fx+1)*TS-P.w/2-1,y1:ly,t:0};P.face=ix;P.vx=P.vy=0;P.atkQueued=0;SFX.land();burst(ix>0?fx*TS:(fx+1)*TS,ly,5,'#cfc6b8',50,.25,2,80);return true}}
  return false}
 // 完美闪避：翻滚刚开始时躲过攻击，短暂子弹时间，下一刀必暴击

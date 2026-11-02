@@ -69,18 +69,10 @@ function poseOf(){const p={},a=P.anim,spd=Math.abs(P.vx)/RUN;p.blink=P.blinkT<0;
 function drawPlayer(cx,cy){
  for(let i=ghosts.length-1;i>=0;i--){const g=ghosts[i];ctx.globalAlpha=g.t*2;ctx.save();ctx.translate(R(g.x-cx),R(g.y-cy-8));ctx.rotate(g.roll*g.face*22);px(-6,-6,12,12,'#7fd8ff');ctx.restore();ctx.globalAlpha=1}
  const x=P.x-cx,y=P.y-cy,flash=P.inv>0&&P.hurtT<=0&&P.rollT<=0&&Math.floor(P.inv*16)%2===0;
- if(P.rollT>0){ctx.save();ctx.translate(R(x),R(y-8));ctx.rotate(-(ROLLT-P.rollT)/ROLLT*Math.PI*2*P.face);drawMan(0,8,P.face,{crouch:6,legA:1.2,kneeA:2,legB:1,kneeB:2,armF:1.8,elbF:1.4,armB:1.4,lean:2,headY:3},false);ctx.restore();return}
- if(P.djT>0&&!P.atk&&P.hurtT<=0){ctx.save();ctx.translate(R(x),R(y-12));ctx.rotate((1-P.djT/.3)*Math.PI*2*P.face);drawMan(0,12,P.face,{crouch:4,legA:1,kneeA:1.8,legB:.8,kneeB:1.8,armF:1.6,elbF:1.2,armB:1.2,lean:1,headY:2},false);ctx.restore();return}
+ if(P.rollT>0&&!(useSpr&&sprReady('player_roll'))){ctx.save();ctx.translate(R(x),R(y-8));ctx.rotate(-(ROLLT-P.rollT)/ROLLT*Math.PI*2*P.face);drawMan(0,8,P.face,{crouch:6,legA:1.2,kneeA:2,legB:1,kneeB:2,armF:1.8,elbF:1.4,armB:1.4,lean:2,headY:3},false);ctx.restore();return}
+ if(P.djT>0&&!P.atk&&P.hurtT<=0&&!(useSpr&&sprReady('player_roll'))){ctx.save();ctx.translate(R(x),R(y-12));ctx.rotate((1-P.djT/.3)*Math.PI*2*P.face);drawMan(0,12,P.face,{crouch:4,legA:1,kneeA:1.8,legB:.8,kneeB:1.8,armF:1.6,elbF:1.2,armB:1.2,lean:1,headY:2},false);ctx.restore();return}
  // 新美术：有素材就用序列帧（T 键切换新旧）
- if(useSpr&&sprReady('player_idle')&&sprReady('player_run')){let n='player_idle',fi=Math.floor(P.anim*5);
-  if(P.atk&&sprReady('player_atk_stylus_1')){const a=P.atk;n='player_atk_stylus_1';fi=a.phase==='su'?0:a.phase==='ac'?(a.t<a.def.ac/2?1:2):3}
-  else if(!P.onGround&&!P.healT){n='player_run';fi=P.vy<0?1:5}
-  else if(Math.abs(P.vx)>20&&P.healT<=0){n='player_run';P.runD=(P.runD||0)+Math.abs(P.vx)/60;fi=Math.floor(P.runD*.21)}
-  if(LV.floor!==1){ctx.globalAlpha=.3;for(const[ox,oy]of[[-1,0],[1,0],[0,-1],[0,1]])sprFrame(n,fi,x+ox,y+oy,P.face);ctx.globalAlpha=1}
-  if(flash)ctx.globalAlpha=.5;sprFrame(n,fi,x,y,P.face);ctx.globalAlpha=1;
-  if(P.atk&&P.atk.phase==='ac'){const d=P.atk.def,W=WEAPONS[P.prim];ctx.globalAlpha=.75;if(d.thrust){pline(x+P.face*6,y-22,x+P.face*(d.rng+4),y-22,2,W.col);px(x+P.face*(d.rng+4)-1,y-23,3,3,'#fff')}else smear(x,y-24,10,d.rng+4,d.arc[0],lerp(d.arc[0],d.arc[1],Math.min(1,P.atk.t/d.ac)),P.face,W.col);ctx.globalAlpha=1}
-  if(P.dive){ctx.globalAlpha=.5;pline(x,y-40,x,y-58,2,WEAPONS[P.prim].col);ctx.globalAlpha=1}
-  return}
+ if(useSpr&&sprReady('player_idle')&&drawPlayerSpr(x,y,flash))return
  const pose=poseOf();if(LV.floor!==1){ctx.globalAlpha=.32;for(const[ox,oy]of[[-1,0],[1,0],[0,-1],[0,1]])drawMan(x+ox,y+oy,P.face,pose,true);ctx.globalAlpha=1}
  if(flash){ctx.globalAlpha=.5}
  const h=drawMan(x,y,P.face,pose,false);ctx.globalAlpha=1;
@@ -93,6 +85,32 @@ function drawPlayer(cx,cy){
  else if(P.sprayT>0){drawIcon('airbrush',h.hx+P.face*3,h.hy)}
  else if(P.parryT>0){px(h.hx-3,h.hy-8,7,12,'#f2a0b0');px(h.hx-3,h.hy-8,7,4,'#3a6ad8')}
  else drawWeaponAt(kind,h.hx,h.hy,.5,P.face)}
+// 雕刻笔连击 12 帧里前手的位置（相对脚底中心，朝右）
+const HAND_ATK=[[9,-28],[12,-21],[5,-27],[7,-27],[-4,-41],[11,-17],[7,-20],[4,-17],[6,-25],[8,-29],[19,-29],[6,-29]];
+// 每把武器的连击段 → 素材里第几刀（0 上撩、1 下劈、2 横扫）
+const ATK_SEG={stylus:[0,1,2],marker:[2,1],ruler:[0,0,2],knife:[0,1,0,2]};
+function drawPlayerSpr(x,y,flash){let n='player_idle',fi=Math.floor(P.anim*5),hand=[5,-20],wang=.5;const W=WEAPONS[P.prim];
+ const has=k=>sprReady(k);
+ if(P.rollT>0&&has('player_roll')){n='player_roll';fi=Math.min(5,Math.floor((ROLLT-P.rollT)/ROLLT*6));hand=null}
+ else if(P.djT>0&&!P.atk&&P.hurtT<=0&&has('player_roll')){n='player_roll';fi=1+Math.min(3,Math.floor((1-P.djT/.3)*4));hand=null}
+ else if(P.hurtT>0&&has('player_hurt')){n='player_hurt';fi=P.hurtT>.17?0:1}
+ else if(P.atk&&has('player_atk_stylus')){const a=P.atk,d=a.def,segs=ATK_SEG[P.prim]||[0,1,2],seg=d.dash?2:segs[Math.min(a.idx,segs.length-1)];
+  const k=a.phase==='su'?0:a.phase==='ac'?(a.t<d.ac/2?1:2):3;fi=seg*4+k;n='player_atk_stylus';hand=HAND_ATK[fi];
+  wang=d.thrust?1.57:a.phase==='su'?d.arc[0]:a.phase==='ac'?lerp(d.arc[0],d.arc[1],Math.min(1,a.t/d.ac)):d.arc[1]}
+ else if(P.dive){n=has('player_fall')?'player_fall':'player_run';fi=1;hand=[4,-14];wang=0}
+ else if(!P.onGround&&P.vy<0&&has('player_jump')){n='player_jump';fi=P.anim-(P.jumpAt||0)<.07?0:1}
+ else if(!P.onGround&&has('player_fall')){n='player_fall';fi=groundBelow(P.x,P.y)-P.y<26?1:0;hand=[14,-28];wang=1.6}
+ else if(P.landT>0&&has('player_land')){n='player_land';fi=P.landT>.06?0:1;hand=[8,-14]}
+ else if(P.onGround&&Math.abs(P.vx)>20&&P.healT<=0){n='player_run';P.runD=(P.runD||0)+Math.abs(P.vx)/60;fi=Math.floor(P.runD*.21);hand=[10,-24];wang=1.2}
+ if(LV.floor!==1){ctx.globalAlpha=.3;for(const[ox,oy]of[[-1,0],[1,0],[0,-1],[0,1]])sprFrame(n,fi,x+ox,y+oy,P.face);ctx.globalAlpha=1}
+ if(flash)ctx.globalAlpha=.5;
+ const hx=hand?x+hand[0]*P.face:0,hy=hand?y+hand[1]:0;
+ // 武器：雕刻笔有素材，其他武器暂用代码画
+ const drawW=()=>{if(!hand)return;if(P.prim==='stylus'&&has('weapon_stylus')){ctx.save();ctx.translate(R(hx),R(hy));ctx.scale(P.face,1);ctx.rotate(-(wang-2.36));ctx.drawImage(SPR.weapon_stylus,-8,-7);ctx.restore()}else drawWeaponAt(P.prim,hx,hy,wang,P.face)};
+ sprFrame(n,fi,x,y,P.face);drawW();ctx.globalAlpha=1;
+ if(P.atk&&P.atk.phase==='ac'){const d=P.atk.def;ctx.globalAlpha=.75;if(d.thrust){pline(x+P.face*6,y-26,x+P.face*(d.rng+4),y-26,2,W.col);px(x+P.face*(d.rng+4)-1,y-27,3,3,'#fff')}else smear(x,y-26,Math.max(10,d.rng-6),d.rng+6,d.arc[0],lerp(d.arc[0],d.arc[1],Math.min(1,P.atk.t/d.ac)),P.face,W.col);ctx.globalAlpha=1}
+ if(P.dive){ctx.globalAlpha=.5;pline(x,y-40,x,y-58,2,W.col);ctx.globalAlpha=1}
+ return true}
 function render(){const th=LV.th,cx=R(cam.x+(Math.random()-.5)*shake*2),cy=R(cam.y+(Math.random()-.5)*shake*2);
  drawBackground(cx,cy,T);
  for(const d of LV.decor)if(d.k!=='window'&&d.k!=='lamp'&&d.k!=='sign')drawDecor(d,cx,cy,th,T);

@@ -60,7 +60,7 @@ $('reroll').onclick=()=>{if(P.cells>=25){P.cells-=25;SFX.select();rollRest();rol
 // 结局
 function openEnd(){Snd.play('end');show('hud',false);const tru=G.floor===4;$('etitle').textContent=tru?'真 · 下班了。':'下班了。';$('esub').textContent=tru?'连隐藏大佬都认可了你。明早七点，健身房见。':'踏实做事，好好生活。';const t=G.time;const bpMsg=commitBP();SAVE.clears++;let lvMsg='';if(G.lvl>=SAVE.maxLvl&&G.lvl<5){SAVE.maxLvl=G.lvl+1;lvMsg='解锁了加班等级 '+SAVE.maxLvl}saveGame();
  $('estat').innerHTML=(G.lvl?'<b style="color:#ff7a6a">加班等级 '+G.lvl+' 通关</b><br>':'')+(lvMsg?'<b style="color:#ffd84a">'+lvMsg+'</b><br>':'')+(bpMsg?'<b style="color:#7fd8ff">'+bpMsg+'</b><br>':'')+(!tru&&!SAVE.ljy?'<span style="opacity:.7">天台的灯还亮着……（打败老板后，Boss 房里的货梯能上天台）</span><br>':'')+`用时 <b>${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}</b>　击败 <b>${G.kills}</b>　倒下 <b>${G.deaths}</b> 次<br>灵感 <b>${P.cells}</b>　升级 ${P.upg.map(id=>UPG.find(u=>u.id===id).ic).join(' ')||'无'}`;setTimeout(()=>show('end',true),1800);G.endT=0}
-function startGame(lvl){G.extra=false;Snd.unlock();G.lvl=clamp(lvl|0,0,SAVE.maxLvl);G.hard=G.lvl>=1;show('title',false);show('hud',true);resetPlayer(false);if(G.lvl>=3)P.maxFlasks=P.flasks=1;P.bought=[];P.bps=[];P.curse=0;G.time=0;G.kills=0;G.deaths=0;$('mode').textContent=G.lvl?'加班等级 '+G.lvl:'';loadFloor(1)}
+function startGame(lvl){G.extra=false;G.tut=null;show('tut',false);Snd.unlock();G.lvl=clamp(lvl|0,0,SAVE.maxLvl);G.hard=G.lvl>=1;show('title',false);show('hud',true);resetPlayer(false);if(G.lvl>=3)P.maxFlasks=P.flasks=1;P.bought=[];P.bps=[];P.curse=0;G.time=0;G.kills=0;G.deaths=0;$('mode').textContent=G.lvl?'加班等级 '+G.lvl:'';loadFloor(1)}
 let selLvl=SAVE.maxLvl;
 function setLvl(v){selLvl=clamp(v,0,SAVE.maxLvl);$('lvln').textContent=selLvl;$('lvld').textContent=LVLS.slice(1,selLvl+1).join(' ')||LVLS[0];$('lvlm').disabled=selLvl<=0;$('lvlp').disabled=selLvl>=SAVE.maxLvl;$('bstart').textContent=selLvl?'开始加班':'开始上班';
  $('meta').textContent=`图纸 ${SAVE.bp.length}/${BP_ALL.length} 已解锁 · 通关 ${SAVE.clears} 次`+(SAVE.ljy?` · ★ 击败刘敬阳 ${SAVE.ljy} 次`:'')+(SAVE.maxLvl<5?` · 通关加班等级 ${SAVE.maxLvl} 可解锁下一级`:'')}
@@ -161,7 +161,7 @@ function step(dt){T+=dt;
  shake=Math.max(0,shake-dt*20);flashRed=Math.max(0,flashRed-dt*2);
  for(let i=ghosts.length-1;i>=0;i--){ghosts[i].t-=dt;if(ghosts[i].t<=0)ghosts.splice(i,1)}
  if(G.state==='play'){G.time+=dt;G.floorT+=dt;
-  if(!P.dead)playerUpdate(dt);updEnemies(dt);bossUpdate(dt);updProjs(dt);updPickups(dt);updBoxes(dt);updRush(dt);updRoom(dt);
+  if(!P.dead)playerUpdate(dt);updEnemies(dt);bossUpdate(dt);updProjs(dt);updPickups(dt);updBoxes(dt);updRush(dt);updRoom(dt);updTutorial(dt);
   if(!boss&&!G.bossDone&&P.x>LV.arenaX+4*TS){LV.gate.active=true;G.bossLock=true;spawnBoss(LV.th.boss)}
   if(boss){const b=$('bossfill');b.style.width=Math.max(0,boss.hp/boss.max*100)+'%';const s=$('bossstag');s.style.width=(boss.state==='stagger'?Math.max(0,1-boss.t/2.3):Math.min(1,boss.stag/boss.stagMax))*100+'%';s.classList.toggle('on',boss.state==='stagger'||boss.stagPend)}
   for(const s of splats)s.life-=dt*.15}
@@ -186,7 +186,7 @@ function uiTick(){if(G.state!=='play')return;const fl=P.flow||0,fe=$('flow');if(
 // ===== 武器轮盘：按住 R / F 打开，J/L 或 ←/→ 选择，松开切换；打开时背景模糊、慢动作 =====
 function wheelOpen(slot){const bag=slot===1?P.primBag:P.secBag;G.wheel={slot,sel:slot===1?P.primIdx:P.secIdx};$('screen').classList.add('blur');wheelDraw();show('wheel',true);SFX.select()}
 function wheelClose(apply){const w=G.wheel;if(!w)return;G.wheel=null;$('screen').classList.remove('blur');show('wheel',false);
- const cur=w.slot===1?P.primIdx:P.secIdx;if(apply&&w.sel!==cur){equipFromBag(w.slot,w.sel);hud();SFX.pick();if(P.swapCd<=0){P.swapCd=4;if(w.slot===1)P.swapBuff=3;if(hasU('hotkey')){P.skillCd=0;P.kfMark=null;if(w.slot===2)P.swapBuff=3}ringFx(P.x,P.y-18,'#7fd8ff')}toast('换上了 '+(w.slot===1?wname(P.prim,P.primLv):wname(P.sec,P.secLv)),1000)}}
+ const cur=w.slot===1?P.primIdx:P.secIdx;if(apply&&w.sel!==cur){if(G.tut)G.tut.swapped=true;equipFromBag(w.slot,w.sel);hud();SFX.pick();if(P.swapCd<=0){P.swapCd=4;if(w.slot===1)P.swapBuff=3;if(hasU('hotkey')){P.skillCd=0;P.kfMark=null;if(w.slot===2)P.swapBuff=3}ringFx(P.x,P.y-18,'#7fd8ff')}toast('换上了 '+(w.slot===1?wname(P.prim,P.primLv):wname(P.sec,P.secLv)),1000)}}
 function wheelDraw(){const w=G.wheel,bag=w.slot===1?P.primBag:P.secBag,cur=w.slot===1?P.primIdx:P.secIdx;
  // 先把当前装备同步回背包，显示的等级、词缀才是最新的
  if(w.slot===1)P.primBag[P.primIdx]={w:P.prim,lv:P.primLv,aff:P.primAff};else P.secBag[P.secIdx]={w:P.sec,lv:P.secLv,aff:P.secAff};
@@ -224,7 +224,7 @@ function frame(ts){requestAnimationFrame(frame);try{let dt=Math.min(.05,(ts-last
  uiTick();present();clearPressed()}catch(e){__err(e)}}
 requestAnimationFrame(frame);
 // ===== 回到主页 =====
-function goHome(){for(const id of['end','dead','pause','rest','scroll','hud','wheel','prompt'])show(id,false);$('bossbar').classList.remove('show');$('screen').classList.remove('blur');
+function goHome(){G.tut=null;for(const id of['end','dead','pause','rest','scroll','hud','wheel','prompt','tut'])show(id,false);$('bossbar').classList.remove('show');$('screen').classList.remove('blur');
  G.wheel=null;G.state='title';G.rush=null;boss=null;enemies.length=0;projs.length=0;pickups.length=0;parts.length=0;fxs.length=0;corpses.length=0;splats.length=0;nums.length=0;
  LV=null;genLevel(1);renderTitle.gy=undefined;T=0;setLvl(Math.min(selLvl,SAVE.maxLvl));show('title',true);Snd.play('rest');SFX.select()}
 $('bhome').onclick=goHome;$('bhome2').onclick=goHome;$('bhome3').onclick=goHome;
@@ -279,3 +279,32 @@ function cdxDraw(){const tabs=$('cdxtabs');tabs.innerHTML='';for(const [k,n] of 
   const t=document.createElement('div');t.innerHTML=`<b>${c.n}${c.tag?`<i class=tag>${c.tag}</i>`:''}</b><small>${c.d}</small>`;d.appendChild(t);list.appendChild(d)}}
 function showCodex(v){show('codex',v);if(v)cdxDraw()}
 $('bcdx').onclick=()=>{SFX.select();showCodex(true)};$('bcdxx').onclick=()=>showCodex(false);
+// ===== 新手教程 =====
+const TUT=[
+ {t:'按 <b>A</b> <b>D</b> 左右移动，往右走',ok:()=>P.x>11*TS},
+ {t:'按 <b>空格</b> 跳上台阶',ok:()=>P.x>14.5*TS&&P.onGround&&P.y<=15*TS+1},
+ {t:'按住 <b>空格</b> 能跳得更高；碰到齐胸高的墙沿会自动攀上去',ok:()=>P.x>20.5*TS&&P.onGround&&P.y<=12*TS+1},
+ {t:'跳起来后在空中再按一次 <b>空格</b>：二段跳，翻上高墙',ok:()=>P.x>32.5*TS&&P.onGround&&P.y<=6*TS+1},
+ {t:'站在平台上按 <b>S</b> + <b>空格</b>，从平台上跳下去',ok:()=>P.x>38*TS&&P.y>=16*TS},
+ {t:'按 <b>Shift</b> 翻滚。翻滚的时候无敌，可以穿过敌人的攻击',ok:g=>g.rolled},
+ {t:'走到沙袋前按 <b>J</b> 攻击，连按打出三连击（鼠标左键也行）',ok:g=>g.hits>=3},
+ {t:'翻滚后立刻按 <b>J</b>：冲刺斩，必定暴击',ok:g=>g.dash},
+ {t:'跳上沙袋上方的平台，在空中按 <b>S</b> + <b>J</b>：下劈',ok:()=>P.diveLandT>0},
+ {t:'按 <b>K</b> 使用地编工具（副武器，用完要等冷却；鼠标右键也行）',ok:g=>g.skill},
+ {t:'你受伤了。按 <b>Q</b> 吃便当回血，每层开始时便当会补满',start:()=>{P.hp=Math.round(P.maxHp*.45);P.flasks=P.maxFlasks;hud()},ok:()=>P.healT>0},
+ {t:'走到武器旁按 <b>E</b> 捡起来。建模、地编工具各能带 3 把',start:()=>{pickups.push({k:'weapon',w:'whip',lv:0,aff:[],x:clamp(P.x+50,57*TS,90*TS),y:P.y-20,vy:-100})},ok:()=>P.primBag.length>1},
+ {t:'按住 <b>R</b> 打开武器切换器（时间会变慢），用 <b>J</b> / <b>L</b> 选择，松开 <b>R</b> 换上。地编工具用 <b>F</b>',ok:g=>g.swapped},
+ {t:'实战：打倒这只穿模怪！它缩成一团就是要扑过来了，按 <b>Shift</b> 翻滚躲开。在快被打中的瞬间翻滚是“完美闪避”，下一击必暴击',start:g=>{const x=clamp(P.x+110,58*TS,92*TS);g.foe=spawnEnemy({type:'crumple',x,y:17*TS});g.foe.aggro=true;burst(x,17*TS-12,14,['#ff5a4a','#fff'],140,.4)},ok:g=>g.foe&&g.foe.hp<=0},
+ {t:'教程完成！走进右边的门回到主页。游戏中按 <b>Esc</b> 暂停，标题画面的“图鉴”里有全部武器、道具和敌人的介绍',start:()=>{pickups.push({k:'door',x:95*TS,y:17*TS,open:true});burst(95*TS,17*TS-20,20,['#ffd84a','#fff'],160,.5)},ok:()=>false}];
+function startTutorial(){Snd.unlock();G.lvl=0;G.hard=false;show('title',false);show('hud',true);resetPlayer(false);P.bought=[];P.bps=[];P.curse=0;G.time=0;G.kills=0;G.deaths=0;$('mode').textContent='';
+ G.floor=1;G.rush=null;genTutorial();G.floorT=0;enemies.length=0;projs.length=0;pickups.length=0;parts.length=0;fxs.length=0;corpses.length=0;splats.length=0;nums.length=0;boss=null;G.bossDone=true;G.bossLock=false;
+ resetPlayer(true);P.x=5*TS;P.y=17*TS;P.hp=P.maxHp;P.flasks=P.maxFlasks;
+ const d=spawnEnemy({type:'crumple',x:66*TS,y:17*TS});d.dummy=true;d.hp=d.max=99999;d.hx=d.x;
+ G.tut={step:-1};tutNext();cam.x=0;cam.y=8;G.state='play';Snd.play('f1');$('floor').textContent='新手教程';banner('新手教程','跟着上方的提示操作',2000);hud()}
+function tutNext(){const g=G.tut;g.step++;g.rolled=false;g.hits=0;g.dash=false;g.skill=false;g.swapped=false;const s=TUT[g.step];if(s.start)s.start(g);
+ const el=$('tut');el.innerHTML=`<i>新手教程 ${g.step+1} / ${TUT.length}</i>${s.t}`;el.classList.remove('done');show('tut',true);if(g.step>0)SFX.pick()}
+function updTutorial(dt){const g=G.tut;if(!g||G.state!=='play')return;if(P.rollT>0)g.rolled=true;if(P.atk&&P.atk.def.dash)g.dash=true;const s=TUT[g.step];
+ if(!g.wait&&s.ok(g)){g.wait=.55;$('tut').classList.add('done');ringFx(P.x,P.y-18,'#7af07a')}
+ if(g.wait){g.wait-=dt;if(g.wait<=0){g.wait=0;tutNext()}}}
+function finishTutorial(){SAVE.tut=1;saveGame();SFX.win();toast('教程完成，去上班吧！',1800);G.tut=null;show('tut',false);goHome()}
+$('btut').onclick=()=>{SFX.select();startTutorial()};

@@ -131,3 +131,16 @@ function drawLights(cx,cy,t){const f=LV.af,th=LV.th;
 // 近景剪影层：试玩反馈说像奇怪的影子，默认关闭
 const SHOW_NEAR=false;
 function drawNear(cx,cy){if(!SHOW_NEAR)return;const n='bg_f'+LV.af+'_near';if(!sprReady(n))return;const im=SPR[n],s=SPRS[n]||1,W=im.naturalWidth/s,H=im.naturalHeight/s;for(let x=-(Math.floor(cx*1.3)%W);x<VW;x+=W)ctx.drawImage(im,x,VH-H,W,H)}
+// ===== 新手教程关卡：一条走廊，从左到右依次练移动、跳、二段跳、下平台，再到训练场练战斗 =====
+function genTutorial(){const w=100,T=new Uint8Array(w*HT);const set=(x,y,v)=>{if(x>=0&&x<w&&y>=0&&y<HT)T[y*w+x]=v};
+ const ground=(x0,x1,g)=>{for(let x=x0;x<=x1;x++)for(let y=g;y<HT;y++)set(x,y,1)};
+ for(let x=0;x<w;x++){set(x,0,1);set(x,1,1)}for(let y=0;y<HT;y++){set(0,y,1);set(1,y,1);set(w-1,y,1);set(w-2,y,1)}
+ ground(2,13,17);ground(14,19,15);ground(20,31,12);ground(32,37,6);
+ // 平台层：只能从平台跳下去才能继续往前
+ ground(38,w-3,17);for(let x=38;x<=53;x++)set(x,6,2);for(let y=2;y<=13;y++){set(54,y,1);set(55,y,1)}
+ // 训练场：沙袋上方一块平台，用来练下劈
+ for(let x=63;x<=69;x++)set(x,13,2);for(let x=58;x<=61;x++)set(x,15,2);
+ const decor=[{k:'elevator',x:3*TS,y:17*TS-64,gy:17*TS,s:0}];
+ for(const x of[10,28,46,62,78,92])decor.push({k:'lamp',x:x*TS,y:6*TS,s:0});
+ decor.push({k:'plant',x:8*TS,y:17*TS-26,gy:17*TS,s:1});decor.push({k:'easel',x:24*TS,y:12*TS-30,gy:12*TS,s:0});decor.push({k:'shelf',x:84*TS,y:17*TS-19,gy:17*TS,s:2});
+ LV={floor:1,af:1,th:THEME[1],w,h:HT,T,spawns:[],decor,pick:[],signs:[],boxes:[],room:null,arenaX:w*TS+9999,arenaW:0,gate:{x:-9,active:false},exitX:95*TS,tlimit:1e9,tut:true};return LV}

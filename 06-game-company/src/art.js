@@ -103,7 +103,7 @@ function pring(cx,cy,r,c,th=1){ctx.fillStyle=c;for(let a=0;a<64;a++){const t=a/6
 // 刀光残影
 function smear(x,y,r0,r1,a0,a1,face,col){ctx.fillStyle=col;const n=Math.ceil(Math.abs(a1-a0)*r1/1.5);for(let i=0;i<=n;i++){const t=a0+(a1-a0)*i/n,c=Math.cos(t),s=Math.sin(t);for(let r=r0;r<=r1;r+=1.5)ctx.fillRect(R(x+s*r*face),R(y+c*r),2,2)}}
 // ===== 敌人 =====
-function drawEnemy(e,cx,cy){if(e.elite){ctx.globalAlpha=.35+.2*Math.sin(e.anim*8);pcirc(R(e.x-cx),R(e.y-cy-e.h/2),Math.max(e.w,e.h)*.75,'#ff5a4a');ctx.globalAlpha=1}drawEnemySpr(e,cx,cy)}
+function drawEnemy(e,cx,cy){if(e.dummy){ctx.font='bold 8px sans-serif';ctx.textAlign='center';const x=R(e.x-cx),y=R(e.y-cy-e.h-10);ctx.fillStyle='#14121a';ctx.fillText('沙袋',x+1,y+1);ctx.fillStyle='#ffd84a';ctx.fillText('沙袋',x,y);ctx.textAlign='left'}if(e.elite){ctx.globalAlpha=.35+.2*Math.sin(e.anim*8);pcirc(R(e.x-cx),R(e.y-cy-e.h/2),Math.max(e.w,e.h)*.75,'#ff5a4a');ctx.globalAlpha=1}drawEnemySpr(e,cx,cy)}
 // ===== Boss =====
 function drawBoss(b,cx,cy){drawBossSpr(b,cx,cy)}
 // ===== 楼层主题 =====

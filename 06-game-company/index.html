@@ -95,6 +95,8 @@ const ART_GAP={"boss_ceo_pound": [0.0, 0.0, 4.0, 11.0, 13.0, 6.0, 0.0, 0.0], "en
 // 发新版本时：在 CHANGELOG 最前面加一条，build.py 重新生成 index.html，合并到 main 即可。
 // 标题画面会显示最新版本号；玩家没看过的新版本，“更新内容”按钮上会亮“新”字。
 const CHANGELOG=[
+ {v:'v1.4',date:'2026-11-02',items:[
+  '装饰物按马楠的身高调整比例：数位板缩小并放到桌子上，1F、2F 吊灯和废纸篓缩小一半，鱼缸放到柜子上']},
  {v:'v1.3',date:'2026-11-02',items:[
   '修正比较宽的装饰物右边被裁掉一截：数位板、吊灯、原画墙、懒人沙发、看板、鱼缸、真皮沙发、水晶吊灯等']},
  {v:'v1.2',date:'2026-11-02',items:[
@@ -369,8 +371,19 @@ const DECOR_WALL=['artwall','board','whiteboard','poster','portrait'];
 function drawDecorSpr(d,cx,cy){if(!useSpr||d.gy===undefined)return false;let name=d.k==='elevator'?'elevator':null;const m=DECOR_MAP[LV.floor]&&DECOR_MAP[LV.floor][d.k];if(m)name=m[d.s%m.length];if(!name)return false;const n='decor_f'+LV.floor+'_'+name;if(!sprReady(n))return false;
  // 第一次画的时候检查摆不摆得下：不能被地面挡住，落地的物件下面要全是地面；放不下就左右挪，挪不开就不放
  if(d.fit===undefined||d.fitN!==n)decorFit(d,n,name);if(d.fit===null)return true;
- sprFrame(n,0,R(d.x+12+d.fit-cx),R(d.gy-(DECOR_WALL.includes(name)?34:0)-cy),1);return true}
-function decorFit(d,n,name){const im=SPR[n],s=SPRS[n]||1,W=im.naturalWidth/s,H=im.naturalHeight/s,wall=DECOR_WALL.includes(name),bot=d.gy-(wall?34:0);d.fitN=n;
+ const st=DECOR_STYLE[name]||{},b=decorBox(n,name),x=R(d.x+12+d.fit-cx),bot=R(d.gy-(DECOR_WALL.includes(name)?34:0)-cy);
+ let top=bot;if(st.base){drawDecorBase(st.base,x,bot);top=bot-st.base.h}
+ const im=SPR[n],s=SPRS[n]||1,k=st.scale||1,W=im.naturalWidth/s*k,H=im.naturalHeight/s*k;
+ ctx.drawImage(im,R(x-W/2),R(top-H),W,H);return true}
+// 装饰物比例：以马楠（42 像素≈175 厘米，1 像素≈4 厘米）为尺子。
+// scale：缩放（只用 0.5 这类和 2 倍素材对齐的值，像素不糊）；base：垫在下面的家具（代码画）
+const DECOR_STYLE={drawingdesk:{scale:.5,base:{k:'desk',w:34,h:17}},wastebasket:{scale:.5},aquarium:{base:{k:'cabinet',w:34,h:14}}};
+function decorBox(n,name){const im=SPR[n],s=SPRS[n]||1,st=DECOR_STYLE[name]||{},k=st.scale||1,W=im.naturalWidth/s*k,H=im.naturalHeight/s*k;return{w:Math.max(W,st.base?st.base.w:0),h:H+(st.base?st.base.h:0)}}
+function drawDecorBase(b,x,bot){const f=LV.floor,L=R(x-b.w/2);
+ if(b.k==='desk'){const top=f===1?'#a87a58':f===2?'#5a6070':'#6a3a2a',side=f===1?'#7a5238':f===2?'#3a3e4a':'#4a2418';
+  px(L,bot-b.h,b.w,3,top);px(L,bot-b.h+3,b.w,1,side);px(L+2,bot-b.h+4,2,b.h-4,side);px(L+b.w-4,bot-b.h+4,2,b.h-4,side);px(L+b.w-14,bot-b.h+4,10,6,side);px(L+b.w-13,bot-b.h+6,8,1,top);px(L,bot-b.h,b.w,1,'rgba(255,255,255,.18)')}
+ else if(b.k==='cabinet'){px(L,bot-b.h,b.w,b.h,'#3a2018');px(L,bot-b.h,b.w,2,'#c8a050');px(L+2,bot-b.h+4,b.w/2-3,b.h-6,'#4a2820');px(L+b.w/2+1,bot-b.h+4,b.w/2-3,b.h-6,'#4a2820');px(L+b.w/2-3,bot-b.h+8,2,2,'#c8a050');px(L+b.w/2+1,bot-b.h+8,2,2,'#c8a050');px(L,bot-1,b.w,1,'rgba(0,0,0,.35)')}}
+function decorFit(d,n,name){const bx=decorBox(n,name),W=bx.w,H=bx.h,wall=DECOR_WALL.includes(name),bot=d.gy-(wall?34:0);d.fitN=n;
  const ok=cx=>{for(let x=Math.floor((cx-W/2+1)/TS);x<=Math.floor((cx+W/2-1)/TS);x++){for(let y=Math.floor((bot-H+1)/TS);y<=Math.floor((bot-1)/TS);y++)if(isSolid(x,y)||tileAt(x,y)===3)return false;
    if(!wall&&!isSolid(x,Math.floor(bot/TS)))return false}return true};
  for(const o of[0,-8,8,-16,16,-24,24,-32,32,-48,48])if(ok(d.x+12+o)){d.fit=o;return}d.fit=null}
@@ -385,7 +398,7 @@ function drawDecor(d,cx,cy,th,t){const x=R(d.x-cx),y=R(d.y-cy);if(x<-120||x>VW+1
  case 'board':px(x,y,46,28,'#9aa0a8');px(x+2,y+2,42,24,'#f8f8fa');for(let i=0;i<4;i++)px(x+5,y+6+i*5,10+((i*11+d.s)%26),1,['#3a6ad8','#d8584a','#3a3a46'][i%3]);break;
  case 'poster':px(x,y,18,24,['#d8584a','#3a6ad8','#f2c14e'][d.s%3]);px(x+3,y+3,12,10,'#f4f1ea');px(x+3,y+16,12,2,'#fff');px(x+3,y+19,8,1,'#fff');break;
  case 'trophy':px(x+4,y+16,8,4,'#6a5a4a');px(x+6,y+12,4,4,'#e8b84a');px(x+2,y+2,12,10,'#e8b84a');px(x,y+3,2,5,'#e8b84a');px(x+14,y+3,2,5,'#e8b84a');px(x+4,y+4,2,4,'#fff2c0');break;
- case 'lamp':{const ln=sprReady('decor_f'+LV.floor+'_chandelier')?'decor_f'+LV.floor+'_chandelier':'decor_f'+LV.floor+'_lamp';if(useSpr&&sprReady(ln)){const H=SPR[ln].naturalHeight/(SPRS[ln]||1),top=R(2*TS-cy);px(x,top,1,y+3-top,'#2a2a34');px(x-2,top,5,2,'#2a2a34');sprFrame(ln,0,x,y+2+H,1);ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.5+.08*Math.sin(t*3+d.x);pcirc(x,R(y+2+H),2,'#ffe6a0');ctx.restore();break}}px(x,y-40,1,40,'#3a3a46');px(x-1,y,2,6,'#3a3a46');px(x-6,y+6,12,3,'#3a3a46');ctx.fillStyle=th.light+'0.07)';ctx.beginPath();ctx.moveTo(x-5,y+9);ctx.lineTo(x+5,y+9);ctx.lineTo(x+30,y+130);ctx.lineTo(x-30,y+130);ctx.fill();px(x-4,y+9,8,1,'#fff6d0');break;
+ case 'lamp':{const ln=sprReady('decor_f'+LV.floor+'_chandelier')?'decor_f'+LV.floor+'_chandelier':'decor_f'+LV.floor+'_lamp';if(useSpr&&sprReady(ln)){const im=SPR[ln],k=ln.endsWith('chandelier')?1:.5,W=im.naturalWidth/(SPRS[ln]||1)*k,H=im.naturalHeight/(SPRS[ln]||1)*k,top=R(2*TS-cy);px(x,top,1,y+3-top,'#2a2a34');px(x-2,top,5,2,'#2a2a34');ctx.drawImage(im,R(x-W/2),R(y+2),W,H);ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.5+.08*Math.sin(t*3+d.x);pcirc(x,R(y+2+H),2,'#ffe6a0');ctx.restore();break}}px(x,y-40,1,40,'#3a3a46');px(x-1,y,2,6,'#3a3a46');px(x-6,y+6,12,3,'#3a3a46');ctx.fillStyle=th.light+'0.07)';ctx.beginPath();ctx.moveTo(x-5,y+9);ctx.lineTo(x+5,y+9);ctx.lineTo(x+30,y+130);ctx.lineTo(x-30,y+130);ctx.fill();px(x-4,y+9,8,1,'#fff6d0');break;
  case 'sign':px(x,y,64,16,'#2a2d36');px(x+1,y+1,62,14,th.trim);break;
  case 'cooler':px(x,y,12,8,'#9fd3f0');px(x+1,y+8,10,22,'#e8e8ee');px(x+3,y+14,2,2,'#5ab0f0');px(x+7,y+14,2,2,'#d8584a');break;
  case 'shelf':px(x,y,30,3,'#8a6248');px(x,y+16,30,3,'#8a6248');for(let i=0;i<5;i++)px(x+2+i*5,y-9+((i*7+d.s)%4),4,9+((i*3)%3),['#d8584a','#3a6ad8','#f2c14e','#5ab85a','#9a6ad8'][(i+d.s)%5]);break;

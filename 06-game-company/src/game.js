@@ -3,8 +3,8 @@
 const SAVE=(()=>{let d={maxLvl:0,bp:[],clears:0};try{const s=JSON.parse(localStorage.getItem('magame06')||'{}');if(s&&typeof s==='object')d=Object.assign(d,s)}catch(e){}if(!Array.isArray(d.bp))d.bp=[];return d})();
 function saveGame(){try{localStorage.setItem('magame06',JSON.stringify(SAVE))}catch(e){}}
 // 需要图纸解锁的武器和升级
-const BP_ALL=['knife','boxcol','turret','upg:jump','upg:crit','upg:cd'];
-const BP_NAME={knife:'切线刀',boxcol:'碰撞体方块',turret:'预制体炮台','upg:jump':'人体工学椅','upg:crit':'甲方满意','upg:cd':'快捷键大师'};
+const BP_ALL=['knife','boxcol','turret','render','keyframe','upg:jump','upg:crit','upg:cd'];
+const BP_NAME={render:'渲染大剑',keyframe:'关键帧',knife:'切线刀',boxcol:'碰撞体方块',turret:'预制体炮台','upg:jump':'人体工学椅','upg:crit':'甲方满意','upg:cd':'快捷键大师'};
 const unlocked=id=>!BP_ALL.includes(id)||SAVE.bp.includes(id);
 // 加班等级：通关一次解锁下一级
 const LVLS=['正常上班','敌人更硬更痛，Boss 更快，准时门更紧','+ 精英更多','+ 便当只带 1 个','+ 怪物更多，同时出招的怪 +1','+ 换楼层只回一半血'];
@@ -18,7 +18,7 @@ function applyUpg(id){P.upg.push(id);if(id==='dmg')P.dmgMul*=1.2;if(id==='hp'){P
 function slotIcon(cv,w){const c=cv.getContext('2d');c.imageSmoothingEnabled=false;ctx.clearRect(0,0,24,24);ctx.fillStyle='rgba(0,0,0,0)';drawIcon(w,12,12);c.clearRect(0,0,cv.width,cv.height);c.drawImage(buf,0,0,24*RES,24*RES,0,0,cv.width,cv.height)}
 function hud(){$('hpfill').style.width=(P.hp/P.maxHp*100)+'%';$('hprally').style.width=((P.hp+P.rally)/P.maxHp*100)+'%';$('hptxt').textContent=Math.ceil(P.hp)+' / '+P.maxHp;$('flasks').textContent='🍱'.repeat(P.flasks)+'▫'.repeat(Math.max(0,P.maxFlasks-P.flasks));
  $('stats').innerHTML=`<span class=s1>建模 ${P.stat.line}</span><span class=s2>地编 ${P.stat.color}</span><span class=s3>体力 ${P.stat.body}</span>`;
- const k1=P.prim+P.primLv+P.primAff.join(),k2=P.sec+P.secLv+P.secAff.join();if(hud.p!==k1){hud.p=k1;slotIcon($('ic1'),P.prim);$('n1').textContent=wname(P.prim,P.primLv);$('a1').textContent=P.primAff.map(a=>AFF[a].n).join(' · ')}if(hud.s!==k2){hud.s=k2;slotIcon($('ic2'),P.sec);$('n2').textContent=wname(P.sec,P.secLv);$('a2').textContent=P.secAff.map(a=>AFF[a].n).join(' · ')}hudCells()}
+ const k1=P.prim+P.primLv+P.primAff.join()+P.primIdx+(P.primBag||[]).length,k2=P.sec+P.secLv+P.secAff.join()+P.secIdx+(P.secBag||[]).length;if(hud.p!==k1){hud.p=k1;slotIcon($('ic1'),P.prim);$('n1').textContent=wname(P.prim,P.primLv);$('b1').textContent=P.primBag.length>1?(P.primIdx+1)+'/'+P.primBag.length:'';$('a1').textContent=P.primAff.map(a=>AFF[a].n).join(' · ')}if(hud.s!==k2){hud.s=k2;slotIcon($('ic2'),P.sec);$('n2').textContent=wname(P.sec,P.secLv);$('b2').textContent=P.secBag.length>1?(P.secIdx+1)+'/'+P.secBag.length:'';$('a2').textContent=P.secAff.map(a=>AFF[a].n).join(' · ')}hudCells()}
 function hudCells(){$('cells').textContent=P.cells}
 let toastT=0,bannerT=0;
 function toast(s,ms=1800){const t=$('toast');t.textContent=s;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),ms)}
@@ -29,7 +29,7 @@ function show(id,v){$(id).classList.toggle('show',v)}
 function loadFloor(n,fromRetry){G.floor=n;G.rush=null;genLevel(n);LV.tlimit=[0,110,140,160][n]*(G.hard?.8:1);G.floorT=0;enemies.length=0;projs.length=0;pickups.length=0;parts.length=0;fxs.length=0;corpses.length=0;splats.length=0;nums.length=0;boss=null;G.bossDone=false;G.bossLock=false;
  const keepHp=P.hp;resetPlayer(true);P.hp=G.lvl>=5&&!fromRetry&&n>1?Math.min(P.maxHp,keepHp+P.maxHp*.5):P.maxHp;P.flasks=P.maxFlasks;
  for(const s of LV.spawns)spawnEnemy(s);for(const k of LV.pick)pickups.push(Object.assign({vy:0},k));
- G.snap=JSON.stringify({prim:P.prim,sec:P.sec,primLv:P.primLv,primAff:P.primAff,secLv:P.secLv,secAff:P.secAff,stat:P.stat,cells:P.cells,dmgMul:P.dmgMul,spdMul:P.spdMul,rollMul:P.rollMul,cdMul:P.cdMul,airJumps:P.airJumps,steal:P.steal,critMul:P.critMul,maxHp:P.maxHp,maxFlasks:P.maxFlasks,upg:P.upg,bps:P.bps||[],curse:P.curse||0});
+ G.snap=JSON.stringify({prim:P.prim,sec:P.sec,primLv:P.primLv,primAff:P.primAff,secLv:P.secLv,secAff:P.secAff,stat:P.stat,cells:P.cells,dmgMul:P.dmgMul,spdMul:P.spdMul,rollMul:P.rollMul,cdMul:P.cdMul,airJumps:P.airJumps,steal:P.steal,critMul:P.critMul,maxHp:P.maxHp,maxFlasks:P.maxFlasks,upg:P.upg,bps:P.bps||[],curse:P.curse||0,primBag:P.primBag,secBag:P.secBag,primIdx:P.primIdx,secIdx:P.secIdx});
  cam.x=0;cam.y=8;G.state='play';Snd.play(LV.th.song);$('floor').textContent=LV.th.name;banner(LV.th.name,['','赶在下班前，穿过美术部','Bug 满地爬的研发部','最后一关：老板办公室'][n],2400);hud()}
 function exitFloor(){if(G.state!=='play')return;SFX.door();if(G.floor<3){G.state='rest';openRest()}else{G.state='end';openEnd()}}
 function playerDie(){G.deaths++;G.state='dead';Snd.play('rest');$('dcause').textContent=P.lastHit?'击倒你的是：'+P.lastHit:'';setTimeout(()=>{show('dead',true)},900)}
@@ -110,7 +110,7 @@ function drawPlayer(cx,cy){
 // 每帧前手位置来自 art/**/anchors.json（帧左上角为原点），换算成相对脚底中心
 function handOf(n,fi){const a=(typeof ART_ANCHOR!=='undefined'?ART_ANCHOR:{})[n];if(!a||!sprReady(n))return null;const c=sprN(n),s=SPRS[n]||1,L=SPR[n].naturalHeight/s;fi=((fi%c)+c)%c;return a[fi]?[a[fi][0]/s-L/2,a[fi][1]/s-L]:null}
 // 没有专属连击素材的武器借用雕刻笔：连击段 → 雕刻笔第几刀
-const ATK_SEG={stylus:[0,1,2],marker:[2,1],ruler:[0,0,2],knife:[0,1,0,2]};
+const ATK_SEG={stylus:[0,1,2],marker:[2,1],ruler:[0,0,2],knife:[0,1,0,2],whip:[0,1,2],shears:[0,1],render:[2,1]};
 function drawPlayerSpr(x,y,flash){let n='player_idle',fi=Math.floor(P.anim*5),hand=[5,-20],wang=.5,noW=false;const W=WEAPONS[P.prim];
  const has=k=>sprReady(k),prog=(t,d)=>Math.max(0,Math.min(.999,t/d));
  if(P.dead&&has('player_die')){n='player_die';const t=T-(P.deadAt||T);fi=Math.min(5,Math.floor(t/.14));if(fi>=3)fi=5;noW=true}
@@ -157,13 +157,15 @@ function render(){const th=LV.th,cx=R(cam.x+(Math.random()-.5)*shake*2),cy=R(cam
  ctx.font='bold 8px sans-serif';ctx.textAlign='center';for(const e of enemies)if(e.affix&&e.hp>0&&Math.abs(e.x-cx-VW/2)<VW/2+20){const a=EAFFIX[e.affix],x=R(e.x-cx),y=R(e.y-cy-e.h-10);ctx.fillStyle='#14121a';ctx.fillText(a.n,x+1,y+1);ctx.fillStyle=a.c;ctx.fillText(a.n,x,y)}ctx.textAlign='left';
  for(const e of enemies)if(e.hp<e.max&&e.hp>0){const x=R(e.x-cx-8),y=R(e.y-cy-e.h-6);px(x,y,16,2,'#2a2030');px(x,y,R(16*e.hp/e.max),2,e.elite?'#ffb84a':'#ff5a4a')}
  drawCorpses(cx,cy);drawProjs(cx,cy);
+ if(P.kfMark){const mx=R(P.kfMark.x-cx),my=R(P.kfMark.y-cy);ctx.globalAlpha=.4+.25*Math.sin(T*8);ctx.save();ctx.translate(mx,my-18);ctx.rotate(Math.PI/4);px(-5,-5,10,10,'#c8a0ff');px(-2,-2,4,4,'#fff');ctx.restore();px(mx-6,my-1,12,1,'#c8a0ff');ctx.globalAlpha=1;pnum(String(Math.ceil(P.kfMark.t)),mx,my-34,'#c8a0ff',1)}
  if(G.state!=='dead'||Math.floor(T*8)%2||(useSpr&&sprReady('player_die')))drawPlayer(cx,cy);
+ if(P.chargeT>.08&&P.prim==='render'){const k=Math.min(1,P.chargeT/.55),x=R(P.x-cx),y=R(P.y-cy);px(x-8,y-48,16,2,'#2a2030');px(x-8,y-48,R(16*k),2,k>=1?'#fff6c0':'#ffd84a')}
  drawFx(cx,cy);drawParts(cx,cy);drawNear(cx,cy);drawNums(cx,cy);
  ctx.drawImage(VIG,0,0);
  if(flashRed>0){ctx.fillStyle=`rgba(216,40,40,${flashRed*.6})`;ctx.fillRect(0,0,VW,VH)}
  if(slowT>0){ctx.fillStyle='rgba(255,255,255,.06)';ctx.fillRect(0,0,VW,VH)}
  // 提示
- const pr=$('prompt');if(near){let s='';if(near.k==='weapon'){const W=WEAPONS[near.w],old=W.slot===1?P.prim:P.sec,af=(near.aff||[]).map(a=>`<em>${AFF[a].n}</em>${AFF[a].d}`).join('　');s=`<b>E</b> 拾取 ${wname(near.w,near.lv)}<small>${W.desc}　（替换${WEAPONS[old].name}）</small>${af?'<small class=af>'+af+'</small>':''}`}else if(near.k==='chest')s='<b>E</b> 打开宝箱';else if(near.k==='cchest')s=`<b>E</b> 签加班合同<small>奖励一把高级武器 + 卷轴 + 灵感；但击败 ${8+LV.floor*3} 个敌人之前，受到的伤害翻倍</small>`;else if(near.k==='tdoor')s='<b>E</b> 打开准时下班门';else if(near.k==='wireterm')s='<b>E</b> 补模型<small>这里有一段没做完的场景，地编的活儿</small>';else if(near.k==='rush')s=`<b>E</b> 接下加急任务<small>限时清掉刷出来的怪，奖励高级武器</small>`;else s=`<b>E</b> ${G.floor<3?'进入茶水间':'下班！'}`;if(pr.dataset.s!==s){pr.innerHTML=s;pr.dataset.s=s}pr.classList.add('show')}else pr.classList.remove('show')}
+ const pr=$('prompt');if(near&&!G.wheel){let s='';if(near.k==='weapon'){const W=WEAPONS[near.w],old=W.slot===1?P.prim:P.sec,af=(near.aff||[]).map(a=>`<em>${AFF[a].n}</em>${AFF[a].d}`).join('　');{const bag=W.slot===1?P.primBag:P.secBag,room=bag.length<BAG_MAX;s=`<b>E</b> 拾取 ${wname(near.w,near.lv)}<small>${W.desc}　（${room?'放进背包 '+(bag.length+1)+'/'+BAG_MAX:'替换当前的'+WEAPONS[old].name}）</small>${af?'<small class=af>'+af+'</small>':''}`}}else if(near.k==='chest')s='<b>E</b> 打开宝箱';else if(near.k==='cchest')s=`<b>E</b> 签加班合同<small>奖励一把高级武器 + 卷轴 + 灵感；但击败 ${8+LV.floor*3} 个敌人之前，受到的伤害翻倍</small>`;else if(near.k==='tdoor')s='<b>E</b> 打开准时下班门';else if(near.k==='wireterm')s='<b>E</b> 补模型<small>这里有一段没做完的场景，地编的活儿</small>';else if(near.k==='rush')s=`<b>E</b> 接下加急任务<small>限时清掉刷出来的怪，奖励高级武器</small>`;else s=`<b>E</b> ${G.floor<3?'进入茶水间':'下班！'}`;if(pr.dataset.s!==s){pr.innerHTML=s;pr.dataset.s=s}pr.classList.add('show')}else pr.classList.remove('show')}
 function updCamera(dt){let tx=P.x-VW/2+P.face*36,ty=P.y-175;
  if(boss||G.bossLock){tx=LV.arenaX}
  tx=clamp(tx,0,LV.w*TS-VW);ty=clamp(ty,0,LV.h*TS-VH);cam.x=lerp(cam.x,tx,1-Math.exp(-6*dt));cam.y=lerp(cam.y,ty,1-Math.exp(-6*dt))}
@@ -194,10 +196,33 @@ function uiTick(){if(G.state!=='play')return;const fl=P.flow||0,fe=$('flow');if(
  const cd=secCd();$('hprally').style.width=((P.hp+P.rally)/P.maxHp*100)+'%';
  const td=$('tdoor'),left=LV.tlimit-G.floorT,tdk=LV.pick&&pickups.find(k=>k.k==='tdoor');if(tdk&&!tdk.used&&left>0&&!boss&&!G.bossDone){td.textContent='准时下班门 '+Math.floor(left/60)+':'+String(Math.floor(left%60)).padStart(2,'0');td.className=left<20?'warn':''}else td.textContent='';$('cd2').style.height=(Math.max(0,P.skillCd)/cd*100)+'%';const t=G.time;$('timer').textContent=Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0');
  if(Math.floor(T*10)!==uiTick.k){uiTick.k=Math.floor(T*10);$('hpfill').style.width=(P.hp/P.maxHp*100)+'%';$('hptxt').textContent=Math.ceil(P.hp)+' / '+P.maxHp}}
+// ===== 武器轮盘：按住 R / F 打开，J/L 或 ←/→ 选择，松开切换；打开时背景模糊、慢动作 =====
+function wheelOpen(slot){const bag=slot===1?P.primBag:P.secBag;G.wheel={slot,sel:slot===1?P.primIdx:P.secIdx};$('screen').classList.add('blur');wheelDraw();show('wheel',true);SFX.select()}
+function wheelClose(apply){const w=G.wheel;if(!w)return;G.wheel=null;$('screen').classList.remove('blur');show('wheel',false);
+ const cur=w.slot===1?P.primIdx:P.secIdx;if(apply&&w.sel!==cur){equipFromBag(w.slot,w.sel);hud();SFX.pick();toast('换上了 '+(w.slot===1?wname(P.prim,P.primLv):wname(P.sec,P.secLv)),1000)}}
+function wheelDraw(){const w=G.wheel,bag=w.slot===1?P.primBag:P.secBag,cur=w.slot===1?P.primIdx:P.secIdx;
+ // 先把当前装备同步回背包，显示的等级、词缀才是最新的
+ if(w.slot===1)P.primBag[P.primIdx]={w:P.prim,lv:P.primLv,aff:P.primAff};else P.secBag[P.secIdx]={w:P.sec,lv:P.secLv,aff:P.secAff};
+ $('wtitle').textContent=(w.slot===1?'建模工具（主武器）':'地编工具（副武器）')+'  '+bag.length+'/'+BAG_MAX;
+ const box=$('wcards');box.innerHTML='';
+ for(let i=0;i<BAG_MAX;i++){const it=bag[i],d=document.createElement('div');d.className='wcard'+(i===w.sel?' sel':'')+(it?'':' empty');
+  if(it){const cv=document.createElement('canvas');cv.width=48;cv.height=48;d.appendChild(cv);slotIcon(cv,it.w);const n=document.createElement('div');n.className='wn';n.textContent=wname(it.w,it.lv);d.appendChild(n);if(i===cur){const c=document.createElement('div');c.className='wc';c.textContent='使用中';d.appendChild(c)}
+   const ds=document.createElement('div');ds.className='wd';ds.textContent=WEAPONS[it.w].desc;d.appendChild(ds);if(it.aff&&it.aff.length){const af=document.createElement('div');af.className='wa';af.textContent=it.aff.map(a=>AFF[a].n).join(' · ');d.appendChild(af)}}
+  else{const n=document.createElement('div');n.className='wn';n.textContent='空位';d.appendChild(n);const ds=document.createElement('div');ds.className='wd';ds.textContent='捡到新武器会放进这里';d.appendChild(ds)}
+  box.appendChild(d)}
+ $('whint').innerHTML='<b>J</b>/<b>L</b> 或 <b>←</b>/<b>→</b> 选择　松开 <b>'+(w.slot===1?'R':'F')+'</b> 换上'}
+function wheelUpdate(){if(G.state!=='play'){if(G.wheel)wheelClose(false);return}
+ if(!G.wheel){if(pressed('wheel1'))wheelOpen(1);else if(pressed('wheel2'))wheelOpen(2);return}
+ const w=G.wheel,bag=w.slot===1?P.primBag:P.secBag,held=down(w.slot===1?'wheel1':'wheel2');
+ if(!held){wheelClose(true);return}
+ if(pressed('wl')){w.sel=(w.sel-1+bag.length)%bag.length;SFX.select();wheelDraw()}
+ if(pressed('wr')){w.sel=(w.sel+1)%bag.length;SFX.select();wheelDraw()}
+ for(const k in KP)if(/Key[JKL]|Space|Shift|Mouse/.test(k))delete KP[k]}
 // ===== 主循环 =====
 let last=0;
 function frame(ts){requestAnimationFrame(frame);try{let dt=Math.min(.05,(ts-last)/1000||.016);last=ts;
- pollPad();if(pressed('pause'))togglePause(G.state==='play');
+ pollPad();if(pressed('pause')){if(G.wheel)wheelClose(false);togglePause(G.state==='play')}
+ wheelUpdate();
  if(G.state==='scroll'){if(pressed('opt1'))chooseScroll(0);else if(pressed('opt2'))chooseScroll(1)}
  if(G.state==='rest'){if(pressed('opt1'))chooseRest(0);else if(pressed('opt2'))chooseRest(1);else if(pressed('opt3'))chooseRest(2)}
  if(G.state==='dead'&&(pressed('confirm')||KP['Space'])&&$('dead').classList.contains('show'))retry();
@@ -209,6 +234,6 @@ function frame(ts){requestAnimationFrame(frame);try{let dt=Math.min(.05,(ts-last
  if(G.state==='title'){T+=dt;renderTitle()}
  else if(G.state==='end'){T+=dt;renderEnd()}
  else if(G.state==='pause'||G.state==='rest'||G.state==='scroll'){render()}
- else{let d=dt*slowmo;if(hitstop>0){hitstop-=dt;d*=.04}step(d);render()}
+ else{let d=dt*slowmo;if(G.wheel)d=dt*.12;if(hitstop>0){hitstop-=dt;d*=.04}step(d);render()}
  uiTick();present();clearPressed()}catch(e){__err(e)}}
 requestAnimationFrame(frame);

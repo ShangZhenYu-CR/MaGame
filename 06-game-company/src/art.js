@@ -119,6 +119,9 @@ function drawWeaponAt(kind,hx,hy,ang,face){
  else if(kind==='marker'){seg(-3,9,2,'#6a5040');const cx=hx+dx*12,cy=hy+dy*12;ctx.save();ctx.translate(R(cx),R(cy));ctx.rotate(-ang*face);px(-5,-4,10,8,'#c8d0dc');px(-5,-4,10,1,'#fff');px(-5,3,10,1,'#7a8494');px(-5,-4,1,8,'#3a8ad8');px(4,-4,1,8,'#3a8ad8');px(-2,-1,4,2,'#9fd8ff');ctx.restore()}
  else if(kind==='ruler'){seg(-4,20,2,'#9aa0a8');seg(20,24,4,'#ff9a4a');seg(24,27,2,'#ff9a4a');seg(27,28,1,'#fff2c0');seg(6,7,3,'#3a8ad8')}
  else if(kind==='knife'){seg(-3,1,2,'#3a3d46');seg(1,12,1,'#bff8f0');seg(1,9,2,'#7ff0e0');px(hx+dx*12,hy+dy*12,1,1,'#fff')}
+ else if(kind==='whip'){seg(-3,3,2,'#5a3a2a');const s=Math.sin(T*20)*2;pline(hx+dx*3,hy+dy*3,hx+dx*14+s*dy,hy+dy*14-s*dx,1,'#7fd8ff');pline(hx+dx*14+s*dy,hy+dy*14-s*dx,hx+dx*22,hy+dy*22,1,'#bfe8ff')}
+ else if(kind==='shears'){seg(-2,1,2,'#ff7ab0');seg(1,10,1,'#d8dde6');pline(hx+dx*1,hy+dy*1,hx+dx*10+dy*2,hy+dy*10-dx*2,1,'#c8ccd4')}
+ else if(kind==='render'){seg(-4,0,2,'#6a5040');seg(0,1,4,'#3a3d46');seg(1,20,3,'#ffd84a');seg(2,18,1,'#fff6c0');seg(20,22,1,'#ffd84a')}
  else if(kind==='redpen'){seg(-6,0,5,'#c03028');seg(0,26,5,'#e8483a');seg(26,32,3,'#2a1a1a')}
 }
 // 刀光残影

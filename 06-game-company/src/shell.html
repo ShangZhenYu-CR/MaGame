@@ -61,21 +61,29 @@
 #bchg{font-size:.9em;position:relative}#vnew{display:none;font-style:normal;background:#d8483a;color:#fff;font-size:.7em;padding:0 .3em;margin-left:.3em;border-radius:.2em}#bchg.new #vnew{display:inline}
 #chg{background:rgba(14,10,24,.82);z-index:5}.chgbox{max-width:34em;max-height:80%;overflow:auto;padding:1em 1.6em;text-align:left;pointer-events:auto}.chgbox h2{margin:.1em 0 .4em;font-size:2.2em}
 #chglist h3{margin:.8em 0 .2em;color:#ffd84a;font-size:1.15em}#chglist h3 small{color:#bbb;font-weight:400;margin-left:.6em;font-size:.75em}#chglist ul{margin:.2em 0;padding-left:1.3em;line-height:1.6;font-size:.95em}.chgbox .btn{font-size:1.2em;display:block;margin:.8em auto 0}
+#screen{transition:filter .12s}#screen.blur{filter:blur(4px) brightness(.6) saturate(.7)}
+#wheel{position:absolute;left:0;right:0;top:22%;display:flex;flex-direction:column;align-items:center;opacity:0;visibility:hidden;transition:opacity .12s}#wheel.show{opacity:1;visibility:visible}
+#wtitle{font-size:1.8em;text-shadow:0 .1em 0 #000;margin-bottom:.4em}#wcards{display:flex;gap:1em}
+.wcard{width:11em;min-height:12em;background:rgba(20,18,30,.88);border:.3em solid #3a3458;padding:.6em;display:flex;flex-direction:column;align-items:center;gap:.3em;text-align:center;transform:scale(.92);transition:transform .08s}
+.wcard canvas{width:4em;height:4em;image-rendering:pixelated}.wcard .wn{font-weight:900;font-size:1em}.wcard .wd{font-size:.72em;opacity:.8;line-height:1.35}.wcard .wa{font-size:.72em;color:#ffd84a}
+.wcard.sel{border-color:#ffd84a;transform:scale(1.06);box-shadow:0 0 1.2em rgba(255,216,74,.45)}.wcard.empty{opacity:.4}.slot .bg{position:absolute;right:-.5em;top:-.6em;font-size:.6em;background:#3a3458;border:.15em solid #ffd84a;padding:0 .35em;font-weight:900}.slot .bg:empty{display:none}.wcard .wc{font-size:.65em;background:#ffd84a;color:#14121a;padding:0 .5em;font-weight:900}
+#whint{margin-top:.7em;font-size:.95em;text-shadow:0 .1em 0 #000}#whint b{background:#ffd84a;color:#14121a;padding:0 .3em;margin:0 .15em}
 #err{position:fixed;left:8px;right:8px;bottom:8px;color:#fff;background:#a33;padding:8px;font:12px monospace;white-space:pre-wrap;z-index:99;display:none;max-height:40vh;overflow:auto}
 </style></head><body>
 <canvas id="screen"></canvas>
 <div id="ui">
  <div id="hud"><div id="hpw"><div id="hpbar"><div id="hprally"></div><div id="hpfill"></div><div id="hptxt">100 / 100</div></div><div id="flasks"></div><div id="stats"></div></div><div id="tdoor"></div><div id="flow"></div><div id="rush"></div><div id="curse"></div>
   <div id="tr"><div id="floor" class="k">1F · 美术部</div><div id="cellw">✦ <span id="cells">0</span></div><div id="timer">0:00</div><div id="mode"></div></div>
-  <div id="slots"><div class="slot pane"><span class="kk">J</span><canvas id="ic1" width="48" height="48"></canvas><div class="nm" id="n1"></div><div class="af" id="a1"></div></div><div class="slot pane"><span class="kk">K</span><canvas id="ic2" width="48" height="48"></canvas><div class="nm" id="n2"></div><div class="af" id="a2"></div><div id="cd2"></div></div></div>
-  <div id="help">A/D 移动 · 空格 跳（按住跳更高，空中再按二段跳）· 贴墙自动攀边 · S+空格 下平台 · 空中 S+J 下劈<br>J 建模工具 · 翻滚后立刻 J = 冲刺斩 · K 地编工具 · Shift 翻滚（踩点躲开 = 完美闪避）· Q 便当 · E 互动 · Esc 暂停</div>
+  <div id="slots"><div class="slot pane"><span class="kk">J</span><canvas id="ic1" width="48" height="48"></canvas><div class="nm" id="n1"></div><span class="bg" id="b1"></span><div class="af" id="a1"></div></div><div class="slot pane"><span class="kk">K</span><canvas id="ic2" width="48" height="48"></canvas><div class="nm" id="n2"></div><span class="bg" id="b2"></span><div class="af" id="a2"></div><div id="cd2"></div></div></div>
+  <div id="help">A/D 移动 · 空格 跳（按住跳更高，空中再按二段跳）· 贴墙自动攀边 · S+空格 下平台 · 空中 S+J 下劈<br>J 建模工具 · 翻滚后立刻 J = 冲刺斩 · K 地编工具 · 按住 R / F 切换武器 · Shift 翻滚（踩点躲开 = 完美闪避）· Q 便当 · E 互动 · Esc 暂停</div>
   <div id="bossbar"><div id="bossname" class="k"></div><div id="bossb"><div id="bossfill"></div></div><div id="bossst"><div id="bossstag"></div></div></div>
   <div id="prompt" class="pane"></div><div id="toast" class="pane"></div>
  </div>
+ <div id="wheel"><div id="wtitle" class="k"></div><div id="wcards"></div><div id="whint"></div></div>
  <div id="banner"><div id="bn1" class="k"></div><div id="bn2"></div></div>
  <button id="bmute">🔊</button>
  <div id="title" class="ov show"><h1 class="k">马楠<br>通关游戏公司</h1><div class="sub k">一个建模师兼地编的下班之路</div>
-  <div class="ctl"><b>A D</b>移动　<b>空格</b>跳 / 二段跳　<b>S+空格</b>跳下平台<br><b>J</b>建模工具（主武器）　<b>K</b>地编工具（副武器）　<b>Shift</b>翻滚（无敌）<br><b>Q</b>吃便当回血　<b>E</b>拾取武器 / 开宝箱　<b>Esc</b>暂停<br>鼠标左键 = J，右键 = K</div>
+  <div class="ctl"><b>A D</b>移动　<b>空格</b>跳 / 二段跳　<b>S+空格</b>跳下平台<br><b>J</b>建模工具（主武器）　<b>K</b>地编工具（副武器）　<b>Shift</b>翻滚（无敌）<br><b>Q</b>吃便当回血　<b>E</b>拾取武器 / 开宝箱　<b>R / F</b>按住切换武器　<b>Esc</b>暂停<br>鼠标左键 = J，右键 = K</div>
   <div id="lvlsel"><button class="lb" id="lvlm">◀</button><span>加班等级 <b id="lvln">0</b></span><button class="lb" id="lvlp">▶</button></div><div id="lvld" class="ctl"></div><div><button class="btn" id="bstart">开始上班</button></div><div id="meta" class="ctl"></div><div id="verw"><span id="ver"></span><button id="bchg" class="lb">更新内容<i id="vnew">新</i></button></div></div>
  <div id="pause" class="ov"><h2 class="k" style="font-size:3.6em;margin:0">暂停</h2><div id="pstat"></div><div class="ctl" style="margin-top:1em"><b>A D</b>移动　<b>空格</b>跳　<b>J</b>攻击　<b>K</b>副武器　<b>Shift</b>翻滚　<b>Q</b>回血　<b>E</b>拾取</div><button class="btn" id="bresume">继续</button></div>
  <div id="dead" class="ov"><h2 class="k" style="font-size:4em;margin:0">需求太多，先躺一会儿……</h2><div id="dcause"></div><div style="font-size:1.2em;margin-top:.6em">重新挑战本层（保留武器和升级，灵感减半）</div><button class="btn" id="bretry">再来（Enter）</button></div>

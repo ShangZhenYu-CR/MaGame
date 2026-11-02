@@ -41,6 +41,10 @@ function genLevel(floor){
     if(ok){for(let y=g0-11;y<g0;y++)for(let x=bx-1;x<bx+7;x++)if(T[y*w+x]===2||T[y*w+x]===3)set(x,y,0);for(let i=pks.length-1;i>=0;i--){const k=pks[i];if(k.x>=(bx-1)*TS&&k.x<=(bx+7)*TS&&k.y<g0*TS-2)pks.splice(i,1)}for(let i=0;i<3;i++)set(bx+i,g0-4,5);for(let i=0;i<3;i++)set(bx+3+i,g0-7,5);for(let i=0;i<3;i++)set(bx+i,g0-10,5);pks.push({k:'wireterm',x:(bx+4)*TS+8,y:g0*TS});pks.push({k:'chest',x:(bx+1)*TS+8,y:(g0-10)*TS,bonus:true,secret:true});secretDone=true;break}}}
   // 加班合同（诅咒宝箱）：第 3 块，一半概率
   if(c===2&&Math.random()<.5){const ss=segs.filter(s=>s.len>=4);if(ss.length){const s=pick(ss),cx=s.x+Math.floor(s.len/2);if(T[(s.g-1)*w+cx]===0)pks.push({k:'cchest',x:cx*TS+8,y:s.g*TS})}}
+  // 实习生小卖部：第 3 块，60% 概率。一个实习生 + 三件商品，用灵感买
+  if(c===2&&Math.random()<.6){const ss=segs.filter(s=>!s.room&&s.len>=9&&s.x>x0+2);if(ss.length){const s=pick(ss);let ok=true;for(let i=1;i<9;i++)for(let y=s.g-3;y<s.g;y++)if(T[y*w+s.x+i]!==0&&T[y*w+s.x+i]!==3)ok=false;
+   if(ok){for(let i=0;i<10;i++)for(let y=s.g-3;y<s.g;y++)if(T[y*w+s.x+i]===3)set(s.x+i,y,0);pks.push({k:'intern',x:(s.x+1)*TS+8,y:s.g*TS});const ws=Object.keys(WARES).sort(()=>Math.random()-.5).slice(0,3);
+    ws.forEach((it,i)=>pks.push({k:'ware',item:it,c:Math.round(WARES[it].c*(1+.2*(floor-1))/5)*5,x:(s.x+3.5+i*2.2)*TS,y:s.g*TS}))}}}
   // 加急任务：第 2 块
   if(c===1){const s=segs[irnd(0,segs.length-1)];pks.push({k:'rush',x:(s.x+Math.floor(s.len/2))*TS+8,y:s.g*TS})}
   // 卷轴：第 2、4 块各一个

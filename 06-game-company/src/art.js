@@ -36,14 +36,15 @@ function drawEnemySpr(e,cx,cy){const b='enemy_'+e.type;if(!useSpr||!sprReady(b+'
  const has=k=>sprReady(b+'_'+k);
  if(e.state==='stun'&&has('stun')){n=b+'_stun';fi=Math.floor(e.anim*5)}
  else if(e.state==='tired'&&has('tired')){n=b+'_tired';fi=Math.floor(e.anim*4)}
- else if(e.state==='wind'&&has('wind')){n=b+'_wind';fi=Math.floor((1-Math.max(0,e.timer)/(e.windT||.5))*3)}
- else if((['lunge','swoop','bash','slam'].includes(e.state)||e.atkT>0||(e.type==='bug'&&!e.onGround&&e.cd>.6))&&has('attack')){n=b+'_attack';fi=e.atkT>0?Math.floor((1-e.atkT/.3)*3):Math.min(2,Math.floor(e.anim*10)%3)}
+ else if(e.state==='blinkw'&&has('blink')){n=b+'_blink';fi=Math.min(3,Math.floor((1-Math.max(0,e.timer)/.5)*4))}
+ else if((e.state==='wind'||e.state==='slashw')&&has('wind')){n=b+'_wind';fi=Math.floor((1-Math.max(0,e.timer)/(e.windT||.5))*3)}
+ else if((['lunge','swoop','bash','slam','spray','slash','rally'].includes(e.state)||e.atkT>0||(e.type==='bug'&&!e.onGround&&e.cd>.6))&&has('attack')){n=b+'_attack';fi=e.atkT>0?Math.floor((1-e.atkT/.3)*3):Math.min(2,Math.floor(e.anim*10)%3)}
  const x=e.x-cx,y=e.y-cy;
  if(e.fly){sprFrame(n,fi,x,y-e.h/2,e.face,false,'center');if(e.flash>0)sprFrame(n,fi,x,y-e.h/2,e.face,true,'center')}
  else{sprFrame(n,fi,x,y,e.face);if(e.flash>0)sprFrame(n,fi,x,y,e.face,true)}
  if(e.bleedT>0&&Math.floor(e.anim*8)%2)px(x+rnd(-4,4),y-e.h*rnd(.3,1.1),1,2,pick(['#ff6a2a','#ffb84a']));
  if(e.slowT>0){for(let i=0;i<3;i++){const vx=x-e.w/2+((i*7+Math.floor(e.anim*3))%Math.max(1,e.w));pline(vx,y,vx+2,y-6,1,'#3a8a3a');px(vx+1,y-5,2,1,'#9ad870')}}
- if(e.state==='wind'&&e.windT>0&&Math.floor(e.anim*12)%2===0)pnum('!',R(x),R(y-e.h-12),'#ff5a4a',2);
+ if((e.state==='wind'||e.state==='slashw')&&e.windT>0&&Math.floor(e.anim*12)%2===0)pnum('!',R(x),R(y-e.h-12),'#ff5a4a',2);
  return true}
 // Boss 素材
 function drawBossSpr(b,cx,cy){const p='boss_'+b.kind;if(!useSpr||!sprReady(p+'_idle'))return false;let n=p+'_idle',fi=Math.floor(b.anim*5);const has=k=>sprReady(p+'_'+k),st=b.state,set=(k,f)=>{if(has(k)){n=p+'_'+k;fi=f}};
@@ -141,10 +142,25 @@ function drawEnemy(e,cx,cy){if(e.elite){ctx.globalAlpha=.35+.2*Math.sin(e.anim*8
  else if(e.type==='firewall'){const l=Math.sin(t*8)*1.5,tired=e.state==='tired';px(x-3+l,y-3,2,3,'#2a2d36');px(x+1-l,y-3,2,3,'#2a2d36');px(x-6,y-22,12,19,W||'#4a5470');eyes(x-3,y-19,f,true,tired?'#7fd8ff':'#14121a');
   const sx=x+f*(tired?2:7),sy=y-(tired?8:24);ctx.save();if(tired){ctx.translate(sx,sy);ctx.rotate(f*1.2);ctx.translate(-sx,-sy)}px(sx-3,sy,6,22,W||'#b8603a');for(let r=0;r<5;r++)px(sx-3+(r%2)*3,sy+2+r*4,3,1,'#7a3a20');px(sx-2,sy+8,4,5,'#ffb84a');px(sx-1,sy+6,2,2,'#ff6a3a');ctx.restore();if(tired&&Math.floor(t*6)%2)pnum('+',x,y-30,'#7fd8ff')}
  else if(e.type==='invite'){const b=Math.sin(t*5)*2;px(x-8,y-12+b,16,11,W||'#f4f4f8');pline(x-8,y-12+b,x,y-6+b,1,'#9aa0a8');pline(x+7,y-12+b,x,y-6+b,1,'#9aa0a8');px(x-3,y-5+b,6,3,'#d8584a');px(x+4,y-15+b,6,6,'#3a6ad8');px(x+5,y-13+b,4,1,'#fff');px(x+5,y-11+b,2,1,'#fff');eyes(x-4,y-10+b,f,false)}
+ else if(e.type==='spray'){const sh=e.state==='wind'?Math.round(Math.sin(t*60)):0,lean=e.state==='spray'?-f*2:0,l=Math.sin(t*12)*1.5,X=x+sh+lean;
+  px(x-4+l,y-3,3,3,'#14121a');px(x+1-l,y-3,3,3,'#14121a');px(X-7,y-23,14,21,'#14121a');px(X-6,y-22,12,19,W||'#e8503a');px(X-6,y-22,3,19,W||'#ff7a5a');px(X-6,y-14,12,6,W||'#f4f1ea');px(X-4,y-13,8,1,W||'#3a8ad8');px(X-4,y-11,5,1,W||'#5ab85a');
+  px(X-4,y-26,8,4,'#14121a');px(X-3,y-25,6,3,W||'#3a3a46');px(X+f*3-1,y-28,3,2,W||'#d8d8e0');eyes(X-2,y-19,f,e.state!=='idle'&&e.state!=='move');
+  if(e.state==='spray'){ctx.globalAlpha=.6;for(let i=0;i<6;i++)px(X+f*(6+i*6+rnd(0,4)),y-27+rnd(-3,3)+i,3,3,pick(['#e8503a','#ff7a5a','#f4f1ea']));ctx.globalAlpha=1}}
+ else if(e.type==='merge'){const g=(e.state==='blinkw'||e.state==='wind')&&Math.floor(t*20)%2,o=g?rnd(-2,2):0,l=Math.sin(t*10)*1.5;
+  px(x-5+l,y-3,3,3,'#14121a');px(x+2-l,y-3,3,3,'#14121a');px(x-9+o,y-27,18,25,'#14121a');px(x-8+o,y-26,8,23,W||'#2f7a3a');px(x+o,y-26,8,23,W||'#8a2a32');
+  for(let r=0;r<4;r++){px(x-7+o,y-23+r*5,5,1,W||'#7af07a');px(x+2+o,y-23+r*5,5,1,W||'#ff7a7a')}px(x-6+o,y-24,1,3,W||'#7af07a');px(x+o-1,y-27,2,25,'#14121a');
+  eyes(x-2+o,y-17,f,true,e.state==='slashw'||e.state==='slash'?'#ff3a3a':'#14121a');
+  if(e.state==='slash'||e.state==='slashw'){const a=e.state==='slash';pline(x+f*6,y-14,x+f*(a?26:10),y-(a?10:24),2,'#f4f1ea');px(x+f*(a?26:10)-1,y-(a?11:25),3,3,'#ff7a7a')}}
+ else if(e.type==='pm'){ctx.save();ctx.translate(x,y);ctx.scale(1.3,1.3);ctx.translate(-x,-y);const l=Math.sin(t*9)*1.5,up=e.state==='wind'||e.state==='rally';
+  px(x-4+l,y-4,3,4,'#14121a');px(x+1-l,y-4,3,4,'#14121a');px(x-7,y-21,14,18,'#14121a');px(x-6,y-20,12,16,W||'#3a6ad8');px(x-1,y-20,2,9,W||'#d8483a');px(x-6,y-20,12,2,W||'#f4f1ea');
+  px(x-6,y-31,12,11,'#14121a');px(x-5,y-30,10,9,W||'#f0c8a0');px(x-5,y-31,10,3,W||'#3a2a20');px(x-4,y-26,3,2,'#14121a');px(x+1,y-26,3,2,'#14121a');px(x-1,y-26,2,1,'#14121a');
+  const bx=x+f*(up?4:8),by=y-(up?40:20);px(bx-6,by,12,10,'#14121a');px(bx-5,by+1,10,8,W||'#f4f1ea');px(bx-4,by+2,5,2,W||'#5ab85a');px(bx-2,by+4,6,2,W||'#f2c14e');px(bx,by+6,4,2,W||'#d8483a');
+  if(e.state==='rally'){ctx.globalAlpha=.4+.3*Math.sin(t*20);pcirc(x,y-20,22,'#ffd84a');ctx.globalAlpha=1}ctx.restore()}
+ if(e.hasteT>0&&Math.floor(t*10)%2){px(x-f*(e.w/2+3),y-e.h*.7,4,1,'#ffd84a');px(x-f*(e.w/2+5),y-e.h*.4,5,1,'#ffd84a')}
  if(e.bleedT>0&&Math.floor(t*8)%2)px(x+rnd(-4,4),y-e.h*rnd(.3,1.1),1,2,pick(['#ff6a2a','#ffb84a']));
  if(e.slowT>0){for(let i=0;i<3;i++){const vx=x-e.w/2+((i*7+Math.floor(t*3))%Math.max(1,e.w));pline(vx,y,vx+2,y-6,1,'#3a8a3a');px(vx+1,y-5,2,1,'#9ad870')}}
  if(e.state==='stun'&&Math.floor(t*6)%2){px(x-4,y-e.h-6,2,2,'#ffd84a');px(x+3,y-e.h-8,2,2,'#ffd84a')}
- if(e.state==='wind'&&e.windT>0&&Math.floor(e.anim*12)%2===0){pnum('!',x,y-e.h-12,'#ff5a4a',2)}}
+ if((e.state==='wind'||e.state==='slashw')&&e.windT>0&&Math.floor(e.anim*12)%2===0){pnum('!',x,y-e.h-12,'#ff5a4a',2)}}
 // ===== Boss =====
 function drawBoss(b,cx,cy){if(drawBossSpr(b,cx,cy))return;const x=R(b.x-cx),y=R(b.y-cy),f=b.face,t=b.anim,fl=b.flash>0;const c=(v)=>fl?'#fff':v;
  ctx.save();ctx.translate(x,y);ctx.scale(f,1);
@@ -170,9 +186,9 @@ function drawPenArm(x,y,a,c){pline(x,y,x+Math.sin(a)*6,y+Math.cos(a)*6,3,c('#5a3
  const dx=Math.sin(a+.6),dy=Math.cos(a+.6);pline(hx-dx*6,hy-dy*6,hx+dx*26,hy+dy*26,4,c('#e8483a'));pline(hx+dx*26,hy+dy*26,hx+dx*31,hy+dy*31,2,c('#2a1a1a'))}
 // ===== 楼层主题 =====
 const THEME={
- 1:{name:'1F · 美术部',wall:'#eadfca',wall2:'#ddcfb4',trim:'#b89a74',floor:'#8a6248',floorT:'#a87a58',floorD:'#5e4030',plat:'#b98a5e',platT:'#d8a878',sky:['#9fd3f0','#d8ecf8'],light:'rgba(255,230,170,',enemies:['crumple','sticky','printer'],boss:'ad',song:'f1'},
- 2:{name:'2F · 研发部',wall:'#232a42',wall2:'#1c2236',trim:'#3a4a6a',floor:'#3a4258',floorT:'#56607a',floorD:'#242a3a',plat:'#4a5470',platT:'#6a7896',sky:['#0e1426','#1c2a4a'],light:'rgba(120,220,255,',enemies:['bug','popup','firewall','crumple'],boss:'pd',song:'f2'},
- 3:{name:'顶层 · 总裁办',wall:'#cfc6b4',wall2:'#beb4a0',trim:'#a8884a',floor:'#5a2a2a',floorT:'#7a3a36',floorD:'#3a1a1a',plat:'#6a5a4a',platT:'#a8884a',sky:['#1a1c3a','#3a3060'],light:'rgba(255,215,140,',enemies:['kpi','invite','firewall','popup'],boss:'ceo',song:'f3'}};
+ 1:{name:'1F · 美术部',wall:'#eadfca',wall2:'#ddcfb4',trim:'#b89a74',floor:'#8a6248',floorT:'#a87a58',floorD:'#5e4030',plat:'#b98a5e',platT:'#d8a878',sky:['#9fd3f0','#d8ecf8'],light:'rgba(255,230,170,',enemies:['crumple','sticky','printer','spray'],boss:'ad',song:'f1'},
+ 2:{name:'2F · 研发部',wall:'#232a42',wall2:'#1c2236',trim:'#3a4a6a',floor:'#3a4258',floorT:'#56607a',floorD:'#242a3a',plat:'#4a5470',platT:'#6a7896',sky:['#0e1426','#1c2a4a'],light:'rgba(120,220,255,',enemies:['bug','popup','firewall','crumple','merge'],boss:'pd',song:'f2'},
+ 3:{name:'顶层 · 总裁办',wall:'#cfc6b4',wall2:'#beb4a0',trim:'#a8884a',floor:'#5a2a2a',floorT:'#7a3a36',floorD:'#3a1a1a',plat:'#6a5a4a',platT:'#a8884a',sky:['#1a1c3a','#3a3060'],light:'rgba(255,215,140,',enemies:['kpi','invite','firewall','popup','pm'],boss:'ceo',song:'f3'}};
 // 背景装饰
 // 装饰物素材：程序生成的装饰种类 → 各层的素材名（用 d.s 在几种之间轮换）；wall=挂在墙上
 const DECOR_MAP={1:{easel:['easel'],frame:['artwall'],plant:['plant','sculpture'],board:['drawingdesk'],shelf:['bookshelf'],cooler:['watercooler','wastebasket']},

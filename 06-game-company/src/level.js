@@ -83,8 +83,10 @@ function tileIdx(v,tx,ty){const h=(tx*7+ty*13)%3;
  if(v===1){if(ty<=1)return isSolid(tx,ty+1)?16:17;const top=!isSolid(tx,ty-1),L=!isSolid(tx-1,ty),Rt=!isSolid(tx+1,ty);if(top)return L&&Rt?5:L?0:Rt?4:1+h;return L&&Rt?11:L?9:Rt?10:6+h}
  if(v===2){const L=tileAt(tx-1,ty)!==2,Rt=tileAt(tx+1,ty)!==2;return L&&Rt?15:L?12:Rt?14:13}
  return {3:18,4:21,5:19}[v]}
+// 平台瓦片素材顶部有几像素透明，画的时候往上挪，让木板上沿和碰撞线对齐（不然人看起来悬空）
+const PLAT_OFF={1:4.5,2:3,3:4.5};
 function drawTilesSpr(cx,cy){const n='tiles_f'+LV.floor;if(!useSpr||!sprReady(n))return false;const im=SPR[n],s=SPRS[n]||1,ts=16*s,x0=Math.max(0,Math.floor(cx/TS)),x1=Math.min(LV.w-1,Math.floor((cx+VW)/TS)),y0=Math.max(0,Math.floor(cy/TS)),y1=Math.min(LV.h-1,Math.floor((cy+VH)/TS));
- for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){const v=LV.T[ty*LV.w+tx];if(!v)continue;const i=tileIdx(v,tx,ty);if(i===undefined)continue;if(v===5)ctx.globalAlpha=.55+.25*Math.sin(T*6+tx);ctx.drawImage(im,(i%8)*ts,Math.floor(i/8)*ts,ts,ts,tx*TS-cx,ty*TS-cy,TS,TS);ctx.globalAlpha=1}
+ for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){const v=LV.T[ty*LV.w+tx];if(!v)continue;const i=tileIdx(v,tx,ty);if(i===undefined)continue;if(v===5)ctx.globalAlpha=.55+.25*Math.sin(T*6+tx);ctx.drawImage(im,(i%8)*ts,Math.floor(i/8)*ts,ts,ts,tx*TS-cx,ty*TS-cy-(v===2?PLAT_OFF[LV.floor]||0:0),TS,TS);ctx.globalAlpha=1}
  if(LV.gate.active){const sx=LV.gate.x*TS-cx;for(let ty=2;ty<LV.h;ty++)ctx.drawImage(im,(20%8)*ts,Math.floor(20/8)*ts,ts,ts,sx,ty*TS-cy,TS,TS)}
  return true}
 function drawTiles(cx,cy){if(drawTilesSpr(cx,cy))return;const th=LV.th,x0=Math.max(0,Math.floor(cx/TS)),x1=Math.min(LV.w-1,Math.floor((cx+VW)/TS)),y0=Math.max(0,Math.floor(cy/TS)),y1=Math.min(LV.h-1,Math.floor((cy+VH)/TS));
@@ -139,7 +141,9 @@ function drawLights(cx,cy,t){const f=LV.floor,th=LV.th;
   if(scene&&d.k==='window')continue;
   if(d.k==='window'&&f===1){ctx.fillStyle='rgba(255,226,160,.07)';ctx.beginPath();ctx.moveTo(x+2,y+2);ctx.lineTo(x+38,y+2);ctx.lineTo(x+110,y+190);ctx.lineTo(x+60,y+190);ctx.fill();ctx.fillStyle='rgba(255,226,160,.05)';ctx.fillRect(x+2,y+2,36,32)}
   if(d.k==='window'&&f===2){ctx.fillStyle='rgba(255,150,90,.06)';ctx.beginPath();ctx.moveTo(x+2,y+2);ctx.lineTo(x+38,y+2);ctx.lineTo(x+120,y+190);ctx.lineTo(x+40,y+190);ctx.fill()}
-  if(d.k==='lamp'){const ly=y+(scene?20:12),g=ctx.createRadialGradient(x,ly,2,x,ly,f===3?130:80);g.addColorStop(0,th.light+(f===3?'.6)':'.14)'));g.addColorStop(1,th.light+'0)');ctx.fillStyle=g;ctx.fillRect(x-135,ly-132,270,270)}
+  if(d.k==='lamp'){const ly=y+(scene?20:12),g=ctx.createRadialGradient(x,ly,2,x,ly,f===3?130:80);g.addColorStop(0,th.light+(f===3?'.6)':scene?'.22)':'.14)'));g.addColorStop(1,th.light+'0)');ctx.fillStyle=g;ctx.fillRect(x-135,ly-132,270,270)}
   if(d.k==='monitor'||d.k==='server'){ctx.fillStyle='rgba(90,200,255,.06)';ctx.beginPath();ctx.arc(x+11,y+8,22,0,7);ctx.fill()}}
  ctx.restore()}
-function drawNear(cx,cy){const n='bg_f'+LV.floor+'_near';if(!sprReady(n))return;const im=SPR[n],s=SPRS[n]||1,W=im.naturalWidth/s,H=im.naturalHeight/s;for(let x=-(Math.floor(cx*1.3)%W);x<VW;x+=W)ctx.drawImage(im,x,VH-H,W,H)}
+// 近景剪影层：试玩反馈说像奇怪的影子，默认关闭
+const SHOW_NEAR=false;
+function drawNear(cx,cy){if(!SHOW_NEAR)return;const n='bg_f'+LV.floor+'_near';if(!sprReady(n))return;const im=SPR[n],s=SPRS[n]||1,W=im.naturalWidth/s,H=im.naturalHeight/s;for(let x=-(Math.floor(cx*1.3)%W);x<VW;x+=W)ctx.drawImage(im,x,VH-H,W,H)}

@@ -4,7 +4,7 @@ const BOSSDEF={
  ad:{name:'主美 · 改稿大师',hp:950,w:22,h:60,quote:'“这版不行，再改一版。”',p2:'“这是终稿……的第二版！”',dead:'“……这版，过了。”',contact:16},
  pd:{name:'制作人 · 需求变更',hp:1250,w:22,h:52,quote:'“需求有一点点小调整……”',p2:'“上线前再加个功能！”',dead:'“需求……冻结。”',contact:16},
  ceo:{name:'老板 · 画大饼',hp:2200,w:34,h:64,quote:'“年轻人，项目做成了，大家都有饼吃！”',p2:'“这个饼，可大了！”',dead:'“好吧……今天准时下班。”',contact:20},
- ljy:{name:'隐藏大佬 · 刘敬阳',hp:3400,w:36,h:72,quote:'“这么晚还在公司？来，陪我练两组。”',p2:'“炎龙铠甲——合体！”',p3:'“龙魂，燃烧吧！”',dead:'“……好小子。明早七点，健身房见。”',contact:22}};
+ ljy:{name:'隐藏大佬 · 刘敬阳',hp:3400,w:22,h:72,quote:'“这么晚还在公司？来，陪我练两组。”',p2:'“炎龙铠甲——合体！”',p3:'“龙魂，燃烧吧！”',dead:'“……好小子。明早七点，健身房见。”',contact:22}};
 function bsp(b){return(b.phase===3?1.5:b.phase===2?1.3:1)*(G.hard?1.15:1)}
 function spawnBoss(kind){const d=BOSSDEF[kind],hp=Math.round(d.hp*(G.hard?1.4:1));boss={kind,isBoss:true,name:d.name,x:LV.arenaX+LV.arenaW-80,y:19*TS,w:d.w,h:d.h,vx:0,vy:0,face:-1,hp,max:hp,state:'intro',t:0,anim:0,flash:0,phase:1,onGround:true,drop:false,cd:0,idleT:1,contactCd:0,pen:-.4,alpha:1,minions:0,seq:0,stag:0,stagMax:Math.round(hp*.25),stagPend:false,phasePend:0,closeT:0,hitLog:[]};
  bossBanner(d.name,d.quote);Snd.play('boss');SFX.boss()}
@@ -128,7 +128,7 @@ function ljyUpdate(b,dt,dx,sp){const gy=19*TS,AX0=LV.arenaX+3*TS,AX1=LV.arenaX+L
  case 'slam':if(b.t<.32){b.vx=0}else if(!b.jumped){b.jumped=true;b.vy=-540;b.vx=clamp(dx/0.95,-280,280);SFX.jump()}else if(b.onGround&&b.t>.45){b.jumped=false;SFX.stamp();shake=7;b.landT=.36;for(const d of[-1,1])eproj({kind:'wave',x:b.x+d*16,y:b.y,vx:d*210*sp,vy:0,r:6,dmg:16,life:2,col:'#9aa0a8'});burst(b.x,b.y-4,16,['#9aa0a8','#fff'],180,.4);if(Math.abs(dx)<36)hurtPlayer(24,sign(dx)||1,b);b.state='recover';b.t=0;b.rec=.8}break;
  // ---- 变身 ----
  case 'transform':b.vx=0;b.face=sign(dx)||b.face;if(Math.random()<.9)part(b.x+rnd(-20,20),b.y-rnd(0,b.h),rnd(-40,40),-rnd(60,160),pick(['#ff8a2a','#ffd84a','#c8281e','#fff']),.5,3,-40);
-  if(b.t>.9&&!b.armor){b.armor=true;b.h=76;b.flash=.3;SFX.boom();shake=9;hitstop=Math.max(hitstop,.12);slowmo=.3;slowT=.55;flashRed=.35;banner('炎龙铠甲','合 体 ！',1600);$('bossname').textContent='炎龙铠甲 · 刘敬阳';$('bossname').classList.add('flame');burst(b.x,b.y-34,50,['#ff8a2a','#ffd84a','#c8281e','#fff'],320,.7,3,0);ringFx(b.x,b.y-34,'#ff8a2a');if(Math.abs(P.x-b.x)<120&&!P.dead){P.vx=sign(P.x-b.x||1)*300;P.vy=-240}}
+  if(b.t>.9&&!b.armor){b.armor=true;b.h=72;b.w=28;b.flash=.3;SFX.boom();shake=9;hitstop=Math.max(hitstop,.12);slowmo=.3;slowT=.55;flashRed=.35;banner('炎龙铠甲','合 体 ！',1600);$('bossname').textContent='炎龙铠甲 · 刘敬阳';$('bossname').classList.add('flame');burst(b.x,b.y-34,50,['#ff8a2a','#ffd84a','#c8281e','#fff'],320,.7,3,0);ringFx(b.x,b.y-34,'#ff8a2a');if(Math.abs(P.x-b.x)<120&&!P.dead){P.vx=sign(P.x-b.x||1)*300;P.vy=-240}}
   if(b.t>1.8)done(.3);break;
  // ---- 二阶段：炎龙铠甲 ----
  case 'fdash_wind':b.vx=0;b.face=sign(dx)||b.face;if(b.t<.05)SFX.warn();if(Math.random()<.6)part(b.x-b.face*10,b.y-rnd(0,30),-b.face*60,-20,'#ff8a2a',.3,2,0);if(b.t>.48/sp){b.state='fdash';b.t=0;b.trailX=b.x;SFX.heavy()}break;

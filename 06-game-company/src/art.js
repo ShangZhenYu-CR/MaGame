@@ -54,9 +54,13 @@ function drawEnemySpr(e,cx,cy){const b='enemy_'+e.type;if(!useSpr||!sprReady(b+'
 // 刘敬阳：一阶段 boss_ljy_xxx，二阶段（铠甲）boss_ljy_p2_xxx；缺的动作用 idle 顶上
 const LJY_ANIM={intro:'intro',cube:'cube',bell:'throw',brush_wind:'brush_wind',brush:'brush',curl_wind:'curl_wind',curl:'curl',slam:'slam',stagger:'stagger',transform:'transform',roar:'roar',dead:'die',
  fdash_wind:'fdash_wind',fdash:'fdash',breath:'breath',pillars:'pillars',dive_up:'dive_up',dive_hover:'dive_up',dive_fall:'dive',upper_wind:'upper_wind',upper:'upper',meteor:'roar'};
-function drawLJYSpr(b,cx,cy){const pre=b.armor?'boss_ljy_p2_':'boss_ljy_';if(!useSpr||!sprReady(pre+'idle')||(b.state==='transform'&&!sprReady('boss_ljy_transform')))return false;
- let k=LJY_ANIM[b.state]||(Math.abs(b.vx)>10?'walk':'idle');if(b.state==='transform')k='transform';let n=(k==='transform'?'boss_ljy_':pre)+k;if(!sprReady(n)){k=Math.abs(b.vx)>10&&sprReady(pre+'walk')?'walk':'idle';n=pre+k}
- const c=sprN(n),loop=['idle','walk','stagger','dive_up','fdash','breath'].includes(k);let fi=loop?Math.floor(b.anim*8):Math.min(c-1,Math.floor(b.t*10));
+// 还没交付的动作先借用最接近的已有姿势（停在最后一帧），保持整场画风一致
+const LJY_FALLBACK={throw:'cube',brush_wind:'curl_wind',brush:'curl_wind',slam:'curl',intro:'idle',walk:'idle',transform:'idle',
+ fdash:'fdash_wind',breath:'upper_wind',pillars:'upper_wind',dive_up:'upper_wind',dive:'fdash_wind',upper:'upper_wind',roar:'idle',die:'stagger'};
+function drawLJYSpr(b,cx,cy){const pre=b.armor?'boss_ljy_p2_':'boss_ljy_';if(!useSpr||!sprReady(pre+'idle'))return false;
+ let k=LJY_ANIM[b.state]||(Math.abs(b.vx)>10?'walk':'idle');let n=(k==='transform'?'boss_ljy_':pre)+k,held=false;
+ if(!sprReady(n)){const fb=LJY_FALLBACK[k]||'idle';n=pre+fb;if(!sprReady(n))n=pre+'idle';held=!['idle','stagger'].includes(fb)}
+ const c=sprN(n),base=n.slice(pre.length),loop=!held&&['idle','walk','stagger','dive_up','fdash','breath'].includes(base)&&n.indexOf('transform')<0;let fi=held?c-1:loop?Math.floor(b.anim*8):Math.min(c-1,Math.floor(b.t*10));
  sprFrame(n,fi,b.x-cx,b.y-cy,b.face);if(b.flash>0)sprFrame(n,fi,b.x-cx,b.y-cy,b.face,true);return true}
 function drawBossSpr(b,cx,cy){if(b.kind==='ljy')return drawLJYSpr(b,cx,cy);const p='boss_'+b.kind;if(!useSpr||!sprReady(p+'_idle'))return false;let n=p+'_idle',fi=Math.floor(b.anim*5);const has=k=>sprReady(p+'_'+k),st=b.state,set=(k,f)=>{if(has(k)){n=p+'_'+k;fi=f}};
  if((st==='tele'||st==='tele_in')&&has('tele_out'))ctx.globalAlpha=1;

@@ -77,6 +77,9 @@ $('chglist').innerHTML=CHANGELOG.map(c=>`<h3>${c.v}<small>${c.date}</small></h3>
 const seenVer=(()=>{try{return localStorage.getItem('magame06_ver')}catch(e){return null}})();
 if(seenVer!==VERSION)$('bchg').classList.add('new');
 function showChanges(v){show('chg',v);if(v){$('bchg').classList.remove('new');try{localStorage.setItem('magame06_ver',VERSION)}catch(e){}}}
+// 全屏：按钮或标题画面按 F（游戏中 F 是地编工具切换，所以只在标题画面生效）
+function toggleFull(){try{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen({navigationUI:'hide'}).catch(()=>{})}catch(e){}setTimeout(resize,200)}
+$('bfull').onclick=e=>{e.currentTarget.blur();toggleFull()};document.addEventListener('fullscreenchange',()=>setTimeout(resize,60));
 $('bchg').onclick=()=>{SFX.select();showChanges(true)};$('bchgx').onclick=()=>showChanges(false);$('bretry').onclick=retry;$('bagain').onclick=()=>{show('end',false);setLvl(SAVE.maxLvl);startGame(G.lvl<SAVE.maxLvl?G.lvl+1:G.lvl)};$('bresume').onclick=()=>togglePause(false);$('bmute').onclick=()=>{$('bmute').textContent=Snd.toggle()?'🔇':'🔊'};
 function togglePause(v){if(G.state!=='play'&&G.state!=='pause')return;if(v)$('pstat').innerHTML=pauseStats()+`<br><small style="opacity:.6">${VERSION}</small>`;G.state=v?'pause':'play';show('pause',v)}
 function pauseStats(){const r=[];r.push(`主武器 <b>${wname(P.prim,P.primLv)}</b> ${P.primAff.map(a=>'<em>'+AFF[a].n+'</em>').join(' ')}`);r.push(`副武器 <b>${wname(P.sec,P.secLv)}</b> ${P.secAff.map(a=>'<em>'+AFF[a].n+'</em>').join(' ')}`);
@@ -215,7 +218,7 @@ function frame(ts){requestAnimationFrame(frame);try{let dt=Math.min(.05,(ts-last
  if(G.state==='dead'&&(pressed('confirm')||KP['Space'])&&$('dead').classList.contains('show'))retry();
  if(G.state==='title'&&$('codex').classList.contains('show')){if(pressed('confirm')||pressed('pause'))showCodex(false);else if(pressed('left')||pressed('right')){const i=CDX_TABS.findIndex(t=>t[0]===cdxTab),n=CDX_TABS.length;cdxTab=CDX_TABS[(i+(pressed('left')?n-1:1))%n][0];SFX.select();cdxDraw()}}
  else if(G.state==='title'&&$('chg').classList.contains('show')){if(pressed('confirm')||pressed('pause'))showChanges(false)}
- else if(G.state==='title'){if(!skinBtn.ok&&sprReady('player_summer_idle')){skinBtn.ok=1;skinBtn()}if(pressed('skin'))nextSkin();if(pressed('confirm'))startGame(selLvl);if(pressed('left'))setLvl(selLvl-1);if(pressed('right'))setLvl(selLvl+1)}
+ else if(G.state==='title'){if(!skinBtn.ok&&sprReady('player_summer_idle')){skinBtn.ok=1;skinBtn()}if(KP['KeyF'])toggleFull();if(pressed('skin'))nextSkin();if(pressed('confirm'))startGame(selLvl);if(pressed('left'))setLvl(selLvl-1);if(pressed('right'))setLvl(selLvl+1)}
  if(KP['KeyM'])$('bmute').textContent=Snd.toggle()?'🔇':'🔊';
  if(G.state==='title'){T+=dt;renderTitle()}
  else if(G.state==='end'){T+=dt;renderEnd()}

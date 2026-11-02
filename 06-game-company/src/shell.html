@@ -36,7 +36,7 @@
 .card{pointer-events:auto;width:13em;height:17em;font:inherit;color:#14121a;background:#f4f1ea;border:.35em solid #14121a;box-shadow:0 .4em 0 #14121a;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6em;position:relative;transition:transform .12s}
 .card:hover{transform:translateY(-.5em)}.ci{font-size:3.4em}.cn{font-family:"ZCOOL KuaiLe",system-ui;font-size:1.7em}.cd{font-size:.95em;padding:0 1em;line-height:1.4}.ck{position:absolute;top:.3em;left:.5em;font-weight:900;opacity:.4}
 #end{background:linear-gradient(rgba(14,10,24,0) 30%,rgba(14,10,24,.7))}#end h2{font-size:4.4em;margin:0;text-shadow:0 .08em 0 #d8483a}#estat{font-size:1.2em;line-height:1.8;margin:.6em 0}
-#bmute{position:absolute;right:1.2em;top:5.6em;pointer-events:auto;font-size:1.2em;background:rgba(20,18,30,.6);border:.15em solid #14121a;color:#fff;cursor:pointer;padding:.1em .4em}
+#bmute,#bfull{position:absolute;right:1.2em;top:5.6em;pointer-events:auto;font-size:1.2em;background:rgba(20,18,30,.6);border:.15em solid #14121a;color:#fff;cursor:pointer;padding:.1em .4em}#bfull{right:4.2em}
 #hprally{position:absolute;left:0;top:0;bottom:0;background:#f2c14e;opacity:.85;width:0;transition:width .3s}#hpfill{position:absolute;left:0;top:0;bottom:0}
 #stats{margin-top:.3em;display:flex;gap:.5em;font-size:.75em;font-weight:800}#stats span{padding:0 .4em;border:.15em solid #14121a}.s1{background:#e8483a}.s2{background:#3a8ad8}.s3{background:#5ab85a}
 #tdoor{position:absolute;left:50%;top:1.2em;transform:translateX(-50%);font-weight:800;font-size:1em;color:#bde986;text-shadow:0 .12em 0 #000}#tdoor.warn{color:#ff7a6a}
@@ -87,7 +87,7 @@
  </div>
  <div id="wheel"><div id="wtitle" class="k"></div><div id="wcards"></div><div id="whint"></div></div>
  <div id="banner"><div id="bn1" class="k"></div><div id="bn2"></div></div>
- <button id="bmute">🔊</button>
+ <button id="bmute">🔊</button><button id="bfull" title="全屏（F）">⛶</button>
  <div id="title" class="ov show"><h1 class="k">马楠<br>通关游戏公司</h1><div class="sub k">一个建模师兼地编的下班之路</div>
   <div id="lvlsel"><button class="lb" id="lvlm">◀</button><span>加班等级 <b id="lvln">0</b></span><button class="lb" id="lvlp">▶</button></div><div id="lvld" class="ctl"></div><button class="lb" id="bskin" style="display:none;margin-top:.3em"></button><div><button class="btn" id="bstart">开始上班</button> <button class="btn btn2" id="btut">新手教程</button></div><div id="meta" class="ctl"></div><div id="verw"><span id="ver"></span><button id="bcdx" class="lb">图鉴</button><button id="bchg" class="lb">更新内容<i id="vnew">新</i></button></div></div>
  <div id="pause" class="ov"><h2 class="k" style="font-size:3.6em;margin:0">暂停</h2><div id="pstat"></div><div class="ctl" style="margin-top:1em"><b>A D</b>移动　<b>空格</b>跳　<b>J</b>攻击　<b>K</b>副武器　<b>Shift</b>翻滚　<b>Q</b>回血　<b>E</b>拾取</div><div><button class="btn" id="bresume">继续</button> <button class="btn btn2" id="bhome2">回到主页</button></div></div>

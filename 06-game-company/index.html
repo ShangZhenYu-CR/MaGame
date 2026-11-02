@@ -36,7 +36,7 @@
 .card{pointer-events:auto;width:13em;height:17em;font:inherit;color:#14121a;background:#f4f1ea;border:.35em solid #14121a;box-shadow:0 .4em 0 #14121a;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6em;position:relative;transition:transform .12s}
 .card:hover{transform:translateY(-.5em)}.ci{font-size:3.4em}.cn{font-family:"ZCOOL KuaiLe",system-ui;font-size:1.7em}.cd{font-size:.95em;padding:0 1em;line-height:1.4}.ck{position:absolute;top:.3em;left:.5em;font-weight:900;opacity:.4}
 #end{background:linear-gradient(rgba(14,10,24,0) 30%,rgba(14,10,24,.7))}#end h2{font-size:4.4em;margin:0;text-shadow:0 .08em 0 #d8483a}#estat{font-size:1.2em;line-height:1.8;margin:.6em 0}
-#bmute{position:absolute;right:1.2em;top:5.6em;pointer-events:auto;font-size:1.2em;background:rgba(20,18,30,.6);border:.15em solid #14121a;color:#fff;cursor:pointer;padding:.1em .4em}
+#bmute,#bfull{position:absolute;right:1.2em;top:5.6em;pointer-events:auto;font-size:1.2em;background:rgba(20,18,30,.6);border:.15em solid #14121a;color:#fff;cursor:pointer;padding:.1em .4em}#bfull{right:4.2em}
 #hprally{position:absolute;left:0;top:0;bottom:0;background:#f2c14e;opacity:.85;width:0;transition:width .3s}#hpfill{position:absolute;left:0;top:0;bottom:0}
 #stats{margin-top:.3em;display:flex;gap:.5em;font-size:.75em;font-weight:800}#stats span{padding:0 .4em;border:.15em solid #14121a}.s1{background:#e8483a}.s2{background:#3a8ad8}.s3{background:#5ab85a}
 #tdoor{position:absolute;left:50%;top:1.2em;transform:translateX(-50%);font-weight:800;font-size:1em;color:#bde986;text-shadow:0 .12em 0 #000}#tdoor.warn{color:#ff7a6a}
@@ -87,7 +87,7 @@
  </div>
  <div id="wheel"><div id="wtitle" class="k"></div><div id="wcards"></div><div id="whint"></div></div>
  <div id="banner"><div id="bn1" class="k"></div><div id="bn2"></div></div>
- <button id="bmute">🔊</button>
+ <button id="bmute">🔊</button><button id="bfull" title="全屏（F）">⛶</button>
  <div id="title" class="ov show"><h1 class="k">马楠<br>通关游戏公司</h1><div class="sub k">一个建模师兼地编的下班之路</div>
   <div id="lvlsel"><button class="lb" id="lvlm">◀</button><span>加班等级 <b id="lvln">0</b></span><button class="lb" id="lvlp">▶</button></div><div id="lvld" class="ctl"></div><button class="lb" id="bskin" style="display:none;margin-top:.3em"></button><div><button class="btn" id="bstart">开始上班</button> <button class="btn btn2" id="btut">新手教程</button></div><div id="meta" class="ctl"></div><div id="verw"><span id="ver"></span><button id="bcdx" class="lb">图鉴</button><button id="bchg" class="lb">更新内容<i id="vnew">新</i></button></div></div>
  <div id="pause" class="ov"><h2 class="k" style="font-size:3.6em;margin:0">暂停</h2><div id="pstat"></div><div class="ctl" style="margin-top:1em"><b>A D</b>移动　<b>空格</b>跳　<b>J</b>攻击　<b>K</b>副武器　<b>Shift</b>翻滚　<b>Q</b>回血　<b>E</b>拾取</div><div><button class="btn" id="bresume">继续</button> <button class="btn btn2" id="bhome2">回到主页</button></div></div>
@@ -109,6 +109,9 @@ const ART_GAP={"boss_ceo_pound": [0.0, 0.0, 4.0, 11.0, 13.0, 6.0, 0.0, 0.0], "en
 // 发新版本时：在 CHANGELOG 最前面加一条，build.py 重新生成 index.html，合并到 main 即可。
 // 标题画面会显示最新版本号；玩家没看过的新版本，“更新内容”按钮上会亮“新”字。
 const CHANGELOG=[
+ {v:'v2.5',date:'2026-11-02',items:[
+  '画面按窗口等比放大到占满，不再在四周留一圈黑边（窗口不是 16:9 时只在一个方向留边）',
+  '右上角新增全屏按钮，标题画面也可以按 F 全屏']},
  {v:'v2.4',date:'2026-11-02',items:[
   '新增新手教程：标题画面点“新手教程”，在一个专门的关卡里一步步练移动、跳跃、二段跳、下平台、翻滚、连击、冲刺斩、下劈、副武器、吃便当、捡武器、切换武器，最后打一只真的穿模怪',
   '教程里有打不死的沙袋可以随便打，也不会倒下',
@@ -200,7 +203,8 @@ const screen=$('screen'),sctx=screen.getContext('2d');
 const RES=2;const buf=document.createElement('canvas');buf.width=VW*RES;buf.height=VH*RES;const ctx=buf.getContext('2d');ctx.setTransform(RES,0,0,RES,0,0);ctx.imageSmoothingEnabled=false;
 let SCALE=3,OX=0,OY=0;
 function resize(){const dpr=Math.min(window.devicePixelRatio||1,2),w=innerWidth||1280,h=innerHeight>100?innerHeight:720;screen.width=Math.floor(w*dpr);screen.height=Math.floor(h*dpr);screen.style.width=w+'px';screen.style.height=h+'px';
- const s=Math.min(screen.width/VW,screen.height/VH);SCALE=s>=2?Math.floor(s):s;OX=Math.floor((screen.width-VW*SCALE)/2);OY=Math.floor((screen.height-VH*SCALE)/2);sctx.imageSmoothingEnabled=false;
+ // 按窗口等比放大到刚好占满（不再取整，取整会在四周留黑边）；窗口不是 16:9 时只在一个方向留边
+ const s=Math.min(screen.width/VW,screen.height/VH);SCALE=s;OX=Math.floor((screen.width-VW*SCALE)/2);OY=Math.floor((screen.height-VH*SCALE)/2);sctx.imageSmoothingEnabled=false;
  const ui=$('ui');if(ui){const cs=SCALE/dpr;ui.style.width=VW*cs+'px';ui.style.height=VH*cs+'px';ui.style.left=OX/dpr+'px';ui.style.top=OY/dpr+'px';ui.style.fontSize=(cs*4.5)+'px'}}
 addEventListener('resize',resize);resize();setTimeout(resize,300);
 function present(){sctx.fillStyle='#000';sctx.fillRect(0,0,screen.width,screen.height);sctx.imageSmoothingEnabled=false;sctx.drawImage(buf,0,0,buf.width,buf.height,OX,OY,VW*SCALE,VH*SCALE)}
@@ -1276,6 +1280,9 @@ $('chglist').innerHTML=CHANGELOG.map(c=>`<h3>${c.v}<small>${c.date}</small></h3>
 const seenVer=(()=>{try{return localStorage.getItem('magame06_ver')}catch(e){return null}})();
 if(seenVer!==VERSION)$('bchg').classList.add('new');
 function showChanges(v){show('chg',v);if(v){$('bchg').classList.remove('new');try{localStorage.setItem('magame06_ver',VERSION)}catch(e){}}}
+// 全屏：按钮或标题画面按 F（游戏中 F 是地编工具切换，所以只在标题画面生效）
+function toggleFull(){try{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen({navigationUI:'hide'}).catch(()=>{})}catch(e){}setTimeout(resize,200)}
+$('bfull').onclick=e=>{e.currentTarget.blur();toggleFull()};document.addEventListener('fullscreenchange',()=>setTimeout(resize,60));
 $('bchg').onclick=()=>{SFX.select();showChanges(true)};$('bchgx').onclick=()=>showChanges(false);$('bretry').onclick=retry;$('bagain').onclick=()=>{show('end',false);setLvl(SAVE.maxLvl);startGame(G.lvl<SAVE.maxLvl?G.lvl+1:G.lvl)};$('bresume').onclick=()=>togglePause(false);$('bmute').onclick=()=>{$('bmute').textContent=Snd.toggle()?'🔇':'🔊'};
 function togglePause(v){if(G.state!=='play'&&G.state!=='pause')return;if(v)$('pstat').innerHTML=pauseStats()+`<br><small style="opacity:.6">${VERSION}</small>`;G.state=v?'pause':'play';show('pause',v)}
 function pauseStats(){const r=[];r.push(`主武器 <b>${wname(P.prim,P.primLv)}</b> ${P.primAff.map(a=>'<em>'+AFF[a].n+'</em>').join(' ')}`);r.push(`副武器 <b>${wname(P.sec,P.secLv)}</b> ${P.secAff.map(a=>'<em>'+AFF[a].n+'</em>').join(' ')}`);
@@ -1414,7 +1421,7 @@ function frame(ts){requestAnimationFrame(frame);try{let dt=Math.min(.05,(ts-last
  if(G.state==='dead'&&(pressed('confirm')||KP['Space'])&&$('dead').classList.contains('show'))retry();
  if(G.state==='title'&&$('codex').classList.contains('show')){if(pressed('confirm')||pressed('pause'))showCodex(false);else if(pressed('left')||pressed('right')){const i=CDX_TABS.findIndex(t=>t[0]===cdxTab),n=CDX_TABS.length;cdxTab=CDX_TABS[(i+(pressed('left')?n-1:1))%n][0];SFX.select();cdxDraw()}}
  else if(G.state==='title'&&$('chg').classList.contains('show')){if(pressed('confirm')||pressed('pause'))showChanges(false)}
- else if(G.state==='title'){if(!skinBtn.ok&&sprReady('player_summer_idle')){skinBtn.ok=1;skinBtn()}if(pressed('skin'))nextSkin();if(pressed('confirm'))startGame(selLvl);if(pressed('left'))setLvl(selLvl-1);if(pressed('right'))setLvl(selLvl+1)}
+ else if(G.state==='title'){if(!skinBtn.ok&&sprReady('player_summer_idle')){skinBtn.ok=1;skinBtn()}if(KP['KeyF'])toggleFull();if(pressed('skin'))nextSkin();if(pressed('confirm'))startGame(selLvl);if(pressed('left'))setLvl(selLvl-1);if(pressed('right'))setLvl(selLvl+1)}
  if(KP['KeyM'])$('bmute').textContent=Snd.toggle()?'🔇':'🔊';
  if(G.state==='title'){T+=dt;renderTitle()}
  else if(G.state==='end'){T+=dt;renderEnd()}

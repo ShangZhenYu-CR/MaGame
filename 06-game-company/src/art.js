@@ -166,7 +166,13 @@ const DECOR_MAP={1:{easel:['easel'],frame:['artwall'],plant:['plant','sculpture'
  3:{trophy:['trophycase'],plant:['moneytree','globe'],frame:['portrait'],poster:['statue','winecabinet'],monitor:['aquarium','sofa']}};
 const DECOR_WALL=['artwall','board','whiteboard','poster','portrait'];
 function drawDecorSpr(d,cx,cy){if(!useSpr||d.gy===undefined)return false;let name=d.k==='elevator'?'elevator':null;const m=DECOR_MAP[LV.floor]&&DECOR_MAP[LV.floor][d.k];if(m)name=m[d.s%m.length];if(!name)return false;const n='decor_f'+LV.floor+'_'+name;if(!sprReady(n))return false;
- sprFrame(n,0,R(d.x+12-cx),R(d.gy-(DECOR_WALL.includes(name)?34:0)-cy),1);return true}
+ // 第一次画的时候检查摆不摆得下：不能被地面挡住，落地的物件下面要全是地面；放不下就左右挪，挪不开就不放
+ if(d.fit===undefined||d.fitN!==n)decorFit(d,n,name);if(d.fit===null)return true;
+ sprFrame(n,0,R(d.x+12+d.fit-cx),R(d.gy-(DECOR_WALL.includes(name)?34:0)-cy),1);return true}
+function decorFit(d,n,name){const im=SPR[n],s=SPRS[n]||1,W=im.naturalWidth/s,H=im.naturalHeight/s,wall=DECOR_WALL.includes(name),bot=d.gy-(wall?34:0);d.fitN=n;
+ const ok=cx=>{for(let x=Math.floor((cx-W/2+1)/TS);x<=Math.floor((cx+W/2-1)/TS);x++){for(let y=Math.floor((bot-H+1)/TS);y<=Math.floor((bot-1)/TS);y++)if(isSolid(x,y)||tileAt(x,y)===3)return false;
+   if(!wall&&!isSolid(x,Math.floor(bot/TS)))return false}return true};
+ for(const o of[0,-8,8,-16,16,-24,24,-32,32,-48,48])if(ok(d.x+12+o)){d.fit=o;return}d.fit=null}
 function drawDecor(d,cx,cy,th,t){const x=R(d.x-cx),y=R(d.y-cy);if(x<-120||x>VW+120)return;if(drawDecorSpr(d,cx,cy))return;
  switch(d.k){
  case 'window':{px(x-1,y-1,42,38,'rgba(0,0,0,.15)');px(x,y,40,36,th.trim);ctx.save();ctx.beginPath();ctx.rect(x+2,y+2,36,32);ctx.clip();drawFar(cx,cy);ctx.fillStyle='rgba(255,255,255,.08)';ctx.beginPath();ctx.moveTo(x+6,y+2);ctx.lineTo(x+16,y+2);ctx.lineTo(x+4,y+34);ctx.lineTo(x-6,y+34);ctx.fill();ctx.restore();px(x+19,y+2,2,32,th.trim);px(x+2,y+17,36,2,th.trim);px(x-3,y+36,46,3,th.trim);px(x-3,y+39,46,1,'rgba(0,0,0,.2)');break}

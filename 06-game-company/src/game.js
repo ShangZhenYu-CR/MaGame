@@ -179,8 +179,11 @@ function step(dt){T+=dt;
  else if(G.state==='dead'){updProjs(dt);P.vy=Math.min(MAXF,P.vy+GRAV*dt);P.vx*=.9;moveBody(P,dt)}
  updParts(dt);updNums(dt);updFx(dt);updCorpses(dt);if(LV)updCamera(dt)}
 // 标题画面
-function renderTitle(){if(!LV)genLevel(1);const th=THEME[1],sx=(T*20)%(LV.arenaX-VW),sy=98;drawBackground(sx,sy,T);for(const d of LV.decor)if(d.k!=='window'&&d.k!=='lamp'&&d.k!=='sign')drawDecor(d,sx,sy,th,T);drawTiles(sx,sy);
- ctx.save();ctx.translate(360,groundBelow(sx+360,120)-98);ctx.scale(3,3);const ph=T*10;if(useSpr&&sprReady('player_run')){sprFrame('player_run',Math.floor(T*12),0,0,-1);ctx.restore();ctx.drawImage(VIG,0,0);return}drawMan(0,0,-1,{legA:Math.sin(ph)*.8,legB:-Math.sin(ph)*.8,kneeA:Math.max(0,-Math.cos(ph)),kneeB:Math.max(0,Math.cos(ph)),armF:-Math.sin(ph)*.7,armB:Math.sin(ph)*.7,elbF:.6,elbB:.6,lean:1,bob:Math.abs(Math.sin(ph))>.7?-1:0,blink:(T%3)<.12},false);drawWeaponAt('stylus',-3,-12,.5,-1);ctx.restore();ctx.drawImage(VIG,0,0)}
+function renderTitle(){if(!LV)genLevel(1);const th=THEME[1],sx=(T*20)%(LV.arenaX-VW);
+ // 前景大号马楠只跟随实心地面（不踩悬空平台），镜头随地面高度平滑升降
+ let gyT=19*TS;for(let ty=3;ty<HT;ty++)if(tileAt(Math.floor((sx+360)/TS),ty)===1){gyT=ty*TS;break}renderTitle.gy=renderTitle.gy===undefined?gyT:lerp(renderTitle.gy,gyT,.06);
+ const sy=R(clamp(renderTitle.gy-206,0,LV.h*TS-VH));drawBackground(sx,sy,T);for(const d of LV.decor)if(d.k!=='window'&&d.k!=='lamp'&&d.k!=='sign')drawDecor(d,sx,sy,th,T);drawTiles(sx,sy);
+ ctx.save();ctx.translate(360,R(renderTitle.gy-sy));ctx.scale(3,3);const ph=T*10;if(useSpr&&sprReady('player_run')){sprFrame('player_run',Math.floor(T*12),0,0,-1);ctx.restore();ctx.drawImage(VIG,0,0);return}drawMan(0,0,-1,{legA:Math.sin(ph)*.8,legB:-Math.sin(ph)*.8,kneeA:Math.max(0,-Math.cos(ph)),kneeB:Math.max(0,Math.cos(ph)),armF:-Math.sin(ph)*.7,armB:Math.sin(ph)*.7,elbF:.6,elbB:.6,lean:1,bob:Math.abs(Math.sin(ph))>.7?-1:0,blink:(T%3)<.12},false);drawWeaponAt('stylus',-3,-12,.5,-1);ctx.restore();ctx.drawImage(VIG,0,0)}
 function renderEnd(){G.endT=(G.endT||0)+1/60;const t=G.endT,gy=Math.round(VH*.83);const g=ctx.createLinearGradient(0,0,0,VH);g.addColorStop(0,'#3a3a7a');g.addColorStop(.55,'#f28a5a');g.addColorStop(1,'#ffd08a');ctx.fillStyle=g;ctx.fillRect(0,0,VW,VH);
  pcirc(Math.round(VW*.72),Math.round(VH*.58),30,'#ffe2a0');for(let i=0;i<14;i++){const bx=i*40-((t*10)%40),bh=40+((i*37)%60);px(bx,gy-bh,34,bh,'#3a2a4a');for(let k=0;k<6;k++)if((i+k)%3)px(bx+5+(k%2)*14,gy-bh+8+Math.floor(k/2)*14,5,7,'#ffd27a')}
  px(0,gy,VW,VH-gy,'#2a2030');for(let x=0;x<VW+40;x+=40)px(x-((t*30)%40),gy+20,20,3,'#5a4a5a');

@@ -3,7 +3,9 @@ const R=Math.round;
 // ===== 外部美术素材（art/ 下的 png，由 build.py 内嵌）=====
 // ART_SRC 的值是 dataURI，或 {src,s}：s=2 表示 @2x 素材（每帧像素是逻辑尺寸的 2 倍）
 const SPR={},SPRS={};let useSpr=true;
-for(const k in (typeof ART_SRC!=='undefined'?ART_SRC:{})){const v=ART_SRC[k],im=new Image();if(k.startsWith('icon_'))im.onload=()=>{if(typeof hud==='function'&&G.state!=='title'){hud.p=hud.s=null;hud()}};im.src=typeof v==='string'?v:v.src;SPR[k]=im;SPRS[k]=typeof v==='string'?1:(v.s||1)}
+// 素材加载失败（例如只拷了 index.html 没带 art 文件夹）时提示，而不是悄悄退回代码像素图
+const ART_FAIL=[];function artFailNote(){const el=document.getElementById('artfail');if(el&&ART_FAIL.length)el.textContent=`有 ${ART_FAIL.length} 张美术素材没加载出来，游戏正在用代码画的旧像素图。请通过网页地址打开，或把 index.html 和 art 文件夹放在一起再打开。`}
+for(const k in (typeof ART_SRC!=='undefined'?ART_SRC:{})){const v=ART_SRC[k],im=new Image();im.onerror=()=>{ART_FAIL.push(k);artFailNote()};if(k.startsWith('icon_'))im.onload=()=>{if(typeof hud==='function'&&G.state!=='title'){hud.p=hud.s=null;hud()}};im.src=typeof v==='string'?v:v.src;SPR[k]=im;SPRS[k]=typeof v==='string'?1:(v.s||1)}
 function sprReady(n){const im=SPR[n];return !!(im&&im.complete&&im.naturalWidth)}
 // 帧默认是正方形（边长 = 图片高度）；不是正方形的在这里写逻辑帧宽（按名字前缀匹配）
 const FRAME_W={enemy_printer:40,enemy_popup:40,enemy_bug:24,enemy_firewall:28,enemy_invite:32,enemy_kpi:28,boss_ad:72,boss_pd:64,boss_ceo:80,proj_paper:16,proj_doc:16,proj_kpi_bar:24,proj_laser:32,proj_x:12,proj_zone:32,fx_dive:64,fx_djump:24,fx_dust:16,pk_bp:16,pk_cchest:24,pk_chest:24,pk_door:28,pk_food:16,pk_rush:16,pk_scroll:16,pk_tdoor:28,pk_wireterm:16,tiles_:8};

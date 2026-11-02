@@ -56,6 +56,7 @@
 #lvld{font-size:.85em;opacity:.8;min-height:1.5em;max-width:30em}#meta{font-size:.8em;opacity:.7;margin-top:.6em}
 #restbp{color:#7fd8ff;font-weight:800;margin-top:.3em;min-height:1.2em}
 #curse{position:absolute;left:50%;top:4em;transform:translateX(-50%);font-weight:900;font-size:1em;color:#c87aff;text-shadow:0 .12em 0 #000}
+#artfail{position:fixed;left:8px;right:8px;top:8px;color:#fff;background:#a33;padding:6px 10px;font:13px system-ui,sans-serif;z-index:98;border-radius:4px}#artfail:empty{display:none}
 #err{position:fixed;left:8px;right:8px;bottom:8px;color:#fff;background:#a33;padding:8px;font:12px monospace;white-space:pre-wrap;z-index:99;display:none;max-height:40vh;overflow:auto}
 </style></head><body>
 <canvas id="screen"></canvas>
@@ -78,7 +79,7 @@
  <div id="scroll" class="ov"><h2 class="k" style="font-size:3.6em;margin:0">✦ 灵感卷轴</h2><div style="font-size:1.2em;margin-top:.4em">选一项属性提升（按 1 / 2）</div><div id="scards" style="display:flex;gap:1.6em;margin-top:1.2em"></div></div>
  <div id="end" class="ov"><h2 class="k">下班了。</h2><div class="k" style="font-size:1.8em;color:#ffd84a">踏实做事，好好生活。</div><div id="estat"></div><button class="btn" id="bagain">再上一次班</button></div>
 </div>
-<pre id="err"></pre>
+<pre id="err"></pre><div id="artfail"></div>
 <script>window.__e=0;function __err(x){if(__e++)return;const d=document.getElementById('err');d.style.display='block';d.textContent='出错了：'+(x&&x.message||x)+'\n'+(x&&x.stack||'')}addEventListener('error',e=>{if(e.target&&e.target.tagName==='LINK')return;__err(e.error||e.message)},true);</script>
 <script>try{
 __JS__

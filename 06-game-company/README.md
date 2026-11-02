@@ -34,4 +34,4 @@
 
 改完源码后运行 `python build.py`，会重新生成 `index.html`。图片默认按相对路径引用 `art/` 下的文件，所以发布或拷贝时要连同 `art/` 目录一起；需要单文件版本时运行 `python build.py --embed`，图片会全部内嵌（约 16MB）。
 
-正式美术都在 `art/`：马楠（`player/`）、敌人（`enemy/`）、三个 Boss（`boss/`）、拾取物（`pickup/`）、投射物和特效（`fx/`）、武器图标（`ui/`）、三层场景的瓦片、背景和装饰（`scene/`）。文件名带 `@2x` 的是 2 倍精度素材，`anchors.json` 记录手部、笔尖等挂点。代码里仍保留了全部程序像素画作为后备，游戏里按 T 可以切换新旧美术。美术需求见 [ART_SPEC.md](ART_SPEC.md) 和 `art/batch*_brief*.md`。
+正式美术都在 `art/`：马楠（`player/`）、敌人（`enemy/`）、三个 Boss（`boss/`）、拾取物（`pickup/`）、投射物和特效（`fx/`）、武器图标（`ui/`）、三层场景的瓦片、背景和装饰（`scene/`）。文件名带 `@2x` 的是 2 倍精度素材，`anchors.json` 记录手部、笔尖等挂点。代码里仍保留了全部程序像素画作为后备，游戏里按 Shift+F8 可以切换新旧美术（调试用）。美术需求见 [ART_SPEC.md](ART_SPEC.md) 和 `art/batch*_brief*.md`。

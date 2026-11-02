@@ -190,7 +190,8 @@ function frame(ts){requestAnimationFrame(frame);try{let dt=Math.min(.05,(ts-last
  if(G.state==='rest'){if(pressed('opt1'))chooseRest(0);else if(pressed('opt2'))chooseRest(1);else if(pressed('opt3'))chooseRest(2)}
  if(G.state==='dead'&&(pressed('confirm')||KP['Space'])&&$('dead').classList.contains('show'))retry();
  if(G.state==='title'){if(pressed('confirm'))startGame(selLvl);if(pressed('left'))setLvl(selLvl-1);if(pressed('right'))setLvl(selLvl+1)}
- if(KP['KeyT']&&G.state==='play'){useSpr=!useSpr;toast(useSpr?'新美术':'旧美术（代码像素）',900)}
+ // 调试用：Shift+F8 切换新旧美术（以前是 T，太容易误按）
+ if(KP['F8']&&(K['ShiftLeft']||K['ShiftRight'])&&G.state==='play'){useSpr=!useSpr;toast(useSpr?'新美术':'旧美术（代码像素），再按 Shift+F8 切回',1500)}
  if(KP['KeyM'])$('bmute').textContent=Snd.toggle()?'🔇':'🔊';
  if(G.state==='title'){T+=dt;renderTitle()}
  else if(G.state==='end'){T+=dt;renderEnd()}

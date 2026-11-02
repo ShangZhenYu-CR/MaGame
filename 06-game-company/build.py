@@ -5,7 +5,7 @@
   python build.py          图片按相对路径引用 art/ 下的文件（默认，index.html 很小，发布时要带上 art/ 目录）
   python build.py --embed  图片全部内嵌进 index.html（单文件可运行，但体积大）
 """
-import base64, json, pathlib, sys
+import base64, hashlib, json, pathlib, sys
 
 here = pathlib.Path(__file__).parent
 order = ['engine', 'art', 'level', 'actors', 'bosses', 'game']
@@ -17,7 +17,8 @@ for p in sorted((here / 'art').rglob('*.png'), key=lambda p: ('@2x' in p.stem, s
     if embed:
         src = 'data:image/png;base64,' + base64.b64encode(p.read_bytes()).decode()
     else:
-        src = p.relative_to(here).as_posix()
+        # 加上内容哈希，素材更新后浏览器不会继续用缓存里的旧图
+        src = p.relative_to(here).as_posix() + '?v=' + hashlib.md5(p.read_bytes()).hexdigest()[:8]
     art[p.stem.replace('@2x', '')] = {'src': src, 's': 2} if '@2x' in p.stem else src
 
 anc = {}

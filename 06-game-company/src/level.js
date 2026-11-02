@@ -103,36 +103,11 @@ function drawTilesSpr(cx,cy){const n='tiles_f'+LV.af;if(!useSpr||!sprReady(n))re
  for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){const v=LV.T[ty*LV.w+tx];if(!v)continue;const i=tileIdx(v,tx,ty);if(i===undefined)continue;if(v===5)ctx.globalAlpha=.55+.25*Math.sin(T*6+tx);ctx.drawImage(im,(i%8)*ts,Math.floor(i/8)*ts,ts,ts,tx*TS-cx,ty*TS-cy-(v===2?PLAT_OFF[LV.af]||0:0),TS,TS);ctx.globalAlpha=1}
  if(LV.gate.active){const sx=LV.gate.x*TS-cx;for(let ty=2;ty<LV.h;ty++)ctx.drawImage(im,(20%8)*ts,Math.floor(20/8)*ts,ts,ts,sx,ty*TS-cy,TS,TS)}
  return true}
-function drawTiles(cx,cy){if(drawTilesSpr(cx,cy))return;const th=LV.th,x0=Math.max(0,Math.floor(cx/TS)),x1=Math.min(LV.w-1,Math.floor((cx+VW)/TS)),y0=Math.max(0,Math.floor(cy/TS)),y1=Math.min(LV.h-1,Math.floor((cy+VH)/TS));
- for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){const v=tileAt(tx,ty),sx=tx*TS-cx,sy=ty*TS-cy;
-  if(v===1){const top=!isSolid(tx,ty-1),ceil=ty<=1;if(ceil){px(sx,sy,TS,TS,th.trim);if(ty===1)px(sx,sy+TS-3,TS,3,th.wall2);continue}
-   px(sx,sy,TS,TS,top?th.floor:th.floorD);if(top){px(sx,sy,TS,3,th.floorT);px(sx,sy+3,TS,1,th.floorD);if((tx*7)%3===0)px(sx+5,sy+6,4,1,th.floorT)}else if((tx+ty)%3===0)px(sx+3,sy+5,6,1,th.floor)
-   if(!isSolid(tx-1,ty))px(sx,sy,2,TS,th.floorD);if(!isSolid(tx+1,ty))px(sx+TS-2,sy,2,TS,th.floorD)}
-  else if(v===4){px(sx,sy,TS,TS,'rgba(208,214,224,.92)');ctx.fillStyle='#3ad870';ctx.fillRect(sx,sy,TS,1);ctx.fillRect(sx,sy,1,TS);ctx.fillRect(sx+TS-1,sy,1,TS);ctx.fillRect(sx,sy+TS-1,TS,1);pline(sx+1,sy+1,sx+TS-2,sy+TS-2,1,'rgba(122,240,160,.6)')}
-  else if(v===5){const a=.35+.25*Math.sin(T*6+tx);ctx.globalAlpha=a;ctx.fillStyle='#7fd8ff';for(let i=0;i<TS;i+=3){ctx.fillRect(sx+i,sy,2,1);ctx.fillRect(sx+i,sy+5,2,1)}ctx.fillRect(sx,sy,1,6);ctx.fillRect(sx+TS-1,sy,1,6);pline(sx,sy+5,sx+TS-1,sy,1,'#7fd8ff');ctx.globalAlpha=1}
-  else if(v===3){for(let i=0;i<4;i++){const ox=2+i*4;px(sx+ox,sy+TS-7,1,6,'#c8ccd4');px(sx+ox-1,sy+TS-9,3,3,['#d8584a','#3a8ad8','#f2c14e','#5ab85a'][(tx+i)%4])}px(sx,sy+TS-1,TS,1,'rgba(0,0,0,.25)')}
-  else if(v===2){px(sx,sy,TS,4,th.platT);px(sx,sy+4,TS,2,th.plat);if(tileAt(tx-1,ty)!==2)px(sx+1,sy+6,2,8,th.plat);if(tileAt(tx+1,ty)!==2)px(sx+TS-3,sy+6,2,8,th.plat)}}
- if(LV.gate.active){const sx=LV.gate.x*TS-cx;for(let ty=2;ty<LV.h;ty++){px(sx,ty*TS-cy,TS,TS,'#3a3a46');px(sx+2,ty*TS-cy+2,TS-4,TS-4,'#d8584a');px(sx+6,ty*TS-cy+4,4,8,'#fff')}}}
+function drawTiles(cx,cy){drawTilesSpr(cx,cy)}
 // ===== 背景：窗外远景（far）→ 墙面（mid，窗户处透出远景）→ 装饰 → 灯光 =====
-// 有 bg_f{n}_far / bg_f{n}_mid / bg_f{n}_arena / bg_f{n}_near 素材时用素材，没有就用代码画
-const FAR={};
-function farCanvas(f){if(FAR[f])return FAR[f];const c=document.createElement('canvas');c.width=480*RES;c.height=300*RES;const g=c.getContext('2d');g.scale(RES,RES);
- let seed=f*977;const rr=()=>(seed=(seed*16807)%2147483647)/2147483647;const H=300,hz=210;
- const sky={1:[['#7fbde8',0],['#cfe8f6',.75],['#eef6fa',1]],2:[['#2a2858',0],['#7a4a78',.4],['#f0845a',.75],['#ffc27a',1]],3:[['#05081a',0],['#121638',.7],['#26244a',1]]}[f];
- const gr=g.createLinearGradient(0,0,0,hz);for(const[c,p]of sky)gr.addColorStop(p,c);g.fillStyle=gr;g.fillRect(0,0,480,H);
- if(f===1){g.fillStyle='rgba(255,255,255,.85)';for(let i=0;i<7;i++){const x=rr()*480,y=20+rr()*90,w=30+rr()*50;for(let k=0;k<5;k++){g.beginPath();g.ellipse(x+k*w/5,y+Math.sin(k*1.7)*3,w/4,7+rr()*4,0,0,7);g.fill();g.beginPath();g.ellipse(x+k*w/5-480,y+Math.sin(k*1.7)*3,w/4,7+rr()*4,0,0,7);g.fill()}}}
- if(f===2){g.fillStyle='#ffd08a';g.beginPath();g.arc(330,hz-18,22,0,7);g.fill();g.fillStyle='rgba(255,208,138,.25)';g.beginPath();g.arc(330,hz-18,40,0,7);g.fill()}
- if(f===3){for(let i=0;i<90;i++){g.fillStyle=rr()<.2?'#fff':'rgba(255,255,255,.55)';g.fillRect(Math.floor(rr()*480),Math.floor(rr()*170),1,1)}g.fillStyle='#f4ecd0';g.beginPath();g.arc(90,60,12,0,7);g.fill();g.fillStyle='#121638';g.beginPath();g.arc(95,56,11,0,7);g.fill()}
- // 两层城市剪影，水平方向首尾相接
- const layers={1:[['#b4cadc','#d6e4ee',.0],['#93adc4','#c6d8e6',.25]],2:[['#4a3060','#ffcf7a',.25],['#2a1e3c','#ffd27a',.35]],3:[['#161a34','#f2d27a',.4],['#0c0e22','#9fd8ff',.45]]}[f];
- layers.forEach(([col,win,lit],li)=>{let x=0;const base=hz+li*28;while(x<480){const w=18+Math.floor(rr()*34),h=30+Math.floor(rr()*(li?70:110));for(const ox of[0,-480,480]){g.fillStyle=col;g.fillRect(x+ox,base-h,w,H-base+h);
-   if(rr()<.4){g.fillRect(x+ox+w/2-1,base-h-8,2,8)}
-   for(let wy=base-h+5;wy<base-4;wy+=6)for(let wx=x+ox+3;wx<x+ox+w-3;wx+=5){const on=((wx*7+wy*13+f)%11)/11<lit;if(on||f===1){g.fillStyle=f===1?'rgba(255,255,255,.35)':win;g.fillRect(wx,wy,2,3)}}}
-  x+=w+Math.floor(rr()*4)}});
- return FAR[f]=c}
+// 素材：bg_f{n}_far / bg_f{n}_mid / bg_f{n}_arena / bg_f{n}_near（素材还没加载完时先铺一层墙色）
 function drawFar(cx,cy){const n='bg_f'+LV.af+'_far',ox=Math.floor(cx*.15),oy=R(-cy*.12)-12;
- if(sprReady(n)){const im=SPR[n],s=SPRS[n]||1,W=im.naturalWidth/s,H=im.naturalHeight/s;for(let x=-(ox%W);x<VW;x+=W)ctx.drawImage(im,x,oy,W,H);return}
- const c=farCanvas(LV.af);for(let x=-(ox%480);x<VW;x+=480)ctx.drawImage(c,x,oy,480,300)}
+ if(sprReady(n)){const im=SPR[n],s=SPRS[n]||1,W=im.naturalWidth/s,H=im.naturalHeight/s;for(let x=-(ox%W);x<VW;x+=W)ctx.drawImage(im,x,oy,W,H)}}
 function drawBackground(cx,cy,t){const th=LV.th,f=LV.af,mid='bg_f'+f+'_mid',arena='bg_f'+f+'_arena';
  if(sprReady(mid)){drawFar(cx,cy);const im=SPR[mid],s=SPRS[mid]||1,W=im.naturalWidth/s,H=im.naturalHeight/s,y0=R(2*TS-cy);
   const hasA=sprReady(arena),ax0=R(LV.arenaX-cx),ax1=ax0+LV.arenaW;
@@ -141,12 +116,7 @@ function drawBackground(cx,cy,t){const th=LV.th,f=LV.af,mid='bg_f'+f+'_mid',aren
   for(let x=-(Math.floor(cx*.5)%W);x<VW;x+=W)ctx.drawImage(im,x,y0,W,H);ctx.restore();
   if(hasA){const a=SPR[arena],sa=SPRS[arena]||1;ctx.drawImage(a,ax0,y0,a.naturalWidth/sa,a.naturalHeight/sa)}
   for(const d of LV.decor)if(d.k==='lamp')drawDecor(d,cx,cy,th,t);return}
- ctx.fillStyle=th.wall;ctx.fillRect(0,0,VW,VH);
- // 墙面竖条纹（视差）+ 墙裙
- const o=Math.floor(cx*.5)%64;for(let x=-o;x<VW;x+=64){px(x,0,32,VH,th.wall2);px(x+31,0,1,VH,'rgba(0,0,0,.05)')}
- px(0,R(2*TS-cy),VW,4,th.trim);px(0,R(2*TS-cy)+4,VW,2,'rgba(0,0,0,.12)');
- px(0,R(15*TS-cy),VW,R(2*TS),'rgba(0,0,0,.06)');px(0,R(15*TS-cy),VW,1,th.trim);px(0,R(17*TS-cy),VW,2,th.trim);
- for(const d of LV.decor)if(d.k==='window'||d.k==='lamp'||d.k==='sign')drawDecor(d,cx,cy,th,t)}
+ ctx.fillStyle=th.wall;ctx.fillRect(0,0,VW,VH)}
 // 灯光：只照背景和装饰（在地面、角色之前画），让前景更突出
 function drawLights(cx,cy,t){const f=LV.af,th=LV.th;
  const scene=sprReady('bg_f'+f+'_mid');const amb=scene?{1:0,2:.06,3:.12}[f]:{1:0,2:.16,3:.45}[f];if(amb){ctx.fillStyle=f===2?`rgba(20,24,64,${amb})`:`rgba(8,6,26,${amb})`;ctx.fillRect(0,0,VW,VH)}

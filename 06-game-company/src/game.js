@@ -83,39 +83,10 @@ function pauseStats(){const r=[];r.push(`主武器 <b>${wname(P.prim,P.primLv)}<
  r.push(`属性　建模 ${P.stat.line} · 地编 ${P.stat.color} · 体力 ${P.stat.body}`);if(P.upg.length)r.push('升级　'+P.upg.map(id=>{const u=UPG.find(q=>q.id===id);return u.ic+u.n}).join('　'));return r.join('<br>')}
 // ===== 渲染 =====
 const VIG=(()=>{const c=document.createElement('canvas');c.width=VW;c.height=VH;const g=c.getContext('2d');const gr=g.createRadialGradient(VW/2,VH/2,VH*.35,VW/2,VH/2,VH*.95);gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(1,'rgba(10,6,20,.45)');g.fillStyle=gr;g.fillRect(0,0,VW,VH);return c})();
-function poseOf(){const p={},a=P.anim,spd=Math.abs(P.vx)/RUN;p.blink=P.blinkT<0;
- if(P.mantle){const k=Math.min(1,P.mantle.t/.17);p.armF=lerp(3,1.2,k);p.elbF=lerp(.2,1.4,k);p.armB=lerp(2.8,.8,k);p.legA=lerp(.2,1.2,k);p.kneeA=1.6;p.legB=-.2;p.kneeB=.8;p.crouch=lerp(0,4,k);p.lean=2;return p}
- if(P.healT>0){p.armF=2.7;p.elbF=.8;p.armB=.3;p.bob=0;return p}
- if(P.hurtT>0){p.lean=-2;p.armF=2.2;p.armB=2.4;p.legA=.3;p.legB=-.3;p.hurt=1;return p}
- if(!P.onGround){if(P.vy<0){p.legA=.6;p.kneeA=1.2;p.legB=-.2;p.kneeB=.4;p.armF=-.6;p.armB=.8}else{p.legA=.3;p.kneeA=.4;p.legB=-.4;p.kneeB=.6;p.armF=.9;p.armB=-.7}}
- else if(spd>.1){const ph=a*13;p.legA=Math.sin(ph)*.85;p.legB=-Math.sin(ph)*.85;p.kneeA=Math.max(0,-Math.cos(ph))*1.1;p.kneeB=Math.max(0,Math.cos(ph))*1.1;p.armF=-Math.sin(ph)*.7;p.armB=Math.sin(ph)*.7;p.elbF=p.elbB=.6;p.bob=Math.abs(Math.sin(ph))>.7?-1:0;p.lean=1}
- else{p.bob=Math.sin(a*2.4)>.3?1:0;p.armF=.15;p.armB=-.1;p.elbF=.3;p.legA=.08;p.legB=-.08}
- if(P.landT>0){p.crouch=2}
- if(P.atk){const d=P.atk.def;let k=P.atk.phase==='su'?0:P.atk.phase==='ac'?Math.min(1,P.atk.t/d.ac):1;
-  if(d.thrust){p.armF=lerp(1.0,1.6,k);p.elbF=lerp(-.6,0,k);p.lean=lerp(-1,2,k);p.armB=-.6}else{p.armF=lerp(d.arc[0],d.arc[1],k);p.elbF=.1;p.lean=k>0?2:-1;p.armB=-.5}p.legA=.5;p.legB=-.5;p.kneeB=.5}
- if(P.dive){p.armF=0;p.elbF=0;p.armB=-.3;p.legA=.9;p.kneeA=1.6;p.legB=.6;p.kneeB=1.6;p.crouch=3}
- if(P.sprayT>0){p.armF=1.55;p.elbF=0;p.lean=1}
- if(P.parryT>0){p.armF=2.2;p.elbF=-.4;p.lean=-1}
- return p}
 function drawPlayer(cx,cy){
  for(let i=ghosts.length-1;i>=0;i--){const g=ghosts[i];ctx.globalAlpha=g.t*2;ctx.save();ctx.translate(R(g.x-cx),R(g.y-cy-8));ctx.rotate(g.roll*g.face*22);px(-6,-6,12,12,'#7fd8ff');ctx.restore();ctx.globalAlpha=1}
  const x=P.x-cx,y=P.y-cy,flash=P.inv>0&&P.hurtT<=0&&P.rollT<=0&&Math.floor(P.inv*16)%2===0;
- if(P.rollT>0&&!(useSpr&&sprReady('player_roll'))){ctx.save();ctx.translate(R(x),R(y-8));ctx.rotate(-(ROLLT-P.rollT)/ROLLT*Math.PI*2*P.face);drawMan(0,8,P.face,{crouch:6,legA:1.2,kneeA:2,legB:1,kneeB:2,armF:1.8,elbF:1.4,armB:1.4,lean:2,headY:3},false);ctx.restore();return}
- if(P.djT>0&&!P.atk&&P.hurtT<=0&&!(useSpr&&sprReady('player_roll'))){ctx.save();ctx.translate(R(x),R(y-12));ctx.rotate((1-P.djT/.3)*Math.PI*2*P.face);drawMan(0,12,P.face,{crouch:4,legA:1,kneeA:1.8,legB:.8,kneeB:1.8,armF:1.6,elbF:1.2,armB:1.2,lean:1,headY:2},false);ctx.restore();return}
- // 新美术：有素材就用序列帧（T 键切换新旧）
- if(useSpr&&sprReady('player_idle')&&drawPlayerSpr(x,y,flash))return
- const pose=poseOf();if(LV.floor!==1){ctx.globalAlpha=.32;for(const[ox,oy]of[[-1,0],[1,0],[0,-1],[0,1]])drawMan(x+ox,y+oy,P.face,pose,true);ctx.globalAlpha=1}
- if(flash){ctx.globalAlpha=.5}
- const h=drawMan(x,y,P.face,pose,false);ctx.globalAlpha=1;
- // 武器
- const W=WEAPONS[P.prim],kind=P.prim;
- if(P.dive){drawWeaponAt(kind,h.hx,h.hy,0,P.face);ctx.globalAlpha=.5;pline(x,y-30,x,y-48,2,W.col);ctx.globalAlpha=1}
- else if(P.atk){const d=P.atk.def;const ang=pose.armF+pose.elbF*.5;drawWeaponAt(kind,h.hx,h.hy,ang,P.face);
-  if(P.atk.phase==='ac'){ctx.globalAlpha=.7;if(d.thrust){pline(x+P.face*6,y-18,x+P.face*d.rng,y-18,2,W.col);px(x+P.face*d.rng-1,y-19,3,3,'#fff')}else smear(x,y-20,8,d.rng-2,d.arc[0],lerp(d.arc[0],d.arc[1],Math.min(1,P.atk.t/d.ac)),P.face,W.col);ctx.globalAlpha=1}}
- else if(P.healT>0){px(h.hx-4,h.hy-4,8,5,'#c8553d');px(h.hx-4,h.hy-5,8,2,'#f4f1ea')}
- else if(P.sprayT>0){drawIcon('airbrush',h.hx+P.face*3,h.hy)}
- else if(P.parryT>0){px(h.hx-3,h.hy-8,7,12,'#f2a0b0');px(h.hx-3,h.hy-8,7,4,'#3a6ad8')}
- else drawWeaponAt(kind,h.hx,h.hy,.5,P.face)}
+ if(sprReady('player_idle'))drawPlayerSpr(x,y,flash)}
 // 每帧前手位置来自 art/**/anchors.json（帧左上角为原点），换算成相对脚底中心
 function handOf(n0,fi){const AA=typeof ART_ANCHOR!=='undefined'?ART_ANCHOR:{},n=skinOf(n0),a=AA[n]||AA[n0];if(!a||!sprReady(n))return null;const c=sprN(n),s=SPRS[n]||1,L=SPR[n].naturalHeight/s;fi=((fi%c)+c)%c;return a[fi]?[a[fi][0]/s-L/2,a[fi][1]/s-L]:null}
 // 没有专属连击素材的武器借用雕刻笔：连击段 → 雕刻笔第几刀
@@ -152,7 +123,7 @@ function drawPlayerSpr(x,y,flash){let n='player_idle',fi=Math.floor(P.anim*5),ha
  if(!noW&&hand){const hx=x+hand[0]*P.face,hy=y+hand[1];const wn='weapon_'+P.prim;if(has(wn)){const im=SPR[wn],s=SPRS[wn]||1,g=(ART_ANCHOR[wn]||{}).grip||[im.naturalWidth/2,im.naturalHeight/2],base=P.prim==='ruler'?1.57:2.36;ctx.save();ctx.translate(R(hx),R(hy));ctx.scale(P.face,1);ctx.rotate(-(wang-base));
   // 渲染大剑蓄力：换成进度条逐格亮起的那张
   if(P.prim==='render'&&P.chargeT>.08&&has('weapon_render_charge')){const ci=SPR.weapon_render_charge,fw=im.naturalWidth,fi=Math.min(3,Math.floor(P.chargeT/.55*4));ctx.drawImage(ci,fi*fw,0,fw,ci.naturalHeight,-g[0]/s,-g[1]/s,fw/s,ci.naturalHeight/s)}
-  else ctx.drawImage(im,-g[0]/s,-g[1]/s,im.naturalWidth/s,im.naturalHeight/s);ctx.restore()}else drawWeaponAt(P.prim,hx,hy,wang,P.face)}
+  else ctx.drawImage(im,-g[0]/s,-g[1]/s,im.naturalWidth/s,im.naturalHeight/s);ctx.restore()}}
  ctx.globalAlpha=1;
  if(P.atk&&P.atk.phase==='ac'&&!(P.atk.def.charged&&has('fx_render_slash'))&&!(P.prim==='whip'&&has('fx_whip_1'))){const d=P.atk.def;ctx.globalAlpha=.75;if(d.thrust){pline(x+P.face*6,y-26,x+P.face*(d.rng+4),y-26,2,W.col);px(x+P.face*(d.rng+4)-1,y-27,3,3,'#fff')}else smear(x,y-26,Math.max(10,d.rng-6),d.rng+6,d.arc[0],lerp(d.arc[0],d.arc[1],Math.min(1,P.atk.t/d.ac)),P.face,W.col);ctx.globalAlpha=1}
  if(P.dive){ctx.globalAlpha=.5;pline(x,y-40,x,y-58,2,W.col);ctx.globalAlpha=1}
@@ -201,11 +172,11 @@ function renderTitle(){if(!LV)genLevel(1);const th=THEME[1],sx=(T*20)%(LV.arenaX
  // 前景大号马楠只跟随实心地面（不踩悬空平台），镜头随地面高度平滑升降
  let gyT=19*TS;for(let ty=3;ty<HT;ty++)if(tileAt(Math.floor((sx+360)/TS),ty)===1){gyT=ty*TS;break}renderTitle.gy=renderTitle.gy===undefined?gyT:lerp(renderTitle.gy,gyT,.06);
  const sy=R(clamp(renderTitle.gy-206,0,LV.h*TS-VH));drawBackground(sx,sy,T);for(const d of LV.decor)if(d.k!=='window'&&d.k!=='lamp'&&d.k!=='sign')drawDecor(d,sx,sy,th,T);drawTiles(sx,sy);
- ctx.save();ctx.translate(360,R(renderTitle.gy-sy));ctx.scale(3,3);const ph=T*10;if(useSpr&&sprReady('player_run')){sprFrame('player_run',Math.floor(T*12),0,0,-1);ctx.restore();ctx.drawImage(VIG,0,0);return}drawMan(0,0,-1,{legA:Math.sin(ph)*.8,legB:-Math.sin(ph)*.8,kneeA:Math.max(0,-Math.cos(ph)),kneeB:Math.max(0,Math.cos(ph)),armF:-Math.sin(ph)*.7,armB:Math.sin(ph)*.7,elbF:.6,elbB:.6,lean:1,bob:Math.abs(Math.sin(ph))>.7?-1:0,blink:(T%3)<.12},false);drawWeaponAt('stylus',-3,-12,.5,-1);ctx.restore();ctx.drawImage(VIG,0,0)}
+ ctx.save();ctx.translate(360,R(renderTitle.gy-sy));ctx.scale(3,3);const ph=T*10;sprFrame('player_run',Math.floor(T*12),0,0,-1);ctx.restore();ctx.drawImage(VIG,0,0)}
 function renderEnd(){G.endT=(G.endT||0)+1/60;const t=G.endT,gy=Math.round(VH*.83);const g=ctx.createLinearGradient(0,0,0,VH);g.addColorStop(0,'#3a3a7a');g.addColorStop(.55,'#f28a5a');g.addColorStop(1,'#ffd08a');ctx.fillStyle=g;ctx.fillRect(0,0,VW,VH);
  pcirc(Math.round(VW*.72),Math.round(VH*.58),30,'#ffe2a0');for(let i=0;i<14;i++){const bx=i*40-((t*10)%40),bh=40+((i*37)%60);px(bx,gy-bh,34,bh,'#3a2a4a');for(let k=0;k<6;k++)if((i+k)%3)px(bx+5+(k%2)*14,gy-bh+8+Math.floor(k/2)*14,5,7,'#ffd27a')}
  px(0,gy,VW,VH-gy,'#2a2030');for(let x=0;x<VW+40;x+=40)px(x-((t*30)%40),gy+20,20,3,'#5a4a5a');
- ctx.save();ctx.translate(Math.round(VW*.16+((t*14)%(VW*.1))),gy);ctx.scale(2,2);const ph=t*9;if(useSpr&&sprReady('player_run')){sprFrame('player_run',Math.floor(t*10),0,0,1);ctx.restore();return}drawMan(0,0,1,{legA:Math.sin(ph)*.6,legB:-Math.sin(ph)*.6,kneeA:Math.max(0,-Math.cos(ph))*.8,kneeB:Math.max(0,Math.cos(ph))*.8,armF:-Math.sin(ph)*.5,armB:Math.sin(ph)*.5,elbF:.4,elbB:.4,bob:Math.abs(Math.sin(ph))>.7?-1:0},false);ctx.restore()}
+ ctx.save();ctx.translate(Math.round(VW*.16+((t*14)%(VW*.1))),gy);ctx.scale(2,2);const ph=t*9;sprFrame('player_run',Math.floor(t*10),0,0,1);ctx.restore()}
 function uiTick(){if(G.state!=='play')return;const fl=P.flow||0,fe=$('flow');if(fl>=3){const tier=fl>=50?3:fl>=25?2:fl>=10?1:0;fe.innerHTML=`心流 ×${fl}${tier?` <i>+${tier*10}%</i>`:''}`;fe.className='t'+tier}else fe.innerHTML='';
  $('curse').textContent=P.curse>0?`加班合同：再击败 ${P.curse} 个，受到伤害 ×2`:'';
  const re=$('rush');if(LV.room&&LV.room.state===1){const r=LV.room;re.textContent=r.delay>0&&r.wave>0?'评审会 · 第二轮马上开始':`评审会 · 第 ${Math.max(1,r.wave)}/2 轮 · 剩 ${r.list?r.list.filter(e=>e.hp>0).length:0}`}else if(G.rush){const left=G.rush.list.filter(e=>e.hp>0).length;re.textContent=`加急任务 ${Math.ceil(G.rush.t)}s · 剩 ${left}/${G.rush.total}`}else re.textContent='';
@@ -244,8 +215,6 @@ function frame(ts){requestAnimationFrame(frame);try{let dt=Math.min(.05,(ts-last
  if(G.state==='dead'&&(pressed('confirm')||KP['Space'])&&$('dead').classList.contains('show'))retry();
  if(G.state==='title'&&$('chg').classList.contains('show')){if(pressed('confirm')||pressed('pause'))showChanges(false)}
  else if(G.state==='title'){if(!skinBtn.ok&&sprReady('player_summer_idle')){skinBtn.ok=1;skinBtn()}if(pressed('skin'))nextSkin();if(pressed('confirm'))startGame(selLvl);if(pressed('left'))setLvl(selLvl-1);if(pressed('right'))setLvl(selLvl+1)}
- // 调试用：Shift+F8 切换新旧美术（以前是 T，太容易误按）
- if(KP['F8']&&(K['ShiftLeft']||K['ShiftRight'])&&G.state==='play'){useSpr=!useSpr;toast(useSpr?'新美术':'旧美术（代码像素），再按 Shift+F8 切回',1500)}
  if(KP['KeyM'])$('bmute').textContent=Snd.toggle()?'🔇':'🔊';
  if(G.state==='title'){T+=dt;renderTitle()}
  else if(G.state==='end'){T+=dt;renderEnd()}

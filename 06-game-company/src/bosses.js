@@ -151,30 +151,6 @@ function ljyUpdate(b,dt,dx,sp){const gy=19*TS,AX0=LV.arenaX+3*TS,AX1=LV.arenaX+L
   if(b.t>1.5)done(.5);break;
  }
  return grav}
-function drawLJY(b,t,c){const A=!!b.armor,st=b.state,bob=st==='idle'||st==='recover'?Math.round(Math.sin(t*4)):0;
- const S=A?'#c8281e':'#4a5058',SD=A?'#7a1410':'#353a42',SL=A?'#e8483a':'#5e6670',G=A?'#f2c14e':'#c8b070',K='#14121a';
- // 腿
- const walk=Math.abs(b.vx)>10&&b.onGround!==false?Math.sin(t*12)*2:0;px(-10,-15,8,13,c(SD));px(2,-15,8,13,c(SD));px(-10+walk,-3,9,3,c(A?'#3a0a08':'#141418'));px(2-walk,-3,9,3,c(A?'#3a0a08':'#141418'));
- if(A){px(-10,-10,8,2,c(G));px(2,-10,8,2,c(G))}
- // 躯干（壮）
- px(-13,-40+bob,26,26,c(K));px(-12,-39+bob,24,24,c(S));px(-12,-39+bob,24,2,c(SL));px(-12,-17+bob,24,2,c(SD));
- if(!A){for(let i=0;i<5;i++)px(-1,-36+bob+i*4,2,1,c(G));px(-10,-35+bob,6,4,c(SD));px(4,-35+bob,6,4,c(SD));px(-10,-35+bob,6,1,c(SL));px(4,-35+bob,6,1,c(SL));px(-10,-24+bob,7,5,c(SD));px(3,-24+bob,7,5,c(SD))}
- else{pcirc(0,-29+bob,6,c(G));pcirc(0,-29+bob,4,c('#ff8a2a'));px(-2,-31+bob,4,2,c('#fff2a0'));px(-12,-20+bob,24,3,c(G))}
- // 南瓜肩
- for(const s of[-1,1]){pcirc(s*13,-36+bob,A?9:8,c(K));pcirc(s*13,-36+bob,A?8:7,c(S));pcirc(s*13-2,-38+bob,3,c(SL));if(A){px(s*13-7,-31+bob,14,2,c(G));px(s*13-1,-45+bob,2,3,c(G))}}
- // 领子、脖子、头
- if(!A){px(-5,-42+bob,10,3,c(S));px(-4,-41+bob,8,1,c(SD));px(-4,-44+bob,8,2,c('#d8a880'));px(-6,-55+bob,12,12,c('#e8bf9a'));px(-7,-57+bob,14,4,c('#1a1a1e'));px(-7,-55+bob,2,5,c('#1a1a1e'));px(1,-50+bob,2,2,c(K));px(4,-50+bob,2,2,c(K));px(1,-53+bob,3,1,c('#1a1a1e'));px(4,-53+bob,2,1,c('#1a1a1e'));px(1,-46+bob,4,1,c('#a05040'))}
- else{px(-7,-58+bob,14,15,c(K));px(-6,-57+bob,12,13,c(S));px(-6,-57+bob,12,2,c(SL));px(0,-52+bob,6,3,c(K));px(1,-51+bob,4,1,c(st.endsWith('_wind')||st==='breath'?'#fff':'#ffd84a'));px(-6,-46+bob,12,2,c(G));
-  pline(-4,-57+bob,-9,-64+bob,2,c(G));pline(2,-57+bob,6,-65+bob,2,c(G));px(-1,-60+bob,2,3,c(G));if(st==='breath'&&b.t>.5){ctx.globalAlpha=.8;pcirc(8,-50+bob,3,'#ffd84a');ctx.globalAlpha=1}}
- // 后手
- px(-20,-34+bob,7,15,c(K));px(-19,-33+bob,5,13,c(S));px(-19,-21+bob,5,4,c(A?G:'#e8bf9a'));
- // 前手 + 道具
- let hx=16,hy=-24+bob;if(st.endsWith('_wind')||st==='cube'&&b.t<.45||st==='bell'&&b.t<.4||st==='dive_up')hy=-50;if(['brush','curl','upper','fdash'].includes(st)){hx=22;hy=st==='curl'||st==='upper'?-48:-30}
- pline(10,-34+bob,hx,hy,6,c(K));pline(10,-34+bob,hx,hy,4,c(S));px(hx-2,hy-2,5,5,c(A?G:'#e8bf9a'));
- if(!A){if(st.startsWith('brush')){pline(hx,hy,hx+18,hy-8,3,c(K));pline(hx,hy,hx+17,hy-8,2,c('#2a2a32'));px(hx+16,hy-10,4,4,c('#ff9a3a'))}
-  else if(st==='cube'&&b.t<.5){px(hx-6,hy-14,12,12,c(K));px(hx-5,hy-13,10,10,c('#c8ccd6'));px(hx-5,hy-13,10,2,c('#f4f4f8'));pline(hx-5,hy-13,hx+4,hy-4,1,c('#5ab85a'))}
-  else if(st!=='bell'||b.t<.4){px(hx-1,hy-8,3,16,c('#3a3a46'));px(hx-4,hy-10,9,4,c(K));px(hx-4,hy+6,9,4,c(K));px(hx-3,hy-9,7,2,c('#6a6e78'));px(hx-3,hy+7,7,2,c('#6a6e78'))}}
- else{ctx.globalAlpha=.5+.3*Math.sin(t*20);pcirc(hx,hy,5,'#ff8a2a');ctx.globalAlpha=1;px(hx-3,hy-3,6,6,c(G))}}
 // ===== 刘敬阳变身演出 =====
 // 火焰龙卷（分前后两层，包住 Boss）、龙影（变身合体那一下和三阶段龙魂爆发）、四周压暗 + 聚光
 function ljyCineK(b){if(!b||b.kind!=='ljy')return 0;if(b.state==='transform')return Math.min(1,b.t/.35)*(b.t>1.5?Math.max(0,1-(b.t-1.5)/.3):1);if(b.state==='roar'&&b.phase>=3)return Math.min(1,b.t/.2)*Math.max(0,1-Math.max(0,b.t-.7)/.3);return 0}

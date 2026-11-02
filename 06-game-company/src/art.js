@@ -6,7 +6,7 @@ const SPR={},SPRS={};let useSpr=true;
 for(const k in (typeof ART_SRC!=='undefined'?ART_SRC:{})){const v=ART_SRC[k],im=new Image();if(k.startsWith('icon_'))im.onload=()=>{if(typeof hud==='function'&&G.state!=='title'){hud.p=hud.s=null;hud()}};im.src=typeof v==='string'?v:v.src;SPR[k]=im;SPRS[k]=typeof v==='string'?1:(v.s||1)}
 function sprReady(n){const im=SPR[n];return !!(im&&im.complete&&im.naturalWidth)}
 // 帧默认是正方形（边长 = 图片高度）；不是正方形的在这里写逻辑帧宽（按名字前缀匹配）
-const FRAME_W={enemy_printer:40,enemy_popup:40,enemy_bug:24,enemy_firewall:28,boss_ad:72,proj_paper:16};
+const FRAME_W={enemy_printer:40,enemy_popup:40,enemy_bug:24,enemy_firewall:28,enemy_invite:32,enemy_kpi:28,boss_ad:72,boss_pd:64,boss_ceo:80,proj_paper:16,proj_doc:16,proj_kpi_bar:24,proj_laser:32,proj_x:12,proj_zone:32,fx_dive:64,fx_djump:24,fx_dust:16,pk_bp:16,pk_cchest:24,pk_chest:24,pk_door:28,pk_food:16,pk_rush:16,pk_scroll:16,pk_tdoor:28,pk_wireterm:16,tiles_:8};
 function sprFW(n){const im=SPR[n],s=SPRS[n]||1;for(const k in FRAME_W)if(n.startsWith(k))return FRAME_W[k]*s;return im.naturalHeight}
 function sprN(n){const im=SPR[n];return im&&im.naturalWidth?Math.max(1,Math.round(im.naturalWidth/sprFW(n))):1}
 // 被打闪白：缓存一张纯白剪影
@@ -38,6 +38,18 @@ function drawEnemySpr(e,cx,cy){const b='enemy_'+e.type;if(!useSpr||!sprReady(b+'
  return true}
 // Boss 素材
 function drawBossSpr(b,cx,cy){const p='boss_'+b.kind;if(!useSpr||!sprReady(p+'_idle'))return false;let n=p+'_idle',fi=Math.floor(b.anim*5);const has=k=>sprReady(p+'_'+k),st=b.state,set=(k,f)=>{if(has(k)){n=p+'_'+k;fi=f}};
+ if((st==='tele'||st==='tele_in')&&has('tele_out'))ctx.globalAlpha=1;
+ // 制作人
+ if(st==='tele')set('tele_out',Math.min(3,Math.floor(b.t/.3*4)));
+ else if(st==='tele_in')set('tele_in',Math.min(3,Math.floor(b.t/.3*4)));
+ else if(st==='doc')set('doc',Math.min(3,Math.floor(b.t/.55*4)));
+ else if(st==='change')set('change',Math.min(3,Math.floor(b.t/.8*4)));
+ else if(st==='laser')set('laser',b.t<.8?Math.min(2,Math.floor(b.t/.8*3)):3+Math.floor((b.t-.8)*10)%3);
+ // 老板
+ else if(st==='pie')set('pie',Math.min(3,Math.floor(b.t/.7*4)));
+ else if(st==='pound')set('pound',b.t<.3?Math.min(2,Math.floor(b.t*10)):b.vy<0?3:4);
+ else if(st==='kpi')set('kpi',Math.floor(b.t*6)%4);
+ else if(st==='bigpie')set('bigpie',Math.min(5,Math.floor(b.t/1.2*6)));
  if(st==='intro')set('intro',Math.min(5,Math.floor(b.t/2.2*6)));
  else if(st==='dead')set('die',Math.min(7,Math.floor(b.t/1.6*8)));
  else if(st==='stagger')set('stagger',Math.min(3,Math.floor(b.t*4)));
@@ -47,7 +59,7 @@ function drawBossSpr(b,cx,cy){const p='boss_'+b.kind;if(!useSpr||!sprReady(p+'_i
  else if(st==='notes')set('notes',Math.min(3,Math.floor(b.t/.8*4)));
  else if(st==='stamp_up')set('stamp',b.t<.25?Math.min(2,Math.floor(b.t*12)):2);
  else if(st==='stamp_hover'||st==='stamp_fall')set('stamp',3+(Math.floor(b.anim*6)%2));
- else if(st==='recover'){if(b.landT>0)set('stamp',5+Math.min(2,Math.floor((.36-b.landT)/.12)));else set('recover',Math.floor(b.anim*3)%2)}
+ else if(st==='recover'){const lk=b.kind==='ceo'?'pound':'stamp';if(b.landT>0&&has(lk))set(lk,5+Math.min(2,Math.floor((.36-b.landT)/.12)));else set('recover',Math.floor(b.anim*3)%2)}
  else if(st==='idle'&&Math.abs(b.vx)>5)set('walk',Math.floor(b.anim*8));
  const x=b.x-cx,y=b.y-cy;sprFrame(n,fi,x,y,b.face);if(b.flash>0)sprFrame(n,fi,x,y,b.face,true);return true}
 function px(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(R(x),R(y),w,h)}
@@ -141,7 +153,14 @@ const THEME={
  2:{name:'2F · 研发部',wall:'#232a42',wall2:'#1c2236',trim:'#3a4a6a',floor:'#3a4258',floorT:'#56607a',floorD:'#242a3a',plat:'#4a5470',platT:'#6a7896',sky:['#0e1426','#1c2a4a'],light:'rgba(120,220,255,',enemies:['bug','popup','firewall','crumple'],boss:'pd',song:'f2'},
  3:{name:'顶层 · 总裁办',wall:'#cfc6b4',wall2:'#beb4a0',trim:'#a8884a',floor:'#5a2a2a',floorT:'#7a3a36',floorD:'#3a1a1a',plat:'#6a5a4a',platT:'#a8884a',sky:['#1a1c3a','#3a3060'],light:'rgba(255,215,140,',enemies:['kpi','invite','firewall','popup'],boss:'ceo',song:'f3'}};
 // 背景装饰
-function drawDecor(d,cx,cy,th,t){const x=R(d.x-cx),y=R(d.y-cy);if(x<-80||x>VW+80)return;
+// 装饰物素材：程序生成的装饰种类 → 各层的素材名（用 d.s 在几种之间轮换）；wall=挂在墙上
+const DECOR_MAP={1:{easel:['easel'],frame:['artwall'],plant:['plant','sculpture'],board:['drawingdesk'],shelf:['bookshelf'],cooler:['watercooler','wastebasket']},
+ 2:{monitor:['workstation'],server:['server'],board:['board','whiteboard'],poster:['poster'],plant:['coffee','beanbag','cables']},
+ 3:{trophy:['trophycase'],plant:['moneytree','globe'],frame:['portrait'],poster:['statue','winecabinet'],monitor:['aquarium','sofa']}};
+const DECOR_WALL=['artwall','board','whiteboard','poster','portrait'];
+function drawDecorSpr(d,cx,cy){if(!useSpr||d.gy===undefined)return false;let name=d.k==='elevator'?'elevator':null;const m=DECOR_MAP[LV.floor]&&DECOR_MAP[LV.floor][d.k];if(m)name=m[d.s%m.length];if(!name)return false;const n='decor_f'+LV.floor+'_'+name;if(!sprReady(n))return false;
+ sprFrame(n,0,R(d.x+12-cx),R(d.gy-(DECOR_WALL.includes(name)?34:0)-cy),1);return true}
+function drawDecor(d,cx,cy,th,t){const x=R(d.x-cx),y=R(d.y-cy);if(x<-120||x>VW+120)return;if(drawDecorSpr(d,cx,cy))return;
  switch(d.k){
  case 'window':{px(x-1,y-1,42,38,'rgba(0,0,0,.15)');px(x,y,40,36,th.trim);ctx.save();ctx.beginPath();ctx.rect(x+2,y+2,36,32);ctx.clip();drawFar(cx,cy);ctx.fillStyle='rgba(255,255,255,.08)';ctx.beginPath();ctx.moveTo(x+6,y+2);ctx.lineTo(x+16,y+2);ctx.lineTo(x+4,y+34);ctx.lineTo(x-6,y+34);ctx.fill();ctx.restore();px(x+19,y+2,2,32,th.trim);px(x+2,y+17,36,2,th.trim);px(x-3,y+36,46,3,th.trim);px(x-3,y+39,46,1,'rgba(0,0,0,.2)');break}
  case 'easel':pline(x+2,y+30,x+10,y,2,'#8a6248');pline(x+18,y+30,x+10,y,2,'#8a6248');px(x+1,y+4,18,16,'#f4f1ea');px(x+3,y+6,14,12,['#9fd3f0','#f2a0b0','#bde986'][d.s%3]);px(x+5,y+12,6,4,'#5a7a9a');px(x+1,y+20,18,2,'#8a6248');break;
@@ -152,7 +171,7 @@ function drawDecor(d,cx,cy,th,t){const x=R(d.x-cx),y=R(d.y-cy);if(x<-80||x>VW+80
  case 'board':px(x,y,46,28,'#9aa0a8');px(x+2,y+2,42,24,'#f8f8fa');for(let i=0;i<4;i++)px(x+5,y+6+i*5,10+((i*11+d.s)%26),1,['#3a6ad8','#d8584a','#3a3a46'][i%3]);break;
  case 'poster':px(x,y,18,24,['#d8584a','#3a6ad8','#f2c14e'][d.s%3]);px(x+3,y+3,12,10,'#f4f1ea');px(x+3,y+16,12,2,'#fff');px(x+3,y+19,8,1,'#fff');break;
  case 'trophy':px(x+4,y+16,8,4,'#6a5a4a');px(x+6,y+12,4,4,'#e8b84a');px(x+2,y+2,12,10,'#e8b84a');px(x,y+3,2,5,'#e8b84a');px(x+14,y+3,2,5,'#e8b84a');px(x+4,y+4,2,4,'#fff2c0');break;
- case 'lamp':px(x,y-40,1,40,'#3a3a46');px(x-1,y,2,6,'#3a3a46');px(x-6,y+6,12,3,'#3a3a46');ctx.fillStyle=th.light+'0.07)';ctx.beginPath();ctx.moveTo(x-5,y+9);ctx.lineTo(x+5,y+9);ctx.lineTo(x+30,y+130);ctx.lineTo(x-30,y+130);ctx.fill();px(x-4,y+9,8,1,'#fff6d0');break;
+ case 'lamp':{const ln=sprReady('decor_f'+LV.floor+'_chandelier')?'decor_f'+LV.floor+'_chandelier':'decor_f'+LV.floor+'_lamp';if(useSpr&&sprReady(ln)){px(x,y-40,1,42,'#2a2a34');sprFrame(ln,0,x,y+(ln.endsWith('chandelier')?16:10),1);break}}px(x,y-40,1,40,'#3a3a46');px(x-1,y,2,6,'#3a3a46');px(x-6,y+6,12,3,'#3a3a46');ctx.fillStyle=th.light+'0.07)';ctx.beginPath();ctx.moveTo(x-5,y+9);ctx.lineTo(x+5,y+9);ctx.lineTo(x+30,y+130);ctx.lineTo(x-30,y+130);ctx.fill();px(x-4,y+9,8,1,'#fff6d0');break;
  case 'sign':px(x,y,64,16,'#2a2d36');px(x+1,y+1,62,14,th.trim);break;
  case 'cooler':px(x,y,12,8,'#9fd3f0');px(x+1,y+8,10,22,'#e8e8ee');px(x+3,y+14,2,2,'#5ab0f0');px(x+7,y+14,2,2,'#d8584a');break;
  case 'shelf':px(x,y,30,3,'#8a6248');px(x,y+16,30,3,'#8a6248');for(let i=0;i<5;i++)px(x+2+i*5,y-9+((i*7+d.s)%4),4,9+((i*3)%3),['#d8584a','#3a6ad8','#f2c14e','#5ab85a','#9a6ad8'][(i+d.s)%5]);break;

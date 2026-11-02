@@ -10,7 +10,7 @@ function genLevel(floor){
  // 起点
  let g=19;for(let x=0;x<startW;x++)for(let y=g;y<HT;y++)set(x,y,1);
  for(let y=0;y<HT;y++){set(0,y,1);set(1,y,1)}
- signs.push({x:8*TS,y:(g-6)*TS,text:th.name});
+ signs.push({x:8*TS,y:(g-6)*TS,text:th.name});decor.push({k:'elevator',x:3*TS,y:g*TS-64,gy:g*TS,s:0});
  
  // 普通地图块
  let x=startW,secretDone=false;
@@ -47,7 +47,7 @@ function genLevel(floor){
   for(let k=x0+4;k<x0+CW;k+=irnd(10,14))decor.push({k:'lamp',x:k*TS,y:6*TS,s:0});
   for(const s of segs){if(Math.random()<.8){const kinds=floor===1?['easel','frame','plant','board','shelf','cooler']:floor===2?['monitor','server','board','poster','plant']:['trophy','plant','frame','poster','monitor'];
    const k=pick(kinds),dx=(s.x+irnd(0,Math.max(0,s.len-3)))*TS;const hgt={easel:30,frame:16,plant:26,board:28,shelf:19,cooler:30,monitor:20,server:46,poster:24,trophy:20}[k];
-   decor.push({k,x:dx,y:(k==='frame'||k==='poster'||k==='board'?s.g*TS-hgt-30:s.g*TS-hgt),s:irnd(0,99)})}}
+   decor.push({k,x:dx,y:(k==='frame'||k==='poster'||k==='board'?s.g*TS-hgt-30:s.g*TS-hgt),gy:s.g*TS,s:irnd(0,99)})}}
   x+=CW}
  // 宝箱（精英掉落武器 + 一个宝箱）
  // 精英：楼层越高越多，加班等级 2 以上再多两只
@@ -121,7 +121,7 @@ function drawBackground(cx,cy,t){const th=LV.th,f=LV.floor,mid='bg_f'+f+'_mid',a
  if(sprReady(mid)){drawFar(cx,cy);const im=SPR[mid],s=SPRS[mid]||1,W=im.naturalWidth/s,H=im.naturalHeight/s,y0=R(19*TS+60-H-cy);
   for(let x=-(Math.floor(cx*.5)%W);x<VW;x+=W)ctx.drawImage(im,x,y0,W,H);
   if(sprReady(arena)){const a=SPR[arena],sa=SPRS[arena]||1;ctx.drawImage(a,R(LV.arenaX-cx),R(19*TS+60-a.naturalHeight/sa-cy),a.naturalWidth/sa,a.naturalHeight/sa)}
-  for(const d of LV.decor)if(d.k==='lamp')drawDecor(d,cx,cy,th,t);return}
+  return}
  ctx.fillStyle=th.wall;ctx.fillRect(0,0,VW,VH);
  // 墙面竖条纹（视差）+ 墙裙
  const o=Math.floor(cx*.5)%64;for(let x=-o;x<VW;x+=64){px(x,0,32,VH,th.wall2);px(x+31,0,1,VH,'rgba(0,0,0,.05)')}
@@ -130,9 +130,10 @@ function drawBackground(cx,cy,t){const th=LV.th,f=LV.floor,mid='bg_f'+f+'_mid',a
  for(const d of LV.decor)if(d.k==='window'||d.k==='lamp'||d.k==='sign')drawDecor(d,cx,cy,th,t)}
 // 灯光：只照背景和装饰（在地面、角色之前画），让前景更突出
 function drawLights(cx,cy,t){const f=LV.floor,th=LV.th;
- const amb={1:0,2:.16,3:.45}[f];if(amb){ctx.fillStyle=f===2?`rgba(20,24,64,${amb})`:`rgba(8,6,26,${amb})`;ctx.fillRect(0,0,VW,VH)}
+ const scene=sprReady('bg_f'+f+'_mid');const amb=scene?{1:0,2:.06,3:.12}[f]:{1:0,2:.16,3:.45}[f];if(amb){ctx.fillStyle=f===2?`rgba(20,24,64,${amb})`:`rgba(8,6,26,${amb})`;ctx.fillRect(0,0,VW,VH)}
  ctx.save();ctx.globalCompositeOperation='lighter';
  for(const d of LV.decor){const x=R(d.x-cx),y=R(d.y-cy);if(x<-120||x>VW+120)continue;
+  if(scene&&(d.k==='window'||d.k==='lamp'))continue;
   if(d.k==='window'&&f===1){ctx.fillStyle='rgba(255,226,160,.07)';ctx.beginPath();ctx.moveTo(x+2,y+2);ctx.lineTo(x+38,y+2);ctx.lineTo(x+110,y+190);ctx.lineTo(x+60,y+190);ctx.fill();ctx.fillStyle='rgba(255,226,160,.05)';ctx.fillRect(x+2,y+2,36,32)}
   if(d.k==='window'&&f===2){ctx.fillStyle='rgba(255,150,90,.06)';ctx.beginPath();ctx.moveTo(x+2,y+2);ctx.lineTo(x+38,y+2);ctx.lineTo(x+120,y+190);ctx.lineTo(x+40,y+190);ctx.fill()}
   if(d.k==='lamp'){const g=ctx.createRadialGradient(x,y+12,2,x,y+12,f===3?130:80);g.addColorStop(0,th.light+(f===3?'.6)':'.14)'));g.addColorStop(1,th.light+'0)');ctx.fillStyle=g;ctx.fillRect(x-135,y-120,270,270)}

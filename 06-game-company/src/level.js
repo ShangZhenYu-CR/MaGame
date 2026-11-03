@@ -99,8 +99,9 @@ function tileIdx(v,tx,ty){const h=(tx*7+ty*13)%3;
  return {3:18,4:21,5:19}[v]}
 // 平台瓦片素材顶部有几像素透明，画的时候往上挪，让木板上沿和碰撞线对齐（不然人看起来悬空）
 const PLAT_OFF={1:4.5,2:3,3:4.5};
-function drawTilesSpr(cx,cy){const n='tiles_f'+LV.af;if(!useSpr||!sprReady(n))return false;const im=SPR[n],s=SPRS[n]||1,ts=16*s,x0=Math.max(0,Math.floor(cx/TS)),x1=Math.min(LV.w-1,Math.floor((cx+VW)/TS)),y0=Math.max(0,Math.floor(cy/TS)),y1=Math.min(LV.h-1,Math.floor((cy+VH)/TS));
- for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){const v=LV.T[ty*LV.w+tx];if(!v)continue;const i=tileIdx(v,tx,ty);if(i===undefined)continue;if(v===5)ctx.globalAlpha=.55+.25*Math.sin(T*6+tx);ctx.drawImage(im,(i%8)*ts,Math.floor(i/8)*ts,ts,ts,tx*TS-cx,ty*TS-cy-(v===2?PLAT_OFF[LV.af]||0:0),TS,TS);ctx.globalAlpha=1}
+// 某层的地面瓦片还没交付时（天台），先借顶层的瓦片
+function drawTilesSpr(cx,cy){const tf=sprReady('tiles_f'+LV.af)?LV.af:3,n='tiles_f'+tf;if(!useSpr||!sprReady(n))return false;const im=SPR[n],s=SPRS[n]||1,ts=16*s,x0=Math.max(0,Math.floor(cx/TS)),x1=Math.min(LV.w-1,Math.floor((cx+VW)/TS)),y0=Math.max(0,Math.floor(cy/TS)),y1=Math.min(LV.h-1,Math.floor((cy+VH)/TS));
+ for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){const v=LV.T[ty*LV.w+tx];if(!v)continue;const i=tileIdx(v,tx,ty);if(i===undefined)continue;if(v===5)ctx.globalAlpha=.55+.25*Math.sin(T*6+tx);ctx.drawImage(im,(i%8)*ts,Math.floor(i/8)*ts,ts,ts,tx*TS-cx,ty*TS-cy-(v===2?PLAT_OFF[tf]||0:0),TS,TS);ctx.globalAlpha=1}
  if(LV.gate.active){const sx=LV.gate.x*TS-cx;for(let ty=2;ty<LV.h;ty++)ctx.drawImage(im,(20%8)*ts,Math.floor(20/8)*ts,ts,ts,sx,ty*TS-cy,TS,TS)}
  return true}
 function drawTiles(cx,cy){drawTilesSpr(cx,cy)}
@@ -119,7 +120,7 @@ function drawBackground(cx,cy,t){const th=LV.th,f=LV.af,mid='bg_f'+f+'_mid',aren
  ctx.fillStyle=th.wall;ctx.fillRect(0,0,VW,VH)}
 // 灯光：只照背景和装饰（在地面、角色之前画），让前景更突出
 function drawLights(cx,cy,t){const f=LV.af,th=LV.th;
- const scene=sprReady('bg_f'+f+'_mid');const amb=scene?{1:0,2:.06,3:.12}[f]:{1:0,2:.16,3:.45}[f];if(amb){ctx.fillStyle=f===2?`rgba(20,24,64,${amb})`:`rgba(8,6,26,${amb})`;ctx.fillRect(0,0,VW,VH)}
+ const scene=sprReady('bg_f'+f+'_mid');const amb=scene?{1:0,2:.06,3:.12,4:.1}[f]:{1:0,2:.16,3:.45,4:.3}[f];if(amb){ctx.fillStyle=f===2?`rgba(20,24,64,${amb})`:`rgba(8,6,26,${amb})`;ctx.fillRect(0,0,VW,VH)}
  ctx.save();ctx.globalCompositeOperation='lighter';
  for(const d of LV.decor){const x=R(d.x-cx),y=R(d.y-cy);if(x<-120||x>VW+120)continue;
   if(scene&&d.k==='window')continue;

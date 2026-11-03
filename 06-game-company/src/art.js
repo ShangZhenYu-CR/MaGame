@@ -65,7 +65,7 @@ const LJY_FALLBACK={throw:'cube',brush_wind:'curl_wind',brush:'curl_wind',slam:'
 function drawLJYSpr(b,cx,cy){const pre=b.armor?'boss_ljy_p2_':'boss_ljy_';if(!useSpr||!sprReady(pre+'idle'))return false;
  let k=LJY_ANIM[b.state]||(Math.abs(b.vx)>10?'walk':'idle');let n=(k==='transform'?'boss_ljy_':pre)+k,held=false;
  if(!sprReady(n)){const fb=LJY_FALLBACK[k]||'idle';n=pre+fb;if(!sprReady(n))n=pre+'idle';held=!['idle','stagger'].includes(fb)}
- const c=sprN(n),base=n.slice(pre.length),loop=!held&&['idle','walk','stagger','dive_up','fdash','breath'].includes(base)&&n.indexOf('transform')<0;let fi=held?c-1:loop?Math.floor(b.anim*8):Math.min(c-1,Math.floor(b.t*10));
+ const c=sprN(n),base=n.slice(pre.length),loop=!held&&['idle','walk','stagger','fdash','breath'].includes(base)&&n.indexOf('transform')<0;let fi=held?c-1:loop?Math.floor(b.anim*8):Math.min(c-1,Math.floor(b.t*10));
  CHK_LAST.b=[n,((fi%sprN(n))+sprN(n))%sprN(n),sprN(n)];sprFrame(n,fi,b.x-cx,b.y-cy,b.face);if(b.flash>0)sprFrame(n,fi,b.x-cx,b.y-cy,b.face,true);return true}
 function drawBossSpr(b,cx,cy){if(b.kind==='ljy')return drawLJYSpr(b,cx,cy);const p='boss_'+b.kind;if(!useSpr||!sprReady(p+'_idle'))return false;let n=p+'_idle',fi=Math.floor(b.anim*5);const has=k=>sprReady(p+'_'+k),st=b.state,set=(k,f)=>{if(has(k)){n=p+'_'+k;fi=f}};
  if((st==='tele'||st==='tele_in')&&has('tele_out'))ctx.globalAlpha=1;
@@ -125,7 +125,7 @@ const DECOR_MAP={1:{easel:['easel'],frame:['artwall'],plant:['plant','sculpture'
 const DECOR_WALL=['artwall','board','whiteboard','poster','portrait','neon'];
 // 天台（第 4 层）：健身房陈设单独到位了就先用，墙面、地面还没到时继续用顶层的；没到位的陈设不画，免得冒出总裁办的东西
 function decorFloor(){return LV.floor===4&&sprReady('decor_f4_dumbbellrack')?4:LV.af}
-function drawDecorSpr(d,cx,cy){if(!useSpr||d.gy===undefined)return false;const F=d.k==='elevator'?LV.af:decorFloor();let name=d.k==='elevator'?'elevator':null;const m=DECOR_MAP[F]&&DECOR_MAP[F][d.k];if(m)name=m[d.s%m.length];if(!name)return false;const n='decor_f'+F+'_'+name;if(!sprReady(n))return F===4;
+function drawDecorSpr(d,cx,cy){if(!useSpr||d.gy===undefined)return false;const F=d.k==='elevator'?LV.af:decorFloor();let name=d.k==='elevator'?'elevator':null;const m=DECOR_MAP[F]&&DECOR_MAP[F][d.k];if(m)name=m[d.s%m.length];if(!name)return false;const n=d.lift&&sprReady('decor_f4_elevator')?'decor_f4_elevator':'decor_f'+F+'_'+name;if(!sprReady(n))return F===4;
  // 第一次画的时候检查摆不摆得下：不能被地面挡住，落地的物件下面要全是地面；放不下就左右挪，挪不开就不放
  if(d.fit===undefined||d.fitN!==n)decorFit(d,n,name);if(d.fit===null)return true;
  const st=DECOR_STYLE[name]||{},b=decorBox(n,name),x=R(d.x+12+d.fit-cx),bot=R(d.gy-(DECOR_WALL.includes(name)?34:0)-cy);

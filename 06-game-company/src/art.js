@@ -26,6 +26,8 @@ function sprFrame(n,i,x,y,face,white,mode){n=skinOf(n);if(!sprReady(n))return fa
  const gp=mode==='center'?0:((typeof ART_GAP!=='undefined'&&ART_GAP[n])?ART_GAP[n][i]||0:0);
  ctx.save();ctx.translate(R(x),R(y+gp));ctx.scale(face,1);ctx.drawImage(white?whiteOf(n):im,i*fw,0,fw,fh,-W/2,mode==='center'?-H/2:-H,W,H);ctx.restore();return true}
 // 序列帧特效（命中火花等）
+// 动画检查页用：记下最近一次画出来的素材名和帧号
+const CHK_LAST={};
 const fxs=[];function sfx(n,x,y,face=1,fps=20){if(sprReady(n))fxs.push({n,x,y,face,t:0,fps})}
 function updFx(dt){for(let i=fxs.length-1;i>=0;i--){fxs[i].t+=dt;if(fxs[i].t*fxs[i].fps>=sprN(fxs[i].n))fxs.splice(i,1)}}
 function drawFx(cx,cy){for(const f of fxs)sprFrame(f.n,Math.floor(f.t*f.fps),f.x-cx,f.y-cy,f.face,false,'center')}
@@ -44,6 +46,7 @@ function drawEnemySpr(e,cx,cy){const b='enemy_'+e.type;if(!useSpr||!sprReady(b+'
  else if((e.state==='wind'||e.state==='slashw')&&has('wind')){n=b+'_wind';fi=Math.floor((1-Math.max(0,e.timer)/(e.windT||.5))*3)}
  else if((['lunge','swoop','bash','slam','spray','slash','rally'].includes(e.state)||e.atkT>0||(e.type==='bug'&&!e.onGround&&e.cd>.6))&&has('attack')){n=b+'_attack';fi=e.atkT>0?Math.floor((1-e.atkT/.3)*3):Math.min(2,Math.floor(e.anim*10)%3)}
  const x=e.x-cx,y=e.y-cy;
+ e._spr=[n,((fi%sprN(n))+sprN(n))%sprN(n),sprN(n)];
  if(e.fly){sprFrame(n,fi,x,y-e.h/2,e.face,false,'center');if(e.flash>0)sprFrame(n,fi,x,y-e.h/2,e.face,true,'center')}
  else{const k=ENEMY_SPR_SCALE[e.type]||1;if(k!==1){ctx.save();ctx.translate(x,y);ctx.scale(k,k);ctx.translate(-x,-y)}sprFrame(n,fi,x,y,e.face);if(e.flash>0)sprFrame(n,fi,x,y,e.face,true);if(k!==1)ctx.restore()}
  if(e.bleedT>0&&Math.floor(e.anim*8)%2)px(x+rnd(-4,4),y-e.h*rnd(.3,1.1),1,2,pick(['#ff6a2a','#ffb84a']));
@@ -61,7 +64,7 @@ function drawLJYSpr(b,cx,cy){const pre=b.armor?'boss_ljy_p2_':'boss_ljy_';if(!us
  let k=LJY_ANIM[b.state]||(Math.abs(b.vx)>10?'walk':'idle');let n=(k==='transform'?'boss_ljy_':pre)+k,held=false;
  if(!sprReady(n)){const fb=LJY_FALLBACK[k]||'idle';n=pre+fb;if(!sprReady(n))n=pre+'idle';held=!['idle','stagger'].includes(fb)}
  const c=sprN(n),base=n.slice(pre.length),loop=!held&&['idle','walk','stagger','dive_up','fdash','breath'].includes(base)&&n.indexOf('transform')<0;let fi=held?c-1:loop?Math.floor(b.anim*8):Math.min(c-1,Math.floor(b.t*10));
- sprFrame(n,fi,b.x-cx,b.y-cy,b.face);if(b.flash>0)sprFrame(n,fi,b.x-cx,b.y-cy,b.face,true);return true}
+ CHK_LAST.b=[n,((fi%sprN(n))+sprN(n))%sprN(n),sprN(n)];sprFrame(n,fi,b.x-cx,b.y-cy,b.face);if(b.flash>0)sprFrame(n,fi,b.x-cx,b.y-cy,b.face,true);return true}
 function drawBossSpr(b,cx,cy){if(b.kind==='ljy')return drawLJYSpr(b,cx,cy);const p='boss_'+b.kind;if(!useSpr||!sprReady(p+'_idle'))return false;let n=p+'_idle',fi=Math.floor(b.anim*5);const has=k=>sprReady(p+'_'+k),st=b.state,set=(k,f)=>{if(has(k)){n=p+'_'+k;fi=f}};
  if((st==='tele'||st==='tele_in')&&has('tele_out'))ctx.globalAlpha=1;
  // 制作人
@@ -95,7 +98,7 @@ function drawBossSpr(b,cx,cy){if(b.kind==='ljy')return drawLJYSpr(b,cx,cy);const
  else if(st==='stamp_hover'||st==='stamp_fall')set('stamp',3+(Math.floor(b.anim*6)%2));
  else if(st==='recover'){const lk=b.kind==='ceo'?'pound':'stamp';if(b.landT>0&&has(lk))set(lk,5+Math.min(2,Math.floor((.36-b.landT)/.12)));else set('recover',Math.floor(b.anim*3)%2)}
  else if(st==='idle'&&Math.abs(b.vx)>5)set('walk',Math.floor(b.anim*8));
- const x=b.x-cx,y=b.y-cy;sprFrame(n,fi,x,y,b.face);if(b.flash>0)sprFrame(n,fi,x,y,b.face,true);return true}
+ const x=b.x-cx,y=b.y-cy;CHK_LAST.b=[n,((fi%sprN(n))+sprN(n))%sprN(n),sprN(n)];sprFrame(n,fi,x,y,b.face);if(b.flash>0)sprFrame(n,fi,x,y,b.face,true);return true}
 function px(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(R(x),R(y),w,h)}
 function pline(x0,y0,x1,y1,w,c){ctx.fillStyle=c;const d=Math.max(Math.abs(x1-x0),Math.abs(y1-y0)),n=Math.max(1,Math.ceil(d));const o=Math.floor(w/2);for(let i=0;i<=n;i++){const t=i/n;ctx.fillRect(R(x0+(x1-x0)*t)-o,R(y0+(y1-y0)*t)-o,w,w)}}
 function pcirc(cx,cy,r,c){ctx.fillStyle=c;for(let y=-r;y<=r;y++){const w=Math.round(Math.sqrt(r*r-y*y));ctx.fillRect(R(cx-w),R(cy+y),w*2+1,1)}}

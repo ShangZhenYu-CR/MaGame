@@ -121,9 +121,9 @@ function drawPlayerSpr(x,y,flash){let n='player_idle',fi=Math.floor(P.anim*5),ha
  if(!noW&&!P.atk&&!P.dive&&!(P.diveLandT>0)){const ha=handOf(n,fi);if(ha)hand=ha}
  if(LV.floor!==1){ctx.globalAlpha=.3;for(const[ox,oy]of[[-1,0],[1,0],[0,-1],[0,1]])sprFrame(n,fi,x+ox,y+oy,P.face);ctx.globalAlpha=1}
  if(flash)ctx.globalAlpha=.5;
- sprFrame(n,fi,x,y,P.face);
+ CHK_LAST.p=[skinOf(n),((fi%sprN(skinOf(n)))+sprN(skinOf(n)))%sprN(skinOf(n)),sprN(skinOf(n))];sprFrame(n,fi,x,y,P.face);
  // 武器：雕刻笔用素材，其他武器暂用代码画；格挡、喷涂等道具已画在人物图里
- if(!noW&&hand){const hx=x+hand[0]*P.face,hy=y+hand[1];const wn='weapon_'+P.prim;if(has(wn)){const im=SPR[wn],s=SPRS[wn]||1,g=(ART_ANCHOR[wn]||{}).grip||[im.naturalWidth/2,im.naturalHeight/2],base=P.prim==='ruler'?1.57:2.36;ctx.save();ctx.translate(R(hx),R(hy));ctx.scale(P.face,1);ctx.rotate(-(wang-base));
+ if(!noW&&hand){const hx=x+hand[0]*P.face,hy=y+hand[1];CHK_LAST.hand=[hx,hy];const wn='weapon_'+P.prim;if(has(wn)){const im=SPR[wn],s=SPRS[wn]||1,g=(ART_ANCHOR[wn]||{}).grip||[im.naturalWidth/2,im.naturalHeight/2],base=P.prim==='ruler'?1.57:2.36;ctx.save();ctx.translate(R(hx),R(hy));ctx.scale(P.face,1);ctx.rotate(-(wang-base));
   // 渲染大剑蓄力：换成进度条逐格亮起的那张
   if(P.prim==='render'&&P.chargeT>.08&&has('weapon_render_charge')){const ci=SPR.weapon_render_charge,fw=im.naturalWidth,fi=Math.min(3,Math.floor(P.chargeT/.55*4));ctx.drawImage(ci,fi*fw,0,fw,ci.naturalHeight,-g[0]/s,-g[1]/s,fw/s,ci.naturalHeight/s)}
   else ctx.drawImage(im,-g[0]/s,-g[1]/s,im.naturalWidth/s,im.naturalHeight/s);ctx.restore()}}
@@ -150,13 +150,13 @@ function render(){const th=LV.th,cx=R(cam.x+(Math.random()-.5)*shake*2),cy=R(cam
  if(P.kfMark){const mx=R(P.kfMark.x-cx),my=R(P.kfMark.y-cy);ctx.globalAlpha=.4+.25*Math.sin(T*8);ctx.save();ctx.translate(mx,my-18);ctx.rotate(Math.PI/4);px(-5,-5,10,10,'#c8a0ff');px(-2,-2,4,4,'#fff');ctx.restore();px(mx-6,my-1,12,1,'#c8a0ff');ctx.globalAlpha=1;pnum(String(Math.ceil(P.kfMark.t)),mx,my-34,'#c8a0ff',1)}
  if(G.state!=='dead'||Math.floor(T*8)%2||(useSpr&&sprReady('player_die')))drawPlayer(cx,cy);
  if(P.chargeT>.08&&P.prim==='render'){const k=Math.min(1,P.chargeT/.55),x=R(P.x-cx),y=R(P.y-cy);px(x-8,y-48,16,2,'#2a2030');px(x-8,y-48,R(16*k),2,k>=1?'#fff6c0':'#ffd84a')}
- drawFx(cx,cy);drawParts(cx,cy);drawNear(cx,cy);drawNums(cx,cy);if(boss)drawLjyCine(cx,cy);
+ drawFx(cx,cy);drawParts(cx,cy);drawNear(cx,cy);drawNums(cx,cy);if(boss)drawLjyCine(cx,cy);drawCheckOverlay(cx,cy);
  ctx.drawImage(VIG,0,0);
  if(flashRed>0){ctx.fillStyle=`rgba(216,40,40,${flashRed*.6})`;ctx.fillRect(0,0,VW,VH)}
  if(slowT>0){ctx.fillStyle='rgba(255,255,255,.06)';ctx.fillRect(0,0,VW,VH)}
  // 提示
  const pr=$('prompt');if(near&&!G.wheel){let s='';if(near.k==='weapon'){const W=WEAPONS[near.w],old=W.slot===1?P.prim:P.sec,af=(near.aff||[]).map(a=>`<em>${AFF[a].n}</em>${AFF[a].d}`).join('　');{const bag=W.slot===1?P.primBag:P.secBag,room=bag.length<BAG_MAX;s=`<b>E</b> 拾取 ${wname(near.w,near.lv)}<small>${W.desc}　（${room?'放进背包 '+(bag.length+1)+'/'+BAG_MAX:'替换当前的'+WEAPONS[old].name}）</small>${af?'<small class=af>'+af+'</small>':''}`}}else if(near.k==='gymlift'){s='<b>E</b> 坐货梯上天台<small>隐藏关卡：先在茶水间整备，再去天台挑战隐藏大佬。走右边的门就是正常下班</small>'}else if(near.k==='ware'){const W=WARES[near.item];s=`<b>E</b> 买下 ${W.n}　✦ ${near.c}<small>${W.d}${P.cells<near.c?'　（灵感不够，现有 '+P.cells+'）':''}</small>`}else if(near.k==='chest')s='<b>E</b> 打开宝箱';else if(near.k==='cchest')s=`<b>E</b> 签加班合同<small>奖励一把高级武器 + 卷轴 + 灵感；但击败 ${8+LV.floor*3} 个敌人之前，受到的伤害翻倍</small>`;else if(near.k==='tdoor')s='<b>E</b> 打开准时下班门';else if(near.k==='wireterm')s='<b>E</b> 补模型<small>这里有一段没做完的场景，地编的活儿</small>';else if(near.k==='rush')s=`<b>E</b> 接下加急任务<small>限时清掉刷出来的怪，奖励高级武器</small>`;else s=`<b>E</b> ${G.floor<3?'进入茶水间':'下班！'}`;if(pr.dataset.s!==s){pr.innerHTML=s;pr.dataset.s=s}pr.classList.add('show')}else pr.classList.remove('show')}
-function updCamera(dt){let tx=P.x-VW/2+P.face*36,ty=P.y-175;
+function updCamera(dt){if(G.chk){cam.x=0;cam.y=LV.h*TS-VH;return}let tx=P.x-VW/2+P.face*36,ty=P.y-175;
  if(boss||G.bossLock){tx=LV.arenaX}
  tx=clamp(tx,0,LV.w*TS-VW);ty=clamp(ty,0,LV.h*TS-VH);cam.x=lerp(cam.x,tx,1-Math.exp(-6*dt));cam.y=lerp(cam.y,ty,1-Math.exp(-6*dt))}
 function step(dt){T+=dt;
@@ -164,7 +164,7 @@ function step(dt){T+=dt;
  shake=Math.max(0,shake-dt*20);flashRed=Math.max(0,flashRed-dt*2);
  for(let i=ghosts.length-1;i>=0;i--){ghosts[i].t-=dt;if(ghosts[i].t<=0)ghosts.splice(i,1)}
  if(G.state==='play'){G.time+=dt;G.floorT+=dt;
-  if(!P.dead)playerUpdate(dt);updEnemies(dt);bossUpdate(dt);updProjs(dt);updPickups(dt);updBoxes(dt);updRush(dt);updRoom(dt);updTutorial(dt);
+  if(!P.dead)playerUpdate(dt);updEnemies(dt);bossUpdate(dt);updProjs(dt);updPickups(dt);updBoxes(dt);updRush(dt);updRoom(dt);updTutorial(dt);chkUpdate(dt);
   if(!boss&&!G.bossDone&&P.x>LV.arenaX+4*TS){LV.gate.active=true;G.bossLock=true;spawnBoss(LV.th.boss)}
   if(boss){const b=$('bossfill');b.style.width=Math.max(0,boss.hp/boss.max*100)+'%';const s=$('bossstag');s.style.width=(boss.state==='stagger'?Math.max(0,1-boss.t/2.3):Math.min(1,boss.stag/boss.stagMax))*100+'%';s.classList.toggle('on',boss.state==='stagger'||boss.stagPend)}
   for(const s of splats)s.life-=dt*.15}
@@ -223,7 +223,7 @@ function frame(ts){requestAnimationFrame(frame);try{let dt=Math.min(.05,(ts-last
  if(G.state==='title'){T+=dt;renderTitle()}
  else if(G.state==='end'){T+=dt;renderEnd()}
  else if(G.state==='pause'||G.state==='rest'||G.state==='scroll'){render()}
- else{let d=dt*slowmo;if(G.wheel)d=dt*.12;if(hitstop>0){hitstop-=dt;d*=.04}step(d);render()}
+ else{let d=dt*slowmo;if(G.wheel)d=dt*.12;if(G.chk){d*=CHK.speed;if(CHK.paused){d=CHK.stepReq?1/60*slowmo:0;CHK.stepReq=0}}if(hitstop>0){hitstop-=dt;d*=.04}step(d);render()}
  uiTick();present();clearPressed()}catch(e){__err(e)}}
 requestAnimationFrame(frame);
 // ===== 回到主页 =====
@@ -311,3 +311,90 @@ function updTutorial(dt){const g=G.tut;if(!g||G.state!=='play')return;if(P.rollT
  if(g.wait){g.wait-=dt;if(g.wait<=0){g.wait=0;tutNext()}}}
 function finishTutorial(){SAVE.tut=1;saveGame();SFX.win();toast('教程完成，去上班吧！',1800);G.tut=null;show('tut',false);goHome()}
 $('btut').onclick=()=>{SFX.select();startTutorial()};
+// ===== 动画检查页（check.html）=====
+// 用游戏本身的引擎和素材，在一个练习房里逐招播放：武器挂点、招式特效位置和时机都和实际游戏完全一致
+const CHK={speed:.5,paused:false,stepReq:0,loop:false,act:null,loopT:0,box:true,anchor:true,boss:null,bossMove:'',bossLoopT:0};
+const CHK_BOSS_MOVES={ad:['dash_wind','notes','stamp_up','sweep_wind','rain'],pd:['tele','doc','change','laser','call','shove_wind'],ceo:['pie','pound','kpi','bigpie','pierain','belly_wind'],
+ ljy:['cube','bell','brush_wind','curl_wind','slam','变身','fdash_wind','breath','pillars','dive_up','upper_wind','meteor']};
+const CHK_MOVE_NAME={dash_wind:'红笔冲刺',notes:'扔修改意见',stamp_up:'跳起盖章',sweep_wind:'近身横扫',rain:'满屏批注',tele:'瞬移',doc:'扔文件',change:'需求变更',laser:'激光',call:'拉人开会',shove_wind:'近身冲击波',
+ pie:'扔饼',pound:'跳砸',kpi:'KPI 柱',bigpie:'巨饼',pierain:'饼雨',belly_wind:'肚子顶人',cube:'扔方块',bell:'回旋哑铃',brush_wind:'雕刻笔横扫',curl_wind:'哑铃上勾',slam:'哑铃砸地','变身':'变身（半血）',
+ fdash_wind:'烈焰冲刺',breath:'龙炎吐息',pillars:'烈焰柱',dive_up:'炎龙天降',upper_wind:'升龙拳',meteor:'天火'};
+function genCheckRoom(af){const w=30,T=new Uint8Array(w*HT),set=(x,y,v)=>{if(x>=0&&x<w&&y>=0&&y<HT)T[y*w+x]=v};
+ for(let x=0;x<w;x++){set(x,0,1);set(x,1,1);for(let y=19;y<HT;y++)set(x,y,1)}for(let y=0;y<HT;y++){set(0,y,1);set(1,y,1);set(w-1,y,1);set(w-2,y,1)}
+ for(let x=10;x<=14;x++)set(x,14,2);
+ const decor=[];for(const x of[7,22])decor.push({k:'lamp',x:x*TS,y:6*TS,s:0});
+ LV={floor:Math.min(af,3),af,th:THEME[af],w,h:HT,T,spawns:[],decor,pick:[],signs:[],boxes:[],room:null,arenaX:2*TS,arenaW:(w-4)*TS,gate:{x:-9,active:false},exitX:9999*TS,tlimit:1e9,tut:true};return LV}
+function chkReset(){P.x=7*TS;P.y=19*TS;P.vx=P.vy=0;P.face=1;P.atk=null;P.dive=false;P.rollT=0;P.chargeT=0;P.inv=0;P.hp=P.maxHp;P.combo=0;P.comboT=0;P.atkQueued=0}
+function chkEquip(w){if(WEAPONS[w].slot===1){P.prim=w;P.primLv=0;P.primAff=[];P.primBag=[{w,lv:0,aff:[]}];P.primIdx=0}else{P.sec=w;P.secLv=0;P.secAff=[];P.secBag=[{w,lv:0,aff:[]}];P.secIdx=0}hud.p=hud.s=null;hud()}
+function chkStartAtk(i){const W=WEAPONS[P.prim];P.atk={def:W.combo[i],t:0,phase:'su',hit:new Set(),idx:i};P.combo=i+1;P.comboT=.5}
+function chkPlay(act){CHK.act=act;CHK.queue=null;chkReset();const W=WEAPONS[P.prim];
+ if(act.k==='hit')chkStartAtk(act.i);
+ else if(act.k==='combo'){CHK.queue=W.combo.map((_,i)=>i);chkStartAtk(CHK.queue.shift())}
+ else if(act.k==='dash'){const fin=W.combo[W.combo.length-1];P.atk={def:Object.assign({},fin,{lunge:fin.lunge*1.6+90,dash:1,su:fin.su*.6}),t:0,phase:'su',hit:new Set(),idx:W.combo.length-1}}
+ else if(act.k==='charged'){P.atk={def:WEAPONS.render.charged,t:0,phase:'su',hit:new Set(),idx:2}}
+ else if(act.k==='dive'){P.x=12*TS;P.y=14*TS-60;P.vy=0;P.dive=true;P.diveAt=P.anim;P.vy=520}
+ else if(act.k==='skill'){P.skillCd=0;P.kfMark=null;useSkill()}
+ CHK.loopT=0}
+function chkUpdate(dt){if(!G.chk)return;P.hp=P.maxHp;
+ if(CHK.queue&&CHK.queue.length&&P.atk&&P.atk.phase==='re'&&P.atk.t>P.atk.def.re*.3){chkStartAtk(CHK.queue.shift())}
+ const busy=P.atk||P.dive||P.diveLandT>0||P.sprayT>0||P.parryT>0;
+ if(CHK.loop&&CHK.act&&!busy){CHK.loopT+=dt;if(CHK.loopT>.6)chkPlay(CHK.act)}
+ for(const e of enemies)if(e.dummy)e.x=e.hx;
+ if(boss){boss.closeT=0;boss.hitLog.length=0;if(!CHK.bossHurt)boss.hp=Math.max(boss.hp,boss.max*(boss.phase>=3?.2:boss.phase>=2?.3:.6));boss.stag=0;boss.stagPend=false;
+  if(boss.state==='idle'){boss.idleT=999;if(CHK.bossLoop&&CHK.bossMove){CHK.bossLoopT+=dt;if(CHK.bossLoopT>.8)chkBossMove(CHK.bossMove)}}}
+ chkInfo()}
+function chkSpawnBoss(kind,phase){boss=null;enemies.length=enemies.filter(e=>e.dummy).length?enemies.length:0;for(let i=enemies.length-1;i>=0;i--)if(!enemies[i].dummy)enemies.splice(i,1);projs.length=0;
+ spawnBoss(kind);boss.state='idle';boss.t=0;boss.idleT=999;boss.x=22*TS;boss.y=19*TS;boss.face=-1;boss.phase=phase;if(kind==='ljy'&&phase>=2){boss.armor=true;boss.h=72;boss.w=28}
+ boss.hp=boss.max*(phase>=3?.2:phase>=2?.3:.8);boss.phasePend=0;$('bossbar').classList.add('show');$('banner').classList.remove('show');CHK.bossHurt=false;chkFillMoves(kind,phase)}
+function chkBossMove(m){if(!boss)return;CHK.bossMove=m;CHK.bossLoopT=0;const b=boss;b.thrown=false;b.jumped=false;b.hitDone=false;b.alpha=1;b.vx=0;
+ if(Math.abs(b.x-22*TS)>2*TS&&!['tele'].includes(m)){b.x=22*TS;b.y=19*TS}
+ if(m==='变身'){CHK.bossHurt=true;b.hp=Math.round(b.max*.505);b.state='idle';b.t=0;damage(b,40,1,0,false,true,'prim');return}
+ b.state=m;b.t=0;b.face=sign(P.x-b.x)||-1;if(m.endsWith('_wind'))SFX.warn()}
+function chkFillMoves(kind,phase){const sel=$('chkmove');sel.innerHTML='';for(const m of CHK_BOSS_MOVES[kind]){if(kind==='ljy'){const p2=['fdash_wind','breath','pillars','dive_up','upper_wind','meteor'].includes(m);if(m==='变身'&&phase!==1)continue;if(p2!==(phase>=2)&&m!=='变身')continue}
+  const o=document.createElement('option');o.value=m;o.textContent=(CHK_MOVE_NAME[m]||m)+'  ('+m+')';sel.appendChild(o)}}
+function chkInfo(){const el=$('chkinfo');if(!el)return;const a=P.atk,p=CHK_LAST.p||['-',0,0],b=CHK_LAST.b;
+ let s=`<b>马楠</b> ${p[0]} 帧 ${p[1]+1}/${p[2]}`;if(a)s+=`<br>招式 第 ${a.idx+1} 段 ${a.def.dash?'冲刺斩':a.def.charged?'蓄力重斩':''} · ${({su:'前摇',ac:'出手',re:'收招'})[a.phase]} ${a.t.toFixed(2)}s`;
+ if(boss&&b)s+=`<br><b>Boss</b> ${b[0]} 帧 ${b[1]+1}/${b[2]} · 状态 ${boss.state} ${boss.t.toFixed(2)}s`;
+ const e=enemies.find(e=>!e.dummy&&e.hp>0);if(e&&e._spr)s+=`<br><b>敌人</b> ${e._spr[0]} 帧 ${e._spr[1]+1}/${e._spr[2]} · ${e.state}`;
+ s+=`<br><b>特效</b> ${fxs.map(f=>f.n+' '+(Math.floor(f.t*f.fps)+1)+'/'+sprN(f.n)).join('，')||'—'}`;el.innerHTML=s}
+// 判定框和锚点叠加
+function drawCheckOverlay(cx,cy){if(!G.chk)return;ctx.save();
+ if(CHK.box){if(P.atk){const b=atkBox(P.atk);ctx.globalAlpha=P.atk.phase==='ac'?.45:.18;ctx.fillStyle='#ff3a3a';ctx.fillRect(b.x0-cx,b.y0-cy,b.x1-b.x0,b.y1-b.y0)}
+  ctx.globalAlpha=.9;ctx.strokeStyle='#5af07a';ctx.lineWidth=.5;for(const e of targets())ctx.strokeRect(e.x-e.w/2-cx+.25,e.y-e.h-cy+.25,e.w,e.h);ctx.strokeStyle='#9fd8ff';ctx.strokeRect(P.x-P.w/2-cx+.25,P.y-P.h-cy+.25,P.w,P.h)}
+ if(CHK.anchor){ctx.globalAlpha=1;const pt=(x,y,c)=>{ctx.fillStyle=c;ctx.fillRect(x-cx-1.5,y-cy-.25,3,.5);ctx.fillRect(x-cx-.25,y-cy-1.5,.5,3)};pt(P.x,P.y,'#9fd8ff');if(CHK_LAST.hand)pt(CHK_LAST.hand[0]+cx,CHK_LAST.hand[1]+cy,'#ff5af0');for(const f of fxs)pt(f.x,f.y,'#ffd84a')}
+ ctx.restore()}
+function checkStart(){G.chk=true;Snd.unlock&&Snd.unlock();show('title',false);show('hud',true);resetPlayer(false);G.lvl=0;G.hard=false;genCheckRoom(1);enemies.length=0;projs.length=0;pickups.length=0;boss=null;G.bossDone=true;
+ chkReset();const d=spawnEnemy({type:'crumple',x:9.5*TS,y:19*TS});d.dummy=true;d.hp=d.max=99999;d.hx=d.x;G.state='play';cam.x=0;cam.y=8;$('floor').textContent='动画检查';hud();chkPanel()}
+function chkPanel(){const p=document.createElement('div');p.id='chk';
+ const opt=(arr,f)=>arr.map(v=>`<option value="${v}">${f(v)}</option>`).join('');
+ p.innerHTML=`<h3>动画检查</h3>
+ <section><h4>马楠</h4><label>建模工具 <select id="chkw">${opt(PRIM,w=>WEAPONS[w].name)}</select></label><div id="chkacts"></div>
+  <label>地编工具 <select id="chks">${opt(SECN,w=>WEAPONS[w].name)}</select></label><button data-a="skill">使用</button>
+  <label class="chkck"><input type="checkbox" id="chkloop"> 循环播放</label></section>
+ <section><h4>敌人</h4><select id="chke">${opt(Object.keys(EDEF),t=>NAMES[t])}</select><button id="chkespawn">放一只</button><button id="chkeclr">清空</button><div class="tip">敌人会正常攻击（马楠无敌）</div></section>
+ <section><h4>Boss</h4><select id="chkb">${opt(['ad','pd','ceo','ljy'],k=>BOSSDEF[k].name)}</select><select id="chkph"><option value="1">一阶段</option><option value="2">二阶段</option><option value="3">三阶段</option></select><button id="chkbspawn">叫出来</button>
+  <select id="chkmove"></select><button id="chkbgo">放招</button><label class="chkck"><input type="checkbox" id="chkbloop"> 循环</label></section>
+ <section><h4>播放</h4><div class="sp">${[.1,.25,.5,1].map(v=>`<button data-sp="${v}">${v}×</button>`).join('')}</div><button id="chkpause">暂停</button><button id="chkstep">下一帧</button>
+  <select id="chkfloor"><option value="1">1F 场景</option><option value="2">2F 场景</option><option value="3">顶层场景</option></select>
+  <label class="chkck"><input type="checkbox" id="chkbox" checked> 判定框（红=攻击 绿=受击）</label><label class="chkck"><input type="checkbox" id="chkanc" checked> 锚点（粉=手 黄=特效中心 蓝=脚底）</label></section>
+ <div id="chkinfo"></div><a href="./" class="back">← 回到游戏</a>`;
+ document.body.appendChild(p);
+ const st=document.createElement('style');st.textContent=`#chk{position:fixed;right:6px;top:6px;bottom:6px;width:278px;overflow:auto;z-index:20;background:rgba(14,10,24,.92);color:#f4f1ea;border:2px solid #3a3458;border-radius:8px;padding:8px 10px;font:13px/1.45 system-ui,"PingFang SC","Microsoft YaHei",sans-serif}
+ #chk h3{margin:0 0 6px;font-size:16px;color:#ffd84a}#chk h4{margin:8px 0 4px;font-size:13px;color:#9fd8ff}#chk section{border-top:1px solid #3a3458;padding-top:4px}#chk select,#chk button{font:inherit;background:#2a2640;color:#fff;border:1px solid #14121a;border-radius:4px;padding:2px 6px;margin:2px 2px 2px 0}
+ #chk button:hover{background:#3a3458}#chk button.on{background:#ffd84a;color:#14121a}#chk label{display:block;margin:2px 0}#chk .chkck{font-size:12px}#chk .tip{font-size:11px;opacity:.6}#chkinfo{margin-top:8px;padding:6px;background:rgba(0,0,0,.35);border-radius:4px;font:11px/1.5 ui-monospace,Menlo,monospace;word-break:break-all}#chk b{color:#ffd84a}#chk .back{display:block;margin-top:8px;color:#9fd8ff}`;document.head.appendChild(st);
+ const $$=id=>document.getElementById(id);
+ const acts=()=>{const W=WEAPONS[P.prim],box=$$('chkacts');let h=W.combo.map((_,i)=>`<button data-a="hit" data-i="${i}">第 ${i+1} 下</button>`).join('')+`<button data-a="combo">整套连招</button><button data-a="dash">冲刺斩</button><button data-a="dive">下劈</button>`;if(P.prim==='render')h+=`<button data-a="charged">蓄力重斩</button>`;box.innerHTML=h};
+ $$('chkw').onchange=e=>{chkEquip(e.target.value);acts();e.target.blur()};$$('chks').onchange=e=>{chkEquip(e.target.value);e.target.blur()};acts();
+ p.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;b.blur();
+  if(b.dataset.a){chkPlay({k:b.dataset.a,i:+b.dataset.i||0})}
+  if(b.dataset.sp){CHK.speed=+b.dataset.sp;p.querySelectorAll('[data-sp]').forEach(x=>x.classList.toggle('on',x===b))}});
+ p.querySelector('[data-sp="0.5"]').classList.add('on');
+ $$('chkloop').onchange=e=>{CHK.loop=e.target.checked};$$('chkbloop').onchange=e=>{CHK.bossLoop=e.target.checked};$$('chkbox').onchange=e=>{CHK.box=e.target.checked};$$('chkanc').onchange=e=>{CHK.anchor=e.target.checked};
+ $$('chkespawn').onclick=()=>{const t=$$('chke').value;const e=spawnEnemy({type:t,x:20*TS,y:EDEF[t].fly?19*TS-70:19*TS});e.aggro=true};
+ $$('chkeclr').onclick=()=>{for(let i=enemies.length-1;i>=0;i--)if(!enemies[i].dummy)enemies.splice(i,1);projs.length=0};
+ $$('chkbspawn').onclick=()=>chkSpawnBoss($$('chkb').value,+$$('chkph').value);$$('chkb').onchange=()=>chkSpawnBoss($$('chkb').value,+$$('chkph').value);$$('chkph').onchange=()=>chkSpawnBoss($$('chkb').value,+$$('chkph').value);
+ $$('chkbgo').onclick=()=>{if(!boss)chkSpawnBoss($$('chkb').value,+$$('chkph').value);chkBossMove($$('chkmove').value)};
+ $$('chkpause').onclick=e=>{CHK.paused=!CHK.paused;e.target.textContent=CHK.paused?'继续':'暂停'};$$('chkstep').onclick=()=>{CHK.paused=true;$$('chkpause').textContent='继续';CHK.stepReq=1};
+ $$('chkfloor').onchange=e=>{const f=+e.target.value;LV.af=f;LV.th=THEME[f];LV.floor=f;e.target.blur()};
+ chkFillMoves('ad',1)}
+if(window.CHECK_MODE)setTimeout(checkStart,400);

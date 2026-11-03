@@ -8,7 +8,7 @@ const screen=$('screen'),sctx=screen.getContext('2d');
 // 渲染缓冲是逻辑分辨率的 RES 倍：场景和代码像素按逻辑像素画（每个占 RES×RES），@2x 素材可以用到更细的像素
 const RES=2;const buf=document.createElement('canvas');buf.width=VW*RES;buf.height=VH*RES;const ctx=buf.getContext('2d');ctx.setTransform(RES,0,0,RES,0,0);ctx.imageSmoothingEnabled=false;
 let SCALE=3,OX=0,OY=0;
-function resize(){const dpr=Math.min(window.devicePixelRatio||1,2),w=innerWidth||1280,h=innerHeight>100?innerHeight:720;screen.width=Math.floor(w*dpr);screen.height=Math.floor(h*dpr);screen.style.width=w+'px';screen.style.height=h+'px';
+function resize(){const dpr=Math.min(window.devicePixelRatio||1,2),w=(innerWidth||1280)-(window.CHECK_MODE?290:0),h=innerHeight>100?innerHeight:720;screen.width=Math.floor(w*dpr);screen.height=Math.floor(h*dpr);screen.style.width=w+'px';screen.style.height=h+'px';
  // 按窗口等比放大到刚好占满（不再取整，取整会在四周留黑边）；窗口不是 16:9 时只在一个方向留边
  const s=Math.min(screen.width/VW,screen.height/VH);SCALE=s;OX=Math.floor((screen.width-VW*SCALE)/2);OY=Math.floor((screen.height-VH*SCALE)/2);sctx.imageSmoothingEnabled=false;
  const ui=$('ui');if(ui){const cs=SCALE/dpr;ui.style.width=VW*cs+'px';ui.style.height=VH*cs+'px';ui.style.left=OX/dpr+'px';ui.style.top=OY/dpr+'px';ui.style.fontSize=(cs*4.5)+'px'}}

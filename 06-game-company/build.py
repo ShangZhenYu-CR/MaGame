@@ -66,4 +66,8 @@ js = ('const ART_SRC=' + json.dumps(art) + ';\nconst ART_ANCHOR=' + json.dumps(a
       + '\n'.join((here / 'src' / f'{m}.js').read_text(encoding='utf-8') for m in order))
 shell = (here / 'src' / 'shell.html').read_text(encoding='utf-8')
 (here / 'index.html').write_text(shell.replace('__JS__', js), encoding='utf-8')
+# 动画检查页：同一份游戏代码，打开就进练习房并显示检查面板
+chk = shell.replace('__JS__', js).replace('<script>try{', '<script>window.CHECK_MODE=1</script><script>try{', 1)
+chk = chk.replace('<title>', '<title>动画检查 · ', 1)
+(here / 'check.html').write_text(chk, encoding='utf-8')
 print('已生成 index.html，', len(js), '字符', '（图片内嵌）' if embed else '（图片引用 art/）')

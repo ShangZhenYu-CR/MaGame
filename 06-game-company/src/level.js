@@ -114,7 +114,10 @@ function drawBackground(cx,cy,t){const th=LV.th,f=LV.af,mid='bg_f'+f+'_mid',aren
   const hasA=sprReady(arena),ax0=R(LV.arenaX-cx),ax1=ax0+LV.arenaW;
   // Boss 房那段不画普通墙面，让 Boss 房墙面的窗户透出窗外景色
   ctx.save();if(hasA&&ax0<VW){ctx.beginPath();ctx.rect(-10,-10,Math.max(0,ax0+10),VH+20);ctx.rect(ax1,-10,Math.max(0,VW-ax1+10),VH+20);ctx.clip()}
-  for(let x=-(Math.floor(cx*.5)%W);x<VW;x+=W)ctx.drawImage(im,x,y0,W,H);ctx.restore();
+  for(let x=-(Math.floor(cx*.5)%W);x<VW;x+=W)ctx.drawImage(im,x,y0,W,H);
+  // 墙面图底部有透明区（比如顶层墙面只画到 4/5 高）：把底边往上几行（边缘那一两行是半透明的）完全不透明的像素往下拉到屏幕底，免得露出窗外远景
+  const gap=(ART_GAP[mid]||[0])[0];if(gap>0){const by=H-gap;for(let x=-(Math.floor(cx*.5)%W);x<VW;x+=W)ctx.drawImage(im,0,Math.floor(by*s)-4,im.naturalWidth,1,x,y0+by-2,W,Math.max(0,VH-(y0+by)+2))}
+  ctx.restore();
   if(hasA){const a=SPR[arena],sa=SPRS[arena]||1;ctx.drawImage(a,ax0,y0,a.naturalWidth/sa,a.naturalHeight/sa)}
   for(const d of LV.decor)if(d.k==='lamp')drawDecor(d,cx,cy,th,t);return}
  ctx.fillStyle=th.wall;ctx.fillRect(0,0,VW,VH)}

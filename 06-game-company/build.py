@@ -45,12 +45,14 @@ try:
     gaps = {}
     for p in sorted(p for p in (here / 'art').rglob('*.png') if '_pending' not in p.parts):
         name = p.stem.replace('@2x', '')
-        if not name.startswith(('player_', 'enemy_', 'boss_', 'pk_', 'decor_')):
+        if not name.startswith(('player_', 'enemy_', 'boss_', 'pk_', 'decor_', 'bg_')):
             continue
         scale = 2 if '@2x' in p.stem else 1
         im = Image.open(p).convert('RGBA')
         w = frame_w(name, im.height, scale, im.width)
         alpha = im.getchannel('A')
+        if name.startswith('bg_'):  # 背景图的边缘常有几乎看不见的杂点，按半透明以上才算有内容
+            alpha = alpha.point(lambda v: 255 if v > 128 else 0)
         row = []
         for i in range(max(1, im.width // w)):
             bb = alpha.crop((i * w, 0, i * w + w, im.height)).getbbox()

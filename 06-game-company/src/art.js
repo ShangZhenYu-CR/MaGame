@@ -66,6 +66,17 @@ function drawLJYSpr(b,cx,cy){const pre=b.armor?'boss_ljy_p2_':'boss_ljy_';if(!us
  let k=LJY_ANIM[b.state]||(Math.abs(b.vx)>10?'walk':'idle');let n=(k==='transform'?'boss_ljy_':pre)+k,held=false;
  if(!sprReady(n)){const fb=LJY_FALLBACK[k]||'idle';n=pre+fb;if(!sprReady(n))n=pre+'idle';held=!['idle','stagger'].includes(fb)}
  const c=sprN(n),base=n.slice(pre.length),loop=!held&&['idle','walk','stagger','fdash','breath'].includes(base)&&n.indexOf('transform')<0;let fi=held?c-1:loop?Math.floor(b.anim*8):Math.min(c-1,Math.floor(b.t*10));
+ // 按招式时长对帧：变身 0.9 秒合体正好到铠甲合上那一帧；吐息前 3 帧聚火、后 5 帧循环喷火；下劈落地停在火焰炸开那一帧
+ if(!held){const t=b.t,st=b.state;
+  if(st==='transform')fi=Math.min(c-1,Math.floor(t*8.5));
+  else if(st==='intro')fi=Math.min(c-1,Math.floor(t/2.0*c));
+  else if(st==='roar')fi=Math.min(c-1,Math.floor(t*8.5));
+  else if(st==='breath')fi=t<.55?Math.floor(t/.55*3):3+Math.floor((t-.55)*10)%5;
+  else if(st==='brush')fi=Math.min(3,Math.floor(t*12));
+  else if(st==='brush_wind')fi=Math.min(c-1,Math.floor(t*8));
+  else if(st==='dive_fall')fi=2;
+  else if(st==='dead')fi=Math.min(c-1,Math.floor(t*5.5))}
+ if(b.armor&&b.state==='recover'&&b.landT>0&&sprReady('boss_ljy_p2_dive')){n='boss_ljy_p2_dive';fi=3}
  CHK_LAST.b=[n,((fi%sprN(n))+sprN(n))%sprN(n),sprN(n)];sprFrame(n,fi,b.x-cx,b.y-cy,b.face);if(b.flash>0)sprFrame(n,fi,b.x-cx,b.y-cy,b.face,true);return true}
 function drawBossSpr(b,cx,cy){if(b.kind==='ljy')return drawLJYSpr(b,cx,cy);const p='boss_'+b.kind;if(!useSpr||!sprReady(p+'_idle'))return false;let n=p+'_idle',fi=Math.floor(b.anim*5);const has=k=>sprReady(p+'_'+k),st=b.state,set=(k,f)=>{if(has(k)){n=p+'_'+k;fi=f}};
  if((st==='tele'||st==='tele_in')&&has('tele_out'))ctx.globalAlpha=1;

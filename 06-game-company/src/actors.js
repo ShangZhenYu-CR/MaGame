@@ -93,6 +93,8 @@ function playerUpdate(dt){
  if(P.atk){const a=P.atk,d=a.def,sp=P.spdMul*(hasAff(1,'speed')?1.15:1);a.t+=dt*sp;
   if(a.phase==='su'&&a.t>=d.su){a.phase='ac';a.t=0;P.vx+=P.face*d.lunge;atkFx(a)}
   else if(a.phase==='ac'){doHit(a);if(a.t>=d.ac){a.phase='re';a.t=0}}
+  // 剪切刀每段剪两下：收招到第二次合拢那一帧再出一次剪口特效
+  else if(a.phase==='re'&&P.prim==='shears'&&!a.snip2&&a.t>=d.re*.25&&!d.dash){a.snip2=1;sfx('fx_snip',P.x+P.face*(d.rng-4),P.y-20,P.face,20,{follow:1})}
   if(P.atk&&!P.onGround&&P.atk.phase!=='re'&&P.vy>40)P.vy=40;
   else if(a.phase==='re'&&a.t>=d.re){P.atk=null;if(P.combo>=WEAPONS[P.prim].combo.length)P.combo=0}}
  // 副武器

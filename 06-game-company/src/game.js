@@ -92,9 +92,15 @@ function drawPlayer(cx,cy){
  if(sprReady('player_idle'))drawPlayerSpr(x,y,flash)}
 // 每帧前手位置来自 art/**/anchors.json（帧左上角为原点），换算成相对脚底中心
 function handOf(n0,fi){const AA=typeof ART_ANCHOR!=='undefined'?ART_ANCHOR:{},n=skinOf(n0),a=AA[n]||AA[n0];if(!a||!sprReady(n))return null;const c=sprN(n),s=SPRS[n]||1,L=SPR[n].naturalHeight/s;fi=((fi%c)+c)%c;return a[fi]?[a[fi][0]/s-L/2,a[fi][1]/s-L,a[fi][2]]:null}
+// 剪切刀拆成两片：前手拿上片 a、后手拿下片 b；挂点 xxx_hands = {front:[[x,y,角度]],back:[...]}
+function hands2(n,fi){const h=(ART_ANCHOR||{})[n+'_hands'];if(!h||!sprReady(n))return null;const s=SPRS[n]||1,L=SPR[n].naturalHeight/s,c=sprN(n),i=((fi%c)+c)%c,cv=p=>p&&[p[0]/s-L/2,p[1]/s-L,p[2]];return h.front[i]&&h.back[i]?[cv(h.front[i]),cv(h.back[i])]:null}
+function drawBlade(bn,x,y,p){const im=SPR[bn],s=SPRS[bn]||1,g=(ART_ANCHOR[bn]||{}).grip||[0,0];ctx.save();ctx.translate(R(x+p[0]*P.face),R(y+p[1]));ctx.scale(P.face,1);ctx.rotate((90-p[2])*Math.PI/180);ctx.drawImage(im,-g[0]/s,-g[1]/s,im.naturalWidth/s,im.naturalHeight/s);ctx.restore()}
+// 背在背上：carry 挂点里每个动作每帧的背部位置和身体倾斜
+function drawOnBack(wn,n,fi,x,y){const C=((ART_ANCHOR||{}).carry||{})[n];if(!C||!sprReady(wn)||!sprReady(n))return false;const s=SPRS[n]||1,L=SPR[n].naturalHeight/s,c=C.back.length,i=((fi%c)+c)%c,b=C.back[i],im=SPR[wn],ws=SPRS[wn]||1,m=(ART_ANCHOR[wn]||{}).mount||[im.naturalWidth/2,im.naturalHeight/2];
+ ctx.save();ctx.translate(R(x+(b[0]/s-L/2)*P.face),R(y+b[1]/s-L));ctx.scale(P.face,1);ctx.rotate((C.tilt[i]||0)*Math.PI/180);ctx.drawImage(im,-m[0]/ws,-m[1]/ws,im.naturalWidth/ws,im.naturalHeight/ws);ctx.restore();return true}
 // 没有专属连击素材的武器借用雕刻笔：连击段 → 雕刻笔第几刀
 // 每把武器每一段攻击里“打中”的那一帧（段内 0~3）。布尔锤第二下第 3 帧才砸下；渲染大剑劈下在第 4 帧、反撩第 3 帧；法线鞭第 3 帧甩出
-const ATK_IMPACT={marker:[1,2],render:[3,2,3],whip:[2,2,2]};
+const ATK_IMPACT={marker:[1,2],render:[3,2,3],whip:[2,2,2],shears:[1,1]};
 const ATK_SEG={stylus:[0,1,2],marker:[2,1],ruler:[0,0,2],knife:[0,1,0,2],whip:[0,1,2],shears:[0,1],render:[2,1]};
 function drawPlayerSpr(x,y,flash){let n='player_idle',fi=Math.floor(P.anim*5),hand=[5,-20],wang=.5,noW=false;const W=WEAPONS[P.prim];
  const has=k=>sprReady(k),prog=(t,d)=>Math.max(0,Math.min(.999,t/d));
@@ -116,9 +122,9 @@ function drawPlayerSpr(x,y,flash){let n='player_idle',fi=Math.floor(P.anim*5),ha
    // 每段帧数 = 总帧数 ÷ 段数（渲染大剑多一段蓄力重斩）。4 帧一段按前摇/出手/出手/收招；其它帧数按这一段的时间进度平均分
    const segN=P.prim==='render'?3:WEAPONS[P.prim].combo.length,per=Math.max(1,Math.floor(sprN(n)/segN)),seg=Math.min(a.idx,segN-1);
    const ki=(ATK_IMPACT[P.prim]||[])[seg];
-   if(per===4&&ki!=null){// 出手帧对齐：前摇播到出手前一帧，出手阶段停在出手帧（特效同时出现），收招播剩下的帧
-    const pr=a.phase==='su'?Math.min(.999,a.t/d.su):a.phase==='re'?Math.min(.999,a.t/d.re):0;
-    fi=seg*4+(a.phase==='su'?Math.floor(pr*ki):a.phase==='ac'?ki:ki>=3?3:ki+1+Math.floor(pr*(3-ki)))}
+   if(ki!=null){// 出手帧对齐：前摇播到出手前一帧，出手阶段停在出手帧（特效同时出现），收招播剩下的帧
+    const pr=a.phase==='su'?Math.min(.999,a.t/d.su):a.phase==='re'?Math.min(.999,a.t/d.re):0,L=per-1;
+    fi=seg*per+(a.phase==='su'?Math.floor(pr*ki):a.phase==='ac'?ki:ki>=L?L:ki+1+Math.floor(pr*(L-ki)))}
    else if(per===4)fi=seg*4+k;else{const T=d.su+d.ac+d.re,el=a.phase==='su'?a.t:a.phase==='ac'?d.su+a.t:d.su+d.ac+a.t;fi=seg*per+Math.min(per-1,Math.floor(el/T*per))}}
   else if(has('player_atk_stylus')){const segs=ATK_SEG[P.prim]||[0,1,2];n='player_atk_stylus';fi=segs[Math.min(a.idx,segs.length-1)]*4+k}
   hand=handOf(n,fi)||hand}
@@ -128,6 +134,16 @@ function drawPlayerSpr(x,y,flash){let n='player_idle',fi=Math.floor(P.anim*5),ha
  else if(P.onGround&&Math.abs(P.vx)>20){n='player_run';P.runD=(P.runD||0)+Math.abs(P.vx)/60;fi=Math.floor(P.runD*.21);hand=[10,-24];wang=P.prim==='ruler'?1.45:2.3}
  // 跑步、待机、跳跃等动作也按每帧手的位置挂武器，武器跟着手动
  if(!noW&&!P.atk&&!P.dive&&!(P.diveLandT>0)){const ha=handOf(n,fi);if(ha)hand=ha}
+ // 剪切刀：站着时双手各拿一片，走动跳跃时背在背上，停下来先从背后拔出；出招时两片分别跟着前后手开合
+ let blades=null,onBack=false;
+ if(P.prim==='shears'&&!noW&&has('weapon_shears_a')&&has('weapon_shears_b')){
+  if(P.atk&&n==='player_atk_shears')blades=hands2(n,fi);
+  else if(n==='player_idle'&&has('player_hold2_idle')){if(P.shMode!=='hand'){P.shMode='hand';P.shDrawAt=T}const dt0=T-(P.shDrawAt||-9);
+   if(dt0<.2&&has('player_draw_back')){n='player_draw_back';fi=Math.min(3,Math.floor(dt0/.2*4));if(fi<2){onBack=true;noW=true}else hand=handOf(n,fi)}
+   else{n='player_hold2_idle';fi=Math.floor(P.anim*4)%4;blades=hands2(n,fi)}}
+  else if(!P.atk&&has('weapon_shears_rest')&&((ART_ANCHOR.carry||{})[n])){onBack=true;noW=true;P.shMode='back'}
+  if(blades)noW=true}
+ if(onBack)drawOnBack('weapon_shears_rest',onBack&&n==='player_draw_back'?'player_idle':n,fi,x,y);
  if(LV.floor!==1){ctx.globalAlpha=.3;for(const[ox,oy]of[[-1,0],[1,0],[0,-1],[0,1]])sprFrame(n,fi,x+ox,y+oy,P.face);ctx.globalAlpha=1}
  if(flash)ctx.globalAlpha=.5;
  CHK_LAST.p=[skinOf(n),((fi%sprN(skinOf(n)))+sprN(skinOf(n)))%sprN(skinOf(n)),sprN(skinOf(n))];sprFrame(n,fi,x,y,P.face);
@@ -140,6 +156,7 @@ function drawPlayerSpr(x,y,flash){let n='player_idle',fi=Math.floor(P.anim*5),ha
   // 渲染大剑蓄力：换成进度条逐格亮起的那张
   if(P.prim==='render'&&P.chargeT>.08&&has('weapon_render_charge')){const ci=SPR.weapon_render_charge,fw=im.naturalWidth,fi=Math.min(3,Math.floor(P.chargeT/.55*4));ctx.drawImage(ci,fi*fw,0,fw,ci.naturalHeight,-g[0]/s,-g[1]/s,fw/s,ci.naturalHeight/s)}
   else ctx.drawImage(im,-g[0]/s,-g[1]/s,im.naturalWidth/s,im.naturalHeight/s);ctx.restore()}}
+ if(blades){drawBlade('weapon_shears_b',x,y,blades[1]);drawBlade('weapon_shears_a',x,y,blades[0])}
  ctx.globalAlpha=1;
  if(P.dive){ctx.globalAlpha=.5;pline(x,y-40,x,y-58,2,W.col);ctx.globalAlpha=1}
  return true}

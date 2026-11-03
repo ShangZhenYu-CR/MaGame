@@ -22,7 +22,7 @@ function bossChoose(){const b=boss,dx=P.x-b.x,dist=Math.abs(dx),sp=bsp(b);b.t=0;
  else{const opts=['pie','pound','kpi'];if(b.phase>=2)opts.push('bigpie','pierain');b.state=pick(opts);if(b.phase>=2&&b.seq%4===0)b.state='bigpie'}
  if(b.state!==prev)break}b.last=b.state;b.sp=sp}
 function bossUpdate(dtA){const b=boss;if(!b)return;if(b.state!=='dead'){tickStatus(b,dtA);if(!boss)return}const dt=dtA*(b.slowT>0?.75:1);b.anim+=dt;if(b.landT>0)b.landT-=dt;b.flash-=dt;b.t+=dt;b.contactCd-=dt;const dx=P.x-b.x,sp=bsp(b);
- if(b.state==='dead'){b.vx*=.9;if(Math.random()<.5){burst(b.x+rnd(-14,14),b.y-rnd(4,b.h),6,['#ffd84a','#fff','#d8584a'],200,.5,3,200)}if(b.t>1.6){bossGone()}return}
+ if(b.state==='dead'){b.vx*=.9;if(Math.random()<.5){burst(b.x+rnd(-14,14),b.y-rnd(4,b.h),6,['#ffd84a','#fff','#d8584a'],200,.5,3,200)}if(b.t>(b.kind==='ljy'?2.6:1.6)){bossGone()}return}
  // 贴身计时（翻滚中不算）
  if(!['intro','stagger','roar','tele','tele_in'].includes(b.state)&&Math.abs(dx)<44&&Math.abs((P.y-17)-(b.y-b.h/2))<b.h/2+20&&P.rollT<=0)b.closeT+=dt;else b.closeT=Math.max(0,b.closeT-dt*.6);
  if(b.state==='recover'&&b.t>.25&&bossCounterDue(b)){bossChoose()}

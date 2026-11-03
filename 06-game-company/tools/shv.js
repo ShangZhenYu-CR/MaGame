@@ -1,0 +1,10 @@
+const {chromium}=require('playwright');const out=process.argv[3];require('fs').mkdirSync(out,{recursive:true});
+(async()=>{const b=await chromium.launch();const pg=await b.newPage({viewport:{width:1600,height:900}});const errs=[];pg.on('pageerror',e=>errs.push(e.message));
+await pg.goto(process.env.CHK_URL||'http://127.0.0.1:8767/test_chk.html');await pg.waitForTimeout(3500);const ev=s=>pg.evaluate(x=>window.__dbg(x),s);
+await ev("enemies.length=0;P.inv=999;P.prim='shears';chkReset();CHK.box=false;CHK.anchor=false;window.requestAnimationFrame=()=>0;window.__ts=performance.now();window.__adv=n=>{for(let i=0;i<n;i++){__ts+=1000/60;frame(__ts)}}");
+const crop=async f=>{const r=await ev("(()=>{const s=SCALE;return {x:Math.round(OX+(P.x-cam.x-40)*s),y:Math.round(OY+(P.y-cam.y-56)*s),width:Math.round(80*s),height:Math.round(58*s)}})()");console.log(f,JSON.stringify(r));await pg.screenshot({path:f,clip:r})};
+await ev("__adv(30)");await crop(out+'/a_idle0.png');await ev("__adv(15)");await crop(out+'/a_idle1.png');
+await ev("P.vx=150;P.onGround=true;P.runD=3;render();present()");await crop(out+'/b_run0.png');await ev("P.runD=12;render();present()");await crop(out+'/b_run1.png');
+await ev("P.vx=0;render();present()");await crop(out+'/c_draw0.png');await ev("P.shDrawAt=T-.12;render();present()");await crop(out+"/c_draw1.png");await ev("P.shDrawAt=T-.5;render();present()");await crop(out+'/c_draw2.png');
+await ev("P.vy=-200;P.onGround=false;render();present()");await crop(out+'/d_jump.png');
+console.log('errs',errs,await ev("CHK_LAST.p+''"));await b.close()})();

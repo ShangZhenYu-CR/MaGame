@@ -91,7 +91,7 @@ function drawPlayer(cx,cy){
  const x=P.x-cx,y=P.y-cy,flash=P.inv>0&&P.hurtT<=0&&P.rollT<=0&&Math.floor(P.inv*16)%2===0;
  if(sprReady('player_idle'))drawPlayerSpr(x,y,flash)}
 // 每帧前手位置来自 art/**/anchors.json（帧左上角为原点），换算成相对脚底中心
-function handOf(n0,fi){const AA=typeof ART_ANCHOR!=='undefined'?ART_ANCHOR:{},n=skinOf(n0),a=AA[n]||AA[n0];if(!a||!sprReady(n))return null;const c=sprN(n),s=SPRS[n]||1,L=SPR[n].naturalHeight/s;fi=((fi%c)+c)%c;return a[fi]?[a[fi][0]/s-L/2,a[fi][1]/s-L]:null}
+function handOf(n0,fi){const AA=typeof ART_ANCHOR!=='undefined'?ART_ANCHOR:{},n=skinOf(n0),a=AA[n]||AA[n0];if(!a||!sprReady(n))return null;const c=sprN(n),s=SPRS[n]||1,L=SPR[n].naturalHeight/s;fi=((fi%c)+c)%c;return a[fi]?[a[fi][0]/s-L/2,a[fi][1]/s-L,a[fi][2]]:null}
 // 没有专属连击素材的武器借用雕刻笔：连击段 → 雕刻笔第几刀
 const ATK_SEG={stylus:[0,1,2],marker:[2,1],ruler:[0,0,2],knife:[0,1,0,2],whip:[0,1,2],shears:[0,1],render:[2,1]};
 function drawPlayerSpr(x,y,flash){let n='player_idle',fi=Math.floor(P.anim*5),hand=[5,-20],wang=.5,noW=false;const W=WEAPONS[P.prim];
@@ -123,12 +123,15 @@ function drawPlayerSpr(x,y,flash){let n='player_idle',fi=Math.floor(P.anim*5),ha
  if(flash)ctx.globalAlpha=.5;
  CHK_LAST.p=[skinOf(n),((fi%sprN(skinOf(n)))+sprN(skinOf(n)))%sprN(skinOf(n)),sprN(skinOf(n))];sprFrame(n,fi,x,y,P.face);
  // 武器：雕刻笔用素材，其他武器暂用代码画；格挡、喷涂等道具已画在人物图里
- if(!noW&&hand){const hx=x+hand[0]*P.face,hy=y+hand[1];CHK_LAST.hand=[hx,hy];const wn='weapon_'+P.prim;if(has(wn)){const im=SPR[wn],s=SPRS[wn]||1,g=(ART_ANCHOR[wn]||{}).grip||[im.naturalWidth/2,im.naturalHeight/2],base=P.prim==='ruler'?1.57:2.36;ctx.save();ctx.translate(R(hx),R(hy));ctx.scale(P.face,1);ctx.rotate(-(wang-base));
+ // 挂点里给了武器角度（第三个数，度：0=朝下，90=朝前，180=朝上）就用素材的，不用代码插值
+ if(hand&&hand[2]!=null)wang=hand[2]*Math.PI/180;
+ // 法线鞭出手后鞭身由特效画，手里不再画整条鞭子
+ const whipOut=P.prim==='whip'&&P.atk&&P.atk.phase!=='su'&&has('fx_whip_1');if(whipOut&&!has('weapon_whip_handle'))noW=true;
+ if(!noW&&hand){const hx=x+hand[0]*P.face,hy=y+hand[1];CHK_LAST.hand=[hx,hy];const wn=whipOut?'weapon_whip_handle':'weapon_'+P.prim;if(has(wn)){const im=SPR[wn],s=SPRS[wn]||1,g=(ART_ANCHOR[wn]||{}).grip||[im.naturalWidth/2,im.naturalHeight/2],base=P.prim==='ruler'?1.57:2.36;ctx.save();ctx.translate(R(hx),R(hy));ctx.scale(P.face,1);ctx.rotate(-(wang-base));
   // 渲染大剑蓄力：换成进度条逐格亮起的那张
   if(P.prim==='render'&&P.chargeT>.08&&has('weapon_render_charge')){const ci=SPR.weapon_render_charge,fw=im.naturalWidth,fi=Math.min(3,Math.floor(P.chargeT/.55*4));ctx.drawImage(ci,fi*fw,0,fw,ci.naturalHeight,-g[0]/s,-g[1]/s,fw/s,ci.naturalHeight/s)}
   else ctx.drawImage(im,-g[0]/s,-g[1]/s,im.naturalWidth/s,im.naturalHeight/s);ctx.restore()}}
  ctx.globalAlpha=1;
- if(P.atk&&P.atk.phase==='ac'&&!(P.atk.def.charged&&has('fx_render_slash'))&&!(P.prim==='whip'&&has('fx_whip_1'))){const d=P.atk.def;ctx.globalAlpha=.75;if(d.thrust){pline(x+P.face*6,y-26,x+P.face*(d.rng+4),y-26,2,W.col);px(x+P.face*(d.rng+4)-1,y-27,3,3,'#fff')}else smear(x,y-26,Math.max(10,d.rng-6),d.rng+6,d.arc[0],lerp(d.arc[0],d.arc[1],Math.min(1,P.atk.t/d.ac)),P.face,W.col);ctx.globalAlpha=1}
  if(P.dive){ctx.globalAlpha=.5;pline(x,y-40,x,y-58,2,W.col);ctx.globalAlpha=1}
  return true}
 function drawRoom(cx,cy){const r=LV.room;if(!r)return;const mx=R((r.x0+r.x1)/2-cx),gy=R(r.g*TS-cy);if(mx<-200||mx>VW+200)return;

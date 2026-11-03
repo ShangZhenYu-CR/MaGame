@@ -37,5 +37,7 @@
 "fx_eyedrop": 64,
 "fx_render_slash": 96,
 "fx_whip_": 96,
-"weapon_render_charge": 32
+"weapon_render_charge": 32,
+"fx_marker_sweep": 96,
+"fx_marker_smash": 64
 }

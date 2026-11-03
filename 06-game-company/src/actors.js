@@ -129,14 +129,17 @@ function atkBox(a){const d=a.def,f=P.face;if(d.thrust)return{x0:P.x+(f>0?2:-d.rn
 function overlapE(b,e){return b.x1>e.x-e.w/2&&b.x0<e.x+e.w/2&&b.y1>e.y-e.h&&b.y0<e.y}
 function targets(){const t=enemies.filter(e=>e.hp>0);if(boss&&boss.hp>0&&boss.state!=='intro'&&boss.state!=='tele_out')t.push(boss);return t}
 // 招式特效（第十批素材）：出招瞬间
-function atkFx(a){const d=a.def,f=P.face,w=P.prim;
- if(w==='whip')sfx('fx_whip_'+(Math.min(2,a.idx||0)+1),P.x+f*52,P.y-20,f,22);
- else if(w==='ruler')sfx('fx_extrude',P.x+f*(d.rng-6),P.y-18,f,22);
- else if(w==='render'&&d.charged)sfx('fx_render_slash',P.x+f*30,P.y-24,f,18);
- else if(w==='marker'&&d.crit){const gy=groundBelow(P.x+f*26,P.y-8);sfx('fx_bool_crater',P.x+f*26,gy-12,f,14)}
- else if(w==='stylus'&&d.crit)sfx('fx_sculpt',P.x+f*20,P.y-22,f,20)}
-// 命中特效
-function hitFx(e,w,d){const ex=e.x+rnd(-3,3),ey=e.y-e.h*.55;if(w==='shears')sfx('fx_snip',ex,ey,P.face,20);else if(w==='knife')sfx('fx_grid_slash',ex,ey,P.face,24);else if(w==='stylus')sfx('fx_clay',ex,ey,P.face,20)}
+// 招式特效（第十批素材）：出招瞬间放刀光，跟着马楠一起走。挥砍方向反过来的那一下上下翻转
+function atkFx(a){const d=a.def,f=P.face,w=P.prim,i=a.idx||0,up=d.arc&&d.arc[1]>d.arc[0],F={follow:1};
+ if(w==='whip')sfx('fx_whip_'+(Math.min(2,i)+1),P.x+f*58,P.y-30,f,22,F);// 鞭身特效左端中点是握柄，对准胸前的手
+ else if(w==='ruler'){const sc=d.crit||d.dash?.75:.6;sfx('fx_extrude',P.x+f*(d.rng-14+32*sc),P.y-19,f,22,{sc,follow:1})}// 从枪尖往前挤出
+ else if(w==='render'){if(d.charged)sfx('fx_render_slash',P.x+f*30,P.y-24,f,18,F);else sfx('fx_render_slash',P.x+f*22,P.y-22,f,20,{sc:.62,fy:up,follow:1})}
+ else if(w==='marker'){if(d.crit){sfx('fx_marker_smash',P.x+f*30,P.y-30,f,20,F);const gy=groundBelow(P.x+f*32,P.y-8);sfx('fx_bool_crater',P.x+f*32,gy-12,f,14)}else sfx('fx_marker_sweep',P.x+f*24,P.y-22,f,20,F)}
+ else if(w==='stylus'){if(!d.crit&&sprReady('fx_stylus_slash'))sfx('fx_stylus_slash',P.x+f*16,P.y-22,f,22,{fy:up,follow:1});else sfx('fx_sculpt',P.x+f*16,P.y-22,f,22,{sc:d.crit?.85:.6,fy:up,follow:1})}
+ else if(w==='knife')sfx('fx_grid_slash',P.x+f*12,P.y-20,f,26,{sc:d.crit?1.15:.85,fy:i%2===1,follow:1});
+ else if(w==='shears')sfx('fx_snip',P.x+f*(d.rng-4),P.y-20,f,20,F)}
+// 命中特效：雕刻笔命中飞黏土（剪刀、切线刀的刀光在出招时已经放了）
+function hitFx(e,w,d){const ex=e.x+rnd(-3,3),ey=e.y-e.h*.55;if(w==='stylus')sfx('fx_clay',ex,ey,P.face,20)}
 function doHit(a){const b=atkBox(a),d=a.def;let any=false;
  for(const e of targets()){if(a.hit.has(e)||!overlapE(b,e))continue;a.hit.add(e);any=true;let crit=!!d.crit;
   if(!crit&&(P.pdT>0||d.dash))crit=true;
@@ -161,7 +164,7 @@ function damage(e,dmg,dir,kb,crit,quiet,src='prim'){if(e.hp<=0)return;if(e.dummy
  if(e.affix==='armor')v*=.7;e.sinceHit=0;
  e.hp-=v;e.flash=.08;
  const W=WEAPONS[P.prim];if(!quiet){burst(e.x,e.y-e.h/2,crit?14:8,W.ink||['#fff'],crit?220:150,.4,2,350);splat(e.x,groundBelow(e.x,e.y-2),pick(W.ink||['#888']),crit?5:3);(crit?SFX.crit:SFX.hit)()}
- dmgNum(e.x+rnd(-4,4),e.y-e.h-6,v,crit?'#ffd84a':'#fff',crit);if(crit&&hasU('critheal')&&P.healCd<=0&&P.hp<P.maxHp){P.healCd=.25;P.hp=Math.min(P.maxHp,P.hp+2);hud()}sfx(crit?'fx_crit':'fx_hit',e.x-dir*e.w*.2+rnd(-3,3),e.y-e.h*.55+rnd(-4,4),dir||1,crit?22:26);
+ dmgNum(e.x+rnd(-4,4),e.y-e.h-6,v,crit?'#ffd84a':'#fff',crit);if(crit&&hasU('critheal')&&P.healCd<=0&&P.hp<P.maxHp){P.healCd=.25;P.hp=Math.min(P.maxHp,P.hp+2);hud()}sfx(crit?'fx_crit':'fx_hit',e.x-dir*e.w*.2+rnd(-3,3),e.y-e.h*.55+rnd(-4,4),dir||1,crit?22:26,{sc:crit?.85:.7});
  if(e.isBoss){e.vx+=dir*kb*.05}else{const res=e.elite?.4:1;e.vx=dir*kb*res;if(e.type!=='printer'&&e.type!=='popup'&&e.type!=='sticky')e.vy=Math.min(e.vy,-60*res);const pd=dmg*(crit?1.4:1)+kb*.04;e.poise-=pd;e.poiseT=1.4;
   if(e.poise<=0){e.poise=e.maxPoise;if(e.state!=='stun'){e.state='stun';e.timer=e.elite?.9:.5;e.windT=0;e.vx=dir*kb*res*1.2;burst(e.x,e.y-e.h,8,['#ffd84a','#fff'],120,.3,2,0);if(e.elite||e.maxPoise>=24)dmgNum(e.x,e.y-e.h-14,'!','#ffd84a',true);sfx('fx_poise_break',e.x,e.y-e.h*.6,1,18)}}
   else if(ATK_STATES.includes(e.state)){e.vx*=.25}

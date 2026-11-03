@@ -28,9 +28,11 @@ function sprFrame(n,i,x,y,face,white,mode){n=skinOf(n);if(!sprReady(n))return fa
 // 序列帧特效（命中火花等）
 // 动画检查页用：记下最近一次画出来的素材名和帧号
 const CHK_LAST={};
-const fxs=[];function sfx(n,x,y,face=1,fps=20){if(sprReady(n))fxs.push({n,x,y,face,t:0,fps})}
+// o.sc 缩放，o.fy 上下翻转（反向挥砍），o.follow 跟着马楠一起移动（突进时刀光不掉队）
+const fxs=[];function sfx(n,x,y,face=1,fps=20,o){if(!sprReady(n))return;const f={n,x,y,face,t:0,fps,sc:o&&o.sc||1,fy:o&&o.fy};if(o&&o.follow){f.dx=x-P.x;f.dy=y-P.y}fxs.push(f)}
 function updFx(dt){for(let i=fxs.length-1;i>=0;i--){fxs[i].t+=dt;if(fxs[i].t*fxs[i].fps>=sprN(fxs[i].n))fxs.splice(i,1)}}
-function drawFx(cx,cy){for(const f of fxs)sprFrame(f.n,Math.floor(f.t*f.fps),f.x-cx,f.y-cy,f.face,false,'center')}
+function drawFx(cx,cy){for(const f of fxs){if(f.dx!==undefined){f.x=P.x+f.dx;f.y=P.y+f.dy}const x=f.x-cx,y=f.y-cy,fi=Math.floor(f.t*f.fps);
+ if(f.sc!==1||f.fy){ctx.save();ctx.translate(x,y);ctx.scale(f.sc,f.sc*(f.fy?-1:1));sprFrame(f.n,fi,0,0,f.face,false,'center');ctx.restore()}else sprFrame(f.n,fi,x,y,f.face,false,'center')}}
 // 敌人尸体（播放死亡动画）
 const corpses=[];
 function updCorpses(dt){for(let i=corpses.length-1;i>=0;i--){corpses[i].t+=dt;if(corpses[i].t>sprN(corpses[i].n)*.08+.25)corpses.splice(i,1)}}
@@ -104,7 +106,6 @@ function pline(x0,y0,x1,y1,w,c){ctx.fillStyle=c;const d=Math.max(Math.abs(x1-x0)
 function pcirc(cx,cy,r,c){ctx.fillStyle=c;for(let y=-r;y<=r;y++){const w=Math.round(Math.sqrt(r*r-y*y));ctx.fillRect(R(cx-w),R(cy+y),w*2+1,1)}}
 function pring(cx,cy,r,c,th=1){ctx.fillStyle=c;for(let a=0;a<64;a++){const t=a/64*Math.PI*2;ctx.fillRect(R(cx+Math.cos(t)*r),R(cy+Math.sin(t)*r),th,th)}}
 // 刀光残影
-function smear(x,y,r0,r1,a0,a1,face,col){ctx.fillStyle=col;const n=Math.ceil(Math.abs(a1-a0)*r1/1.5);for(let i=0;i<=n;i++){const t=a0+(a1-a0)*i/n,c=Math.cos(t),s=Math.sin(t);for(let r=r0;r<=r1;r+=1.5)ctx.fillRect(R(x+s*r*face),R(y+c*r),2,2)}}
 // ===== 敌人 =====
 function drawEnemy(e,cx,cy){if(e.dummy){ctx.font='bold 8px sans-serif';ctx.textAlign='center';const x=R(e.x-cx),y=R(e.y-cy-e.h-10);ctx.fillStyle='#14121a';ctx.fillText('沙袋',x+1,y+1);ctx.fillStyle='#ffd84a';ctx.fillText('沙袋',x,y);ctx.textAlign='left'}if(e.elite){ctx.globalAlpha=.35+.2*Math.sin(e.anim*8);pcirc(R(e.x-cx),R(e.y-cy-e.h/2),Math.max(e.w,e.h)*.75,'#ff5a4a');ctx.globalAlpha=1}drawEnemySpr(e,cx,cy)}
 // ===== Boss =====

@@ -93,6 +93,8 @@ function drawPlayer(cx,cy){
 // 每帧前手位置来自 art/**/anchors.json（帧左上角为原点），换算成相对脚底中心
 function handOf(n0,fi){const AA=typeof ART_ANCHOR!=='undefined'?ART_ANCHOR:{},n=skinOf(n0),a=AA[n]||AA[n0];if(!a||!sprReady(n))return null;const c=sprN(n),s=SPRS[n]||1,L=SPR[n].naturalHeight/s;fi=((fi%c)+c)%c;return a[fi]?[a[fi][0]/s-L/2,a[fi][1]/s-L,a[fi][2]]:null}
 // 没有专属连击素材的武器借用雕刻笔：连击段 → 雕刻笔第几刀
+// 每把武器每一段攻击里“打中”的那一帧（段内 0~3）。布尔锤第二下第 3 帧才砸下；渲染大剑劈下在第 4 帧、反撩第 3 帧；法线鞭第 3 帧甩出
+const ATK_IMPACT={marker:[1,2],render:[3,2,3],whip:[2,2,2]};
 const ATK_SEG={stylus:[0,1,2],marker:[2,1],ruler:[0,0,2],knife:[0,1,0,2],whip:[0,1,2],shears:[0,1],render:[2,1]};
 function drawPlayerSpr(x,y,flash){let n='player_idle',fi=Math.floor(P.anim*5),hand=[5,-20],wang=.5,noW=false;const W=WEAPONS[P.prim];
  const has=k=>sprReady(k),prog=(t,d)=>Math.max(0,Math.min(.999,t/d));
@@ -105,12 +107,19 @@ function drawPlayerSpr(x,y,flash){let n='player_idle',fi=Math.floor(P.anim*5),ha
  else if(P.parryT>0&&has('player_parry')){n='player_parry';fi=P.parryT>.2?0:1;noW=true}
  else if(P.sprayT>0&&has('player_spray')){n='player_spray';fi=1;noW=true}
  else if(P.dive&&has('player_dive')){n='player_dive';fi=Math.min(2,Math.floor((P.anim-(P.diveAt||0))/.06));wang=0;hand=handOf(n,fi)}
- else if(P.diveLandT>0&&has('player_dive_land')){n='player_dive_land';fi=Math.floor(prog(.3-P.diveLandT,.3)*3);wang=0;hand=handOf(n,fi)}
+ else if(P.diveLandT>0&&has('player_dive_land')){n='player_dive_land';fi=Math.floor(prog(.3-P.diveLandT,.3)*3);wang=WEAPONS[P.prim]&&['render','ruler','whip'].includes(P.prim)?1.15:0;hand=handOf(n,fi)}
  else if(P.chargeT>.08&&P.prim==='render'&&!P.atk&&has('player_charge')){n='player_charge';fi=Math.floor(P.anim*6)%3;wang=3.0;hand=handOf(n,fi)}
  else if(P.atk){const a=P.atk,d=a.def,k=a.phase==='su'?0:a.phase==='ac'?(a.t<d.ac/2?1:2):3;
   wang=d.thrust?1.57:a.phase==='su'?d.arc[0]:a.phase==='ac'?lerp(d.arc[0],d.arc[1],Math.min(1,a.t/d.ac)):d.arc[1];
   if(d.dash&&has('player_atk_dash')){n='player_atk_dash';fi=a.phase==='su'?0:a.phase==='ac'?(a.t<d.ac/2?1:2):(a.t<d.re/2?3:4)}
-  else if(has('player_atk_'+P.prim)){n='player_atk_'+P.prim;fi=Math.min(a.idx,Math.floor(sprN(n)/4)-1)*4+k}
+  else if(has('player_atk_'+P.prim)){n='player_atk_'+P.prim;
+   // 每段帧数 = 总帧数 ÷ 段数（渲染大剑多一段蓄力重斩）。4 帧一段按前摇/出手/出手/收招；其它帧数按这一段的时间进度平均分
+   const segN=P.prim==='render'?3:WEAPONS[P.prim].combo.length,per=Math.max(1,Math.floor(sprN(n)/segN)),seg=Math.min(a.idx,segN-1);
+   const ki=(ATK_IMPACT[P.prim]||[])[seg];
+   if(per===4&&ki!=null){// 出手帧对齐：前摇播到出手前一帧，出手阶段停在出手帧（特效同时出现），收招播剩下的帧
+    const pr=a.phase==='su'?Math.min(.999,a.t/d.su):a.phase==='re'?Math.min(.999,a.t/d.re):0;
+    fi=seg*4+(a.phase==='su'?Math.floor(pr*ki):a.phase==='ac'?ki:ki>=3?3:ki+1+Math.floor(pr*(3-ki)))}
+   else if(per===4)fi=seg*4+k;else{const T=d.su+d.ac+d.re,el=a.phase==='su'?a.t:a.phase==='ac'?d.su+a.t:d.su+d.ac+a.t;fi=seg*per+Math.min(per-1,Math.floor(el/T*per))}}
   else if(has('player_atk_stylus')){const segs=ATK_SEG[P.prim]||[0,1,2];n='player_atk_stylus';fi=segs[Math.min(a.idx,segs.length-1)]*4+k}
   hand=handOf(n,fi)||hand}
  else if(!P.onGround&&P.vy<0&&has('player_jump')){n='player_jump';fi=P.anim-(P.jumpAt||0)<.07?0:1}

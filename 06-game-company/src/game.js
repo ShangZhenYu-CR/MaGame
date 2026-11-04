@@ -91,16 +91,16 @@ function drawPlayer(cx,cy){
  const x=P.x-cx,y=P.y-cy,flash=P.inv>0&&P.hurtT<=0&&P.rollT<=0&&Math.floor(P.inv*16)%2===0;
  if(sprReady('player_idle'))drawPlayerSpr(x,y,flash)}
 // 每帧前手位置来自 art/**/anchors.json（帧左上角为原点），换算成相对脚底中心
-function handOf(n0,fi){const AA=typeof ART_ANCHOR!=='undefined'?ART_ANCHOR:{},n=skinOf(n0),a=AA[n]||AA[n0];if(!a||!sprReady(n))return null;const c=sprN(n),s=SPRS[n]||1,L=SPR[n].naturalHeight/s;fi=((fi%c)+c)%c;return a[fi]?[a[fi][0]/s-L/2,a[fi][1]/s-L,a[fi][2]]:null}
-// 剪切刀拆成两片：前手拿上片 a、后手拿下片 b；挂点 xxx_hands = {front:[[x,y,角度]],back:[...]}
-function hands2(n,fi){const h=(ART_ANCHOR||{})[n+'_hands'];if(!h||!sprReady(n))return null;const s=SPRS[n]||1,L=SPR[n].naturalHeight/s,c=sprN(n),i=((fi%c)+c)%c,cv=p=>p&&[p[0]/s-L/2,p[1]/s-L,p[2]];return h.front[i]&&h.back[i]?[cv(h.front[i]),cv(h.back[i])]:null}
+function handOf(n0,fi){const AA=ART_ANCHOR,n=skinOf(n0),a=AA[n]||AA[n0];if(!Array.isArray(a)||!sprReady(n))return null;const c=sprN(n);fi=((fi%c)+c)%c;return a[fi]?spritePoint(n,fi,a[fi]):null}
+// 夏装的双手点优先取夏装表；缺少换装动作时沿用实际显示的卫衣帧。
+function hands2(n0,fi){const n=skinOf(n0),h=ART_ANCHOR[n+'_hands']||ART_ANCHOR[n0+'_hands'];if(!h||!sprReady(n))return null;const c=sprN(n),i=((fi%c)+c)%c;return h.front[i]&&h.back[i]?[spritePoint(n,i,h.front[i]),spritePoint(n,i,h.back[i])]:null}
 function drawBlade(bn,x,y,p){const im=SPR[bn],s=SPRS[bn]||1,g=(ART_ANCHOR[bn]||{}).grip||[0,0];ctx.save();ctx.translate(R(x+p[0]*P.face),R(y+p[1]));ctx.scale(P.face,1);ctx.rotate((90-p[2])*Math.PI/180);ctx.drawImage(im,-g[0]/s,-g[1]/s,im.naturalWidth/s,im.naturalHeight/s);ctx.restore()}
 // 背在背上：carry 挂点里每个动作每帧的背部位置和身体倾斜
 function drawOnBack(wn,n,fi,x,y){const C=((ART_ANCHOR||{}).carry||{})[n];if(!C||!sprReady(wn)||!sprReady(n))return false;const s=SPRS[n]||1,L=SPR[n].naturalHeight/s,c=C.back.length,i=((fi%c)+c)%c,b=C.back[i],im=SPR[wn],ws=SPRS[wn]||1,m=(ART_ANCHOR[wn]||{}).mount||[im.naturalWidth/2,im.naturalHeight/2];
- ctx.save();ctx.translate(R(x+(b[0]/s-L/2)*P.face),R(y+b[1]/s-L));ctx.scale(P.face,1);ctx.rotate((C.tilt[i]||0)*Math.PI/180);ctx.drawImage(im,-m[0]/ws,-m[1]/ws,im.naturalWidth/ws,im.naturalHeight/ws);ctx.restore();return true}
+ ctx.save();ctx.translate(R(x+(b[0]/s-L/2)*P.face),R(y+b[1]/s-L+sprGap(skinOf(n),i)));ctx.scale(P.face,1);ctx.rotate((C.tilt[i]||0)*Math.PI/180);ctx.drawImage(im,-m[0]/ws,-m[1]/ws,im.naturalWidth/ws,im.naturalHeight/ws);ctx.restore();return true}
 // 没有专属连击素材的武器借用雕刻笔：连击段 → 雕刻笔第几刀
 // 每把武器每一段攻击里“打中”的那一帧（段内 0~3）。布尔锤第二下第 3 帧才砸下；渲染大剑劈下在第 4 帧、反撩第 3 帧；法线鞭第 3 帧甩出
-const ATK_IMPACT={marker:[1,2],render:[3,2,3],whip:[2,2,2],shears:[1,1]};
+const ATK_IMPACT={knife:[3,2,3,3],marker:[1,2],render:[3,2,3],whip:[2,2,2],shears:[1,1]};
 const ATK_SEG={stylus:[0,1,2],marker:[2,1],ruler:[0,0,2],knife:[0,1,0,2],whip:[0,1,2],shears:[0,1],render:[2,1]};
 function drawPlayerSpr(x,y,flash){let n='player_idle',fi=Math.floor(P.anim*5),hand=[5,-20],wang=.5,noW=false;const W=WEAPONS[P.prim];
  const has=k=>sprReady(k),prog=(t,d)=>Math.max(0,Math.min(.999,t/d));
@@ -152,7 +152,7 @@ function drawPlayerSpr(x,y,flash){let n='player_idle',fi=Math.floor(P.anim*5),ha
  if(hand&&hand[2]!=null)wang=hand[2]*Math.PI/180;
  // 法线鞭出手后鞭身由特效画，手里不再画整条鞭子
  const whipOut=P.prim==='whip'&&P.atk&&P.atk.phase!=='su'&&has('fx_whip_1');if(whipOut&&!has('weapon_whip_handle'))noW=true;
- if(!noW&&hand){const hx=x+hand[0]*P.face,hy=y+hand[1];CHK_LAST.hand=[hx,hy];const wn=whipOut?'weapon_whip_handle':'weapon_'+P.prim;if(has(wn)){const im=SPR[wn],s=SPRS[wn]||1,g=(ART_ANCHOR[wn]||{}).grip||[im.naturalWidth/2,im.naturalHeight/2],base=P.prim==='ruler'?1.57:2.36;ctx.save();ctx.translate(R(hx),R(hy));ctx.scale(P.face,1);ctx.rotate(-(wang-base));
+ if(!noW&&hand){const hx=x+hand[0]*P.face,hy=y+hand[1];CHK_LAST.hand=[hx,hy];const wn=whipOut?'weapon_whip_handle':P.prim==='knife'&&n==='player_atk_knife'&&has('weapon_knife_reverse')?'weapon_knife_reverse':'weapon_'+P.prim;if(has(wn)){const im=SPR[wn],s=SPRS[wn]||1,g=(ART_ANCHOR[wn]||{}).grip||[im.naturalWidth/2,im.naturalHeight/2],base=P.prim==='ruler'?1.57:2.36;ctx.save();ctx.translate(R(hx),R(hy));ctx.scale(P.face,1);ctx.rotate(-(wang-base));
   // 渲染大剑蓄力：换成进度条逐格亮起的那张
   if(P.prim==='render'&&P.chargeT>.08&&has('weapon_render_charge')){const ci=SPR.weapon_render_charge,fw=im.naturalWidth,fi=Math.min(3,Math.floor(P.chargeT/.55*4));ctx.drawImage(ci,fi*fw,0,fw,ci.naturalHeight,-g[0]/s,-g[1]/s,fw/s,ci.naturalHeight/s)}
   else ctx.drawImage(im,-g[0]/s,-g[1]/s,im.naturalWidth/s,im.naturalHeight/s);ctx.restore()}}

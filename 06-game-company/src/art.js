@@ -4,7 +4,7 @@ const R=Math.round;
 // ART_SRC 的值是 dataURI，或 {src,s}：s=2 表示 @2x 素材（每帧像素是逻辑尺寸的 2 倍）
 const SPR={},SPRS={};const useSpr=true;
 // 素材加载失败（例如只拷了 index.html 没带 art 文件夹）时提示，而不是悄悄退回代码像素图
-const ART_FAIL=[];function artFailNote(){const el=document.getElementById('artfail');if(!el)return;if(!ART_FAIL.length){el.textContent='';return}el.textContent=`有 ${ART_FAIL.length} 张美术素材没加载出来，游戏正在用代码画的旧像素图。请通过网页地址打开，或把 index.html 和 art 文件夹放在一起再打开。`}
+const ART_FAIL=[];function artFailNote(){const el=document.getElementById('artfail');if(!el)return;if(!ART_FAIL.length){el.textContent='';return}el.textContent=`有 ${ART_FAIL.length} 张美术素材没加载出来，部分画面可能缺失。请通过网页地址打开，或把 index.html 和 art 文件夹放在一起再打开。`}
 for(const k in (typeof ART_SRC!=='undefined'?ART_SRC:{})){const v=ART_SRC[k],im=new Image(),src0=typeof v==='string'?v:v.src;let tries=0;
  // 网络偶尔抖一下就会有图没加载上：最多自动重试 4 次（间隔递增），都失败才提示
  im.onerror=()=>{if(src0.startsWith('data:')||tries>=4){if(!ART_FAIL.includes(k))ART_FAIL.push(k);artFailNote();return}tries++;setTimeout(()=>{im.src=src0+(src0.includes('?')?'&':'?')+'retry='+tries},400*tries*tries)};
@@ -22,6 +22,11 @@ const WHITE={};function whiteOf(n){if(WHITE[n])return WHITE[n];const im=SPR[n],c
 // 画一帧：横向序列帧，脚底中心对齐 (x,y)，朝左时水平翻转；mode='center' 时 (x,y) 是帧中心
 // 换装：选了夏季服装且有对应素材时，player_xxx 换成 player_summer_xxx（动作、帧数、挂点和原版一致）
 let SKIN='';function skinOf(n){if(SKIN&&n.startsWith('player_')){const m='player_'+SKIN+'_'+n.slice(7);if(sprReady(m))return m}return n}
+// 与人物绘制使用相同的脚底补偿，挂点才能贴在当前帧上。
+function sprGap(n,i){return (ART_GAP[n]||[])[i]||0}
+function spritePoint(n,i,p){const s=SPRS[n]||1;return [p[0]/s-sprFW(n)/s/2,p[1]/s-SPR[n].naturalHeight/s+sprGap(n,i),p[2]]}
+function ljyBreathFrame(t){return t<.55?Math.min(2,Math.floor(t/.55*3)):3+Math.floor((t-.55)*10)%5}
+function ljyMouth(b){const n='boss_ljy_p2_breath',i=ljyBreathFrame(b.t),p=(ART_ANCHOR[n+'_mouth']||[])[i];if(!p||!sprReady(n))return [b.x+b.face*22,b.y-64];const q=spritePoint(n,i,p);return [b.x+b.face*q[0],b.y+q[1]]}
 function sprFrame(n,i,x,y,face,white,mode){n=skinOf(n);if(!sprReady(n))return false;const im=SPR[n],s=SPRS[n]||1,fw=sprFW(n),fh=im.naturalHeight,W=fw/s,H=fh/s,c=sprN(n);i=((i%c)+c)%c;
  const gp=mode==='center'?0:((typeof ART_GAP!=='undefined'&&ART_GAP[n])?ART_GAP[n][i]||0:0);
  ctx.save();ctx.translate(R(x),R(y+gp));ctx.scale(face,1);ctx.drawImage(white?whiteOf(n):im,i*fw,0,fw,fh,-W/2,mode==='center'?-H/2:-H,W,H);ctx.restore();return true}
@@ -71,7 +76,7 @@ function drawLJYSpr(b,cx,cy){const pre=b.armor?'boss_ljy_p2_':'boss_ljy_';if(!us
   if(st==='transform')fi=Math.min(c-1,Math.floor(t*8.5));
   else if(st==='intro')fi=Math.min(c-1,Math.floor(t/2.0*c));
   else if(st==='roar')fi=Math.min(c-1,Math.floor(t*8.5));
-  else if(st==='breath')fi=t<.55?Math.floor(t/.55*3):3+Math.floor((t-.55)*10)%5;
+  else if(st==='breath')fi=ljyBreathFrame(t);
   else if(st==='brush')fi=Math.min(3,Math.floor(t*12));
   else if(st==='brush_wind')fi=Math.min(c-1,Math.floor(t*8));
   else if(st==='dive_fall')fi=2;

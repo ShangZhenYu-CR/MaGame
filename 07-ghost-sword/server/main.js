@@ -2,7 +2,7 @@ import http from 'node:http';
 import {readFileSync} from 'node:fs';
 import {WebSocketServer,WebSocket} from 'ws';
 import {Worker} from 'node:worker_threads';
-const files={'/coverage':['../client/coverage.html','text/html'],'/spec':['../SPEC-1.2.md','text/plain'],'/':['../client/index.html','text/html'],'/app.js':['../client/app.js','text/javascript'],'/style.css':['../client/style.css','text/css'],'/data/catalog.js':['../data/catalog.js','text/javascript']};
+const files={'/client/socket.js':['../client/socket.js','text/javascript'],'/coverage':['../client/coverage.html','text/html'],'/SPEC-1.2.md':['../SPEC-1.2.md','text/plain'],'/spec':['../SPEC-1.2.md','text/plain'],'/':['../client/index.html','text/html'],'/client/app.js':['../client/app.js','text/javascript'],'/client/style.css':['../client/style.css','text/css'],'/data/catalog.js':['../data/catalog.js','text/javascript']};
 const server=http.createServer((req,res)=>{const file=files[req.url];if(!file){res.writeHead(404);res.end('Not found');return;}res.writeHead(200,{'Content-Type':file[1]+'; charset=utf-8','Cache-Control':'no-store'});res.end(readFileSync(new URL(file[0],import.meta.url)));});
 const wss=new WebSocketServer({server,maxPayload:16384});
 // Network heartbeats stay on this thread while the simulation commits SQLite.

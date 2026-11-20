@@ -16,9 +16,9 @@
       value.shards.every(v => typeof v === 'boolean') &&
       (value.checkpoint === 0 || value.checkpoint === 1) &&
       Number.isInteger(value.repairStep) && value.repairStep >= 0 && value.repairStep <= 2 &&
-      (value.dialogue === 0 || value.dialogue === 1);
+      (value.dialogue === 0 || value.dialogue === 1) && (value.bridge === undefined || typeof value.bridge === 'boolean');
   }
-  function copy(v) {return {version: VERSION, stage: v.stage, shards: v.shards.slice(), checkpoint: v.checkpoint, repairStep: v.repairStep, dialogue: v.dialogue};}
+  function copy(v) {const out={version: VERSION, stage: v.stage, shards: v.shards.slice(), checkpoint: v.checkpoint, repairStep: v.repairStep, dialogue: v.dialogue}; if(v.bridge!==undefined)out.bridge=v.bridge; return out;}
   function storage(explicit) {
     if (explicit !== undefined) return explicit;
     try {return typeof window !== 'undefined' ? window.localStorage : null;} catch (_) {return null;}

@@ -54,6 +54,40 @@
       e.x = clamp(e.x + e.dir * (e.type ? 1.2 : 0.85), bounds.min, bounds.max);
     }
   }
+  function updateFish(f, s) {
+    if (!f.alive) return;
+    if (!f.ai) f.ai = {state:'swim', timer:0, t:(f.base || f.x) / 30, baseY:f.y};
+    const a=f.ai, base=f.base === undefined ? f.x : f.base;
+    if (f.stun > 0) {
+      f.stun--;
+      // Interrupt a shot even if the fish was already telegraphing it.
+      a.state='recover'; a.timer=Math.max(a.timer,35);
+      f.x=clamp(f.x,base-90,base+90);
+      return;
+    }
+    a.t++;
+    if (a.state === 'recover') {
+      if (--a.timer <= 0) a.state='swim';
+      return;
+    }
+    if (a.state === 'windup') {
+      if (--a.timer <= 0) {
+        s.projectiles.push({x:f.x+a.facing*25,y:f.y+17,vx:a.facing*3.1,radius:9,kind:'bubble'});
+        a.state='recover'; a.timer=85;
+        if (s.particle) s.particle(f.x+a.facing*25,f.y+17,'#a2e5ed',5);
+      }
+      return;
+    }
+    // Slow horizontal hover distinct from the ground beast's pursuit and lunge.
+    const before=f.x;
+    f.x=base+Math.sin(a.t/65)*58;
+    f.y=a.baseY+Math.sin(a.t/24)*13;
+    f.dir=f.x < before ? -1 : 1;
+    const dx=s.player.x-f.x;
+    if (Math.abs(dx) < 260 && Math.abs(dx)>52 && Math.abs((s.player.y+s.player.h/2)-(f.y+17)) < 100) {
+      a.facing=dx<0?-1:1; f.dir=a.facing; a.state='windup'; a.timer=46;
+    }
+  }
   function updateBoss(s) {
     const b = s.boss;
     if (!b || !b.alive || s.player.x < 2800) return;
@@ -67,15 +101,16 @@
         a.kind = phase2 && a.attacks % 2 ? 'brush' : 'wave';
         a.state = 'windup'; a.timer = a.kind === 'brush' ? 52 : 40;
         a.target = clamp(s.player.x, 2700, 3560);
+        a.facing = s.player.x < b.x ? -1 : 1;
         a.attacks++;
       }
       return;
     }
     if (a.state === 'windup' && --a.timer <= 0) {
       if (a.kind === 'wave') {
-        s.projectiles.push({ x: b.x - 50, y: 408, vx: b.hp <= b.max / 2 ? -5.0 : -4.2, radius: 14, kind: 'ink' });
+        s.projectiles.push({ x: b.x + a.facing * 50, y: 408, vx: a.facing * (b.hp <= b.max / 2 ? 5.0 : 4.2), radius: 14, kind: 'ink' });
         if (b.hp <= b.max / 2) {
-          s.projectiles.push({ x: b.x - 50, y: 328, vx: -4.2, radius: 12, kind: 'ink' });
+          s.projectiles.push({ x: b.x + a.facing * 50, y: 328, vx: a.facing * 4.2, radius: 12, kind: 'ink' });
         }
         a.state = 'recover'; a.timer = b.hp <= b.max / 2 ? 75 : 95;
       } else {
@@ -104,6 +139,7 @@
   }
   function update(s) {
     for (const e of s.enemies) updateEnemy(e, s);
+    for (const f of s.fish || []) updateFish(f, s);
     updateBoss(s);
     updateProjectiles(s);
   }
@@ -117,6 +153,18 @@
       ctx.fillText('!', e.x, e.y - 26);
       ctx.fillStyle = '#ffbd7060'; ctx.fillRect(e.x, e.y + 32, e.ai.facing * 74, 5);
     }
+    for (const f of s.fish || []) {
+      if (!f.alive || !f.ai || f.ai.state !== 'windup') continue;
+      ctx.fillStyle = time % 12 < 6 ? '#d6f7ff' : '#78cfe5';
+      ctx.font = 'bold 19px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('!', f.x, f.y - 18);
+      ctx.strokeStyle = '#b9ecf1aa'; ctx.lineWidth=2; ctx.setLineDash([5,7]); ctx.beginPath();
+      ctx.moveTo(f.x+f.ai.facing*25,f.y+17); ctx.lineTo(f.x+f.ai.facing*155,f.y+17); ctx.stroke(); ctx.setLineDash([]);
+    }
+    // A small halo and shards mark successful interruption without changing sprite art.
+    for (const e of [...s.enemies, ...(s.fish || [])]) if (e.alive && e.stun > 0) {
+      ctx.globalAlpha=.7; ctx.strokeStyle='#edfcff'; ctx.lineWidth=2; ctx.beginPath();
+      ctx.arc(e.x,e.y+18,22,0,Math.PI*2); ctx.stroke(); ctx.globalAlpha=1;
+    }
     const a = s.boss && s.boss.alive && s.boss.ai;
     if (a && a.state === 'windup') {
       ctx.strokeStyle = time % 12 < 6 ? '#ffe6a3' : '#e19d65'; ctx.lineWidth = 3;
@@ -124,7 +172,7 @@
         ctx.fillStyle = '#f5b87255'; ctx.fillRect(a.target - 65, 416, 130, 28);
         ctx.strokeRect(a.target - 65, 416, 130, 28);
       } else {
-        ctx.setLineDash([10, 8]); ctx.beginPath(); ctx.moveTo(s.boss.x - 45, 408); ctx.lineTo(Math.max(0, s.boss.x - 550), 408); if (s.boss.hp <= s.boss.max / 2) { ctx.moveTo(s.boss.x - 45, 328); ctx.lineTo(Math.max(0, s.boss.x - 550), 328); } ctx.stroke(); ctx.setLineDash([]);
+        ctx.setLineDash([10, 8]); ctx.beginPath(); ctx.moveTo(s.boss.x + a.facing * 45, 408); ctx.lineTo(s.boss.x + a.facing * 550, 408); if (s.boss.hp <= s.boss.max / 2) { ctx.moveTo(s.boss.x + a.facing * 45, 328); ctx.lineTo(s.boss.x + a.facing * 550, 328); } ctx.stroke(); ctx.setLineDash([]);
       }
     }
     if (a && a.state === 'brush-active') {
@@ -132,8 +180,8 @@
     }
     for (const b of s.projectiles) {
       const r = b.radius || 12;
-      ctx.fillStyle = '#b4e6ef'; ctx.beginPath(); ctx.arc(b.x, b.y, r, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#275f87'; ctx.beginPath(); ctx.arc(b.x, b.y, r * .55, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = b.kind === 'bubble' ? '#d7faff' : '#b4e6ef'; ctx.beginPath(); ctx.arc(b.x, b.y, r, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = b.kind === 'bubble' ? '#60b6d1' : '#275f87'; ctx.beginPath(); ctx.arc(b.x, b.y, r * .55, 0, Math.PI * 2); ctx.fill();
     }
     ctx.restore();
   }

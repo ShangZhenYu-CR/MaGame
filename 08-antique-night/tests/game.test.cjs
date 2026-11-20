@@ -65,11 +65,18 @@ test('keyboard starts game and shop commission enters bottle', () => {
   assert.equal(g.run('mode'), 'world');
 });
 
-test('first chasm can be crossed with an ordinary jump', () => {
-  const g = game(); g.run('init();enterWorld();player.x=670;player.y=368;player.vy=0;player.ground=true;keys.right=true;taps.jump=true');
-  g.tick(42); g.run('keys.right=false');
-  assert.ok(g.run('player.x') > 770, 'player reached the other bank');
-  assert.ok(g.run('player.y') < 500, 'player did not fall through the gap');
+test('repairing the broken bridge creates a traversable path and saves it', () => {
+  const storage=makeStorage(),g=game(storage);g.run('init();enterWorld();player.x=660;player.y=368;player.vy=0;player.ground=true');
+  g.key('keydown','e');g.tick(95);g.key('keyup','e');
+  assert.equal(g.run('bridgeDone'),true);assert.equal(JSON.parse(storage.getItem('magame08-progress-v1')).bridge,true);
+  g.key('keydown','d');g.tick(85);g.key('keyup','d');assert.ok(g.run('player.x')>930);assert.ok(g.run('player.y')<450);
+  const reload=game(storage);reload.nodes.go.click();assert.equal(reload.run('bridgeDone'),true);
+});
+
+test('bridge repair can be interrupted and gamepad A does not jump beside it',()=>{
+  const g=game();g.run('init();enterWorld();player.x=660;player.y=368;player.ground=true');
+  g.pad(0);g.tick(15);assert.ok(g.run('bridgeProgress')>0);assert.equal(g.run('player.ground'),true);
+  g.pad(-1,1);g.tick(30);assert.equal(g.run('bridgeDone'),false);
 });
 
 test('checkpoint retry preserves collected shards without granting missing ones', () => {
@@ -277,4 +284,12 @@ test('new game can be confirmed by gamepad Y', () => {
   const storage=makeStorage(),first=game(storage);first.run('init();enterWorld();checkpoint=1;saveProgress()');
   const reload=game(storage);reload.pad(3);reload.tick();assert.equal(reload.run('mode'),'title');
   reload.pad();reload.tick();reload.pad(3);reload.tick();assert.equal(reload.run('mode'),'shop');
+});
+
+test('armored porcelain beast blocks light hits and two heavy hits break armor',()=>{
+ const g=game();g.run('init();enterWorld();player.x=1690;player.y=368;player.facing=1;player.ground=true');
+ g.run('hitTarget(enemies[2],false)');assert.equal(g.run('enemies[2].hp'),4);assert.equal(g.run('enemies[2].armor'),2);
+ g.run('hitTarget(enemies[2],true)');assert.equal(g.run('enemies[2].armor'),1);
+ g.run('hitTarget(enemies[2],true)');assert.equal(g.run('enemies[2].armor'),0);
+ g.run('hitTarget(enemies[2],false)');assert.equal(g.run('enemies[2].hp'),3);
 });

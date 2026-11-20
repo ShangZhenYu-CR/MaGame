@@ -3,8 +3,9 @@
   'use strict';
   const AudioContext = global.AudioContext || global.webkitAudioContext;
   let context = null, master = null, music = null, effects = null, noise = null;
-  let muted = false, scene = 'shop', step = 0, nextNote = 0, timer = null;
-  try { muted = global.localStorage.getItem('magame08-muted') === '1'; } catch (_) {}
+  let muted = false, volume = .7, scene = 'shop', step = 0, nextNote = 0, timer = null;
+  let userPaused = false, backgrounded = false;
+  try { muted = global.localStorage.getItem('magame08-muted') === '1'; const saved = global.localStorage.getItem('magame08-volume'); if (saved !== null) { const v = Number(saved); if (Number.isFinite(v)) volume = Math.max(0, Math.min(1, v)); } } catch (_) {}
   const scores = {
     shop:  { tempo: 1100, notes: [220, 261.63, 329.63, 293.66, 261.63, 196, 220, 0], root: 110 },
     world: { tempo: 880, notes: [293.66, 349.23, 440, 523.25, 440, 349.23, 329.63, 0], root: 146.83 },
@@ -62,13 +63,13 @@
     try {
       if (!context) {
         context = new AudioContext(); master = context.createGain(); music = context.createGain(); effects = context.createGain();
-        master.gain.value = muted ? .0001 : .7; music.gain.value = .35; effects.gain.value = .65;
+        master.gain.value = muted ? .0001 : Math.max(.0001, volume); music.gain.value = .35; effects.gain.value = .65;
         music.connect(master); effects.connect(master); master.connect(context.destination);
         noise = context.createBuffer(1, Math.ceil(context.sampleRate * .5), context.sampleRate);
         const data = noise.getChannelData(0); for (let i=0; i<data.length; i++) data[i] = Math.random() * 2 - 1;
         nextNote = context.currentTime + .05; schedule();
       }
-      const resumed = context.state === 'suspended' ? context.resume() : Promise.resolve();
+      const resumed = context.state === 'suspended' && !userPaused && !backgrounded ? context.resume() : Promise.resolve();
       return Promise.resolve(resumed).then(() => true).catch(() => false);
     } catch (_) { return Promise.resolve(false); }
   }
@@ -93,10 +94,44 @@
   function setMuted(value) {
     muted = !!value;
     try { global.localStorage.setItem('magame08-muted', muted ? '1' : '0'); } catch (_) {}
-    if (context && master) ramp(master.gain, muted ? .0001 : .7, context.currentTime, .04);
+    if (context && master) ramp(master.gain, muted ? .0001 : Math.max(.0001, volume), context.currentTime, .04);
     return muted;
   }
-  function setVolume(value) { if (master && context) ramp(master.gain, muted ? .0001 : cap(Number(value) || 0, .0001, 1), context.currentTime, .04); }
-  function destroy() { if(timer) global.clearTimeout(timer); timer=null; if(context) context.close(); context=master=music=effects=noise=null; }
-  global.GameAudio = Object.freeze({ unlock, play, setScene, setMuted, setVolume, isMuted: () => muted, destroy });
+  function setVolume(value) {
+    const v = Number(value);
+    if (!Number.isFinite(v)) return volume;
+    volume = cap(v, 0, 1);
+    try { global.localStorage.setItem('magame08-volume', String(volume)); } catch (_) {}
+    if (master && context) ramp(master.gain, muted ? .0001 : Math.max(.0001, volume), context.currentTime, .04);
+    return volume;
+  }
+  function pause() {
+    userPaused = true;
+    if (!context || context.state !== 'running') return Promise.resolve();
+    return Promise.resolve(context.suspend()).catch(() => {});
+  }
+  function resume() {
+    userPaused = false;
+    if (!context || backgrounded || context.state !== 'suspended') return Promise.resolve(false);
+    return Promise.resolve(context.resume()).then(() => true).catch(() => false);
+  }
+  function onBlur() {
+    backgrounded = true;
+    if (context && context.state === 'running') Promise.resolve(context.suspend()).catch(() => {});
+  }
+  function onFocus() {
+    if (global.document && global.document.hidden) return;
+    backgrounded = false;
+    if (context && !userPaused && context.state === 'suspended') Promise.resolve(context.resume()).catch(() => {});
+  }
+  function onVisibility() { if (global.document.hidden) onBlur(); else onFocus(); }
+  if (global.addEventListener) { global.addEventListener('blur', onBlur); global.addEventListener('focus', onFocus); }
+  if (global.document && global.document.addEventListener) global.document.addEventListener('visibilitychange', onVisibility);
+  function destroy() {
+    if(timer) global.clearTimeout(timer); timer=null;
+    const old = context; context=master=music=effects=noise=null;
+    if(old) Promise.resolve(old.close()).catch(() => {});
+  }
+  global.GameAudio = Object.freeze({ unlock, play, setScene, setMuted, setVolume, getVolume: () => volume,
+    isMuted: () => muted, pause, resume, isPaused: () => userPaused, destroy });
 })(window);

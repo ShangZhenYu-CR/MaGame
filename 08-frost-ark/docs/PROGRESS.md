@@ -45,3 +45,12 @@
 - 调整为 64 px/格（1280×720 时），滚轮 44–80 px/格；实装护栏、包角、锥形浮石与冰凌、热力霜、接触影与 Y 排序、冷暖光与风雪、失温霜花、顶部短 Toast、角标图标和三条生存条。
 - `npm run gate` 通过；既有 M0/M1 功能断言没有删减。HTTP 与独立解压后两种 `file://` 入口全流程通过，四张共享头像原件随 ZIP 提供。新增素材全部解码且图标有可见内容；游戏执行时无生图／Python／网络依赖。Vite 对内联资源给出体积提示，压缩试玩 ZIP 为 4,053,458 B。
 - [5 张验收图](https://drive.google.com/drive/folders/1Y9GcHtY3QGDTbozvFRQU6CpN65Oo0vZ_) · [同场景对比](https://drive.google.com/file/d/1X_R-MZqFZjSvT74mH9uowDDzgJss096m/view)（两侧原始分辨率均为 1280×720，标注默认镜头差异） · [试玩 ZIP](https://drive.google.com/file/d/14rR9zINYfPzMfPJn-9BpqKYg3u_XPqEI/view) · [GitHub 构建记录](https://github.com/ShangZhenYu-CR/MaGame/actions/runs/45965196847)。
+
+## 2026-11-27 · M2 建造科技树与自动化拾荒
+
+- 用户确认 M1.5 美术验收。M2 开工先修五项：纵向专用护栏与薄木侧舷、锥石与冰凌只挂底缘；漂流物在船体下方合成并用云雾轻融；拿铁缩至约 65%、残骸约 75%；规则六角改成透明精绘自然冰纹；加强暴雪风丝与炉火火星。
+- 可以从木工台研究，按浮力预算造网栏、分拣臂、熔炉、灶台、热力中继塔、温室、保温墙、浮力核心和铁甲板。网栏拦漂流物，附近分拣臂自动收取；在加工设备查看耗材、进度与产出。热力扩展、结冻停机、2×2 温室占地、4 秒不打断移动的撤销及跨存档恢复可验证。
+- `B` 建造手册、`E` 使用设备、`X` 拆除、`Z` 撤销、`M` 静音。带延迟／预热的提示、逐层 Esc、等宽读数与精绘物品图。
+- 43 项新增 ImageGen 成品（3 项画面修整、10 张建筑、30 枚图标）；连同基线共 76 件、1,172,625 B。分批在浅棋盘与深冰蓝底审核，旧清单条目保留，未把生图原件入库。
+- 通过 `npm run gate`、3 项美术管线测试、HTTP 全流程、两种 `file://` 入口启动，以及使用交付 ZIP 干净解压后双击 `08-frost-ark/index.html` 的全流程实机。保留原有断言，无浏览器报错。用户可先看 [M2 验收目录](https://drive.google.com/drive/folders/1LuNdwPYSwB_tJYCJqgd6r6CT9FT4bfYp)，或下载 [M2 试玩 ZIP](https://drive.google.com/file/d/1ANdChtWf2BeQ7FK6JFyaMzULNnA4dLTY/view)。源码 `18fdf43`，静态入口 `272b1ce`。
+- 【偏离报告】云端曾重连并回退工作树，源码已按原改动恢复，三批生成美术用原提示词重生、重审，已用匹配成品的审片图覆盖旧截图；没有功能降级。只提交 `game/08-frost-ark` 的游戏目录，不改 `main`、其他游戏或共享资产。等待 M2 验收，不启动 M3。

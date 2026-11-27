@@ -24,7 +24,11 @@
     "m2-icon-tech-b": "Frost Ark inventory illustration sprites. EXACT 3-column by 2-row rectangular grid, equally centered singles, generous pure magenta gutters at every cell. Solid pure magenta #FF00FF flat backdrop, no shadow cast on background, no ground, no text, no outlines around cells, no decoration. Readable 32px game icon art with clear chunky silhouettes, dark slate-brown tapered edge, hand-painted textured indie survival rendering, 40-degree three-quarter top-down, soft upper-left blue skylight, muted colors, small pops of warm orange as appropriate. All six sprites full and completely isolated, exact order like reading a book. TOP: (1) small glass greenhouse with peaked glass roof weathered brass frame and green seedlings, (2) framed dark brown warm insulated wall with fluffy tan batting partly visible and leather strips, (3) small mechanical horizontal buoyancy core with visible suspended blue-white crystal in a dark bronze cradle. BOTTOM: (4) stack of iron deck panel squares with rivets, (5) small bundled blue-tinted ice rope paralysis net with icy cyan knot, NOT a mounted dock net, (6) rare quest skyheart fire seed like small glowing amber ember in a dark smoky floating stone shell, NOT an egg.",
     "m3-icons-tools": "Frost Ark high-altitude winter survival game, original hand-painted indie survival UI item sprite atlas for 48×48 transparent PNGs displayed at 32 pixels. Edge-to-edge flat SOLID PURE RGB(255,0,255) electric MAGENTA backdrop #FF00FF including holes. Exactly one fully visible centered sprite per cell, wide unbroken magenta gutters. No labels, grids, cast/contact shadow, panel, white sticker edge, or hue reflection from magenta. Dark slate-brown softened contour, cool top-left skylight, restrained brown and steel-blue painted facets, chunky memorable silhouette, 40-degree elevated 3/4 orthographic. Precise 2 by 2 arrangement, square canvas. TOP LEFT one basic one-handed wood-cutting hatchet with broad matte hammered dull iron blade, flared cutting edge, rough dark warm timber haft, linen cord wrap. TOP RIGHT upgraded frost iron hatchet: same compact hatchet proportions, bright cold-blue trimmed steel broad head with a twin gold rivet brace and fitted handle. BOTTOM LEFT one simple angled iron mining pick with two arcing sharp clean spikes, chipped textured steel head, worn brown handle and simple leather grip, no axe-shaped blade. BOTTOM RIGHT upgraded bright blue-gray forged frost iron mining pickaxe with reinforced pointed horns, gold rivets on dark forged socket and improved warm grip, noticeably premium. All four tools angle diagonally upward to the right, readable silhouettes at 32px, no disconnected sparks or glow.",
     "m3-icons-islands": "Frost Ark high-altitude winter survival game, original hand-painted indie survival UI item sprite atlas for 48×48 transparent PNGs displayed at 32 pixels. Edge-to-edge flat SOLID PURE RGB(255,0,255) electric MAGENTA backdrop #FF00FF including holes. Exactly one fully visible centered sprite per cell, wide unbroken magenta gutters. No labels, grids, cast/contact shadow, panel, white sticker edge, or hue reflection from magenta. Dark slate-brown softened contour, cool top-left skylight, restrained brown and steel-blue painted facets, chunky memorable silhouette, 40-degree elevated 3/4 orthographic. Precise two-column sprite atlas, wide landscape canvas. LEFT TIER 1: horizontal eclectically shaped floating snowy mountain fragment with pine silhouettes and muted gray-green moss ridges, broad light gray snowy tops and rugged dark charcoal hanging rock apex. RIGHT TIER 2: more dramatic rugged blue-black mineral islet with two clustered large frosty blue crystal spikes and a mute blue glacial ridge, gem glints subdued, broad fractured hanging base. NOT map pins and no decorative round frame. The visible lower sides abruptly end in individually sharp rock contours, no drifting pebbles. Consistent horizontal footprint, similar readable volume, differing shapes/colors and silhouettes. No atmospheric halo or clouds; islands are completely separate against perfectly flat magenta.",
-    "m3-icons-helm": "Frost Ark two original hand painted indie game inventory UI sprites, landscape 2 columns side by side, each isolated on flat pure electric #FF00FF magenta chroma matte with wide gutters. No text, panel, background shadow, rim, fog, decor or gradient. Left: bold compact weathered mahogany ship’s helm steering wheel with six readable spokes and small cast iron hub, 40 degree 3/4 top down, no floor mount. Right: small gray wooden plank gangway bridge for boarding a flying raft, two slim copper metal supports, rope rail only one edge, three-quarter overhead 40 degree, laid diagonally for 32px readable compact silhouette. Soft upper-left icy natural daylight, charcoal edge, slightly frost-weathered materials, matching high-altitude survival assets from Frost Ark. Each unique shape occupies no more than 75 percent of its own column width and completely fits inside its own cell."
+    "m3-icons-helm": "Frost Ark two original hand painted indie game inventory UI sprites, landscape 2 columns side by side, each isolated on flat pure electric #FF00FF magenta chroma matte with wide gutters. No text, panel, background shadow, rim, fog, decor or gradient. Left: bold compact weathered mahogany ship’s helm steering wheel with six readable spokes and small cast iron hub, 40 degree 3/4 top down, no floor mount. Right: small gray wooden plank gangway bridge for boarding a flying raft, two slim copper metal supports, rope rail only one edge, three-quarter overhead 40 degree, laid diagonally for 32px readable compact silhouette. Soft upper-left icy natural daylight, charcoal edge, slightly frost-weathered materials, matching high-altitude survival assets from Frost Ark. Each unique shape occupies no more than 75 percent of its own column width and completely fits inside its own cell.",
+    "m3Terrain": "Original Frost Ark M3 top-down game terrain TEXTURE ATLAS. 2×2 equal quadrants (precise center splits) on square canvas, paint completely edge to edge all four quadrants, NO magenta, labels, gap, borders, shadows across adjacent quadrants, vignette, discrete object, trails, grass tufts, trees, rivers, or view tilt. Paint each quadrant as an evenly balanced edge-to-edge tileable flat aerial texture, no gradient, motifs especially unobtrusive and low-contrast near edges, no strong shape or hard border on cell seams. Hand-painted crisp brushwork with soft cool diffuse light and textured cel detail matching the supplied muted Frost Ark assets, terrain textures are backdrop, not loud. TOP ROW both textures T1 = muted cool charcoal slate-grey gravel and tundra hardpan with faint pale ice rime dusting, no snow masses. TOP LEFT slightly granular, TOP RIGHT slightly flatter worn slate with subtly scattered fine flecks, retain EXACT same palette as left and similar distribution. BOTTOM ROW both textures T2 = pale icy blue-gray glacial ground with wispy frost granules, compacted blue snow on craggy stone, tiny slate mottling, no saturated cyan no bright white. BOTTOM LEFT faint granular drift, BOTTOM RIGHT gently pressed lightly scuffed ice powder, retain EXACT same palette as left and similar distribution. T2 modestly lighter cooler than T1, visually distinct in real game at 64px per tile. Simplified calm mid-value floor, no visible repetitions within each tile, gently rough textures.",
+    "m3Cliffs": "Original hand-painted Frost Ark indie survival sprite sheet. Precise 2×2 equal grid, one distinct complete isolated sprite centered in each quadrant, prominent negative-space gutters and outer margins, no overlap. Elevation orthographic looking down 40°, front view aligned to straight-horizontal plank and stone faces, no 45-degree yaw or diamond footprints. Crisp tactile cel brushed facets, subtle slate-brown outline, soft upper-left cool skylight, cold slate-blues and warm muted browns, match supplied reference sprites. Completely flat solid pure electric #FF00FF RGB(255,0,255) background and all holes negative space, no shadow or terrain around objects, no text or guides or watermark. Each sprite strong clear silhouette, game-ready readable. Top-left hanging T1 floating cliff edge: rough jagged dark ash-slate rock face with chipped stacked layers, long downward rocky points and slight side steps with frost-traced dark edges, horizontal TOP cut like a land surface joining a floating ice island, almost no top surface; detached animated clouds not allowed. Top-right hanging T2 glacial cliff edge: pale blue-gray slab and rock exposed underneath, more jagged taller spires and subtle bare slate inclusions and icy translucent icicle points, horizontal top edge (no rounded snow cap) that can tuck behind square terrain tiles. Bottom-left large FROST PINE: a clearly legible squat yet tall dark evergreen pine with frosty tiered branches, deep desaturated blue-green needles mostly beneath pale ice crystal snow patch highlights, small trunk rooted at bottom, NO base/platform. Bottom-right SMALL FROST SHRUB / twisted dwarf pine: broad sparse deformed windswept blue-gray shrub with twisted low branches and tufts of sparse evergreen and brown wood plus frost, distinct from pine silhouette, heavy root visible, NO base/platform. All isolated. Do not repeat individual sprites.",
+    "m3Resources": "Original hand-painted Frost Ark indie survival sprite sheet. Precise 2×2 equal grid, one distinct complete isolated sprite centered in each quadrant, prominent negative-space gutters and outer margins, no overlap. Elevation orthographic looking down 40°, front view aligned to straight-horizontal plank and stone faces, no 45-degree yaw or diamond footprints. Crisp tactile cel brushed facets, subtle slate-brown outline, soft upper-left cool skylight, cold slate-blues and warm muted browns, match supplied reference sprites. Completely flat solid pure electric #FF00FF RGB(255,0,255) background and all holes negative space, no shadow or terrain around objects, no text or guides or watermark. Each sprite strong clear silhouette, game-ready readable. Top-left frost iron mineral deposit, rough clustered dark blue-grey stone and sharply angled silvery-gray plates shaped like crystalline hematite, scattered iron oxide russet seams tiny highlights, no purple/gold. Top-right coal deposit, charcoal-black broken irregular matte rock pile, hatched slate brown crystalline facets, a little silver frost powder resting on upper planes, low contrast but distinct against a pale background, outlined no absolute dead black mass, no visible fire. Bottom-left prismatic ice outcrop, split translucent multi-spired silicate ice crystal cluster, desaturated wintry cerulean and pale ice facets and deep cyan refraction, no glow outside. Bottom-right compact ancient island ruin crate (CLOSED), sunken slate-gray weather-beaten stone and ornate restrained weathered tarnished bronze cross-straps surrounding pale turquoise small center lock; battered casket-like rectangular silhouette, maybe a frosted rim, well-preserved hinges, entirely prop, no stone dais.",
+    "m3Accessories": "Original hand-painted Frost Ark indie survival sprite sheet. Precise 2×2 equal grid, one distinct complete isolated sprite centered in each quadrant, prominent negative-space gutters and outer margins, no overlap. Elevation orthographic looking down 40°, front view aligned to straight-horizontal plank and stone faces, no 45-degree yaw or diamond footprints. Crisp tactile cel brushed facets, subtle slate-brown outline, soft upper-left cool skylight, cold slate-blues and warm muted browns, match supplied reference sprites. Completely flat solid pure electric #FF00FF RGB(255,0,255) background and all holes negative space, no shadow or terrain around objects, no text or guides or watermark. Each sprite strong clear silhouette, game-ready readable. Top-left ancient ruin crate (OPEN): weather-beaten slate block-style casket with ornate restrained bronze straps, small turquoise lock, battered heavy rectangular silhouette; lid hinges raised behind, dark slate interior with a tiny warm amber artifact shine but no external rays or particles. Top-right ARK GANGWAY MODULE: a perfectly screen-horizontal low straight 1x1 square footprint, flat worn gray-tan wood narrow planks and two short low screen-horizontal railings running from left to right on front and back ends, open walkway ends on the LEFT and RIGHT, tiny frost and iron accents, no torsion or diagonal skew, small side joins straight and credible when rotated in presentation. Bottom-left ORNATE ARK HELM: a traditional wood ship's wheel with 8 clear spokes and dark carved dark mahogany knobs, antique brass hub and brushed burnished bronze bindings, wheel viewed front on and slightly above at 40° attached to a chunky dark sculpted frost-dusted metal/timber pedestal, three-quarter terrain asset that stands on ship deck. Bottom-right ancient ruin crate CLOSED: reproduce the identical closure and body of the first open crate, match bronze strap pattern and turquoise lock, regular rectangular casket with lid fully down and no interior light. NO gold treasure, no floor, no text anywhere."
   },
   "assets": [
     {
@@ -1764,6 +1768,301 @@
         0.5,
         0.5
       ]
+    },
+    {
+      "id": "island-t1-ground-1",
+      "source": "m3-terrain.png",
+      "size": [
+        128,
+        128
+      ],
+      "crop": [
+        5,
+        5,
+        622,
+        622
+      ],
+      "key": "none",
+      "tileW": 1,
+      "tileH": 1,
+      "fit": "stretch"
+    },
+    {
+      "id": "island-t1-ground-2",
+      "source": "m3-terrain.png",
+      "size": [
+        128,
+        128
+      ],
+      "crop": [
+        632,
+        5,
+        1249,
+        622
+      ],
+      "key": "none",
+      "tileW": 1,
+      "tileH": 1,
+      "fit": "stretch"
+    },
+    {
+      "id": "island-t2-ground-1",
+      "source": "m3-terrain.png",
+      "size": [
+        128,
+        128
+      ],
+      "crop": [
+        5,
+        632,
+        622,
+        1249
+      ],
+      "key": "none",
+      "tileW": 1,
+      "tileH": 1,
+      "fit": "stretch"
+    },
+    {
+      "id": "island-t2-ground-2",
+      "source": "m3-terrain.png",
+      "size": [
+        128,
+        128
+      ],
+      "crop": [
+        632,
+        632,
+        1249,
+        1249
+      ],
+      "key": "none",
+      "tileW": 1,
+      "tileH": 1,
+      "fit": "stretch"
+    },
+    {
+      "id": "island-t1-cliff",
+      "source": "m3-cliffs.png",
+      "size": [
+        128,
+        128
+      ],
+      "crop": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "key": "magenta",
+      "tileW": 1.25,
+      "tileH": 1.1,
+      "anchor": [
+        0.5,
+        0.03
+      ],
+      "targetAnchor": [
+        0.5,
+        0.14
+      ]
+    },
+    {
+      "id": "island-t2-cliff",
+      "source": "m3-cliffs.png",
+      "size": [
+        128,
+        128
+      ],
+      "crop": [
+        627,
+        0,
+        1254,
+        627
+      ],
+      "key": "magenta",
+      "tileW": 1.25,
+      "tileH": 1.1,
+      "anchor": [
+        0.5,
+        0.03
+      ],
+      "targetAnchor": [
+        0.5,
+        0.14
+      ]
+    },
+    {
+      "id": "island-frost-pine",
+      "source": "m3-cliffs.png",
+      "size": [
+        160,
+        160
+      ],
+      "crop": [
+        0,
+        627,
+        627,
+        1254
+      ],
+      "key": "magenta",
+      "tileW": 1.43,
+      "tileH": 1.8,
+      "keyClear": 53,
+      "keyOpaque": 150
+    },
+    {
+      "id": "island-frost-shrub",
+      "source": "m3-cliffs.png",
+      "size": [
+        128,
+        128
+      ],
+      "crop": [
+        627,
+        627,
+        1254,
+        1254
+      ],
+      "key": "magenta",
+      "tileW": 1,
+      "tileH": 0.95,
+      "anchor": [
+        0.32,
+        1
+      ],
+      "targetAnchor": [
+        0.33,
+        0.945
+      ],
+      "keyClear": 53,
+      "keyOpaque": 150
+    },
+    {
+      "id": "island-frost-iron",
+      "source": "m3-resources.png",
+      "size": [
+        128,
+        128
+      ],
+      "crop": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "key": "magenta",
+      "tileW": 1,
+      "tileH": 1
+    },
+    {
+      "id": "island-coal",
+      "source": "m3-resources.png",
+      "size": [
+        128,
+        128
+      ],
+      "crop": [
+        627,
+        0,
+        1254,
+        627
+      ],
+      "key": "magenta",
+      "tileW": 1,
+      "tileH": 1
+    },
+    {
+      "id": "island-prismatic-ice",
+      "source": "m3-resources.png",
+      "size": [
+        128,
+        128
+      ],
+      "crop": [
+        0,
+        627,
+        627,
+        1254
+      ],
+      "key": "magenta",
+      "tileW": 1,
+      "tileH": 1.16
+    },
+    {
+      "id": "island-ruin-open",
+      "source": "m3-accessories.png",
+      "size": [
+        128,
+        128
+      ],
+      "crop": [
+        0,
+        0,
+        627,
+        560
+      ],
+      "key": "magenta",
+      "tileW": 1,
+      "tileH": 1
+    },
+    {
+      "id": "island-ruin-closed",
+      "source": "m3-accessories.png",
+      "size": [
+        128,
+        128
+      ],
+      "crop": [
+        627,
+        627,
+        1254,
+        1254
+      ],
+      "key": "magenta",
+      "tileW": 1,
+      "tileH": 1
+    },
+    {
+      "id": "ark-gangway",
+      "source": "m3-accessories.png",
+      "size": [
+        128,
+        128
+      ],
+      "crop": [
+        627,
+        0,
+        1254,
+        627
+      ],
+      "key": "magenta",
+      "tileW": 1.05,
+      "tileH": 1.05,
+      "anchor": [
+        0.5,
+        0.52
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "ark-helm",
+      "source": "m3-accessories.png",
+      "size": [
+        128,
+        128
+      ],
+      "crop": [
+        0,
+        560,
+        627,
+        1254
+      ],
+      "key": "magenta",
+      "tileW": 1.2,
+      "tileH": 1.24
     }
   ],
   "batchReferences": [
@@ -1772,6 +2071,14 @@
       "src/assets/art/storage.png",
       "src/assets/art/wall.png",
       "src/assets/art/deck-1.png"
+    ],
+    [
+      "src/assets/art/storage.png",
+      "src/assets/art/rock.png",
+      "src/assets/art/rock-side.png",
+      "src/assets/art/building-iron-deck.png",
+      "src/assets/art/rail.png",
+      "src/assets/art/hearth-2.png"
     ]
   ]
 }

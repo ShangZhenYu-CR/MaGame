@@ -1,5 +1,6 @@
 import { countItem, inventoryChange, isDeck } from './ark';
 import { dropOnDeck, isDeckDrop } from './latte';
+import { areaAt } from './island';
 import { nextRng } from './rng';
 import { TICK_RATE, type CloudDebris, type Vec2, type WorldState } from './types';
 
@@ -42,7 +43,7 @@ export function aimEnd(w: WorldState, target: Vec2): Vec2 {
 
 export function startCharge(w: WorldState, target: Vec2): boolean {
   const g = w.player.grapple;
-  if (g.active || g.charging || !countItem(w,'grapple_hook')) return false;
+  if (g.active || g.charging || !countItem(w,'grapple_hook') || areaAt(w,w.player.x,w.player.y)!=='ark') return false;
   g.charging = true; g.charge = 0;
   aim(w,target);
   return true;

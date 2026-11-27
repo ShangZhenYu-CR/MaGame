@@ -2,10 +2,19 @@ import items from '../data/items.json';
 import buildings from '../data/buildings.json';
 import recipes from '../data/recipes.json';
 import { STORAGE_SLOTS } from './storage-box';
-import { ARK_SIZE, SAVE_VERSION, TICK_RATE, type BuildingInstance, type WorldState } from './types';
+import { areaAt, dockedIsland, validIslandDeltas } from './island';
+import { ensureNavigation } from './sky-map';
+import { toolDefinition } from './tools';
+import biomes from '../data/biomes.json';
+import { ARK_SIZE, SAVE_VERSION, TICK_RATE, type BuildingInstance, type IslandNode, type WorldState } from './types';
 
 export function serializeWorld(world: WorldState): string {
-  return JSON.stringify(world);
+  // The active map only persists its reference; topology is reconstructed
+  // from the same seed and the island's sparse resource deltas.
+  const activeIsland=world.activeIsland;
+  if(!activeIsland)return JSON.stringify(world);
+  const {tiles:_,...location}=activeIsland;
+  return JSON.stringify({...world,activeIsland:location});
 }
 
 const ids = new Map(items.map(i=>[i.id,i.stack]));
@@ -14,7 +23,9 @@ const recipeDefs = new Map(recipes.map(r=>[r.id,r]));
 const record = (u:unknown):u is Record<string,unknown> => !!u&&typeof u==='object'&&!Array.isArray(u);
 const num = (u:unknown):u is number => typeof u==='number'&&Number.isFinite(u);
 const eachNumber = (u:Record<string,unknown>, keys:string[])=>keys.every(k=>num(u[k]));
-const stack = (u:unknown)=>record(u)&&typeof u.itemId==='string'&&num(u.count)&&Number.isInteger(u.count)&&u.count>0&&u.count<=(ids.get(u.itemId)??0);
+const stack = (u:unknown)=>record(u)&&typeof u.itemId==='string'&&num(u.count)&&Number.isInteger(u.count)&&u.count>0&&u.count<=(ids.get(u.itemId)??0)&&
+  (u.durability===undefined||
+    (num(u.durability)&&Number.isSafeInteger(u.durability)&&u.durability>=0&&u.durability<=(toolDefinition(u.itemId)?.maxDurability??-1)));
 
 function grid(n:unknown):n is number {
   return num(n)&&Number.isInteger(n)&&n>=0&&n<ARK_SIZE;
@@ -47,8 +58,6 @@ export function deserializeWorld(raw: string): WorldState {
      !eachNumber(ark,['buoyancyUsed','buoyancyMax'])||!Array.isArray(ark.buildings)||
      !ark.buildings.every(validBuilding)||
      !record(player)||!eachNumber(player,['x','y','vx','vy','hp','maxHp','warmth','maxWarmth','hunger','maxHunger','portraitMood','selectedSlot'])||
-     !num(player.x)||!num(player.y)||player.x<0||player.y<0||player.x>=ARK_SIZE||player.y>=ARK_SIZE||
-     !ark.decks[Math.floor(player.y)*ARK_SIZE+Math.floor(player.x)]||
      !Array.isArray(player.inventory)||player.inventory.length!==18||!player.inventory.every(s=>s===null||stack(s))||
      !record(player.facing)||!eachNumber(player.facing,['x','y'])||
      !record(player.grapple)||!eachNumber(player.grapple,['charge','targetX','targetY'])||
@@ -87,5 +96,40 @@ export function deserializeWorld(raw: string): WorldState {
       }
     }
   }
-  return p as unknown as WorldState;
+  const invalidNavigation=()=>new Error('航图、跳板或浮岛存档不符合方舟格式');
+  const ids=new Set<string>();
+  for(const v of sky.islands){
+    if(!record(v)||typeof v.id!=='string'||!/^[a-z0-9_]{1,64}$/.test(v.id)||ids.has(v.id)||
+      typeof v.name!=='string'||v.name.length>64||!biomes.some(b=>b.id===v.biomeId&&b.tier===v.tier)||
+      !eachNumber(v,['seed','skyX','skyY'])||!Number.isSafeInteger(v.seed)||
+      typeof v.discovered!=='boolean'||typeof v.bossDefeated!=='boolean'||
+      !record(v.deltas)||Object.keys(v.deltas).length>64||
+      !validIslandDeltas(v as unknown as IslandNode))throw invalidNavigation();
+    ids.add(v.id);
+  }
+  const nav=p.navigationM3;
+  if(nav!==undefined){
+    if(!record(nav)||(nav.targetId!==null&&(typeof nav.targetId!=='string'||!ids.has(nav.targetId))))
+      throw invalidNavigation();
+    const dock=nav.dock;
+    if(dock!==null){
+      if(!record(dock)||typeof dock.nodeId!=='string'||dock.nodeId!==ark.anchoredIslandId||!ids.has(dock.nodeId)
+        ||!grid(dock.gx)||!grid(dock.gy)||!ark.decks[dock.gy*ARK_SIZE+dock.gx]
+        ||(dock.gx<ARK_SIZE-1&&ark.decks[dock.gy*ARK_SIZE+dock.gx+1])
+        ||typeof dock.deployed!=='boolean'||sky.cruising)throw invalidNavigation();
+    }else if(ark.anchoredIslandId!==null)throw invalidNavigation();
+  }else if(ark.anchoredIslandId!==null)throw invalidNavigation();
+
+  const world=p as unknown as WorldState;
+  const active=p.activeIsland;
+  world.activeIsland=null;
+  ensureNavigation(world);
+  const area=areaAt(world,world.player.x,world.player.y);
+  if(area==='island'){
+    const island=dockedIsland(world);
+    if(!island||!record(active)||active.nodeId!==island.nodeId||active.biomeId!==island.biomeId||
+      active.size!==island.size||active.offsetX!==island.offsetX||active.offsetY!==island.offsetY)throw invalidNavigation();
+    world.activeIsland=island;
+  }else if(area==='void'||active!==null)throw invalidNavigation();
+  return world;
 }

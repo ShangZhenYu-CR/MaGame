@@ -5,7 +5,9 @@ import {
   type Vec2,
 } from './types';
 import { seedDrift, stepCloud } from './cloud';
-import { makeBuilding, refreshBuoyancy, walk } from './ark';
+import { makeBuilding, refreshBuoyancy } from './ark';
+import { walkExpedition } from './island';
+import { ensureNavigation, stepNavigation } from './sky-map';
 import { advanceClimate, initializeHeat, stepHeat } from './heatField';
 import { stepIndustry } from './industry';
 import { updateLatte } from './latte';
@@ -115,6 +117,7 @@ export function createInitialWorld(seed = 202608): WorldState {
   };
   refreshBuoyancy(world);
   seedDrift(world);
+  ensureNavigation(world);
   initializeHeat(world);
   return world;
 }
@@ -122,7 +125,8 @@ export function createInitialWorld(seed = 202608): WorldState {
 export function stepWorld(world: WorldState, ticks = 1, direction: Vec2 = {x: 0, y: 0}): void {
   for (let i = 0; i < ticks; i++) {
     world.tick += 1;
-    walk(world, direction);
+    walkExpedition(world, direction);
+    stepNavigation(world);
     stepCloud(world);
     advanceClimate(world);
     stepHeat(world);

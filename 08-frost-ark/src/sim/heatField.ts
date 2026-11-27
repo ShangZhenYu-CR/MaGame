@@ -2,6 +2,7 @@ import data from '../data/buildings.json';
 import items from '../data/items.json';
 import { getIndustrySave } from './m2-state';
 import { countItem, inventoryChange, isDeck } from './ark';
+import { expeditionTemperature } from './island';
 import { TICK_RATE, type BuildingInstance, type Vec2, type WorldState } from './types';
 
 export const DAY_TICKS=TICK_RATE*60*8;
@@ -45,7 +46,7 @@ export function upgradeHearth(w:WorldState):string|null {
 }
 export function heatAt(w:WorldState,x:number,y:number):number{
   const gx=Math.floor(x),gy=Math.floor(y);
-  return isDeck(w,gx,gy)?w.ark.heatGrid[gy*w.ark.size+gx]:w.ambientTemp;
+  return isDeck(w,gx,gy)?w.ark.heatGrid[gy*w.ark.size+gx]:(expeditionTemperature(w,x,y)??w.ambientTemp);
 }
 export function emitters(w:WorldState){
   return w.ark.buildings.flatMap(b=>{

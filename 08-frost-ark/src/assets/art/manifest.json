@@ -1344,6 +1344,246 @@
         46
       ],
       "bytes": 3864
+    },
+    "island-t1-ground-1": {
+      "file": "island-t1-ground-1.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 28757
+    },
+    "island-t1-ground-2": {
+      "file": "island-t1-ground-2.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 25600
+    },
+    "island-t2-ground-1": {
+      "file": "island-t2-ground-1.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 31135
+    },
+    "island-t2-ground-2": {
+      "file": "island-t2-ground-2.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 28590
+    },
+    "island-t1-cliff": {
+      "file": "island-t1-cliff.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 18,
+      "tileW": 1.25,
+      "tileH": 1.1,
+      "contentBox": [
+        2,
+        15,
+        126,
+        117
+      ],
+      "bytes": 20385
+    },
+    "island-t2-cliff": {
+      "file": "island-t2-cliff.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 18,
+      "tileW": 1.25,
+      "tileH": 1.1,
+      "contentBox": [
+        2,
+        15,
+        126,
+        119
+      ],
+      "bytes": 21430
+    },
+    "island-frost-pine": {
+      "file": "island-frost-pine.png",
+      "width": 160,
+      "height": 160,
+      "anchorX": 80,
+      "anchorY": 151,
+      "tileW": 1.43,
+      "tileH": 1.8,
+      "contentBox": [
+        22,
+        2,
+        138,
+        151
+      ],
+      "bytes": 32008
+    },
+    "island-frost-shrub": {
+      "file": "island-frost-shrub.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 42,
+      "anchorY": 121,
+      "tileW": 1,
+      "tileH": 0.95,
+      "contentBox": [
+        2,
+        40,
+        126,
+        121
+      ],
+      "bytes": 21528
+    },
+    "island-frost-iron": {
+      "file": "island-frost-iron.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        18,
+        126,
+        121
+      ],
+      "bytes": 27424
+    },
+    "island-coal": {
+      "file": "island-coal.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        38,
+        126,
+        121
+      ],
+      "bytes": 21651
+    },
+    "island-prismatic-ice": {
+      "file": "island-prismatic-ice.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1,
+      "tileH": 1.16,
+      "contentBox": [
+        10,
+        2,
+        119,
+        121
+      ],
+      "bytes": 25246
+    },
+    "island-ruin-open": {
+      "file": "island-ruin-open.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        5,
+        126,
+        121
+      ],
+      "bytes": 34929
+    },
+    "island-ruin-closed": {
+      "file": "island-ruin-closed.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        35,
+        126,
+        121
+      ],
+      "bytes": 28852
+    },
+    "ark-gangway": {
+      "file": "ark-gangway.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1.05,
+      "tileH": 1.05,
+      "contentBox": [
+        2,
+        19,
+        126,
+        105
+      ],
+      "bytes": 23980
+    },
+    "ark-helm": {
+      "file": "ark-helm.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.2,
+      "tileH": 1.24,
+      "contentBox": [
+        18,
+        2,
+        111,
+        121
+      ],
+      "bytes": 21865
     }
   }
 }

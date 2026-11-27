@@ -5,6 +5,7 @@ import { buildingAt, buildingDefs, hasCost, inventoryChange, isDeck, isEdgeDeck,
 import { heatAt } from './heatField';
 import { dropOnDeck, isDeckDrop } from './latte';
 import { ensureIndustrySave, getIndustrySave, type IndustryStation } from './m2-state';
+import { getNavigation } from './m3-state';
 import { TICK_RATE, type BuildingInstance, type ItemStack, type WorldState } from './types';
 
 const processable=new Set(['workbench','furnace','stove','greenhouse','catch_net','sorter_arm']);
@@ -195,6 +196,10 @@ function connectedWithout(w:WorldState,gx:number,gy:number):boolean{
 
 export function dismantleIssue(w:WorldState,gx:number,gy:number):string|null {
   if(!isDeck(w,gx,gy))return '这里没有可拆除的建筑或甲板';
+  if(w.activeIsland)return '返回方舟后才能拆除';
+  const dock=getNavigation(w)?.dock;
+  if(dock?.gx===gx&&dock.gy===gy)return '靠泊期间不能拆除登岛口';
+
   if(getIndustrySave(w)?.removal)return '上一项仍在撤销期';
   const b=buildingAt(w,gx,gy);
   if(b?.defId==='hearth_core'||b?.id==='storage_main')return '开局主炉与储物箱不可拆除';

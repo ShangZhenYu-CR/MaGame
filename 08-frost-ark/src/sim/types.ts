@@ -11,6 +11,7 @@ export type PortraitMood = 0 | 1 | 2 | 3; // head-0..head-3
 export interface ItemStack {
   itemId: string;
   count: number;
+  durability?: number;
 }
 
 export interface Vec2 {

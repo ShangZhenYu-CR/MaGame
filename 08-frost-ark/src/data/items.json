@@ -23,5 +23,9 @@
   { "id": "mithril_roast", "name": "秘银炙肉", "category": "bait", "stack": 20, "hunger": 50, "warmth": 38 },
   { "id": "grapple_hook", "name": "云海抓钩", "category": "tool", "stack": 1 },
   { "id": "torch_item", "name": "防风火把", "category": "tool", "stack": 20, "fuelValue": 24 },
+  { "id": "wood_axe", "name": "手斧", "category": "tool", "stack": 1 },
+  { "id": "mining_pick", "name": "矿镐", "category": "tool", "stack": 1 },
+  { "id": "frost_axe", "name": "霜铁手斧", "category": "tool", "stack": 1 },
+  { "id": "frost_pick", "name": "霜铁矿镐", "category": "tool", "stack": 1 },
   { "id": "paralysis_net", "name": "麻痹冰网", "category": "tool", "stack": 20 }
 ]

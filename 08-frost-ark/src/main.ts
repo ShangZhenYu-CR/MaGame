@@ -12,6 +12,10 @@ import { openArchive, savedWorld, storeWorld } from './ui/storage';
 import { createIndustryUi, itemList } from './ui/industry';
 import { dismantle, dismantleIssue, industryDistance, industryPanel, nearestIndustry } from './sim/industry';
 import { audio } from './audio/synth';
+import { navigationUi } from './ui/navigation';
+import { expeditionUi } from './ui/expedition';
+import { expeditionToolsUi } from './ui/expedition-tools';
+import biomes from './data/biomes.json';
 
 function el<T extends HTMLElement = HTMLElement>(id: string): T { return document.getElementById(id)! as T; }
 const canvas=el<HTMLCanvasElement>('game-canvas'), view=new ArkView(canvas);
@@ -50,7 +54,21 @@ const industry=createIndustryUi({
   state:()=>w, select:kind=>{industry.showCatalog(false);choose(kind);},
   message:finishAction,icon:iconPath,research:()=>{toggleCatalog(true);el('build-tech-title').scrollIntoView({block:'nearest'});},
 });
-function finishAction(issue:string|null,success:string,event?:'craft'|'undo'|'dismantle'|'place'):void{
+const chart=navigationUi({state:()=>w,icon:iconPath,close:()=>toggleChart(false),onCommand:finishAction});
+const expedition=expeditionUi({state:()=>w,message:finishAction});
+const toolUi=expeditionToolsUi({state:()=>w,icon:iconPath,message:finishAction});
+const skyToggle=el('sky-map-toggle');
+const helmIcon=iconPath('helm');
+if(helmIcon){const img=document.createElement('img');img.alt='';img.src=helmIcon;skyToggle.prepend(img);}
+const regions=new Map(biomes.map(b=>[b.id,b.name]));
+
+function toggleChart(show=!chart.open()):void{
+  if(!show){chart.hide();return;}
+  keys.clear();cancelCharge(w);expedition.cancel();industry.closeTip();chart.show();
+}
+skyToggle.onclick=()=>toggleChart();
+
+function finishAction(issue:string|null,success:string,event?:'craft'|'undo'|'dismantle'|'place'|'hit'):void{
   tell(issue??success);
   if(issue)return;
   if(event)audio.play(event);
@@ -59,6 +77,7 @@ function finishAction(issue:string|null,success:string,event?:'craft'|'undo'|'di
 function useNearby():void{
   if(industry.stationOpen()){industry.showStation(null);return;}
   if(!locker.hidden){toggleStorage(false);return;}
+  if(expedition.use())return;
   const box=nearestStorage(w), station=nearestIndustry(w);
   if(station&&(!box||industryDistance(w,station)<industryDistance(w,box)))openIndustry(station.id);
   else toggleStorage(true);
@@ -87,7 +106,7 @@ el('audio-toggle').onclick=toggleMute;
 el('build-catalog-toggle').onclick=()=>toggleCatalog();
 
 function itemLabel(label:HTMLElement,itemId:string):void {
-  const path=iconPath(itemId.replaceAll('_','-'))??iconPath(itemIcons[itemId]??'');
+  const path=toolUi.iconFor(itemId)??iconPath(itemId.replaceAll('_','-'))??iconPath(itemIcons[itemId]??'');
   if(!path)return;
   const icon=document.createElement('img');icon.alt='';icon.src=path;
   label.classList.add('item-name');label.prepend(icon);
@@ -184,11 +203,11 @@ function saveNow():Promise<void> {
   return saveQueue;
 }
 function safeWorld(next:WorldState):void {
-  w=next;toggleStorage(false);industry.showStation(null);industry.showCatalog(false);lockerSignature='';cancelCharge(w);
+  expedition.cancel();chart.hide(false);w=next;toggleStorage(false);industry.showStation(null);industry.showCatalog(false);lockerSignature='';cancelCharge(w);
   caught=null;keys.clear();messageUntil=0;message='';stackSignature='';view.position(w);fillBag();
 }
 function ghostAt(): Ghost|null {
-  if(mode==='hook'||!pointer)return null;
+  if(mode==='hook'||!pointer||expedition.area()!=='ark')return null;
   const at=view.world(pointer.x,pointer.y), x=Math.floor(at.x), y=Math.floor(at.y);
   const targeted=mode==='dismantle'?buildingAt(w,x,y):null;
   const issue=mode==='dismantle'?dismantleIssue(w,x,y):buildIssue(w,mode,x,y);
@@ -238,7 +257,7 @@ input.onchange=async()=>{
   }catch(e){tell('导入失败：'+(e instanceof Error?e.message:'文件无法读取'));}
 };
 addEventListener('resize',()=>view.resize(w));
-addEventListener('blur',()=>{keys.clear();cancelCharge(w);});
+addEventListener('blur',()=>{keys.clear();cancelCharge(w);expedition.cancel();});
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden){ keys.clear();cancelCharge(w);void saveNow(); }
 });
@@ -247,10 +266,15 @@ addEventListener('keydown',e=>{
   const k=e.key.toLowerCase();
   if(e.ctrlKey||e.metaKey||e.altKey||e.target===input)return;
   audio.unlock();
+  if(chart.open()){
+    if(!e.repeat&&(k==='escape'||k==='n')){e.preventDefault();toggleChart(false);}
+    else if(!e.repeat&&k==='m')toggleMute();
+    return;
+  }
   if('wasd'.split('').includes(k)){keys.add(k);e.preventDefault();return;}
   if(e.repeat)return;
   if(k==='escape'){
-    industry.closeTip();
+    expedition.cancel();industry.closeTip();
     if(industry.stationOpen())industry.showStation(null);
     else if(industry.catalogOpen())toggleCatalog(false);
     else if(!locker.hidden)toggleStorage(false);
@@ -258,6 +282,7 @@ addEventListener('keydown',e=>{
     else if(mode!=='hook')choose('hook');
     else cancelCharge(w);
   } else if(k==='e')useNearby();
+  else if(k==='n'){e.preventDefault();toggleChart();}
   else if(k==='b')toggleCatalog();
   else if(k==='x'){toggleCatalog(false);choose(mode==='dismantle'?'hook':'dismantle');}
   else if(k==='z')industry.undoAction();
@@ -279,10 +304,11 @@ canvas.addEventListener('pointermove',e=>{
 });
 canvas.addEventListener('pointerleave',()=>{pointer=null;});
 canvas.addEventListener('pointerdown',e=>{
-  if(!active||e.button!==0)return;
+  if(!active||e.button!==0||chart.open())return;
   pointer={x:e.clientX,y:e.clientY};
   const at=view.world(e.clientX,e.clientY);
   const x=Math.floor(at.x),y=Math.floor(at.y);
+  if((mode==='hook'||expedition.area()!=='ark')&&expedition.pointer(at))return;
   if(mode==='hook'){
     const hit=buildingAt(w,x,y);
     if(hit&&hit.id===nearestStorage(w)?.id){toggleStorage();return;}
@@ -346,7 +372,11 @@ function frame(now:number):void {
     audio.update({wind:w.weather==='whiteout'?.96:w.weather==='snow'?.72:.19,
       fire:h&&h.fuel>0?Math.min(1,Math.max(0,(local+8)/44)):0});
   }
-  industry.update();
+  industry.update();chart.paint(false,now);
+  const here=expedition.update(now,chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||(mode!=='hook'&&expedition.area()==='ark'));
+  toolUi.update(here);
+  const region=regions.get(w.activeIsland?.biomeId??w.sky.islands.find(n=>n.id===w.ark.anchoredIslandId)?.biomeId??'')??'碎云浅海';
+  if(el('sector-name').textContent!==region)el('sector-name').textContent=region;
   setVital(0,w.player.warmth,w.player.maxWarmth);
   setVital(1,w.player.hp,w.player.maxHp);
   setVital(2,h?.fuel??0,FUEL_MAX[Math.min(2,h?.level??0)]||120);
@@ -363,13 +393,13 @@ function frame(now:number):void {
   if(mood!==w.player.portraitMood){mood=w.player.portraitMood;portrait.src=portraits[mood]??portraits[0];}
   toast(caught?'正在拉回：'+catchName:g.charging?'抓钩蓄力 '+Math.round(g.charge*100)+'%':
     g.active?'抓钩已抛出…':now<messageUntil?message:'');
-  const interactionHint=mode==='hook'?(nearbyStorage()?'按 E 或点击储物箱存取物品':nearestIndustry(w)?'按 E 或点击加工站操作':'按住左键蓄力，松开抛钩'):
+  const interactionHint=here==='island'?'靠近资源按 E 采集 · I 制作和修理工具':here==='gangway'?'沿跳板继续走 · 无需切换场景':mode==='hook'?(nearbyStorage()?'按 E 或点击储物箱存取物品':nearestIndustry(w)?'按 E 或点击加工站操作':'按住左键蓄力，松开抛钩'):
     mode==='wood_deck'?'移动鼠标贴合甲板直边，左键拼接':mode==='torch_post'?'先在背包手搓火把，再选空甲板放置':
     mode==='wind_wall'?'挡风墙放在空甲板，减缓周围热量散失':mode==='dismantle'?'点击选中拆除目标；可按 Z 撤销':
     `${buildDefinitions[mode].name} · 移到甲板预览后左键放置`;
   if(hint.textContent!==interactionHint)hint.textContent=interactionHint;
   meter.hidden=!g.charging;bar.style.width=(g.charge*100)+'%';
-  note.hidden=mode==='hook'||!pointer;
+  note.hidden=mode==='hook'||!pointer||here!=='ark';
   view.draw(w,ghostAt());
   if(!panel.hidden)fillBag();
   if(!locker.hidden)fillLocker();

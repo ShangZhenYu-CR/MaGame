@@ -5,6 +5,9 @@ import { primaryHearth } from '../sim/heatField';
 import { isDeckDrop } from '../sim/latte';
 import { buildingDefs } from '../sim/ark';
 import { getIndustrySave } from '../sim/m2-state';
+import { dockedIsland, gangwayGeometry, islandNodes, islandNodeRemaining } from '../sim/island';
+import { helmPoint } from '../sim/sky-map';
+import { ISLAND_ART, islandActor, islandCameraExtent, paintGangway, paintIsland } from './island-view';
 import { aimEnd, hookTip } from '../sim/cloud';
 import type { Vec2, WorldState } from '../sim/types';
 import { PALETTE as P } from './palette';
@@ -30,7 +33,7 @@ const ironDeck='building-iron-deck';
 const required=[
   ...deckIds,'manan-south','manan-north','manan-west','manan-east','latte-sleep','latte-alert','latte-walk','latte-walk-alt',
   'hearth-1','hearth-2','rail','corner','rock','icicles',ironDeck,...Object.values(buildingVisuals).map(v=>v.art),
-  'debris-wood','debris-iron','debris-rope','clouds','rail-side','rock-side','frost-frame',
+  'debris-wood','debris-iron','debris-rope','clouds','rail-side','rock-side','frost-frame',...ISLAND_ART,
 ] as const;
 interface Cell { x:number; y:number; hash:number; iron:boolean; temperature:number; left:boolean; right:boolean; front:boolean; back:boolean }
 interface Actor {
@@ -77,9 +80,24 @@ export class ArkView {
     this.scale=this.userScale??clamp(Math.round(Math.min(width/15.2,height/10.7)),56,64);
     const deadzoneX=clamp((width/this.scale-6)/2,.2,2.5);
     const deadzoneY=clamp(height/this.scale*.34-.55,.15,2.8);
-    const cx=center+Math.sign(w.player.x-center)*Math.max(0,Math.abs(w.player.x-center)-deadzoneX);
-    const cy=center+Math.sign(w.player.y-center)*Math.max(0,Math.abs(w.player.y-center)-deadzoneY);
-    this.origin={x:Math.round(width/2-cx*this.scale),y:Math.round(height*.414+clamp((680-height)*.15,0,24)-cy*this.scale)};
+    let cx=center+Math.sign(w.player.x-center)*Math.max(0,Math.abs(w.player.x-center)-deadzoneX);
+    let cy=center+Math.sign(w.player.y-center)*Math.max(0,Math.abs(w.player.y-center)-deadzoneY);
+    const island=dockedIsland(w);
+    let yFraming=.414;
+    if(island){
+      const bounds=islandCameraExtent(island);
+      const connection=gangwayGeometry(w);
+      // Reveal the shore from the deck and track the player over the same world
+      // coordinates. Neither zoom nor crossing relocates the camera namespace.
+      const landWeight=clamp((w.player.x-(connection?.x??bounds.left)+1.1)/5.2);
+      const shoreNudge=clamp((bounds.left-center)*.40,1.7,4.1);
+      const landX=clamp(w.player.x+.7,center+shoreNudge,bounds.right-1.65);
+      const landY=clamp(w.player.y,bounds.top+1.4,bounds.bottom-1.55);
+      cx=(cx+shoreNudge)*(1-landWeight)+landX*landWeight;
+      cy=cy*(1-landWeight)+landY*landWeight;
+      yFraming+=landWeight*.064;
+    }
+    this.origin={x:Math.round(width/2-cx*this.scale),y:Math.round(height*yFraming+clamp((680-height)*.15,0,24)-cy*this.scale)};
     const data=this.canvas.dataset;
     if(data.tileScale!==String(this.scale))data.tileScale=String(this.scale);
     if(data.originX!==String(this.origin.x))data.originX=String(this.origin.x);
@@ -119,7 +137,9 @@ export class ArkView {
     }
 
     // L0: Parallax cloud ocean and high-altitude haze.
-    cloudscape(c,this.art.image('clouds'),w,this.origin);
+    cloudscape(c,this.art.image('clouds'),w,{
+      x:this.origin.x+w.sky.x*3.5,y:this.origin.y+w.sky.y*1.9,
+    });
     // Free-floating scrap belongs to the lower air lane. Hull silhouettes can
     // occlude it; deck drops only enter the foreground after a grab/placement.
     const pl=w.player,g=pl.grapple;
@@ -138,9 +158,24 @@ export class ArkView {
       c.restore();
       ovalGlow(c,pos.x+s*.07,fy-s*.12,s*.55,s*.13,'rgba(159,192,211,.19)','rgba(159,192,211,0)');
     }
-    // L1: Projected hull, deck, and generated structural fittings.
+    // L1: Both traversable surfaces and the physical gangway share one
+    // projection and one scenery pass, including the space between them.
+    const island=dockedIsland(w), gangway=gangwayGeometry(w);
+    if(island)paintIsland(c,this.art,island,project,s,w.tick);
     const b=this.deckStructure(c,cells,w);
-    const actors:Actor[]=[...this.edgeActors(cells,w,ghost),...deckDrops];
+    if(gangway?.deployed)paintGangway(c,this.art,gangway,project,s);
+    const actors:Actor[]=[...this.edgeActors(cells,w,ghost,gangway),...deckDrops];
+    if(island){
+      for(const node of islandNodes(w)){
+        const p=project(node.x,node.y);
+        if(p.x< -s*2||p.x>width+s*2||p.y< -s*2||p.y>height+s*3)continue;
+        const actor=islandActor(node,islandNodeRemaining(w,node),island.biomeId);
+        if(actor)actors.push(actor);
+      }
+    }
+    const helm=helmPoint(w);
+    actors.push({...helm,art:'ark-helm',width:.98,height:1.24,shadow:.38,
+      rotation:w.sky.cruising?Math.sin(w.tick*.085)*.017:0});
     const fire=primaryHearth(w);
     for(const bld of w.ark.buildings){
       const {gx,gy}=bld;
@@ -307,7 +342,7 @@ export class ArkView {
     c.fill();c.restore();
   }
 
-  private edgeActors(cells:Cell[],w:WorldState,ghost:Ghost|null):Actor[]{
+  private edgeActors(cells:Cell[],w:WorldState,ghost:Ghost|null,gangway:ReturnType<typeof gangwayGeometry>):Actor[]{
     const trims:Actor[]=[];
     const put=(x:number,y:number,art:string,width:number,height:number,flip=false)=>
       trims.push({x,y,art,width,height,shadow:art==='corner'?.17:.26,flip});
@@ -317,11 +352,12 @@ export class ArkView {
     const hasNet=(x:number,y:number)=>w.ark.buildings.some(b=>b.defId==='catch_net'&&b.gx===x&&b.gy===y);
     for(const t of cells){
       const {x,y}=t;
+      const bridgeExit=!!gangway?.deployed&&Math.abs((x+1)-gangway.x)<1.1&&y<gangway.y+gangway.height&&y+1>gangway.y;
       // A main gap on each side of the launch deck; expanded cells follow the outer contour.
       if(t.back&&!hasNet(x,y)&&!hasGhost(x,y-1)&&x!==center)put(x+.5,y+.10,'rail',1.18,.54);
       if(t.front&&!hasNet(x,y)&&!hasGhost(x,y+1)&&x!==center)put(x+.5,y+.97,'rail',1.14,.55);
       if(t.left&&!hasNet(x,y)&&!hasGhost(x-1,y)&&y!==center-1)put(x+.08,y+1.02,'rail-side',.405,1.11);
-      if(t.right&&!hasNet(x,y)&&!hasGhost(x+1,y)&&y!==center-1)put(x+.92,y+1.02,'rail-side',.405,1.11,true);
+      if(t.right&&!bridgeExit&&!hasNet(x,y)&&!hasGhost(x+1,y)&&y!==center-1)put(x+.92,y+1.02,'rail-side',.405,1.11,true);
       if(t.back&&t.left)put(x+.10,y+.12,'corner',.43,.58,true);
       if(t.back&&t.right)put(x+.88,y+.12,'corner',.43,.58);
       if(t.front&&t.left)put(x+.10,y+.99,'corner',.43,.58,true);

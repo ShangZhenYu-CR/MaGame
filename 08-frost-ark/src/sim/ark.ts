@@ -3,6 +3,7 @@ import recipes from '../data/recipes.json';
 import items from '../data/items.json';
 import tech from '../data/tech.json';
 import { getIndustrySave } from './m2-state';
+import { getNavigation } from './m3-state';
 import type { BuildingInstance, ItemStack, Vec2, WorldState } from './types';
 
 export const buildKinds = [
@@ -111,6 +112,11 @@ export function buildIssue(w: WorldState, kind: BuildKind, x: number, y: number)
   if(!def)return '未知建筑';
   const [sw,sh]=def.size;
   if(!Number.isInteger(x)||!Number.isInteger(y)||x<0||y<0||x+sw>w.ark.size||y+sh>w.ark.size)return '超出方舟范围';
+  const dock=getNavigation(w)?.dock;
+  if(dock && ((x<=dock.gx&&x+sw>dock.gx&&y<=dock.gy&&y+sh>dock.gy&&kind!=='wood_deck'&&kind!=='iron_deck') ||
+    (x>dock.gx&&y<=dock.gy&&y+sh>dock.gy)))return '给登岛跳板留出右舷航道';
+  if(w.activeIsland)return '返回方舟后才能建造';
+
   const node=tech.nodes.find(n=>n.unlocksBuildings.includes(kind));
   if(!node||!w.unlockedTech.includes(node.id))return '先在木工台研究「'+(node?.name??'该项工艺')+'」';
   const pending=getIndustrySave(w)?.removal;

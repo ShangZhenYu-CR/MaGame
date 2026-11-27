@@ -1,5 +1,29 @@
 [
   {
+    "id": "craft_wood_axe",
+    "station": "hand",
+    "output": { "itemId": "wood_axe", "count": 1 },
+    "inputs": [{ "itemId": "driftwood", "count": 2 }, { "itemId": "rope", "count": 1 }]
+  },
+  {
+    "id": "craft_mining_pick",
+    "station": "hand",
+    "output": { "itemId": "mining_pick", "count": 1 },
+    "inputs": [{ "itemId": "driftwood", "count": 3 }, { "itemId": "rope", "count": 1 }, { "itemId": "frost_iron_scrap", "count": 1 }]
+  },
+  {
+    "id": "upgrade_frost_axe",
+    "station": "hand",
+    "output": { "itemId": "frost_axe", "count": 1 },
+    "inputs": [{ "itemId": "wood_axe", "count": 1 }, { "itemId": "frost_iron_ingot", "count": 1 }, { "itemId": "rope", "count": 1 }]
+  },
+  {
+    "id": "upgrade_frost_pick",
+    "station": "hand",
+    "output": { "itemId": "frost_pick", "count": 1 },
+    "inputs": [{ "itemId": "mining_pick", "count": 1 }, { "itemId": "frost_iron_ingot", "count": 1 }, { "itemId": "rope", "count": 1 }]
+  },
+  {
     "id": "craft_torch",
     "station": "hand",
     "output": { "itemId": "torch_item", "count": 2 },

@@ -23,7 +23,7 @@
       <div class="survival-row lift-row numbers"><label for="buoyancy-gauge">浮力</label><meter id="buoyancy-gauge" min="0" max="64"></meter><output id="buoyancy-spare"></output></div>
     </div>
   </header>
-  <aside class="sector"><div class="eyebrow">SKY SECTOR <span>01</span></div><strong>碎云浅海</strong><div id="weather-status" class="numbers"></div><div id="latte-status"></div><div class="hearth-tools"><button id="fuel-hearth" type="button"><kbd>R</kbd> 添柴</button><button id="upgrade-hearth" type="button" title="浮木板 ×4、冻铁废件 ×2"><kbd>U</kbd> 升炉</button></div></aside>
+  <aside class="sector"><div class="eyebrow">SKY SECTOR <span>01</span></div><strong id="sector-name">碎云浅海</strong><div id="weather-status" class="numbers"></div><div id="latte-status"></div><div class="hearth-tools"><button id="fuel-hearth" type="button"><kbd>R</kbd> 添柴</button><button id="upgrade-hearth" type="button" title="浮木板 ×4、冻铁废件 ×2"><kbd>U</kbd> 升炉</button></div></aside>
   <div id="action" class="toast" role="status" data-shown="false"></div>
   <div class="meter" id="meter" hidden><div id="charge-bar"></div></div>
   <nav class="toolbar" aria-label="方舟操作">
@@ -37,6 +37,10 @@
     <div class="panel-head"><div><div class="eyebrow">FIELD PACK</div><h2>背包</h2></div><button id="close" type="button" aria-label="关闭背包">关闭</button></div>
     <ul id="stacks"></ul>
     <section class="craft"><p>手制火把 <small>浮木板 ×2　旧缆绳 ×1</small></p><button type="button" id="craft-torch">制作 ×2</button></section>
+    <section id="expedition-toolcraft" aria-labelledby="expedition-toolcraft-title">
+      <h3 id="expedition-toolcraft-title">远征工具</h3><p class="panel-intro">配齐手斧和矿镐，登岛时会自动选用。</p>
+      <div id="toolcraft-actions"></div>
+    </section>
     <footer><button id="export" type="button">导出 JSON</button><button id="import" type="button">导入 JSON</button><input type="file" id="save-file" accept=".json,application/json" hidden></footer>
   </aside>
   <aside id="storage-panel" class="inventory storage" aria-label="储物箱" hidden>
@@ -63,8 +67,52 @@
   <div class="m2-tools" aria-label="建造操作">
     <button type="button" id="build-catalog-toggle" aria-expanded="false" aria-controls="build-catalog" data-tip="选择蓝图，查看材料和浮力预算"><kbd>B</kbd> 建造手册</button>
     <button type="button" id="dismantle-mode" aria-pressed="false" data-tip="点击一处建筑或可拆甲板；拆除后可在 4 秒内撤销"><kbd>X</kbd> 拆除</button>
+    <button type="button" id="sky-map-toggle" aria-expanded="false" aria-controls="sky-map" data-tip="打开航图，检查风区、可用岛屿与当前航向"><kbd>N</kbd> 航图</button>
     <button type="button" id="audio-toggle" aria-pressed="false" data-tip="开关炉火、风雪和施工音效"><kbd>M</kbd> 音效开</button>
   </div>
+  <div id="expedition-context" class="expedition-context" hidden>
+    <div><span class="eyebrow" id="expedition-eyebrow">CLOUD EXPEDITION</span><strong id="expedition-title"></strong><small id="expedition-detail"></small></div>
+    <button type="button" id="expedition-interact"><kbd>E</kbd><span>互动</span></button>
+    <progress id="expedition-progress" max="1" value="0" aria-label="采集进度" hidden></progress>
+  </div>
+  <aside id="expedition-tools" class="expedition-tools" aria-label="远征工具耐久" hidden>
+    <div class="expedition-tool"><img alt="" id="axe-art" hidden><label for="axe-durability">手斧</label><meter id="axe-durability" min="0" max="1" value="0"></meter><output id="axe-condition"></output></div>
+    <div class="expedition-tool"><img alt="" id="pickaxe-art" hidden><label for="pickaxe-durability">矿镐</label><meter id="pickaxe-durability" min="0" max="1" value="0"></meter><output id="pickaxe-condition"></output></div>
+  </aside>
+  <dialog id="sky-map" aria-labelledby="sky-map-title">
+    <header class="sky-map-head">
+      <div><div class="eyebrow">SKY ATLAS <span>／</span> 方舟领航台</div><h2 id="sky-map-title">云海航图</h2></div>
+      <button type="button" id="sky-map-close" aria-label="关闭云海航图">关闭</button>
+      <p id="sky-nav-status" class="numbers"></p>
+    </header>
+    <div class="sky-map-layout">
+      <div id="sky-chart" class="sky-chart" aria-label="方舟与已发现浮岛相对位置">
+        <svg viewBox="0 0 600 400" aria-hidden="true" class="sky-chart-lines" preserveAspectRatio="none">
+          <defs><pattern id="chart-grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#7598b4" opacity=".28"/></pattern></defs>
+          <path d="M0 0H600V400H0Z" fill="url(#chart-grid)"/>
+          <ellipse id="sky-scan-ring" cx="300" cy="200" rx="140" ry="140"/>
+          <ellipse id="sky-dock-ring" cx="300" cy="200" rx="20" ry="20"/>
+          <path id="sky-line" d="M300 200L300 200"/>
+        </svg>
+        <div class="sky-compass" aria-hidden="true">北<br><span>↑</span></div>
+        <div class="sky-map-ark" aria-hidden="true"><i></i><span>方舟</span></div>
+        <div id="sky-markers"></div>
+        <div class="sky-legend"><i></i> 发现范围 <i></i> 靠泊范围</div>
+      </div>
+      <section class="sky-route" aria-labelledby="sky-destination">
+        <div class="eyebrow">DESTINATION <span>／</span> 航向记录</div>
+        <h3 id="sky-destination">未选择浮岛</h3>
+        <p id="sky-destination-detail">先在航图上选择已发现的浮岛。</p>
+        <div id="sky-island-list"></div>
+        <p id="sky-map-hint" role="status"></p>
+        <div class="sky-actions">
+          <button type="button" id="sky-set-course">设为目的地</button>
+          <button type="button" id="sky-cruise">开始巡航</button>
+        </div>
+      </section>
+    </div>
+    <footer>在舵轮旁设航向，靠泊后到跳板口按 <kbd>E</kbd>。登岛后仍用 <kbd>WASD</kbd> 移动。</footer>
+  </dialog>
   <div class="undo-strip" id="dismantle-undo" hidden>
     <span id="dismantle-name" role="status"></span><button id="undo-dismantle" type="button"><kbd>Z</kbd> 撤销 <output id="undo-seconds" class="numbers"></output></button>
     <progress max="4" value="4" id="undo-progress" aria-label="剩余撤销时间"></progress>

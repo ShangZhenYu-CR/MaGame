@@ -114,3 +114,10 @@
 - **门禁**：`npm run gate` 完整通过；干净解压交付 ZIP 再用 `file://` 跑同套浏览器回归也通过，两条路径均无页面/控制台报错，原 M0–M6 和 P2-01 至 P2-11 都保留。存档 v9 可加载 v1–v8；正式 PNG 153 张，2,813,578 字节。
 - **交付**：[27 张实机图与审片](https://drive.google.com/drive/folders/1feAqdTeyB1x1u0peTJQlCpk3pnz4nXH1) · [离线试玩 ZIP](https://drive.google.com/file/d/1uoF9aFCu8wKXDWt4AGCmzYnKl9FsCvYu/view) · [S2 验收报告](https://drive.google.com/file/d/1wg150hLGw9QnVAwVFX9vT8vgIu8utukG/view) · [两套门禁日志](https://drive.google.com/file/d/1JxfIXWMVDBPX8LYQESTatSqo48bDAj17/view?usp=drivesdk)。实际可玩构建 `848c84c66886b38a72f9b55756f30c4b96fa510d`，仅更新开发分支。
 - **【偏离报告】**：第一轮回归暴露了打开背包时鼠标点火把不能选建造，已修并保留原断言复测。部分战斗是实机准备档，不能代替 P2-42 后的自然档与全量终验；极光岛地表重复感留给 S4 对应地貌单。继续 S3，不碰 `main`。
+
+## 2026-11-28（北京时间） · Phase 2 / S3 暖室、物流与巨舰验收
+
+- **P2-12 至 P2-17**：门和气闸封闭暖室并实机挡雪；捕网经分拣臂与蒸汽槽把物资送进箱、料斗和炉子；帆与推进器改变逆风航速；可跨过的热管把热送到温室，维修台支持单修与整船维护；家具让舒适度从 Lv.2 升至 Lv.5，安全夜过夜；21×21 方舟热力雷达及四向自动靠泊、实机进岛回船。
+- **双门禁**：`npm run gate` 和全新路径独立解压试玩 ZIP 后的 `file://` 浏览器全回归均通过；保留 M0–M6 与 P2-01 至 P2-17 断言，双路径页面异常和控制台错误都为 0。真实物流分别跑满 181.3 秒、5,432 tick 和 181.0 秒、5,420 tick，确认入库、续燃和加工，另有一轮 265.5 秒逐条运输痕迹。
+- **交付**：[32 张实机截图与双背景审片](https://drive.google.com/drive/folders/1DwG6MGIr-eHBdmhVdb2OQuVLp7YIlyMn) · [S3 实机试玩 ZIP](https://drive.google.com/file/d/1riUI4WR79zlq1h5jMCN2tZjAcpARf0SL/view) · [报告](https://drive.google.com/file/d/1RSccWSzj93hjH_OXnhL96Jzjl4Y8UNSy/view) · [双门禁、物流与性能原始记录](https://drive.google.com/file/d/1FnVCmHkac01I2uouQ5bs3qBKpgLYP3DH/view)。S3 可玩构建 `44e1933ba103a87dcca0210e18084f2fd0b635e7`，存档 v15，正式美术 189 件合计 3,492,385 字节。
+- **【偏离报告】**：核心玩法无删减。云端软件绘制的 1080p 暴雪测试中，21×21 方舟的中位帧间隔从约 700 ms 降到约 67 ms，与同环境 7×7 开局船相当，不代表达到 60 FPS 或正式巨舰终验。S3 使用专项准备档，既不替代自然新档，也不替代 P2-42 后的七组终验。`main` 和 Pages 不动，继续 S4，P2-18、P2-19 随后一单一推。

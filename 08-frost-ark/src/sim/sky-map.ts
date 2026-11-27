@@ -1,3 +1,4 @@
+import { rigDrive,sailingRig } from './rigging';
 import { buildingAt, isDeck } from './ark';
 import { ensureNavigationState, getNavigation } from './m3-state';
 import { beastCompanions, crewCruiseMultiplier } from './beasts';
@@ -110,6 +111,9 @@ function findDock(w:WorldState){
   return null;
 }
 
+export function cruiseSpeed(w:WorldState,dx=w.sky.headingX,dy=w.sky.headingY){
+  return CRUISE_SPEED*crewCruiseMultiplier(w)*(w.weather==='whiteout'?.7:w.weather==='snow'?.85:1)*rigDrive(w,dx,dy).multiplier;
+}
 export function stepNavigation(w:WorldState):void{
   if(!w.sky.cruising)return;
   const nav=ensureNavigationState(w);
@@ -126,10 +130,10 @@ export function stepNavigation(w:WorldState):void{
     nav.dock={nodeId:destination.id,...dock,deployed:false};
     return;
   }
-  const speed=CRUISE_SPEED*crewCruiseMultiplier(w)*(w.weather==='whiteout'?.7:w.weather==='snow'?.85:1)/TICK_RATE;
   w.sky.headingX=dx/gap;w.sky.headingY=dy/gap;
+  const speed=cruiseSpeed(w)/TICK_RATE;
   w.sky.x+=w.sky.headingX*Math.min(gap,speed);
   w.sky.y+=w.sky.headingY*Math.min(gap,speed);
-  const eyes=beastCompanions(w).some(b=>b.defId==='galehawk')?1.3:1;
+  const eyes=(beastCompanions(w).some(b=>b.defId==='galehawk')?1.3:1)+sailingRig(w).vanes*.10;
   for(const n of w.sky.islands)if(distance(w,n)<=DISCOVERY_RADIUS*eyes)n.discovered=true;
 }

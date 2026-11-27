@@ -7,6 +7,7 @@ import { bindTooltips } from './tooltip';
 
 const el=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id)! as T;
 const descriptions:Partial<Record<BuildKind,string>>={
+ wind_sail:'增加巡航速度，顺风鼓帆更快。',steam_thruster:'提高巡航推力并抵消逆风阻力。',wind_vane:'减少偏航损耗，扩大新岛搜寻范围。',
  fuel_hopper:'自动给紧邻的主炉或熔炉补燃料。',steam_chute:'将相邻分拣臂与远端容器相连。',
  wind_door:'E 开关，关闭时可封住房间。',frost_airlock:'只为马楠和伙伴打开，离开后自动闭合。',
  frost_turret:'远射自动防御塔，暖区供能时拦截敌袭。',
@@ -47,7 +48,7 @@ export function createIndustryUi(cb:Callbacks){
  let activeStation:string|null=null,catalogKey='',stationKey='',liftKey='',routeKey='';
  const buttons=new Map<BuildKind,HTMLButtonElement>();
  const itemIcon=(id:string)=>cb.icon(id.replaceAll('_','-'))??cb.icon(materialIcons[id]??'');
- const lateBlueprints=new Set<string>(['beast_den','feed_trough','frost_turret','fire_oil_turret','wind_door','frost_airlock','fuel_hopper','steam_chute']);
+ const lateBlueprints=new Set<string>(['beast_den','feed_trough','frost_turret','fire_oil_turret','wind_door','frost_airlock','fuel_hopper','steam_chute','wind_sail','steam_thruster','wind_vane']);
  const categoryGroup=(kind:BuildKind)=>el(['workbench','furnace','stove','catch_net','sorter_arm','greenhouse','beast_den','feed_trough','fuel_hopper','steam_chute'].includes(kind)?'catalog-industry':'catalog-structure');
  for(const kind of buildKinds){
   const def=buildDefinitions[kind],[gw,gh]=def.size;

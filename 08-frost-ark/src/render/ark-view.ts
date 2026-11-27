@@ -1,3 +1,4 @@
+import { cruiseSpeed } from '../sim/sky-map';
 import { transportEvents } from '../sim/logistics';
 import { doorOpen,indoor } from '../sim/rooms';
 import { ELEMENT_ART,paintElementAura,paintElementSigns } from './element-view';
@@ -39,6 +40,9 @@ const buildingVisuals:Readonly<Record<string,BuildingVisual>>={
   catch_net:{art:'building-net',width:1.23,height:1.20,shadow:.45},
   sorter_arm:{art:'building-sorter',width:1.20,height:1.46,shadow:.47},
   greenhouse:{art:'building-greenhouse',width:2.26,height:2.17,shadow:.98},
+  wind_sail:{art:'building-wind-sail',width:1.40,height:1.50,shadow:.50},
+  steam_thruster:{art:'building-steam-thruster',width:1.20,height:1.34,shadow:.50},
+  wind_vane:{art:'building-wind-vane',width:1.16,height:1.38,shadow:.36},
   fuel_hopper:{art:'building-fuel-hopper',width:1.13,height:1.12,shadow:.46},
   steam_chute:{art:'building-steam-chute',width:1.17,height:1.04,shadow:.46},
   wind_door:{art:'building-wind-door',width:1.12,height:1.14,shadow:.45},
@@ -59,7 +63,7 @@ const required=[
 interface Cell { x:number; y:number; hash:number; iron:boolean; temperature:number; left:boolean; right:boolean; front:boolean; back:boolean }
 interface Actor {
   id?:string;x:number;y:number;art:string;shadow:number;
-  width?:number;height?:number;rotation?:number;scale?:number;flip?:boolean;float?:number;fire?:'hearth'|'torch'|'forge'|'stove'|'relay';hearthLevel?:number;
+  steam?:boolean;width?:number;height?:number;rotation?:number;scale?:number;flip?:boolean;float?:number;fire?:'hearth'|'torch'|'forge'|'stove'|'relay';hearthLevel?:number;
 }
 function dataHull(canvas:HTMLCanvasElement,hull:HullProfile):void{
   canvas.dataset.hullCones=String(hull.cones.reduce((n,x)=>n+x,0));
@@ -272,7 +276,8 @@ export class ArkView {
       const effect=bld.defId==='torch_post'?'torch':bld.defId==='heat_relay'?'relay':
         working?(bld.defId==='furnace'?'forge':bld.defId==='stove'?'stove':undefined):undefined;
       const doorArt=doorOpen(bld)?visuals.art+'-open':visuals.art;
-      actors.push({...visuals,art:doorArt,id:bld.id,x:gx+spanX*.5,y:gy+(GROUND_FOOTPRINTS[bld.defId]?.anchorY??spanY*.80),fire:effect});
+      const r=w.sky.cruising&&bld.hp>1&&bld.defId==='wind_sail'?.032*Math.sin(w.tick*.31+gx):undefined;
+      actors.push({...visuals,art:doorArt,id:bld.id,rotation:r,steam:w.sky.cruising&&bld.defId==='steam_thruster'&&bld.hp>1,x:gx+spanX*.5,y:gy+(GROUND_FOOTPRINTS[bld.defId]?.anchorY??spanY*.80),fire:effect});
     }
     const latte=w.latte;
     const catWalking=fire?Math.hypot(latte.x-fire.gx-2.4,latte.y-fire.gy-2.4)>.23:false;
@@ -315,6 +320,9 @@ export class ArkView {
     }
     if(ghost)this.paintGhost(c,ghost);
 
+    const speed=w.sky.cruising?cruiseSpeed(w):0,navSpeed=speed.toFixed(2);
+    if(this.canvas.dataset.cruiseSpeed!==navSpeed)this.canvas.dataset.cruiseSpeed=navSpeed;
+    const jets:Vec2[]=[];
     // L3: Ground-point based depth ordering (including foreground edge fittings).
     actors.sort((a,b)=>a.y-b.y);
     for(const actor of actors){
@@ -323,9 +331,23 @@ export class ArkView {
       if(glow){c.save();c.filter='brightness(2.55) saturate(.15)';}
       this.art.paint(c,actor.art,p.x,p.y-(actor.float??0)-this.juice.bounce(actor.id,now)*s,s,actor);
       if(glow)c.restore();
+      if(actor.steam)jets.push(p);
       if(actor.fire)this.paintFire(c,actor,p,w.tick);
       paintElementAura(c,w,actor,p,s);
     }
+    for(const p of jets){
+      c.save();c.globalCompositeOperation='screen';
+      const lead=w.sky.headingX;
+      for(let i=21;i>=0;i--){
+        const u=(w.tick*(.043+speed*.011)+i*.049)%1,side=i%2===0?-.12:.12;
+        const x=p.x+s*(side-lead*u*.52+Math.sin(i*9.12+w.tick*.19)*u*.26);
+        const y=p.y+s*(.16+u*(1.43+speed*.072));
+        c.globalAlpha=Math.max(0,1-u)*.83;
+        ovalGlow(c,x,y,s*(.09+u*.43),s*(.08+u*.24),'rgba(249,235,208,.88)','rgba(190,214,229,0)');
+      }
+      c.restore();
+    }
+    if(this.canvas.dataset.steamJets!==String(jets.length))this.canvas.dataset.steamJets=String(jets.length);
     const parcel:Record<string,string>={driftwood:'driftwood',coal_chunk:'coal-chunk',frost_iron_scrap:'iron',
       raw_root:'raw-root',cloud_fish:'cloud-fish',raw_meat:'raw-meat',beast_feed:'beast-feed'};
     for(const event of transportEvents(w)){

@@ -908,3 +908,21 @@ assert.ok(!transportEvents(fromFull.w).length);
 const nextNetwork=deserializeWorld(serializeWorld(supplyNet.w));
 assert.equal(networkStation(nextNetwork,nextNetwork.ark.buildings.find(b=>b.defId==='sorter_arm')!).route,'auto');
 console.log('[sim-smoke:P2-13] OK: 5,400 ticks self-burning, live iron smelting, feed, multi-hop storage, full-chest stock conservation and archive');
+
+import { rigTrial } from './p2-rig-fixture';
+import { rigDrive } from '../src/sim/rigging';
+const bareSail=rigTrial(),riggedSail=rigTrial(true);
+const against=(w:typeof bareSail)=>rigDrive(w,1,0).multiplier;
+const withWind=(w:typeof bareSail)=>rigDrive(w,-1,0).multiplier;
+assert.ok(against(bareSail)<withWind(bareSail));
+assert.ok(against(riggedSail)>against(bareSail)*1.24);
+assert.ok(rigDrive(riggedSail,1,0).resistance>.75);
+const timings=[bareSail,riggedSail].map(trip=>{
+ assert.equal(setDestination(trip,'shallows_lantern'),null);
+ assert.equal(toggleCruise(trip),null);
+ while(trip.sky.cruising&&trip.tick<1500)stepWorld(trip);
+ assert.equal(trip.ark.anchoredIslandId,'shallows_lantern');return trip.tick;
+});
+assert.ok(timings[1]<timings[0]*.83,'same in-world route, actual shorter sailing time');
+assert.equal(deserializeWorld(serializeWorld(riggedSail)).ark.buildings.filter(b=>['wind_sail','steam_thruster','wind_vane'].includes(b.defId)).length,3);
+console.log('[sim-smoke:P2-14] OK: counterwind resistance, rigid-mode sailing, timetabled speed and old/archive rig validation');

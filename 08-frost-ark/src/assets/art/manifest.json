@@ -2640,6 +2640,102 @@
         60
       ],
       "bytes": 6132
+    },
+    "building-wind-sail": {
+      "file": "building-wind-sail.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.17,
+      "tileH": 1.28,
+      "contentBox": [
+        26,
+        2,
+        101,
+        121
+      ],
+      "bytes": 17481
+    },
+    "icon-wind-sail": {
+      "file": "icon-wind-sail.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1.17,
+      "tileH": 1.28,
+      "contentBox": [
+        14,
+        2,
+        51,
+        60
+      ],
+      "bytes": 5136
+    },
+    "building-steam-thruster": {
+      "file": "building-steam-thruster.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.17,
+      "tileH": 1.28,
+      "contentBox": [
+        28,
+        2,
+        101,
+        121
+      ],
+      "bytes": 22282
+    },
+    "icon-steam-thruster": {
+      "file": "icon-steam-thruster.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1.17,
+      "tileH": 1.28,
+      "contentBox": [
+        14,
+        2,
+        50,
+        60
+      ],
+      "bytes": 6270
+    },
+    "building-wind-vane": {
+      "file": "building-wind-vane.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.17,
+      "tileH": 1.28,
+      "contentBox": [
+        28,
+        2,
+        99,
+        121
+      ],
+      "bytes": 11307
+    },
+    "icon-wind-vane": {
+      "file": "icon-wind-vane.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1.17,
+      "tileH": 1.28,
+      "contentBox": [
+        14,
+        2,
+        49,
+        60
+      ],
+      "bytes": 3720
     }
   }
 }

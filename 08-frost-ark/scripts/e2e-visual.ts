@@ -1,3 +1,4 @@
+import { runP2Rig } from './p2-rig-e2e';
 import { runP2Logistics } from './p2-logistics-e2e';
 import { runP2Room } from './p2-room-e2e';
 import { runP2Hotbar } from './p2-hotbar-e2e';
@@ -638,6 +639,7 @@ try {
   await runP2Hotbar(browser,baseUrl,outDir,errors);
   await runP2Room(browser,baseUrl,outDir,errors);
   await runP2Logistics(browser,baseUrl,outDir,errors);
+  await runP2Rig(browser,baseUrl,outDir,errors);
 
   if (errors.length > 0) {
     throw new Error(errors.join('\n'));

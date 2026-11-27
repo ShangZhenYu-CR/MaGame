@@ -59,7 +59,8 @@
     "p207-icon-magma-sprayer": "Original illustrated inventory icon for the fictional fantasy survival game Frost Ark. Hand-painted 2.5D game sprite, soft cool upper-left light and restrained weathered pigments. Compact iconic silhouette, centered single prop, crisply legible at 32px, no text or diagrams. Uniform solid bright magenta #FF00FF matte to every edge, no ground shadow, no background decorations, no text or watermark.\nA small ornate fictional portable steam kettle with ribbed copper bulb, side carrying ring, short downturned meteor-stone mouth and a glowing amber porthole in the rounded closed body. This is a fantastical plumbing tool sprite, heavily stylized, simple solid silhouette.",
     "p2-elemental-icons": "Frost Ark original hand-painted indie survival game elemental status icon props, four equally sized images exact square 2 by 2 regular quadrant grid. Each motif distinctly centered in its quadrant, completely separated by wide pure fuchsia #FF00FF. Painterly 2.5D three-quarter top-down viewed 40° above, cool soft light from upper left, fine muted slate-brown edges, warm muted amber and frosted mineral blue, deeply readable at tiny 24 pixels. No text, no numbers, no card, no dividing marks, no outline around cells, no badge frame, no background shadows, flat pure solid saturated #FF00FF chroma key all around and between single glyphs. Precisely this order: top left single warm orange ember plume with rounded flame tongues (burning); top right thin asymmetrical pale icy-blue crystal with one long oblique shard and only two smaller broken side shards (slow); bottom left one distinctive chunky ice-blue translucent cube angled three-quarters enclosing a deep blue frost star silhouette (frozen); bottom right one moderately warm ochre iron shield icon broken in two by a wide diagonal blue-slate crack, clearly readable negative space through the split (armor broken). Compelling detailed painterly object silhouettes, no dark square base, no scenery, no purple. Large open space around every single icon, no clipping. Render square contact sheet.",
     "p2-warm-room-doors": "Create four NEW matching environmental sprites for the Frost Ark top-down indie survival game. The two provided images are only material/camera reference: a frost-weathered low wood ship wall and an insulated light-tan wool-panel wall. Match their exact straight frontal three-quarter top-down orthographic camera (40 degree above, no isometric diamond and no yaw), soft cold light from upper left, muted grey-and-brown hand-painted palette and same visible top compressed depth. Each of these four new sprites is a one tile wide DOOR module only, a centered rectilinear doorpost frame with two feet, front bottom baseline level, slightly taller than the low peer wall, tight on the sides for neighboring modules. Square 2×2 contact sheet, each asset centered alone in a separate quadrant with broad pure RGB(255,0,255) MAGENTA margin; backdrop must be entirely solid magenta, including open door openings, NO floor, NO shadow cast on magenta, no lettering, no cell lines, no labels, no watermark, no ground, NO surrounding architecture, NO people or props. TOP LEFT: wooden storm door closed, small heavy brown rough planks with bronze horizontal iron straps, round tarnished brass latch on the right side, snow on dark frame top. TOP RIGHT: exactly SAME frame, heights and wood door material, now opened hinged to the LEFT at about 100°, visible magenta opening in middle and right, slim low threshold. BOTTOM LEFT: sophisticated frosted steel automatic airlock closed, narrow blue-gray bolted steel pylons and solid two sliding panel leaves with darker center seam, subtle very small warm copper pneumatic accents and top frost, same physical silhouette as top row but distinct material. BOTTOM RIGHT: EXACT matching same steel airlock pylons and top frame, two steel leaves retracted into side housings leaving a clear wide solid-magenta gap, narrow passive threshold along bottom. Each quadrant separated and no additional pieces. Clear silhouettes for 64px independent sprites, artwork textured hand-painted not voxel, no neon, no glow halo on backgrounds, no molten violet. The provided two PNG neighbors are references, do not include them.",
-    "p2-logistics": "Create exactly two new standalone hand-painted 2.5D top-down 3/4 sprites for the Frost Ark indie survival game, inspired by the attached two used sprites ONLY as camera/palette/material reference: bronze robotic sorting arm and frosty iron smelter. Camera 40° overhead orthographic and straight front, see front and top, no diamond/isometric yaw, upper-left soft icy light, rich painterly distressed articulation, muted slate blue-brown and antique amber, clean dark slate/brown contours never dead black. Square sprite sheet split into exactly TWO equal left and right columns; each asset centered whole, outside the gutter, with broad margins on ultra flat pure #FF00FF mage​nta through holes and surroundings. NO labels, no other objects, no ground, no shadow on backdrop, no particle effects, no stray markings. LEFT: compact nautical AUTOMATIC FUEL HOPPER, waist-high stout antique metal bin with a visibly half-full wide tapered rectangular coal mouth, distinct coal shapes visible at top, riveted steel side panel and small front-facing brass change chute with protective upper lever, frosty feet. No furnace fire, no glowing kiln, no straps that read weapon. RIGHT: low 1x1 STEAM TRANSFER CHUTE module, horizontally oriented left-to-right, open shallow copper and grey iron U-shaped trough on two low squat supports, steel rollers visibly crossing from back to front regularly, small insulated steam line along rear edge and right end with steam-copper coupling no plume, frosty ridged rail edges, front track and top clearly read like shipyard conveyor. Horizontal not diagonal; capacity to visually tile in a line, no boxes or food placed on it. Both independent dense painterly textured objects with full outlines. Match the two reference materials, DO NOT duplicate the existing sorter or furnace."
+    "p2-logistics": "Create exactly two new standalone hand-painted 2.5D top-down 3/4 sprites for the Frost Ark indie survival game, inspired by the attached two used sprites ONLY as camera/palette/material reference: bronze robotic sorting arm and frosty iron smelter. Camera 40° overhead orthographic and straight front, see front and top, no diamond/isometric yaw, upper-left soft icy light, rich painterly distressed articulation, muted slate blue-brown and antique amber, clean dark slate/brown contours never dead black. Square sprite sheet split into exactly TWO equal left and right columns; each asset centered whole, outside the gutter, with broad margins on ultra flat pure #FF00FF mage​nta through holes and surroundings. NO labels, no other objects, no ground, no shadow on backdrop, no particle effects, no stray markings. LEFT: compact nautical AUTOMATIC FUEL HOPPER, waist-high stout antique metal bin with a visibly half-full wide tapered rectangular coal mouth, distinct coal shapes visible at top, riveted steel side panel and small front-facing brass change chute with protective upper lever, frosty feet. No furnace fire, no glowing kiln, no straps that read weapon. RIGHT: low 1x1 STEAM TRANSFER CHUTE module, horizontally oriented left-to-right, open shallow copper and grey iron U-shaped trough on two low squat supports, steel rollers visibly crossing from back to front regularly, small insulated steam line along rear edge and right end with steam-copper coupling no plume, frosty ridged rail edges, front track and top clearly read like shipyard conveyor. Horizontal not diagonal; capacity to visually tile in a line, no boxes or food placed on it. Both independent dense painterly textured objects with full outlines. Match the two reference materials, DO NOT duplicate the existing sorter or furnace.",
+    "p2-sailing-machinery": "A square contact sheet of 3 individual new Frost Ark nautical infrastructure sprites for a painterly 2.5D deck building game. 3 evenly divided COLUMNS, centered exactly one object per column with generous separation. Use attached bronze heat relay and wooden helm ONLY as examples of 40 degree orthographic top-down three-quarter frontal camera, no yaw and no diamond isometric view, upper left soft cool skylight, winter muted wood, bronze and grey cast iron, textured hand-painted realism, tapered slate-brown contours. The three isolated new sprites look buildable at one deck-tile width. No floor, no cast shadow off object, no dust or effects, no labels, no cell dividers, no silhouettes in the magenta margin, no accessories outside the object. Background perfectly flat 100% #FF00FF magenta in all unoccluded areas including holes. LEFT column: windbreak sailing mast, a very practical short thick frostwood mast fitted into a low square copper-banded ship bracket, compact broad warm taupe canvas sail billowing to left, worn seams, visible ropes tied close to poles, not a national flag, distinguishable taut fabric silhouette, wood with bronze hardware. CENTER column: frosty steam marine thruster, squat stocky two parallel copper-cylinder boiler prop on a blue-grey bronze cradle, two aft outlets pointing toward the lower edge of picture and small upper valve assembly, no fire or smoke baked in, reads as clean civilian engine not weapon, white frost highlights. RIGHT column: compact navigation wind vane, dark weathered slender woody-brass upright post on squat hexagonal frost base, clearly visible directional brass pointer arrow on top over a small circular wind compass, tiny burgundy slate canvas streamer attached to balancing tail, deliberate thin silhouette with crisp front face. Center each complete object independently and match scale and camera. NO existing attachment objects copied. Brushed canvas and solid iron paint."
   },
   "assets": [
     {
@@ -3235,6 +3236,108 @@
       "tileH": 1.17,
       "crop": [
         627,
+        0,
+        1254,
+        1254
+      ]
+    },
+    {
+      "id": "building-wind-sail",
+      "source": "travel.png",
+      "size": [
+        128,
+        128
+      ],
+      "key": "magenta",
+      "tileW": 1.17,
+      "tileH": 1.28,
+      "crop": [
+        0,
+        0,
+        418,
+        1254
+      ]
+    },
+    {
+      "id": "icon-wind-sail",
+      "source": "travel.png",
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "tileW": 1.17,
+      "tileH": 1.28,
+      "crop": [
+        0,
+        0,
+        418,
+        1254
+      ]
+    },
+    {
+      "id": "building-steam-thruster",
+      "source": "travel.png",
+      "size": [
+        128,
+        128
+      ],
+      "key": "magenta",
+      "tileW": 1.17,
+      "tileH": 1.28,
+      "crop": [
+        418,
+        0,
+        836,
+        1254
+      ]
+    },
+    {
+      "id": "icon-steam-thruster",
+      "source": "travel.png",
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "tileW": 1.17,
+      "tileH": 1.28,
+      "crop": [
+        418,
+        0,
+        836,
+        1254
+      ]
+    },
+    {
+      "id": "building-wind-vane",
+      "source": "travel.png",
+      "size": [
+        128,
+        128
+      ],
+      "key": "magenta",
+      "tileW": 1.17,
+      "tileH": 1.28,
+      "crop": [
+        836,
+        0,
+        1254,
+        1254
+      ]
+    },
+    {
+      "id": "icon-wind-vane",
+      "source": "travel.png",
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "tileW": 1.17,
+      "tileH": 1.28,
+      "crop": [
+        836,
         0,
         1254,
         1254

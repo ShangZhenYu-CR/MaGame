@@ -1,3 +1,4 @@
+import { cruiseSpeed } from '../sim/sky-map';
 import { DISCOVERY_RADIUS, DOCK_RADIUS, nearHelm, navigationPanel, setDestination, toggleCruise } from '../sim/sky-map';
 import { gangwayGeometry } from '../sim/island';
 import { canReachAurora } from '../sim/finale';
@@ -53,7 +54,8 @@ export function navigationUi(hooks:ChartHooks){
   const anchor=nav.islands.find(v=>v.id===nav.anchoredIslandId),target=nav.islands.find(v=>v.id===nav.targetId);
   const heading=Math.round((Math.atan2(nav.headingX,-nav.headingY)*180/Math.PI+360)%360).toString().padStart(3,'0');
   const modeLabel=mode==='docked'?`已靠泊 · ${anchor?.name??'浮岛'}`:mode==='cruising'?`巡航中${target?' · '+islandTitle(target):''}`:'停泊中';
-  put(status,`${modeLabel}　航向 ${heading}°　方位 (${nav.x.toFixed(1)}, ${nav.y.toFixed(1)})`);
+  const speed=w.sky.cruising?' · '+cruiseSpeed(w).toFixed(2)+' 云里/秒':'';
+  put(status,`${modeLabel}${speed}　航向 ${heading}°　方位 (${nav.x.toFixed(1)}, ${nav.y.toFixed(1)})`);
   if(selected&&!buttons.has(selected))selected=null;
   const choice=nav.islands.find(v=>v.id===selected);
   put(get('sky-destination'),choice?islandTitle(choice):'未选择浮岛');

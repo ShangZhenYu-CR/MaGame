@@ -14,7 +14,7 @@ import type { BuildingInstance, ItemStack, Vec2, WorldState } from './types';
 export const buildKinds = [
   'wood_deck','torch_post','wind_wall','workbench','furnace','stove','heat_relay',
   'catch_net','sorter_arm','greenhouse','warm_wall','buoyancy_core','iron_deck','beast_den','feed_trough',
-  'frost_turret','fire_oil_turret','wind_door','frost_airlock','fuel_hopper','steam_chute',
+  'frost_turret','fire_oil_turret','wind_door','frost_airlock','fuel_hopper','steam_chute','wind_sail','steam_thruster','wind_vane',
 ] as const;
 export type BuildKind = typeof buildKinds[number];
 export const itemNames = new Map(items.map(({ id, name }) => [id, name]));

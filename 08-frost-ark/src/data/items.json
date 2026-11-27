@@ -22,6 +22,7 @@
   { "id": "magma_steak", "name": "熔晶肉排", "category": "bait", "stack": 20, "hunger": 42, "warmth": 32 },
   { "id": "mithril_roast", "name": "秘银炙肉", "category": "bait", "stack": 20, "hunger": 50, "warmth": 38 },
   { "id": "grapple_hook", "name": "云海抓钩", "category": "tool", "stack": 1 },
+  { "id": "frost_grapple_hook", "name": "霜铁强化抓钩", "category": "tool", "stack": 1 },
   { "id": "torch_item", "name": "防风火把", "category": "tool", "stack": 20, "fuelValue": 24 },
   { "id": "wood_axe", "name": "手斧", "category": "tool", "stack": 1 },
   { "id": "mining_pick", "name": "矿镐", "category": "tool", "stack": 1 },

@@ -1,3 +1,4 @@
+import { isGrappleItem } from './grapple-tools';
 import { damagePlayer, healPlayer } from './rescue';
 import beastData from '../data/beasts.json';
 import biomes from '../data/biomes.json';
@@ -212,7 +213,7 @@ function work(w:WorldState,b:BeastEntity):void{
     if(h&&h.fuel<cap/2&&inventoryChange(w,[{itemId:'driftwood',count:1}],[]))
       h.fuel=Math.min(cap,h.fuel+18*1.25);
   }else if(b.defId==='galehawk'){
-    const drift=w.sky.debris.find(d=>!d.id.startsWith('deckdrop_')&&
+    const drift=w.sky.debris.find(d=>!d.heavy&&!d.id.startsWith('deckdrop_')&&
       d.id!==w.player.grapple.caughtDebrisId&&distance(b,d)<=9);
     if(drift&&inventoryChange(w,[],drift.loot))w.sky.debris=w.sky.debris.filter(d=>d!==drift);
   }else if(b.defId==='frostyak'){
@@ -240,7 +241,7 @@ export function beastPackContents(w:WorldState):readonly ItemStack[]{return getF
 const packAvailable=(w:WorldState)=>beastCompanions(w).some(b=>b.defId==='frostyak'&&distance(w.player,b)<=2.5);
 export function transferBeastPack(w:WorldState,itemId:string,direction:'deposit'|'withdraw'):string|null{
   if(!packAvailable(w))return '随行霜角牦牛不在身边';
-  if(toolDefinition(itemId)||itemId==='grapple_hook')return '耐久工具和抓钩请留在身上';
+  if(toolDefinition(itemId)||isGrappleItem(itemId))return '耐久工具和抓钩请留在身上';
   const state=ensureFauna(w),s=state.pack.find(v=>v.itemId===itemId);
   if(direction==='deposit'){
     const max=itemStackLimits.get(itemId)??0;

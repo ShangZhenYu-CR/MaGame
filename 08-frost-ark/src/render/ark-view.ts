@@ -42,7 +42,7 @@ const ironDeck='building-iron-deck';
 const required=[
   ...deckIds,'boss-frost-whale-1','boss-frost-whale-2','boss-frost-whale-3','solar-hearth','aurora-crystal','manan-south','manan-north','manan-west','manan-east','latte-sleep','latte-alert','latte-walk','latte-walk-alt',
   'hearth-1','hearth-2','rail','corner','rock','icicles',ironDeck,...Object.values(buildingVisuals).map(v=>v.art),
-  'debris-wood','debris-iron','debris-rope','clouds','rail-side','rock-side','frost-frame',...ISLAND_ART,...BEAST_ART,...HOSTILE_ART,
+  'debris-wood','debris-iron','debris-rope','debris-heavy','clouds','rail-side','rock-side','frost-frame',...ISLAND_ART,...BEAST_ART,...HOSTILE_ART,
 ] as const;
 interface Cell { x:number; y:number; hash:number; iron:boolean; temperature:number; left:boolean; right:boolean; front:boolean; back:boolean }
 interface Actor {
@@ -160,11 +160,11 @@ export class ArkView {
       const pos=project(d.x,d.y);
       if(pos.x< -s||pos.x>width+s||pos.y< -s||pos.y>height+s)continue;
       const drop=isDeckDrop(d),id=d.loot[0].itemId;
-      const art=id==='frost_iron_scrap'?'debris-iron':id==='rope'?'debris-rope':'debris-wood';
+      const art=d.heavy?'debris-heavy':id==='frost_iron_scrap'?'debris-iron':id==='rope'?'debris-rope':'debris-wood';
       if(drop){deckDrops.push({x:d.x,y:d.y+.14,art,shadow:.24,width:.60,height:.60}); continue;}
       const fy=pos.y+s*(.17-.075*Math.sin(w.tick*.10+d.x));
       c.save();c.globalAlpha=.92;
-      this.art.paint(c,art,pos.x,fy,s,{width:.78,height:.78,rotation:.048*Math.sin(w.tick*.052+d.y)});
+      this.art.paint(c,art,pos.x,fy,s,{width:d.heavy?1.05:.78,height:d.heavy?1.05:.78,rotation:.048*Math.sin(w.tick*.052+d.y)});
       c.restore();
       ovalGlow(c,pos.x+s*.07,fy-s*.12,s*.55,s*.13,'rgba(159,192,211,.19)','rgba(159,192,211,0)');
     }

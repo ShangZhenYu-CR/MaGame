@@ -1,6 +1,7 @@
 import { verifyM5 } from './m5';
 import { RESCUE_SHIELD_TICKS } from './rescue';
 import { isMeal, MAX_MEAL_TICKS } from './food';
+import { isGrappleItem } from './grapple-tools';
 import items from '../data/items.json';
 import buildings from '../data/buildings.json';
 import recipes from '../data/recipes.json';
@@ -89,7 +90,7 @@ function validateFauna(p:Record<string,unknown>,ids:Set<string>):void{
     beastM4.feed<0||beastM4.feed>50||!num(beastM4.lastStrike)||!Number.isSafeInteger(beastM4.lastStrike)||
     !num(beastM4.offsetX)||!num(beastM4.offsetY)||!Number.isSafeInteger(beastM4.offsetX)||!Number.isSafeInteger(beastM4.offsetY)||
     (beastM4.islandId!==null&&(typeof beastM4.islandId!=='string'||!ids.has(beastM4.islandId)))||
-    !Array.isArray(beastM4.pack)||beastM4.pack.length>12||!beastM4.pack.every(s=>stack(s)&&s.itemId!=='grapple_hook'&&!toolDefinition(s.itemId))||
+    !Array.isArray(beastM4.pack)||beastM4.pack.length>12||!beastM4.pack.every(s=>stack(s)&&!isGrappleItem(s.itemId)&&!toolDefinition(s.itemId))||
     new Set(beastM4.pack.map(s=>s.itemId)).size!==beastM4.pack.length)throw invalid();
   for(const [id,population] of Object.entries(beastM4.fauna)){
     if(!ids.has(id)||id===beastM4.islandId||!Array.isArray(population)||population.length>20||
@@ -100,15 +101,15 @@ function validateFauna(p:Record<string,unknown>,ids:Set<string>):void{
 
 export function deserializeWorld(raw: string): WorldState {
   const p:unknown=JSON.parse(raw);
-  if(!record(p)||![1,2,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
+  if(!record(p)||![1,2,3,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
     throw new Error('存档版本不受支持');
   if(p.saveVersion===1){
     if(record(p.player))p.player.rescue={startedAt:null,shieldUntil:0};
   }
   if(p.saveVersion===1||p.saveVersion===2){
     if(record(p.player))p.player.diet={warmUntil:0,last:null,quick:null};
-    p.saveVersion=SAVE_VERSION;
   }
+  p.saveVersion=SAVE_VERSION;
   const {ark, player, sky, latte}=p;
   if(!eachNumber(p,['seed','rngState','tick','day','timeOfDay','ambientTemp','skyheartCores'])||
      !num(p.tick)||!Number.isSafeInteger(p.tick)||p.tick<0||!['clear','snow','whiteout'].includes(String(p.weather))||
@@ -124,12 +125,12 @@ export function deserializeWorld(raw: string): WorldState {
      (player.grapple.caughtDebrisId!==null&&typeof player.grapple.caughtDebrisId!=='string')||
      !record(sky)||!eachNumber(sky,['x','y','headingX','headingY','windX','windY'])||typeof sky.cruising!=='boolean'||
      !Array.isArray(sky.islands)||!Array.isArray(sky.debris)||
-     !sky.debris.every(d=>record(d)&&typeof d.id==='string'&&eachNumber(d,['x','y','vx','vy'])&&Array.isArray(d.loot)&&d.loot.length>0&&d.loot.every(stack))||
+     !sky.debris.every(d=>record(d)&&typeof d.id==='string'&&eachNumber(d,['x','y','vx','vy'])&&Array.isArray(d.loot)&&d.loot.length>0&&d.loot.every(stack)&&(d.heavy===undefined||typeof d.heavy==='boolean'))||
      !record(latte)||!eachNumber(latte,['x','y'])||!Array.isArray(p.beasts)||!Array.isArray(p.wildEntities)||
      !Array.isArray(p.unlockedTech)||typeof p.bossDefeated!=='boolean')throw new Error('存档数据不完整或不符合方舟格式');
   if(p.storageM0!==undefined){
     if(!Array.isArray(p.storageM0)||p.storageM0.length>STORAGE_SLOTS||
-       !p.storageM0.every(stack)||p.storageM0.some(s=>s.itemId==='grapple_hook')||
+       !p.storageM0.every(stack)||p.storageM0.some(s=>isGrappleItem(s.itemId))||
        new Set(p.storageM0.map(s=>s.itemId)).size!==p.storageM0.length)
       throw new Error('储物箱数据不符合方舟格式');
   }

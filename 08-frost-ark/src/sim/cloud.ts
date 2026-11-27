@@ -1,11 +1,13 @@
 import { incapacitated } from './rescue';
-import { countItem, inventoryChange, isDeck } from './ark';
+import { inventoryChange, isDeck } from './ark';
+import { equippedGrapple, hasFrostGrapple } from './grapple-tools';
 import { dropOnDeck, isDeckDrop } from './latte';
 import { areaAt } from './island';
 import { nextRng } from './rng';
 import { TICK_RATE, type CloudDebris, type Vec2, type WorldState } from './types';
 
-export const grappleRange = (charge: number): number => 3.5 + 5.5 * Math.min(1, Math.max(0, charge));
+export const grappleRange = (charge:number,reinforced=false):number =>
+  (3.5 + 5.5 * Math.min(1, Math.max(0, charge)))*(reinforced?1.35:1);
 const lootIds = ['driftwood','frost_iron_scrap','rope'] as const;
 const travel = 0.065;
 
@@ -20,6 +22,7 @@ function debris(w: WorldState, index: number, first: boolean): CloudDebris {
     ['coal_chunk','ice_shard','raw_root','warm_fur','raw_meat','cloud_fish',
       'coal_chunk','ice_shard','warm_berry','frost_grass','warm_fur','coal_chunk'];
   const extra=extras[index%extras.length];
+  const heavy=!first&&index>4&&index%19===11;
 
   return {
     id: `drift_${w.tick}_${index}`,
@@ -27,7 +30,9 @@ function debris(w: WorldState, index: number, first: boolean): CloudDebris {
     y: c + (first ? [2.5, -3.45, 4.05][index] : [-5.5, 5.3, 2.9, -2.7, -7.0, 7.1][index % 6]) + jitter,
     vx: .45 + w.sky.windX * .27 + jitter * .18,
     vy: w.sky.windY * .24,
-    loot: [{ itemId:id, count: id === 'driftwood' ? 3 : 2 },...(extra?[{itemId:extra,count:2}]:[])],
+    ...(heavy?{heavy:true}:{}),
+    loot: heavy?[{itemId:'frost_iron_scrap',count:5},{itemId:'coal_chunk',count:3}]:
+      [{ itemId:id, count: id === 'driftwood' ? 3 : 2 },...(extra?[{itemId:extra,count:2}]:[])],
   };
 }
 
@@ -38,13 +43,13 @@ export function seedDrift(w: WorldState): void {
 export function aimEnd(w: WorldState, target: Vec2): Vec2 {
   const p = w.player;
   const dx = target.x - p.x, dy = target.y - p.y;
-  const r = Math.min(1, grappleRange(p.grapple.charge) / Math.max(.0001, Math.hypot(dx,dy)));
+  const r = Math.min(1, grappleRange(p.grapple.charge,hasFrostGrapple(w)) / Math.max(.0001, Math.hypot(dx,dy)));
   return { x: p.x + dx * r, y: p.y + dy * r };
 }
 
 export function startCharge(w: WorldState, target: Vec2): boolean {
   const g = w.player.grapple;
-  if (incapacitated(w) || g.active || g.charging || !countItem(w,'grapple_hook') || areaAt(w,w.player.x,w.player.y)!=='ark') return false;
+  if (incapacitated(w) || g.active || g.charging || !equippedGrapple(w) || areaAt(w,w.player.x,w.player.y)!=='ark') return false;
   g.charging = true; g.charge = 0;
   aim(w,target);
   return true;
@@ -89,7 +94,9 @@ export function stepCloud(w: WorldState): void {
     if (isDeck(w,Math.floor(d.x),Math.floor(d.y))) d.y += .07;
   }
   w.sky.debris = w.sky.debris.filter(d => d.id === g.caughtDebrisId || isDeckDrop(d) || d.x < w.ark.size / 2 + 17);
-  if (g.charging) { g.charge = Math.min(1,g.charge + 1/(TICK_RATE*.8)); return; }
+  if(!g.active&&!g.charging)return;
+  const reinforced=hasFrostGrapple(w);
+  if (g.charging) { g.charge = Math.min(1,g.charge + 1/(TICK_RATE*(reinforced?.58:.8))); return; }
   if (!g.active) return;
   const held = w.sky.debris.find(d=>d.id === g.caughtDebrisId);
   if (held) {
@@ -99,17 +106,17 @@ export function stepCloud(w: WorldState): void {
       w.sky.debris = w.sky.debris.filter(d=>d!==held);
       g.caughtDebrisId = null; g.active = false; g.charge = 0;
     } else {
-      const k = Math.min(.205,dist)/dist;
+      const k = Math.min(reinforced?.31:.205,dist)/dist;
       held.x += (p.x-held.x)*k; held.y += (p.y-held.y)*k;
     }
     return;
   }
   const a = hookTip(w), outbound = g.charge < 1;
-  g.charge = outbound ? Math.min(1,g.charge+travel) : g.charge+.12;
+  g.charge = outbound ? Math.min(1,g.charge+travel) : g.charge+(reinforced?.17:.12);
   const b = hookTip(w);
   if (outbound) {
     const dx = b.x-a.x, dy = b.y-a.y;
-    const hits = w.sky.debris.filter(d=>!isDeckDrop(d)).flatMap(d => {
+    const hits = w.sky.debris.filter(d=>!isDeckDrop(d)&&(reinforced||!d.heavy)).flatMap(d => {
       const k = Math.max(0,Math.min(1,((d.x-a.x)*dx+(d.y-a.y)*dy)/Math.max(.00001,dx*dx+dy*dy)));
       return Math.hypot(d.x-a.x-dx*k,d.y-a.y-dy*k) <= .45 ? [{d,k}] : [];
     }).sort((x,y)=>x.k-y.k);

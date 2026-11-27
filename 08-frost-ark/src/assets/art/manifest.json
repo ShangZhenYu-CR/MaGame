@@ -2192,6 +2192,38 @@
         45
       ],
       "bytes": 4269
+    },
+    "icon-frost-grapple-hook": {
+      "file": "icon-frost-grapple-hook.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        57,
+        60
+      ],
+      "bytes": 5752
+    },
+    "debris-heavy": {
+      "file": "debris-heavy.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        6,
+        126,
+        121
+      ],
+      "bytes": 31117
     }
   }
 }

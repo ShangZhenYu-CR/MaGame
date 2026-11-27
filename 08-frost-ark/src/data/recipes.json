@@ -42,6 +42,16 @@
     ]
   },
   {
+    "id": "craft_frost_grapple_hook",
+    "station": "hand",
+    "output": { "itemId": "frost_grapple_hook", "count": 1 },
+    "inputs": [
+      { "itemId": "grapple_hook", "count": 1 },
+      { "itemId": "frost_iron_ingot", "count": 2 },
+      { "itemId": "rope", "count": 3 }
+    ]
+  },
+  {
     "id": "smelt_frost_iron",
     "station": "furnace",
     "seconds": 7,

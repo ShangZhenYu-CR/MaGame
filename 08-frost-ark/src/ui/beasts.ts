@@ -1,3 +1,4 @@
+import { isGrappleItem } from '../sim/grapple-tools';
 import {
  beastPanel, loadBeastFeed, nearestWildBeast, setBeastRole, strikeWildBeast, tameBeast, transferBeastPack, useRestraint,
 } from '../sim/beasts';
@@ -95,7 +96,7 @@ export function beastUi(h:BeastUIHooks){
   for(const x of data.pack)add(x.itemId,x.count,'withdraw');
   const quantities=new Map<string,number>();
   for(const x of w.player.inventory)if(x)quantities.set(x.itemId,(quantities.get(x.itemId)??0)+x.count);
-  for(const [itemId,count] of quantities)if(itemId!=='grapple_hook')add(itemId,count,'deposit');
+  for(const [itemId,count] of quantities)if(!isGrappleItem(itemId))add(itemId,count,'deposit');
   contents.replaceChildren(...nodes);
  }
  function updateRoster(w:WorldState,data:Info){

@@ -157,7 +157,7 @@ export function stepIndustry(w:WorldState):void {
     if(active.cycle<TICK_RATE)continue;
     active.cycle-=TICK_RATE;
     if(b.defId==='catch_net'&&isEdgeDeck(w,b.gx,b.gy)){
-      const d=w.sky.debris.find(v=>!isDeckDrop(v)&&v.id!==w.player.grapple.caughtDebrisId&&
+      const d=w.sky.debris.find(v=>!v.heavy&&!isDeckDrop(v)&&v.id!==w.player.grapple.caughtDebrisId&&
         Math.hypot(v.x-b.gx-.5,v.y-b.gy-.5)<=2.15&&merge(active.intake,v.loot));
       if(d){
         active.intake=merge(active.intake,d.loot)!;

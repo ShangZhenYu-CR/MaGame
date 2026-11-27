@@ -543,3 +543,47 @@ const beforeFood=JSON.parse(serializeWorld(createInitialWorld()));
 beforeFood.saveVersion=2;delete beforeFood.player.diet;
 assert.deepEqual(deserializeWorld(JSON.stringify(beforeFood)).player.diet,{warmUntil:0,last:null,quick:null});
 console.log('[sim-smoke:P2-02] OK: seven edible meals, no free food, real warmth resistance, hunger drain and v2 migration');
+
+import { BASIC_GRAPPLE, craftGrapple, FROST_GRAPPLE } from '../src/sim/grapple-tools';
+import { aimEnd,grappleRange,stepCloud } from '../src/sim/cloud';
+
+// P2-03: a hookless legacy archive has a playable route back to its tool.
+const hitch=createInitialWorld();hitch.player.inventory[0]=null;
+hitch.player.inventory[3]={itemId:'frost_iron_scrap',count:2};
+hitch.player.inventory[4]={itemId:'rope',count:7};
+hitch.player.inventory[5]={itemId:'frost_iron_ingot',count:2};
+assert.equal(craftGrapple(hitch,1),null);
+assert.equal(countItem(hitch,BASIC_GRAPPLE),1);
+assert.equal(countItem(hitch,'frost_iron_scrap'),0);
+const starterLine=deserializeWorld(serializeWorld(hitch));
+assert.equal(craftGrapple(hitch,2),null);
+assert.equal(countItem(hitch,BASIC_GRAPPLE),0);
+assert.equal(countItem(hitch,FROST_GRAPPLE),1);
+assert.equal(countItem(hitch,'frost_iron_ingot'),0);
+assert.match(craftGrapple(hitch,1)!,/已有/);
+assert.equal(grappleRange(1,true)/grappleRange(1),1.35);
+for(const line of [hitch,starterLine]){
+  const p=line.player, x=p.x-10.3,y=p.y;
+  line.tick=1;line.sky.debris=[{id:'heavy_test',x,y,vx:0,vy:0,heavy:true,loot:[{itemId:'frost_iron_scrap',count:5}]}];
+  assert.ok(startCharge(line,{x:p.x-14,y}));
+  for(let n=0;n<18;n++)stepCloud(line);
+  const boosted=line===hitch;
+  assert.ok(boosted?p.grapple.charge===1:p.grapple.charge<1);
+  for(let n=0;n<7;n++)stepCloud(line);
+  const aimed=aimEnd(line,{x:p.x-14,y});
+  assert.ok(Math.abs((p.x-aimed.x)-(boosted?12.15:9))<1e-7);
+  fire(line);
+  for(let n=0;n<85;n++)stepCloud(line);
+  assert.equal(countItem(line,'frost_iron_scrap'),boosted?5:0);
+  assert.equal(line.sky.debris.length,boosted?0:1);
+}
+assert.equal(countItem(deserializeWorld(serializeWorld(hitch)),FROST_GRAPPLE),1);
+const closeHeavy=deserializeWorld(serializeWorld(starterLine));
+closeHeavy.sky.debris[0].x=closeHeavy.player.x-5;
+assert.ok(startCharge(closeHeavy,{x:closeHeavy.player.x-8,y:closeHeavy.player.y}));
+for(let n=0;n<25;n++)stepCloud(closeHeavy);
+fire(closeHeavy);for(let n=0;n<50;n++)stepCloud(closeHeavy);
+assert.equal(closeHeavy.sky.debris.length,1,'plain hook cannot snag a heavy crate even when in range');
+const v3Hook=JSON.parse(serializeWorld(createInitialWorld()));v3Hook.saveVersion=3;
+assert.equal(deserializeWorld(JSON.stringify(v3Hook)).saveVersion,SAVE_VERSION);
+console.log('[sim-smoke:P2-03] OK: basic recovery, reinforced recipe, 35% longer aim, faster charging, heavy cargo gate and archive migration');

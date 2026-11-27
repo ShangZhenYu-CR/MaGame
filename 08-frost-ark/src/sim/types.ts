@@ -1,4 +1,4 @@
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 export const TICK_RATE = 30;
 export const ARK_SIZE = 48;
 export const ISLAND_SIZE = 64;
@@ -81,6 +81,7 @@ export interface CloudDebris {
   y: number;
   vx: number;
   vy: number;
+  heavy?: boolean;
   loot: ItemStack[];
 }
 

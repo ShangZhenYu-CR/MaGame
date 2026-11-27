@@ -259,3 +259,7 @@ button[aria-disabled=true]{opacity:.62}
 @media(max-width:780px){#quick-meal{left:auto;right:12px;bottom:111px}}
 .hud-card .m5-seeds{position:static;display:inline-block;margin-top:6px;padding:3px 6px}
 #meal-buff img{margin:0;background:none;border:0}
+#grapple-craft{border-top:1px solid var(--edge);border-bottom:1px solid var(--edge)}
+#grapple-craft p{margin:.45rem 0}
+#grapple-craft button{white-space:nowrap}
+#expedition-interact kbd[hidden],#wild-feed kbd[hidden]{display:none}

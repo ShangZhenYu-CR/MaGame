@@ -3,7 +3,8 @@ import './ui/finale.css';
 import { finaleUi } from './ui/finale-ui';
 import { ArkView, type Ghost } from './render/ark-view';
 import { build, buildCosts, buildDefinitions, buildingAt, buildIssue, countItem, craftTorch, itemNames, type BuildKind } from './sim/ark';
-import { aim, cancelCharge, fire, startCharge } from './sim/cloud';
+import { aim, cancelCharge, fire, grappleRange, startCharge } from './sim/cloud';
+import { craftGrapple, equippedGrapple, FROST_GRAPPLE, grappleRecipes, isGrappleItem } from './sim/grapple-tools';
 import { deserializeWorld, serializeWorld } from './sim/save';
 import { nearestStorage, storageContents, STORAGE_SLOTS, transferStorage } from './sim/storage-box';
 import { addFuel, FUEL_MAX, heatAt, partOfDay, primaryHearth, upgradeHearth } from './sim/heatField';
@@ -77,7 +78,7 @@ if(helmIcon){const img=document.createElement('img');img.alt='';img.src=helmIcon
 const regions=new Map(biomes.map(b=>[b.id,b.name]));
 
 function toggleChart(show=!chart.open()):void{
-  if(!show){chart.hide();return;}
+  if(!show){chart.hide();industry.closeTip();return;}
   keys.clear();cancelCharge(w);expedition.cancel();industry.closeTip();chart.show();
 }
 skyToggle.onclick=()=>toggleChart();
@@ -93,20 +94,39 @@ function finishAction(issue:string|null,success:string,event?:'craft'|'undo'|'di
   if(event)audio.play(event);
   void saveNow();
 }
-function useNearby():void{
-  if(beasts.open()){toggleBeastRoster(false);return;}
-  if(industry.stationOpen()){industry.showStation(null);return;}
-  if(!locker.hidden){toggleStorage(false);return;}
-  if(expedition.area()==='island'){
+type PrimaryInteraction={kind:'expedition'|'feed'|'storage'|'beasts'|'close-storage'|'close-station'|'close-beasts'|'none'}|
+  {kind:'station';id:string;label:string};
+function primaryInteraction():PrimaryInteraction{
+  if(beasts.open())return {kind:'close-beasts'};
+  if(industry.stationOpen())return {kind:'close-station'};
+  if(!locker.hidden)return {kind:'close-storage'};
+  if(!panel.hidden||industry.catalogOpen()||chart.open()||finale.arena())return {kind:'none'};
+  const here=expedition.area();
+  if(here==='island'){
     const wild=nearestWildBeast(w);
-    if(wild&&(wild.stunnedTicks>0||wild.hp<=wild.maxHp*.35||!nearestIslandNode(w,1.8))&&beasts.tame())return;
+    if(wild&&(wild.stunnedTicks>0||wild.hp<=wild.maxHp*.35||!nearestIslandNode(w,1.8)))return {kind:'feed'};
   }
-  if(expedition.use())return;
+  if(expedition.keyAction())return {kind:'expedition'};
+  if(here!=='ark')return {kind:'none'};
   const box=nearestStorage(w),station=nearestIndustry(w),animal=nearestBeastFacility(w);
   if(animal&&(!box||industryDistance(w,animal)<industryDistance(w,box))&&
-    (!station||industryDistance(w,animal)<industryDistance(w,station)))toggleBeastRoster(true);
-  else if(station&&(!box||industryDistance(w,station)<industryDistance(w,box)))openIndustry(station.id);
-  else toggleStorage(true);
+    (!station||industryDistance(w,animal)<industryDistance(w,station)))return {kind:'beasts'};
+  if(station&&(!box||industryDistance(w,station)<industryDistance(w,box)))
+    return {kind:'station',id:station.id,label:buildDefinitions[station.defId as BuildKind]?.name??'加工站'};
+  return {kind:box?'storage':'none'};
+}
+function useNearby():void{
+  const action=primaryInteraction();
+  switch(action.kind){
+    case 'close-beasts':toggleBeastRoster(false);break;
+    case 'close-station':industry.showStation(null);break;
+    case 'close-storage':toggleStorage(false);break;
+    case 'feed':beasts.tame();break;
+    case 'expedition':expedition.use();break;
+    case 'beasts':toggleBeastRoster(true);break;
+    case 'station':openIndustry(action.id);break;
+    case 'storage':toggleStorage(true);break;
+  }
 }
 function openIndustry(id:string):void{
   closeOtherPanels('industry');cancelCharge(w);keys.clear();industry.showStation(id);
@@ -149,7 +169,13 @@ function updateToolbar():void {
   if(signature===toolbarSignature)return;
   toolbarSignature=signature;
   const wood=countItem(w,'driftwood');
-  const count=[countItem(w,'grapple_hook'),Math.floor(wood/2),countItem(w,'torch_item'),Math.floor(wood/3),w.player.inventory.filter(Boolean).length+'/18'];
+  const hook=equippedGrapple(w), reinforced=hook===FROST_GRAPPLE;
+  const hookButton=el('hook');
+  hookButton.querySelector('img')!.src=iconPath(reinforced?'frost-grapple-hook':'hook')!;
+  hookButton.querySelector('span')!.textContent=reinforced?'强化抓钩':'抓钩';
+  hookButton.setAttribute('aria-label',reinforced?'霜铁强化抓钩':'抓钩');
+  hookButton.title=reinforced?'霜铁强化抓钩 · 最远 '+grappleRange(1,true).toFixed(2)+' 格，能抓重型货箱':'云海抓钩 · 最远 '+grappleRange(1)+' 格';
+  const count=[hook?1:0,Math.floor(wood/2),countItem(w,'torch_item'),Math.floor(wood/3),w.player.inventory.filter(Boolean).length+'/18'];
   count.forEach((n,i)=>toolbar[i].textContent=String(n));
 }
 
@@ -203,7 +229,7 @@ function fillLocker():void {
     el(target).replaceChildren(...nodes);
   };
   const carried=new Map<string,number>();
-  for(const s of w.player.inventory)if(s&&s.itemId!=='grapple_hook')carried.set(s.itemId,(carried.get(s.itemId)??0)+s.count);
+  for(const s of w.player.inventory)if(s&&!isGrappleItem(s.itemId))carried.set(s.itemId,(carried.get(s.itemId)??0)+s.count);
   drawList('storage-stacks',stash.map(s=>[s.itemId,s.count]),'withdraw');
   drawList('storage-deposit',carried,'deposit');
 }
@@ -229,6 +255,9 @@ function fillBag():void {
     return li;
   });
   el('stacks').replaceChildren(...entries);
+  const hook=equippedGrapple(w);
+  el<HTMLButtonElement>('craft-grapple').disabled=!!hook;
+  el<HTMLButtonElement>('craft-frost-grapple').disabled=hook!== 'grapple_hook';
 }
 const foodShortcut=el<HTMLButtonElement>('quick-meal'),buff=el('meal-buff');
 let shownMeal:MealId|null=null, shownMealCount=-1, shownBuff:MealId|null=null;
@@ -308,6 +337,14 @@ el('craft-torch').onclick=()=>{
   else tell('材料不足，或背包没有空位。');
   fillBag();
 };
+el('grapple-basic-cost').textContent=itemList(grappleRecipes[0].inputs);
+el('grapple-frost-cost').textContent=itemList(grappleRecipes[1].inputs);
+for(const [id,tier] of [['craft-grapple',1],['craft-frost-grapple',2]] as const){
+  el(id).onclick=()=>{
+    finishAction(craftGrapple(w,tier),tier===1?'手制完成：云海抓钩。':'抓钩已强化：更远、更快，可抓重型货箱。','craft');
+    fillBag();
+  };
+}
 el('export').onclick=()=>{
   const url=URL.createObjectURL(new Blob([serializeWorld(w)],{type:'application/json'}));
   const a=document.createElement('a');a.href=url;a.download='frost-ark-save.json';a.click();
@@ -476,8 +513,12 @@ function frame(now:number):void {
   }
   industry.update();chart.paint(false,now);
   const overlay=down||chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||beasts.open();
-  const here=expedition.update(now,overlay||finale.arena()||(mode!=='hook'&&expedition.area()==='ark'));
+  const context=primaryInteraction();
+  const here=expedition.update(now,overlay||finale.arena(),context.kind==='expedition');
+  const feedKey=el('wild-feed').querySelector('kbd')!;
+  feedKey.hidden=context.kind!=='feed';
   beasts.update(now,overlay);m5Ui.update(now,overlay);
+  canvas.dataset.primaryInteraction=context.kind;
   toolUi.update(here);
   finale.update(chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||finale.open());
   const region=regions.get(w.activeIsland?.biomeId??w.sky.islands.find(n=>n.id===w.ark.anchoredIslandId)?.biomeId??'')??'碎云浅海';
@@ -499,10 +540,13 @@ function frame(now:number):void {
   if(mood!==w.player.portraitMood){mood=w.player.portraitMood;portrait.src=portraits[mood]??portraits[0];}
   toast(caught?'正在拉回：'+catchName:g.charging?'抓钩蓄力 '+Math.round(g.charge*100)+'%':
     g.active?'抓钩已抛出…':now<messageUntil?message:'');
-  const interactionHint=here==='island'?(beasts.target()?'云兽虚弱时按 E 投喂 · V 查看伙伴':'靠近资源按 E 采集 · I 制作和修理工具'):here==='gangway'?'沿跳板继续走 · 无需切换场景':mode==='hook'?(nearbyStorage()?'按 E 或点击储物箱存取物品':nearestIndustry(w)?'按 E 或点击加工站操作':'按住左键蓄力，松开抛钩'):
+  const contextHint=!overlay&&(context.kind==='storage'?'按 E 或点击储物箱存取物品':
+    context.kind==='station'?'按 E 操作'+context.label:context.kind==='beasts'?'按 E 打开伙伴管理':'');
+  const interactionHint=contextHint||(here==='island'?(beasts.target()?'靠近虚弱云兽可投喂 · V 查看伙伴':'靠近资源采集 · I 制作和修理工具'):
+    here==='gangway'?'沿跳板继续走 · 无需切换场景':mode==='hook'?'按住左键蓄力，松开抛钩':
     mode==='wood_deck'?'移动鼠标贴合甲板直边，左键拼接':mode==='torch_post'?'先在背包手搓火把，再选空甲板放置':
     mode==='wind_wall'?'挡风墙放在空甲板，减缓周围热量散失':mode==='dismantle'?'点击选中拆除目标；可按 Z 撤销':
-    `${buildDefinitions[mode].name} · 移到甲板预览后左键放置`;
+    `${buildDefinitions[mode].name} · 移到甲板预览后左键放置`);
   if(hint.textContent!==interactionHint)hint.textContent=interactionHint;
   meter.hidden=!g.charging;bar.style.width=(g.charge*100)+'%';
   note.hidden=mode==='hook'||!pointer||here!=='ark';

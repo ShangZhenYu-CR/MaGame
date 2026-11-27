@@ -40,12 +40,19 @@ export function expeditionUi(hooks:Hooks){
   }
   const now=performance.now();gathering={node:target,finish:now+duration,world:w};progress.hidden=false;progress.value=0;
  }
+ function keyAction(){
+  const w=hooks.state(),here=area();
+  if(here==='island')return nearestIslandNode(w,1.8)?'harvest':null;
+  if(here!=='ark')return null;
+  if(w.ark.anchoredIslandId&&nearGangway(w))return 'gangway';
+  if(nearHelm(w))return 'helm';
+  return null;
+ }
  function use():boolean{
-  const w=hooks.state();
-  if(area()==='island'){harvest();return true;}
-  if(area()==='gangway'){hooks.message('沿跳板继续走；不需要再次按 E。','');return true;}
-  if(w.ark.anchoredIslandId&&nearGangway(w)){gangway();return true;}
-  if(nearHelm(w)){cruise();return true;}
+  const action=keyAction();
+  if(action==='harvest'){harvest();return true;}
+  if(action==='gangway'){gangway();return true;}
+  if(action==='helm'){cruise();return true;}
   return false;
  }
  interact.onclick=use;
@@ -65,7 +72,7 @@ export function expeditionUi(hooks:Hooks){
   return false;
  }
  function cancel(){gathering=null;progress.hidden=true;}
- function update(now:number,hide=false):ExpeditionArea{
+ function update(now:number,hide=false,primary=true):ExpeditionArea{
   const w=hooks.state(),here=area(),box=gangwayGeometry(w),node=here==='island'?nearestIslandNode(w,1.8):undefined;
   if(gathering){
    if(gathering.world!==w||here!=='island'||Math.hypot(gathering.node.x-w.player.x,gathering.node.y-w.player.y)>1.8)cancel();
@@ -98,15 +105,16 @@ export function expeditionUi(hooks:Hooks){
    action='helm';title='方舟舵轮';detail='按 N 打开航图，选择目标浮岛。';
    label=w.sky.cruising?'停航':'巡航';
   }else if(w.ark.anchoredIslandId){
-   action='dock';title='已靠泊';detail='走到右舷登岛口，再按 E 搭跳板。';
+   action='dock';title='已靠泊';detail='走到右舷登岛口搭跳板。';
   }
   if(current!==action){current=action;root.dataset.action=action;view.dataset.context=action;}
   root.dataset.area=here;root.dataset.anchored=String(!!w.ark.anchoredIslandId);root.dataset.resourceKind=node?.kind??'';
   root.hidden=hide||action==='none';interact.hidden=!label;interact.disabled=!!gathering;
+  interact.querySelector('kbd')!.hidden=!primary;
   if(title)set(byId('expedition-title'),title);
   if(detail)set(byId('expedition-detail'),detail);
   if(label)set(interact.querySelector('span')!,label);
   return here;
  }
- return {area,use,pointer,update,cancel};
+ return {area,keyAction,use,pointer,update,cancel};
 }

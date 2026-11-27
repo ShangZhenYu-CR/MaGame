@@ -23,7 +23,7 @@ html = html.replace(/<link\b[^>]*\brel="stylesheet"[^>]*\bhref="\.\/(assets\/[^"
 if (scriptCount !== 1 || styleCount !== 1) throw new Error('Expected one bundled JS and one CSS entry');
 const runtime = html.match(/<script>[\s\S]*?<\/script>/)?.[0];
 if (!runtime) throw new Error('Bundled runtime missing');
-html = html.replace(runtime, '').replace('</body>', () => runtime + '\n</body>');
+html = html.replace(runtime, '').replace(/^ +$/gm,'').replace('</body>', () => runtime + '\n</body>');
 writeFileSync(resolve(root, 'index.html'), html);
 
 // A dist entry has the same page-relative portrait path as the project entry.

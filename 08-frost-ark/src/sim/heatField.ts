@@ -84,7 +84,7 @@ export function solveHeat(w:WorldState):void{
     let radiation=0,flow=0,shield=insulation[i];
     for(const e of sources){
       const d=Math.hypot(x+.5-e.x,y+.5-e.y);
-      radiation+=e.power*Math.pow(Math.max(0,1-d/e.radius),1.65);
+      radiation+=e.power*(e.kind==='hearth_core'?1.62:1)*Math.pow(Math.max(0,1-d/e.radius),1.65);
     }
     for(const a of offsets){
       const xx=x+a.x, yy=y+a.y;

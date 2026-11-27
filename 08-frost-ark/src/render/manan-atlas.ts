@@ -42,6 +42,8 @@ export function mananPixels(dir: Direction, phase: number): Uint8ClampedArray {
     rect(x+dx-4,y+14+dy,8+toe,3,lit?C.shoe:C.sole);
     rect(x+dx-4,y+17+dy,8+toe,1,C.sole);
     rect(x+dx-1+toe,y+14+dy,3,1,C.clasp);
+    rect(x+dx-1+toe,y+16+dy,3,1,lit?C.clasp:C.sole);
+    rect(x+dx-2,y+11+dy,4,1,lit?C.coatLit:C.pant);
   };
   if(profile){
     leg(30,38,Math.round(-stride*.52),-Math.round(Math.abs(stride)*.22),false);
@@ -78,12 +80,12 @@ export function mananPixels(dir: Direction, phase: number): Uint8ClampedArray {
     if(north){
       p([[25,24],[38,24],[41,28],[38,32],[33,34],[28,33],[24,29]],C.coatLit);
       p([[27,25],[36,25],[38,28],[35,31],[29,31],[26,28]],C.coat);
-      r(31,33,2,7,C.pocket);r(25,40,13,2,C.black);
+      r(29,32,6,1,C.seam);r(31,33,2,7,C.pocket);r(25,40,13,2,C.black);
     }else{
       p([[23,26],[28,27],[31,31],[28,31],[24,30]],C.coatLit);
       p([[40,26],[35,27],[32,31],[35,31],[39,30]],C.coatLit);
       r(31,30,1,11,C.seam);r(32,30,1,11,C.black);r(31,31,2,2,C.clasp);
-      r(24,36,4,2,C.black);r(35,36,5,2,C.black);r(23,41,17,1,C.black);
+      r(24,35,4,1,C.seam);r(36,35,4,1,C.seam);r(24,36,4,2,C.black);r(35,36,5,2,C.black);r(23,41,17,1,C.black);
       // Pale embroidered A on the chest, drawn at the native pixel density.
       r(36,30,2,1,C.clasp);r(35,31,1,4,C.clasp);r(38,31,1,4,C.clasp);r(36,33,2,1,C.clasp);
     }
@@ -91,6 +93,7 @@ export function mananPixels(dir: Direction, phase: number): Uint8ClampedArray {
     p([[26,7],[37,7],[40,10],[40,17],[38,21],[34,23],[29,23],[25,20],[24,16],[24,11]],north?C.hair:C.skin);
     p([[24,11],[26,7],[37,7],[40,10],[40,13],[38,15],[37,12],[34,12],[32,13],[27,13],[26,16],[24,15]],C.hair);
     r(27,8,9,2,C.bristle);r(28,8,5,1,C.coat);
+    for(const k of [0,1,2,3])r(27+k*3,9+(k%2),1,1,C.coatLit);
     if(north){
       r(26,19,2,2,C.skinDeep);r(37,19,2,2,C.skinDeep);r(29,21,7,3,C.skinDeep);r(29,21,6,1,C.bristle);
     }else{

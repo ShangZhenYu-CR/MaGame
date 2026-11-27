@@ -1,3 +1,5 @@
+import { beastAttackScale,beastWorkScale,gainBeastXp,growthDetails } from './beast-growth';
+import { getIndustrySave } from './m2-state';
 import { beastProfile,luckyParcel,traitStrike,traitSupport,traitTailwind,traitTravel,traitWorkRate } from './beast-traits';
 import { caveActive } from './cave';
 import { dockSide,inverseDock,rotateDockPoint } from './dock-direction';
@@ -171,7 +173,7 @@ export function beastCompanions(w:WorldState):BeastEntity[]{
   return w.beasts.filter(b=>b.role==='companion'&&active(b)&&distance(w.player,b)<=5);
 }
 export function companionStrikePower(w:WorldState):number{
-  return beastCompanions(w).reduce((sum,b)=>sum+(beastDefinitions.get(b.defId)?.attack??0)*traitStrike(w,b),0);
+  return beastCompanions(w).reduce((sum,b)=>sum+(beastDefinitions.get(b.defId)?.attack??0)*traitStrike(w,b)*beastAttackScale(w,b),0);
 }
 function working(w:WorldState,b:BeastEntity){
   const den=currentDen(w,b);
@@ -228,35 +230,48 @@ function moveWorker(w:WorldState,b:BeastEntity):void{
   if(spot)moveToward(b,spot.x,spot.y,.033*traitTravel(w,b),w);
 }
 
-function work(w:WorldState,b:BeastEntity):void{
+function work(w:WorldState,b:BeastEntity):boolean{
   if(b.defId==='emberfox'){
     const h=primaryHearth(w);
     const cap=h?FUEL_MAX[h.level]??120:120;
-    if(h&&h.fuel<cap/2&&inventoryChange(w,[{itemId:'driftwood',count:1}],[]))
+    if(h&&h.fuel<cap/2&&inventoryChange(w,[{itemId:'driftwood',count:1}],[])){
       h.fuel=Math.min(cap,h.fuel+18*1.25*traitSupport(w,b).force);
+      return true;
+    }
   }else if(b.defId==='galehawk'){
     const drift=w.sky.debris.find(d=>!d.heavy&&!d.id.startsWith('deckdrop_')&&
       d.id!==w.player.grapple.caughtDebrisId&&distance(b,d)<=9);
     if(drift){
       const bonus=luckyParcel(w,b,drift.id)?[{itemId:drift.loot[0].itemId,count:1}]:[];
-      if(inventoryChange(w,[],[...drift.loot,...bonus])||(bonus.length>0&&inventoryChange(w,[],drift.loot)))
-        w.sky.debris=w.sky.debris.filter(d=>d!==drift);
+      if(inventoryChange(w,[],[...drift.loot,...bonus])||(bonus.length>0&&inventoryChange(w,[],drift.loot))){
+        w.sky.debris=w.sky.debris.filter(d=>d!==drift);return true;
+      }
     }
   }else if(b.defId==='frostyak'){
     const wall=w.ark.buildings.find(d=>(d.defId==='wind_wall'||d.defId==='warm_wall')&&d.hp<d.maxHp);
     if(wall)wall.hp=Math.min(wall.maxHp,wall.hp+16*traitSupport(w,b).force);
-    inventoryChange(w,[],[{itemId:'warm_fur',count:1}]);
-  }
+    return inventoryChange(w,[],[{itemId:'warm_fur',count:1}])||!!wall;
+  }else if(b.defId==='glacierstag'||b.defId==='burrowback'||b.defId==='magmalisk'){
+    const industry=getIndustrySave(w),kind=b.defId==='glacierstag'?'greenhouse':'furnace';
+    return w.ark.buildings.some(s=>{
+      const job=industry?.stations[s.id]?.job;
+      return s.defId===kind&&!!job&&!s.frozen&&job.progress>0&&job.progress<job.duration;
+    });
+  }else if(b.defId==='tempest_wyvern')return w.sky.cruising;
+  return false;
 }
 
-function companionWork(w:WorldState,b:BeastEntity):void{
-  if(b.defId==='burrowback'&&w.activeIsland){
+function companionWork(w:WorldState,b:BeastEntity):boolean{
+  if(b.defId==='burrowback'&&w.activeIsland&&!caveActive(w)){
     const ore=islandNodes(w).find(n=>n.kind==='ore'&&!harvestIssue(w,n)&&islandNodeRemaining(w,n)>0);
-    if(ore&&inventoryChange(w,[],[{itemId:ore.itemId,count:1}]))consumeIslandNode(w,ore);
-  }else if(b.defId==='glacierstag'){
-    w.player.warmth=Math.min(w.player.maxWarmth,w.player.warmth+5*traitSupport(w,b).heal);
+    if(ore&&inventoryChange(w,[],[{itemId:ore.itemId,count:1}]))return consumeIslandNode(w,ore);
+  }else if(b.defId==='glacierstag'&&!caveActive(w)){
+    const p=w.player,before=p.warmth,hp=p.hp;
+    p.warmth=Math.min(p.maxWarmth,p.warmth+5*traitSupport(w,b).heal);
     healPlayer(w,2*traitSupport(w,b).heal);
+    return p.warmth>before||p.hp>hp;
   }
+  return false;
 }
 
 function canUseTrough(w:WorldState,b:BeastEntity):boolean{
@@ -292,7 +307,7 @@ export function beastPanel(w:WorldState){
       const d=beastDefinitions.get(b.defId)!,den=currentDen(w,b);
       const status=b.warmth<=16?'失温停工':b.hunger<=10?'饥饿待喂':b.role==='companion'?'正在随行':
         !den?'未分配兽窝':!denWarm(w,den)?'兽窝太冷':b.role==='work'?'正在打工':'窝内休息';
-      return {...b,profile:beastProfile(w,b),workRate:traitWorkRate(w,b),preferredBait:d.preferredBait,workSkill:d.workSkill,companionSkill:d.companionSkill,status};
+      return {...b,profile:beastProfile(w,b),growth:growthDetails(w,b),workRate:traitWorkRate(w,b)*beastWorkScale(w,b),preferredBait:d.preferredBait,workSkill:d.workSkill,companionSkill:d.companionSkill,status};
     }),
     wild:w.wildEntities.filter(e=>activeWild(w,e)).map(e=>{
       const d=beastDefinitions.get(e.defId)!;
@@ -334,8 +349,13 @@ export function stepBeasts(w:WorldState):void{
       if(b.warmth<=0&&b.hp>1)b.hp=Math.max(1,b.hp-1);
     }
     if(!b.workCooldown&&active(b)){
-      if(working(w,b)){work(w,b);b.workCooldown=Math.ceil(TICK_RATE*(b.defId==='frostyak'?12:7)/traitWorkRate(w,b));}
-      else if(b.role==='companion'){companionWork(w,b);b.workCooldown=Math.ceil(TICK_RATE*10/traitWorkRate(w,b));}
+      if(working(w,b)){
+        if(work(w,b))gainBeastXp(w,b,5);
+        b.workCooldown=Math.ceil(TICK_RATE*(b.defId==='frostyak'?12:7)/(traitWorkRate(w,b)*beastWorkScale(w,b)));
+      }else if(b.role==='companion'){
+        if(companionWork(w,b))gainBeastXp(w,b,4);
+        b.workCooldown=Math.ceil(TICK_RATE*10/(traitWorkRate(w,b)*beastWorkScale(w,b)));
+      }
     }
   }
 }

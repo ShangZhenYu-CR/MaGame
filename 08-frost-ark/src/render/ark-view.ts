@@ -1,3 +1,4 @@
+import { paintCompanionBurst } from './beast-skills-view';
 import { paintWindZone } from './wind-zones';
 import { EVENT_ART,paintSkyEvent } from './sky-events-view';
 import { activeCave,caveEntrance,caveEntranceArt,caveGuard,CAVE_OFFSET,CAVE_SIZE } from '../sim/cave';
@@ -479,6 +480,7 @@ export class ArkView {
     if(this.canvas.dataset.indoorTiles!==cellCount)this.canvas.dataset.indoorTiles=cellCount;
     this.weather.paint(c,w,this.art.image('frost-frame'),snowMask);
     paintM5CombatEffects(c,w,project,s);
+    paintCompanionBurst(c,w,project,s);
     for(const hostile of hostiles)paintHostileBar(c,project(hostile.x,hostile.y),hostile,s);
     for(const b of beasts)paintBeastCues(c,project(b.x,b.y),b,s,w.tick);
     paintElementSigns(c,this.art,actors,w,project,s);

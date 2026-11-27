@@ -1,3 +1,4 @@
+import { beastMaxHealth,validGrowthArchive } from './beast-growth';
 import { validTraitArchive } from './beast-traits';
 import { validSurveyArchive } from './expansion';
 import { validSkyEvents } from './sky-events';
@@ -87,19 +88,19 @@ function isWildEntity(e:unknown):e is import('./types').WildEntity{
   return e.kind==='beast'?!!d&&typeof e.homeIslandId==='string'&&e.maxHp===d.maxHp&&
     e.tameProgress<d.tameFeedsRequired:e.homeIslandId===undefined||typeof e.homeIslandId==='string';
 }
-function isBeast(b:unknown):b is import('./types').BeastEntity{
+function isBeast(b:unknown,w:WorldState):b is import('./types').BeastEntity{
   if(!record(b)||typeof b.id!=='string'||typeof b.name!=='string'||typeof b.defId!=='string'||
      !num(b.hp)||!num(b.maxHp)||b.maxHp<=0||b.hp<0||b.hp>b.maxHp||
      !num(b.warmth)||b.warmth<0||b.warmth>100||!num(b.hunger)||b.hunger<0||b.hunger>100||
      !num(b.workCooldown)||!Number.isSafeInteger(b.workCooldown)||b.workCooldown<0||
      !eachNumber(b,['x','y'])||!(b.denBuildingId===null||typeof b.denBuildingId==='string')||
      !['work','rest','companion'].includes(String(b.role)))return false;
-  return beastDefinitions.get(b.defId)?.maxHp===b.maxHp;
+  return beastDefinitions.has(b.defId)&&beastMaxHealth(w,{id:b.id,defId:b.defId})===b.maxHp;
 }
 function validateFauna(p:Record<string,unknown>,ids:Set<string>):void{
   const invalid=()=>new Error('云兽或饲料存档不符合方舟格式');
   const {beastM4, beasts, wildEntities}=p;
-  if(!Array.isArray(beasts)||!Array.isArray(wildEntities)||beasts.length>18||!beasts.every(isBeast)||
+  if(!Array.isArray(beasts)||!Array.isArray(wildEntities)||beasts.length>18||!beasts.every(x=>isBeast(x,p as unknown as WorldState))||
      !wildEntities.every(isWildEntity)||wildEntities.some(e=>e.kind==='beast'&&!ids.has(e.homeIslandId!))||
      new Set([...wildEntities,...beasts].map(e=>e.id)).size!==wildEntities.length+beasts.length||
      beasts.filter(b=>b.role==='companion').length>MAX_COMPANIONS)throw invalid();
@@ -119,7 +120,7 @@ function validateFauna(p:Record<string,unknown>,ids:Set<string>):void{
 
 export function deserializeWorld(raw: string): WorldState {
   const p:unknown=JSON.parse(raw);
-  if(!record(p)||![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
+  if(!record(p)||![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
     throw new Error('存档版本不受支持');
   if(p.saveVersion===1){
     if(record(p.player))p.player.rescue={startedAt:null,shieldUntil:0};
@@ -245,6 +246,7 @@ export function deserializeWorld(raw: string): WorldState {
     (world.ark.anchoredIslandId&&!canReachAurora(world,world.ark.anchoredIslandId))||
     (nav&&record(nav)&&typeof nav.targetId==='string'&&!canReachAurora(world,nav.targetId)))
     throw new Error('太阳方舟或终局存档不符合方舟格式');
+  if(!validGrowthArchive(world))throw new Error('云兽成长存档不符合方舟格式');
   if(!validTraitArchive(world))throw new Error('云兽词条存档不符合方舟格式');
   if(!validSurveyArchive(world))throw new Error('远征信号存档不符合方舟格式');
   if(!validSkyEvents(world))throw new Error('云海奇遇存档不符合方舟格式');

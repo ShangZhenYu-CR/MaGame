@@ -77,7 +77,8 @@
     "p2-21-icon": "Create one original painterly tiny inventory icon for Frost Ark game, readable at 32 pixels, a gently curled single pale weathered ancient paper engineering blueprint held by a small gray-blue metal ring, subtle painted narrow charcoal line drawing of a fictional snowbound hearth in three rectangular and circular marks, no writing, symbols or text. One discreet cyan wax seal and frosted paper corner, coherent fine dark slate-brown contours, soft cool winter left light, straight 40° elevated view, isolated on 100% pure solid #FF00FF background with wide padding and clear silhouette, full object, no shadows outside silhouette, no outlines around backdrop, no other item. Match reference 32px painterly palette but not its objects.",
     "p2-22-fleet": "Frost Ark sky survival game original high detail atmospheric hand-painted sprite atlas. Exact 3 columns by 2 rows equal cells, single isolated complete object per cell, very generous pure saturated RGB #FF00FF solid matte available on every unoccluded gap. No labels/letters/columns dividers/frame, no margin objects or cast shadows. Straight-frontal orthographic 40 degree elevated 3/4, visible top and front, frosted cool winter upper-left soft light, restrained blue gray and charcoal warm brown outlines matching the attached painterly style reference. TOP LEFT: friendly civilian cloud merchant balloon airship, a horizontal ash-wood ship basket with ornate but compact amber lamplike glazing, gently rounded tawny-beige cloth balloon up high, slate-bronze rigging ties connect it to the little weathered wood gondola, narrow two softly glowing windows as accents. Not pirate, no flags. TOP CENTER: single distinctive hostile fantasy frost sky-raider sloop as a long narrow flared smoky grey wood hull, ragged deep slate navy sail, small crooked keel, sharp low rusty iron-rimed bow, tiny pale icy shards and worn down top surfaces, NO weapons or glyphs, visually very different silhouette from merchant balloon. TOP RIGHT: a raft of broken pale blue weathered wood and tied crates, aged dark chunks of collapsed deck boards snapped at one side, two small harness straps and one moss-black barrel lashed on the floating irregular broken surface, no characters. BOTTOM LEFT: compact isolated icon depicting a frost-wrapped dark blue-gray glowing cloud with tiny yellow-white lightning forks within the icon shape, graceful detailed painterly small silhouette, no background shadow. BOTTOM CENTER: small isolated icon depicting a pale green-blue flowing natural aurora ribbon and one tiny softly warm center among cooled colors, graphic but hand-painted, no surrounding sky or frame. BOTTOM RIGHT: single small inventory icon of aged trader's parchment blueprint folded in two, a warm copper circular clasp and tiny colored sketch lines only, clearly different from pale-cyan sealed cave blueprint, no letters or watermark. Keep each recognizable at gameplay size, layered handpainted construction no flat shapes, no overlapped cropping.",
     "p2-22-aurora": "Wide 2:1 isolated airborne natural hand-painted sky aurora curtain for the Frost Ark game, on a perfectly uniform pure RGB(255,0,255) magenta backdrop, unoccluded to every border. Center a long nearly horizontal oscillating thin flowing tapering multilayer shape with translucent-looking teal-blue eucalyptus and cool turquoise frost lights, gray pale cyan leading highlight, and just one faint amber glint at one taper. Dark desaturated upper-left light, subtle barely-there curling lower fringe and nonperiodic smooth elegance, like a gently blurred photographic aurora translated into refined handpainted painterly colored light. No solid sky image, no objects or mountains, no salt noise, no violet or neon, no text, no watermark, no sharp cutout boundaries, leave generous pure magenta margin. Will be alpha-keyed and composited dynamically.",
-    "p2-22-aurora-clean": "Create a 3:2 wide original hand-painted Frost Ark aurora game sprite sheet divided into two equal horizontal halves (two equal rows only), each containing one distinct isolated sprite with generous perfectly uniform flat 100% saturated #FF00FF on all sides. Absolutely NO lavender, violet, purple, saturated acid green, indigo, pink or red in the artwork itself. Color only subdued natural mineral sea green, desaturated pale eucalyptus, and dark cool turquoise along translucent edges; use sage and thin pale mint glints. Top row centered: tiny inventory-world compass illustration of a smooth small folded aurora ribbon, tapering and resting nearly horizontally, three slight velvet folds softly lit from upper-left, broad symmetric image padding. Bottom row: long elegant wide, almost horizontal slowly curving thin layered natural aurora drape, open transparent-looking soft edges, two thin brighter misty bands in the middle, no repetitive folds, broad margin on every side. Natural atmospheric hand-painted effects with subtle graduated turquoise tones in low contrast, no hard lines, no white glow blowout, no letters, no frame, no objects or negative space patterns. The only vibrant color anywhere must be the pure fuchsia background, not near edge tints in the subjects. Max two parts."
+    "p2-22-aurora-clean": "Create a 3:2 wide original hand-painted Frost Ark aurora game sprite sheet divided into two equal horizontal halves (two equal rows only), each containing one distinct isolated sprite with generous perfectly uniform flat 100% saturated #FF00FF on all sides. Absolutely NO lavender, violet, purple, saturated acid green, indigo, pink or red in the artwork itself. Color only subdued natural mineral sea green, desaturated pale eucalyptus, and dark cool turquoise along translucent edges; use sage and thin pale mint glints. Top row centered: tiny inventory-world compass illustration of a smooth small folded aurora ribbon, tapering and resting nearly horizontally, three slight velvet folds softly lit from upper-left, broad symmetric image padding. Bottom row: long elegant wide, almost horizontal slowly curving thin layered natural aurora drape, open transparent-looking soft edges, two thin brighter misty bands in the middle, no repetitive folds, broad margin on every side. Natural atmospheric hand-painted effects with subtle graduated turquoise tones in low contrast, no hard lines, no white glow blowout, no letters, no frame, no objects or negative space patterns. The only vibrant color anywhere must be the pure fuchsia background, not near edge tints in the subjects. Max two parts.",
+    "p2-25-skills": "Eight original small painterly ability icons for Frost Ark survival game, exact 4 columns by 2 rows cell layout. Every glyph centered isolated inside its cell with wide perfectly solid flat #FF00FF matte margins, no labels, grid lines, text, border or badges. Camera 40° elevated 2.5D, gentle upper-left cool winter light, muted graphite ice-blue and warm amber brush pigments with soft slate-brown contours; fully readable at 32px, compact silhouettes, no purple, neon, cast shadow or particles on the magenta. TOP left to right: (1) break-earth move as one upright irregular slate stone breaking into three bright blue-gray chunks, narrow amber crack; (2) ember fox surge as a low curving pair of warmly glowing amber flame tongues curling around a single little pale ember, no circle background; (3) yak charge as two carved orange-blue graphite horn curves lowered with strong forward slope, one small blue ice chip; (4) restorative elk field as one spiraling pale teal pine bough gently encompassing a little light blue warm drop, a few pine needles, no cross symbol. BOTTOM left to right: (5) razorwing dive as a single blue-grey detailed bird wing feather pivoting downward and two tiny pale ice airflow trailing wisps within shape; (6) magma creature breath as a compact sweeping horizontal mostly amber-red molten plume of two tapered tongues and small attached graphite ore shell; (7) tempest wyvern gust as differently proportioned rounded pale ice-blue wind funnel and visible little dark inner swirl, no cyan neon; (8) small bronze and ivory carved hourglass with a pale storm-blue sand core, crisp distinct passive cooldown icon. Match attached reference style not anatomy. Exactly eight individual silhouettes."
   },
   "assets": [
     {
@@ -6171,6 +6172,230 @@
         1024
       ],
       "gradePalette": "aurora-teal"
+    },
+    {
+      "id": "icon-skill-burrowback",
+      "source": "p225-icons.png",
+      "crop": [
+        0,
+        0,
+        443,
+        443
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 53,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8200
+    },
+    {
+      "id": "icon-skill-emberfox",
+      "source": "p225-icons.png",
+      "crop": [
+        443,
+        0,
+        887,
+        443
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 53,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8200
+    },
+    {
+      "id": "icon-skill-frostyak",
+      "source": "p225-icons.png",
+      "crop": [
+        887,
+        0,
+        1330,
+        443
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 53,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8200
+    },
+    {
+      "id": "icon-skill-glacierstag",
+      "source": "p225-icons.png",
+      "crop": [
+        1330,
+        0,
+        1774,
+        443
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 53,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8200
+    },
+    {
+      "id": "icon-skill-galehawk",
+      "source": "p225-icons.png",
+      "crop": [
+        0,
+        443,
+        443,
+        887
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 53,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8200
+    },
+    {
+      "id": "icon-skill-magmalisk",
+      "source": "p225-icons.png",
+      "crop": [
+        443,
+        443,
+        887,
+        887
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 53,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8200
+    },
+    {
+      "id": "icon-skill-tempest-wyvern",
+      "source": "p225-icons.png",
+      "crop": [
+        887,
+        443,
+        1330,
+        887
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 53,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8200
+    },
+    {
+      "id": "icon-skill-cooldown",
+      "source": "p225-icons.png",
+      "crop": [
+        1330,
+        443,
+        1774,
+        887
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 53,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8200
     }
   ],
   "batchReferences": [
@@ -6278,6 +6503,14 @@
       "sourceStyles": [
         "island-t4-cliff",
         "clouds"
+      ]
+    },
+    {
+      "batch": "P2-25",
+      "sourceStyles": [
+        "icon-raw-root",
+        "icon-cloud-fish",
+        "icon-raw-meat"
       ]
     }
   ]

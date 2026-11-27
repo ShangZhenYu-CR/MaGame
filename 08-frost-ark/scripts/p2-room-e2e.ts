@@ -43,7 +43,7 @@ export async function runP2Room(browser:Browser,url:string,dir:string,errors:str
   await p.getByText('室内暖室 · 关门挡雪',{exact:true}).waitFor();
   const first=Number((await p.locator('#local-temp').textContent())?.match(/-?\d+/)?.[0]);
   assert.ok(Number.isFinite(first));
-  await p.locator('#action[data-shown=false]').waitFor({timeout:6000});
+  await p.locator('#action').waitFor({state:'hidden',timeout:6000});
   await p.screenshot({path:resolve(dir,'P2-12-01-sealed-whiteout.png')});
   await p.keyboard.press('e');
   await p.getByText('防风门已打开。',{exact:true}).waitFor();

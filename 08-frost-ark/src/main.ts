@@ -1,3 +1,4 @@
+import { castBeastSkill,companionSkillStatus } from './sim/beast-skills';
 import { voyageBiome } from './sim/expansion';
 import { couldMoorTrader } from './sim/sky-events';
 import { skyEventsUi } from './ui/sky-events-ui';
@@ -154,6 +155,24 @@ function paintFishing(hide:boolean,selected:boolean):void{
   fishTrack.dataset.ready=String(cast.peek>=cast.left&&cast.peek<=cast.right);
 }
 
+function triggerCompanionSkill():void{
+ const outcome=castBeastSkill(w,pointer?view.world(pointer.x,pointer.y):undefined);
+ finishAction(outcome.issue,outcome.label+(outcome.hit?' · 命中 '+outcome.hit+' 个目标':'')+(outcome.leveled?' · 伙伴升级！':''),'hit');
+}
+const companionButton=el<HTMLButtonElement>('companion-skill');
+const companionImage=companionButton.querySelector('img')!,companionLabel=companionButton.querySelector('span')!,companionTimer=companionButton.querySelector('output')!;
+companionButton.onclick=()=>{if(!chart.open()&&panel.hidden&&locker.hidden&&!beasts.open()&&!industry.stationOpen()&&!industry.catalogOpen()&&!skyEvents.open())triggerCompanionSkill();};
+function paintCompanionAbility(hide:boolean):void{
+ const s=companionSkillStatus(w);companionButton.hidden=hide||!s;
+ if(!s)return;
+ const icon=iconPath(s.wait?'skill-cooldown':'skill-'+s.companion.defId.replaceAll('_','-'));
+ if(icon&&companionImage.getAttribute('src')!==icon)companionImage.src=icon;
+ if(companionLabel.textContent!==s.skill.name)companionLabel.textContent=s.skill.name;
+ const timer=s.wait?Math.ceil(s.wait/TICK_RATE)+'s':s.near?'就绪':'未就位';
+ if(companionTimer.textContent!==timer)companionTimer.textContent=timer;
+ companionButton.disabled=!!s.wait||!s.near;
+ companionButton.dataset.ready=String(!s.wait&&s.near);
+}
 function finishAction(issue:string|null,success:string,event?:'craft'|'undo'|'dismantle'|'place'|'hit'):void{
   tell(issue??success);
   if(issue)return;
@@ -579,7 +598,10 @@ addEventListener('keydown',e=>{
   else if(/^[1-9]$/.test(k)){e.preventDefault();quickbar.run(Number(k)-1);}
   else if(k==='r')warmthAction('fuel');
   else if(k==='u')warmthAction('upgrade');
-  else if(k==='g')warmthAction('drop');
+  else if(k==='g'){
+    if(e.shiftKey||!companionSkillStatus(w))warmthAction('drop');
+    else if(panel.hidden&&locker.hidden&&!beasts.open()&&!industry.stationOpen()&&!industry.catalogOpen())triggerCompanionSkill();
+  }
   else if(k==='h'){e.preventDefault();consumeMeal();}
   else if(k==='f'&&!rolling(w)){
     if(activeCave(w)){
@@ -708,6 +730,7 @@ function frame(now:number):void {
   beasts.update(now,overlay);m5Ui.update(now,overlay);
   canvas.dataset.primaryInteraction=context.kind;
   paintFishing(overlay||finale.arena(),context.kind==='fishing');
+  paintCompanionAbility(overlay);
   skyEvents.frame(down||finale.arena(),context.kind==='trader');
   toolUi.update(here);
   finale.update(chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||finale.open());

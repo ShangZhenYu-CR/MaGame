@@ -1287,3 +1287,34 @@ const restoredTrait=deserializeWorld(serializeWorld(traitWorld)),afterTrait=rest
 assert.equal(afterTrait.name,'松铃');
 assert.deepEqual(beastProfile(restoredTrait,afterTrait),p1);
 console.log('[sim-smoke:P2-24] OK: seeded individual trait/temperament/stars, actual shorter work cycles and valid persistent renaming');
+
+import { beastAttackScale,beastCooldown,beastLevel,beastWorkScale,chooseBeastLead,gainBeastXp } from '../src/sim/beast-growth';
+import { activeSkillFx,castBeastSkill,skills } from '../src/sim/beast-skills';
+import { liveSkillCombat,skillCompanion } from './p2-skills-fixture';
+for(const species of Object.keys(skills)){
+ const {w,foe}=liveSkillCombat();
+ w.beasts.length=0; // individual skill with no other attacker or cooldown
+ delete (w as typeof w&{beastGrowthP2?:unknown}).beastGrowthP2;
+ const trained=skillCompanion(w,species);
+ const before=foe.hp,tk=w.tick;
+ const cast=castBeastSkill(w);
+ assert.equal(cast.issue,null,species+' actual skill');
+ assert.equal(activeSkillFx(w)?.start,tk);
+ assert.ok(beastCooldown(w,trained)>0);
+ if(species==='glacierstag')assert.ok(w.player.warmth>=62&&w.player.hp>=80);
+ else assert.ok(foe.hp<before,species+' must deal real damage');
+ assert.match(castBeastSkill(w).issue!,/还需/);
+ const prior=beastLevel(w,trained);
+ gainBeastXp(w,trained,8000);
+ assert.equal(beastLevel(w,trained),10);
+ assert.ok(beastAttackScale(w,trained)>1.7&&beastWorkScale(w,trained)>1.4);
+ const archived=deserializeWorld(serializeWorld(w));
+ assert.equal(beastLevel(archived,trained),10);
+ assert.ok(beastLevel(w,trained)>prior);
+}
+const variety=liveSkillCombat();
+assert.equal(castBeastSkill(variety.w).issue,null);
+assert.equal(chooseBeastLead(variety.w,variety.healer.id),null);
+assert.equal(castBeastSkill(variety.w).issue,null,'another leader has an independent timer');
+assert.ok(beastCooldown(variety.w,variety.healer)>0&&beastCooldown(variety.w,variety.leader)>0);
+console.log('[sim-smoke:P2-25] OK: 7 working skills, level cap and derived stats, independent cooldowns, persistent leader and active visual signal');

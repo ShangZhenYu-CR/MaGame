@@ -1,3 +1,5 @@
+import { chooseBeastLead } from '../sim/beast-growth';
+import { skills } from '../sim/beast-skills';
 import { renameBeast,traitList } from '../sim/beast-traits';
 import { isGrappleItem } from '../sim/grapple-tools';
 import {
@@ -31,7 +33,7 @@ export function beastUi(h:BeastUIHooks){
  const load=el<HTMLButtonElement>('beast-feed-load');
  const sector=document.querySelector<HTMLElement>('.sector');
  let targetId:string|null=null,last=0,packKey='',cardKey='';
- const cards=new Map<string,{role:HTMLElement,status:HTMLElement,vitals:HTMLElement,label:HTMLElement,rate:HTMLElement,rename:HTMLDetailsElement,input:HTMLInputElement,buttons:HTMLButtonElement[]}>();
+ const cards=new Map<string,{role:HTMLElement,status:HTMLElement,vitals:HTMLElement,label:HTMLElement,rate:HTMLElement,training:HTMLElement,lead:HTMLButtonElement,rename:HTMLDetailsElement,input:HTMLInputElement,buttons:HTMLButtonElement[]}>();
  const button=(label:string,fn:()=>void)=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.onclick=fn;return b;};
  const img=(src:string)=>{const i=document.createElement('img');i.src=src;i.alt='';return i;};
  function feedback(issue:string|null,msg:string,event?:'craft'|'hit'){h.msg(issue,msg,event);update(performance.now(),encounter.hidden,true);}
@@ -79,12 +81,13 @@ export function beastUi(h:BeastUIHooks){
   const label=document.createElement('strong');label.textContent=beast.name;const role=document.createElement('span');
   const src=h.art(beast.defId);if(src)head.append(img(src));head.append(label,role);
   const status=document.createElement('small'),vitals=document.createElement('div');vitals.className='beast-vitals numbers';
-  const skills=document.createElement('p');skills.className='beast-skills';
-  skills.textContent=`基地：${skillNames[beast.workSkill]??beast.workSkill}　随行：${skillNames[beast.companionSkill]??beast.companionSkill}`;
+  const skillText=document.createElement('p');skillText.className='beast-skills';
+  skillText.textContent=`基地：${skillNames[beast.workSkill]??beast.workSkill}　随行：${skillNames[beast.companionSkill]??beast.companionSkill}`;
   const profile=document.createElement('div');profile.className='beast-profile';
   const subtype=document.createElement('small'),rate=document.createElement('small');
   subtype.textContent='潜力 '+beast.profile.stars+'/5 星 · '+beast.profile.temperament;
   rate.dataset.beastWorkRate='true';profile.append(subtype,rate);
+  const training=document.createElement('small');training.dataset.beastGrowth='true';profile.append(training);
   const traits=document.createElement('ul');traits.className='beast-traits';traits.setAttribute('aria-label','个体词条');
   for(const id of beast.profile.traits){
     const tag=document.createElement('li');tag.dataset.trait=id;tag.textContent=traitList[id].name;tag.title=traitList[id].text;
@@ -110,8 +113,10 @@ export function beastUi(h:BeastUIHooks){
    const b=button(label,()=>feedback(setBeastRole(h.state(),beast.id,key),`${beast.name}：${label}`,'craft'));
    b.dataset.beastRole=key;return b;
   });
-  row.append(...buttons);card.append(head,status,vitals,profile,skills,row,rename);
-  cards.set(beast.id,{role,status,vitals,label,rate,rename,input:edit,buttons});return card;
+  const lead=button('设为领队',()=>feedback(chooseBeastLead(h.state(),beast.id),beast.name+'已带队。','craft'));
+  lead.dataset.beastLeader='true';lead.hidden=beast.role!=='companion';lead.setAttribute('aria-label',beast.name+'设为领队');
+  row.append(...buttons,lead);card.append(head,status,vitals,profile,skillText,row,rename);
+  cards.set(beast.id,{role,status,vitals,label,rate,training,lead,rename,input:edit,buttons});return card;
  }
  function updatePack(w:WorldState,data:Info){
   pack.hidden=!data.packAvailable;
@@ -149,6 +154,10 @@ export function beastUi(h:BeastUIHooks){
    put(card.status,x.status);
    put(card.label,x.name);
    put(card.rate,'工作 '+Math.round(x.workRate*100)+'%');
+   put(card.training,'Lv.'+x.growth.level+' · '+x.growth.xp+'/'+x.growth.next+' 经验');
+   card.lead.hidden=x.role!=='companion';card.lead.disabled=x.growth.lead;
+   put(card.lead,x.growth.lead?'当前领队':'设为领队');
+   card.lead.title=skills[x.defId]?.name??'';card.lead.setAttribute('aria-label',x.name+'设为领队');
    if(!card.rename.open&&card.input.value!==x.name)card.input.value=x.name;
    put(card.vitals,`体力 ${Math.ceil(x.hp)}/${x.maxHp}　体温 ${Math.round(x.warmth)}　饱腹 ${Math.round(x.hunger)}`);
    for(const b of card.buttons)b.setAttribute('aria-pressed',String(b.dataset.beastRole===x.role));

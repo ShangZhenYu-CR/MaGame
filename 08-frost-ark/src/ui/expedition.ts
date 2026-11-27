@@ -1,3 +1,4 @@
+import { currentLeader,gainBeastXp } from '../sim/beast-growth';
 import { activeCave,caveChestTaken,caveContext,caveEntrance,caveEntranceTitle,caveGuard,enterCave,nearCaveGate,useCave } from '../sim/cave';
 import { collectQuarry, harvestForage, nearQuarry, nearForage, patchContents, patchReady, patchTitles, type Patch } from '../sim/forage';
 import { actionLandmark, landmarkPrompt, nearLandmark, type Landmark } from '../sim/landmarks';
@@ -58,7 +59,13 @@ export function expeditionUi(hooks:Hooks){
   const actionable=(c:IslandChoice)=>c.tag==='node'||c.tag==='quarry'||(c.tag==='mark'?!!landmarkPrompt(w,c.point).label:patchReady(w,c.point));
   return candidates.sort((a,b)=>Number(actionable(b))-Number(actionable(a))||distance(a)-distance(b))[0];
  }
- function useForage(p:Patch){hooks.message(harvestForage(hooks.state(),p),'已采集：'+patchContents(p)+'。','hit');}
+ function shareGatherXp(w:WorldState){
+  const lead=currentLeader(w);if(lead&&Math.hypot(lead.x-w.player.x,lead.y-w.player.y)<4.3)gainBeastXp(w,lead,4);
+ }
+ function useForage(p:Patch){
+   const w=hooks.state(),issue=harvestForage(w,p);if(!issue)shareGatherXp(w);
+   hooks.message(issue,'已采集：'+patchContents(p)+'。','hit');
+ }
  function useLandmark(mark:Landmark){const result=actionLandmark(hooks.state(),mark);hooks.message(result.issue,result.message,'place');}
  function keyAction(){
   const w=hooks.state(),here=area();
@@ -132,6 +139,7 @@ export function expeditionUi(hooks:Hooks){
    else if(now>=gathering.finish){
     const {node}=gathering;cancel();
     const result=harvestIslandResource(w,node);
+    if(result.ok)shareGatherXp(w);
     hooks.message(result.ok?null:result.message,result.message,'hit');
    }else progress.value=1-(gathering.finish-now)/duration;
   }

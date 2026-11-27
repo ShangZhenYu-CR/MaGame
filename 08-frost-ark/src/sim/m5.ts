@@ -1,3 +1,4 @@
+import { beastAttackScale,gainBeastXp } from './beast-growth';
 import { traitStrike,traitWatchful } from './beast-traits';
 import { gangwayGeometry } from './island';
 import { rotateDockPoint } from './dock-direction';
@@ -220,7 +221,9 @@ function stepCompanions(w:WorldState){
     const target=w.wildEntities.find(e=>isOwned(e)&&e.hp>0&&length(b,e)<=2.4&&
       (w.activeIsland?e.kind==='boss':e.kind==='raider'));
     if(!target)continue;
-    hurt(w,target,(beastAttack.get(b.defId)??10)*traitStrike(w,b),b.defId==='burrowback'||b.defId==='magmalisk',0,b.defId==='magmalisk'?'fire':undefined);
+    const before=target.hp;
+    hurt(w,target,(beastAttack.get(b.defId)??10)*traitStrike(w,b)*beastAttackScale(w,b),b.defId==='burrowback'||b.defId==='magmalisk',0,b.defId==='magmalisk'?'fire':undefined);
+    if(target.hp<before)gainBeastXp(w,b,target.hp<=0?14:6);
     flash(w,b,target,b.defId==='magmalisk'?'fire':'strike');
   }
 }

@@ -19,6 +19,8 @@ export const GROUND_FOOTPRINTS: Readonly<Record<string, {
   catch_net:      { anchorY:  .92, bounds: [0, .67, 1, .92] },
   sorter_arm:     { anchorY:  .8,  bounds: [.255, .54, .745, .8] },
   greenhouse:     { anchorY: 1.76, bounds: [.06, .72, 1.94, 1.76] },
+  fuel_hopper:    { anchorY:.80, bounds:[.09,.46,.91,.80] },
+  steam_chute:    { anchorY:.77, bounds:[.09,.55,.91,.77] },
   wind_door:      { anchorY:.81, bounds:[0,.49,1,.81] },
   frost_airlock:  { anchorY:.81, bounds:[0,.49,1,.81] },
   warm_wall:      { anchorY:  .8,  bounds: [0, .49, 1, .8] },

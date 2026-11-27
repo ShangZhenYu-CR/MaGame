@@ -327,3 +327,11 @@ export function stepBeasts(w:WorldState):void{
     }
   }
 }
+
+export function transferFeedFromNetwork(w:WorldState,b:BuildingInstance,id:string,count:number):boolean{
+ if(b.defId!=='feed_trough'||!['beast_feed','raw_root','raw_meat','cloud_fish'].includes(id)||
+   !Number.isSafeInteger(count)||count<1)return false;
+ const state=ensureFauna(w);
+ if(state.feed+count>FEED_LIMIT)return false;
+ state.feed+=count;return true;
+}

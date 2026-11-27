@@ -98,6 +98,12 @@
     <button id="bench-research" type="button" hidden>查阅研究蓝图</button>
     <div id="industry-job" class="industry-job" hidden><label for="industry-progress" id="industry-job-label"></label><progress id="industry-progress" max="1" value="0"></progress></div>
     <section id="industry-recipes-section" aria-labelledby="industry-recipes-title" hidden><h3 id="industry-recipes-title">配方</h3><div id="industry-recipes"></div></section>
+    <section id="logistics-panel" hidden aria-labelledby="logistics-title">
+      <h3 id="logistics-title">自动物流</h3>
+      <label id="logistics-route-label">送往 <select id="logistics-route" aria-label="输送目标"></select></label>
+      <p id="logistics-line" class="numbers"></p>
+      <div id="hopper-buttons" hidden><button type="button" id="hopper-wood">加入浮木板 ×1</button><button type="button" id="hopper-coal">加入浮煤块 ×1</button></div>
+    </section>
     <section id="industry-intake-section" aria-labelledby="industry-intake-title" hidden><h3 id="industry-intake-title">待分拣</h3><ul id="industry-intake"></ul></section>
     <section aria-labelledby="industry-output-title"><h3 id="industry-output-title">产出</h3><ul id="industry-output"></ul><button type="button" id="industry-collect">收取产出</button></section>
   </aside>

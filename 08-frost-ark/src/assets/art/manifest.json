@@ -2576,6 +2576,70 @@
         60
       ],
       "bytes": 8750
+    },
+    "building-fuel-hopper": {
+      "file": "building-fuel-hopper.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.17,
+      "tileH": 1.17,
+      "contentBox": [
+        8,
+        2,
+        120,
+        121
+      ],
+      "bytes": 33655
+    },
+    "building-steam-chute": {
+      "file": "building-steam-chute.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.17,
+      "tileH": 1.17,
+      "contentBox": [
+        2,
+        45,
+        126,
+        121
+      ],
+      "bytes": 22034
+    },
+    "icon-fuel-hopper": {
+      "file": "icon-fuel-hopper.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1.17,
+      "tileH": 1.17,
+      "contentBox": [
+        5,
+        2,
+        59,
+        60
+      ],
+      "bytes": 9137
+    },
+    "icon-steam-chute": {
+      "file": "icon-steam-chute.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1.17,
+      "tileH": 1.17,
+      "contentBox": [
+        2,
+        23,
+        62,
+        60
+      ],
+      "bytes": 6132
     }
   }
 }

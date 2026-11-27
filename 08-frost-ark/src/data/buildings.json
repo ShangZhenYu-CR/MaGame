@@ -226,5 +226,7 @@
     ]
   },
   {"id": "wind_door", "name": "木质防风门", "category": "structure", "size": [1, 1], "buoyancyDelta": -1, "insulation": 0.58, "maxHp": 110, "cost": [{"itemId": "driftwood", "count": 3}, {"itemId": "rope", "count": 1}]},
-  {"id": "frost_airlock", "name": "霜铁自动气密门", "category": "structure", "size": [1, 1], "buoyancyDelta": -2, "insulation": 0.82, "maxHp": 175, "cost": [{"itemId": "frost_iron_ingot", "count": 2}, {"itemId": "ice_shard", "count": 2}]}
+  {"id": "frost_airlock", "name": "霜铁自动气密门", "category": "structure", "size": [1, 1], "buoyancyDelta": -2, "insulation": 0.82, "maxHp": 175, "cost": [{"itemId": "frost_iron_ingot", "count": 2}, {"itemId": "ice_shard", "count": 2}]},
+  {"id": "fuel_hopper", "name": "燃料料斗", "category": "industry", "size": [1, 1], "buoyancyDelta": -1, "maxHp": 110, "cost": [{"itemId": "driftwood", "count": 3}, {"itemId": "frost_iron_ingot", "count": 2}]},
+  {"id": "steam_chute", "name": "蒸汽传输滑道", "category": "industry", "size": [1, 1], "buoyancyDelta": -1, "maxHp": 105, "cost": [{"itemId": "frost_iron_scrap", "count": 2}, {"itemId": "driftwood", "count": 2}]}
 ]

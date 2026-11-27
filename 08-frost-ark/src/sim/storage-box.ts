@@ -41,3 +41,13 @@ export function transferStorage(w: WorldState, itemId:string, direction:'deposit
   (w as StorageSave).storageM0=newStacks;
   return null;
 }
+
+/** A machine may feed the existing locker without touching the player's bag. */
+export function addNetworkStorage(w:WorldState,buildingId:string,packet:ItemStack):boolean{
+  if(buildingId!=='storage_main'||isGrappleItem(packet.itemId))return false;
+  const contents=storageContents(w).map(s=>({...s}));
+  const current=contents.find(x=>x.itemId===packet.itemId),cap=limits.get(packet.itemId)??0;
+  if((current?.count??0)+packet.count>cap||(!current&&contents.length>=STORAGE_SLOTS))return false;
+  if(current)current.count+=packet.count;else contents.push({...packet});
+  (w as StorageSave).storageM0=contents;return true;
+}

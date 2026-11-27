@@ -885,3 +885,26 @@ const aggressor={kind:'raider' as const,id:'test_raid_at_door',defId:'froststalk
 defended.wildEntities=[aggressor];stepWorld(defended,90);
 assert.ok(aggressor.y>=27,'raider cannot follow the player through an open friendly airlock');
 console.log('[sim-smoke:P2-12] OK: airtight topology, exposed hole, matched heat, open/close collision, diagonal roll, automatic door and archive');
+
+import { logisticsArk } from './p2-logistics-fixture';
+import { logisticsStats, networkStation, setLogisticsRoute, transportEvents } from '../src/sim/logistics';
+const supplyNet=logisticsArk();
+assert.equal(setLogisticsRoute(supplyNet.w,supplyNet.sorter,'auto'),null);
+stepWorld(supplyNet.w,5400);
+const trials=logisticsStats(supplyNet.w)!;
+assert.ok(trials.hearthRefills>0&&trials.furnaceRefills>0&&trials.storage>0&&trials.feed>0,'both burners, storage and feed all received actual packets');
+assert.ok(supplyNet.h.fuel>0&&supplyNet.furnace.fuel>0);
+assert.equal(networkStation(supplyNet.w,supplyNet.furnace).output.find(s=>s.itemId==='frost_iron_ingot')?.count,3);
+const fromFull=logisticsArk(true);
+assert.equal(setLogisticsRoute(fromFull.w,fromFull.sorter,'storage_main'),null);
+const retained=(world:typeof fromFull.w)=>{
+ const station=getIndustrySave(world)?.stations??{};
+ return world.sky.debris.reduce((n,d)=>n+d.loot.filter(p=>p.itemId==='rope').reduce((sum,p)=>sum+p.count,0),0)+
+  Object.values(station).flatMap(s=>[...s.intake,...s.output]).filter(p=>p.itemId==='rope').reduce((n,p)=>n+p.count,0);
+};
+for(let i=0;i<360;i++){fromFull.w.tick++;stepIndustry(fromFull.w);}
+assert.equal(retained(fromFull.w),7,'a full explicit destination deposits zero and does not consume one unit');
+assert.ok(!transportEvents(fromFull.w).length);
+const nextNetwork=deserializeWorld(serializeWorld(supplyNet.w));
+assert.equal(networkStation(nextNetwork,nextNetwork.ark.buildings.find(b=>b.defId==='sorter_arm')!).route,'auto');
+console.log('[sim-smoke:P2-13] OK: 5,400 ticks self-burning, live iron smelting, feed, multi-hop storage, full-chest stock conservation and archive');

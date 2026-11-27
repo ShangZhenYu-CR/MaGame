@@ -1,3 +1,4 @@
+import { loadHopper,routePanel,runNetworkPass,setLogisticsRoute } from './logistics';
 import { invalidateRoomTopology } from './rooms';
 import recipes from '../data/recipes.json';
 import tech from '../data/tech.json';
@@ -10,7 +11,7 @@ import { getNavigation } from './m3-state';
 import { crewFurnaceFuel, crewIndustryMultiplier, crewSmeltBonus } from './beasts';
 import { TICK_RATE, type BuildingInstance, type ItemStack, type WorldState } from './types';
 
-const processable=new Set(['workbench','furnace','stove','greenhouse','catch_net','sorter_arm']);
+const processable=new Set(['workbench','furnace','stove','greenhouse','catch_net','sorter_arm','fuel_hopper','steam_chute']);
 const rows=new Map(recipes.map(r=>[r.id,r]));
 const nodeById=new Map(tech.nodes.map(n=>[n.id,n]));
 const UNDO_TICKS=4*TICK_RATE;
@@ -51,7 +52,7 @@ function merge(contents:readonly ItemStack[],additions:readonly ItemStack[]):Ite
 }
 
 const isRecipeUnlocked=(w:WorldState,id:string)=>tech.nodes.some(n=>w.unlockedTech.includes(n.id)&&n.unlocksRecipes.includes(id));
-const recipeInputs=(w:WorldState,r:typeof recipes[number])=>r.station==='furnace'&&crewFurnaceFuel(w)
+const recipeInputs=(w:WorldState,r:typeof recipes[number],b:BuildingInstance)=>r.station==='furnace'&&(b.fuel>0||crewFurnaceFuel(w))
   ?r.inputs.filter(s=>s.itemId!=='coal_chunk'):r.inputs;
 const recipeOutput=(w:WorldState,r:typeof recipes[number])=>r.id==='smelt_frost_iron'
   ?{...r.output,count:r.output.count+crewSmeltBonus(w)}:r.output;
@@ -61,7 +62,7 @@ function recipeIssue(w:WorldState,b:BuildingInstance,r:typeof recipes[number],s:
   if(s?.job)return '设备正处理上一批';
   if(!efficiencyAt(w,b))return '设备结冻，先把这里暖起来';
   if(!merge(s?.output??[],[recipeOutput(w,r)]))return '产出格已满，先取走物资';
-  if(!hasCost(w,recipeInputs(w,r)))return '材料不足';
+  if(!hasCost(w,recipeInputs(w,r,b)))return '材料不足';
   return null;
 }
 
@@ -78,8 +79,10 @@ export function industryPanel(w:WorldState,buildingId:string){
   const noNet=b.defId==='sorter_arm'&&!w.ark.buildings.some(net=>linkedNet(b,net));
   return {
     id:b.id,defId:b.defId,name:buildingDefs.get(b.defId)!.name,efficiency,job,
-    recipes:recipes.filter(r=>r.station===b.defId).map(r=>({...r,inputs:recipeInputs(w,r),output:recipeOutput(w,r),seconds:r.seconds??0,issue:recipeIssue(w,b,r,s)})),
+    recipes:recipes.filter(r=>r.station===b.defId).map(r=>({...r,inputs:recipeInputs(w,r,b),output:recipeOutput(w,r),seconds:r.seconds??0,issue:recipeIssue(w,b,r,s)})),
     output:s?.output??[],intake:s?.intake??[],
+    logistics:['fuel_hopper','steam_chute','sorter_arm','furnace'].includes(b.defId)?routePanel(w,b):null,
+    fuel:b.fuel,
     status:!efficiency?'结冻停机':lockedNet?'请在网栏外侧留出一格开放云海':noNet?'附近没有捕捞网栏':
       b.defId==='catch_net'?'拦截漂流残骸，可手动取货':b.defId==='sorter_arm'?'自动收取三格内网栏物资':
       job?(efficiency<1?'低温减速，正在加工':'正在加工'):'待机',
@@ -91,8 +94,11 @@ export function startIndustry(w:WorldState,buildingId:string,recipeId:string):st
   if(!b||!r||r.station!==b.defId||!r.seconds)return '这里不能加工该配方';
   const issue=recipeIssue(w,b,r,getIndustrySave(w)?.stations[b.id]);
   if(issue)return issue;
-  if(!inventoryChange(w,recipeInputs(w,r),[]))return '材料不足';
-  stationFor(w,b).job={recipeId,progress:0,duration:r.seconds*TICK_RATE,cold:0,paid:recipeInputs(w,r).map(s=>({...s}))};
+  const paid=recipeInputs(w,r,b);
+  if(!inventoryChange(w,paid,[]))return '材料不足';
+  const networkFuel=b.defId==='furnace'&&b.fuel>0&&!crewFurnaceFuel(w);
+  stationFor(w,b).job={recipeId,progress:0,duration:r.seconds*TICK_RATE,cold:0,paid:paid.map(s=>({...s})),
+    ...(networkFuel?{networkFuel:true}:{})};
   return null;
 }
 
@@ -101,13 +107,21 @@ export function collectIndustry(w:WorldState,buildingId:string):string|null {
   if(!b||!near(w,b))return '走近设备后再取货';
   const s=getIndustrySave(w)?.stations[b.id];
   if(!s)return '还没有可领取的物资';
-  const goods=b.defId==='catch_net'?s.intake:s.output;
+  const fromIntake=['catch_net','fuel_hopper'].includes(b.defId),goods=fromIntake?s.intake:s.output;
   if(!goods.length)return '还没有可领取的物资';
   if(!inventoryChange(w,[],goods))return '背包空间不足，物资已保留';
-  if(b.defId==='catch_net')s.intake=[];else s.output=[];
+  if(fromIntake)s.intake=[];else s.output=[];
   return null;
 }
 
+export function changeRoute(w:WorldState,id:string,dest:string):string|null{
+ const b=w.ark.buildings.find(s=>s.id===id);
+ return b&&near(w,b)?setLogisticsRoute(w,b,dest):'走近设备再设定输送目标';
+}
+export function addFuelToHopper(w:WorldState,id:string,item:string):string|null{
+ const b=w.ark.buildings.find(s=>s.id===id);
+ return b&&near(w,b)?loadHopper(w,b,item):'走近料斗再加入燃料';
+}
 function techIssue(w:WorldState,id:string):string|null {
   const node=nodeById.get(id);
   if(!node||w.unlockedTech.includes(id))return '已经解锁';
@@ -143,13 +157,23 @@ export function stepIndustry(w:WorldState):void {
       if(!efficiency&&b.defId==='greenhouse'){
         // Frost burns a crop after 30 seconds of continuous exposure.
         if(++job.cold>=30*TICK_RATE)s.job=null;
-      }else if(efficiency){
+      }else if(efficiency&&(!job.networkFuel||b.fuel>0)){
+        if(job.networkFuel)b.fuel=Math.max(0,b.fuel-.045);
         job.cold=0;
         job.progress=Math.min(job.duration,job.progress+efficiency);
         if(job.progress>=job.duration){
           const output=merge(s.output,[recipeOutput(w,recipe)]);
           if(output){s.output=output;s.job=null;}
         }
+      }
+    }
+    if(b.defId==='furnace'&&s&&!s.job&&efficiency&&b.fuel>0){
+      const ore=s.intake.find(q=>q.itemId==='frost_iron_scrap'&&q.count>=2);
+      const recipe=rows.get('smelt_frost_iron')!;
+      if(ore&&merge(s.output,[recipeOutput(w,recipe)])){
+        ore.count-=2;s.intake=s.intake.filter(q=>q.count>0);
+        s.job={recipeId:recipe.id,progress:0,duration:recipe.seconds!*TICK_RATE,cold:0,
+          networkFuel:true,paid:[{itemId:'frost_iron_scrap',count:2}]};
       }
     }
     if(!efficiency||(b.defId!=='catch_net'&&b.defId!=='sorter_arm'))continue;
@@ -175,6 +199,7 @@ export function stepIndustry(w:WorldState):void {
       }
     }
   }
+  runNetworkPass(w);
 }
 
 export function pendingDismantle(w:WorldState){

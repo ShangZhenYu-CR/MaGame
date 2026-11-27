@@ -27,6 +27,7 @@ import { beastUi } from './ui/beasts';
 import { equipmentUi } from './ui/equipment';
 import { weaponsUi } from './ui/weapons';
 import { chooseWeapon, selectedWeapon, triggerWeapon, weaponHover, weaponById } from './sim/weapons';
+import { logisticsStats } from './sim/logistics';
 import { doorCenter,doorOpen,indoorsAt,nearestManualDoor,operateWindDoor } from './sim/rooms';
 import { gearModifiers } from './sim/equipment';
 import { heldTool,holdTool } from './sim/hotbar';
@@ -635,6 +636,12 @@ function frame(now:number):void {
   setVital(3,w.player.hunger,w.player.maxHunger);setVital(4,w.player.roll.stamina,100);updateFoodHud();weaponUi.frame(mode==='weapon');
   const reading=`脚下 ${local}°C`;
   if(localTemperature.textContent!==reading)localTemperature.textContent=reading;
+  const flow=logisticsStats(w);
+  if(flow||canvas.dataset.logistics){
+    const data=flow?JSON.stringify({tick:w.tick-w.tick%30,hearth:Math.round(h?.fuel??0),
+      furnace:Math.round(w.ark.buildings.find(b=>b.defId==='furnace')?.fuel??0),...flow}):'';
+    if(data!==canvas.dataset.logistics)canvas.dataset.logistics=data;
+  }
   updateToolbar();quickbar.frame();paintBuffHud(local,shield);
   const tool=heldTool(w)??'';if(canvas.dataset.heldTool!==tool)canvas.dataset.heldTool=tool;
   thermal.dataset.cold=String(w.player.warmth<=25);

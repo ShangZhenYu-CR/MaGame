@@ -1,3 +1,4 @@
+import { transportEvents } from '../sim/logistics';
 import { doorOpen,indoor } from '../sim/rooms';
 import { ELEMENT_ART,paintElementAura,paintElementSigns } from './element-view';
 import { thawedDeck } from '../sim/elements';
@@ -38,6 +39,8 @@ const buildingVisuals:Readonly<Record<string,BuildingVisual>>={
   catch_net:{art:'building-net',width:1.23,height:1.20,shadow:.45},
   sorter_arm:{art:'building-sorter',width:1.20,height:1.46,shadow:.47},
   greenhouse:{art:'building-greenhouse',width:2.26,height:2.17,shadow:.98},
+  fuel_hopper:{art:'building-fuel-hopper',width:1.13,height:1.12,shadow:.46},
+  steam_chute:{art:'building-steam-chute',width:1.17,height:1.04,shadow:.46},
   wind_door:{art:'building-wind-door',width:1.12,height:1.14,shadow:.45},
   frost_airlock:{art:'building-airlock',width:1.12,height:1.14,shadow:.47},
   warm_wall:{art:'building-insulated-wall',width:1.18,height:1.25,shadow:.55},
@@ -51,7 +54,7 @@ const ironDeck='building-iron-deck';
 const required=[
   ...deckIds,'boss-frost-whale-1','boss-frost-whale-2','boss-frost-whale-3','solar-hearth','aurora-crystal','manan-south','manan-north','manan-west','manan-east','latte-sleep','latte-alert','latte-walk','latte-walk-alt',
   'hearth-1','hearth-2','hearth-3','rail','corner','rock','icicles',ironDeck,...Object.values(buildingVisuals).map(v=>v.art),
-  'debris-wood','debris-iron','debris-rope','debris-heavy','clouds','rail-side','rock-side','frost-frame','building-wind-door-open','building-airlock-open',...ISLAND_ART,...BEAST_ART,...HOSTILE_ART,...ELEMENT_ART,
+  'debris-wood','debris-iron','debris-rope','debris-heavy','clouds','rail-side','rock-side','frost-frame','icon-driftwood','icon-coal-chunk','icon-iron','icon-raw-root','icon-cloud-fish','icon-raw-meat','icon-beast-feed','building-wind-door-open','building-airlock-open',...ISLAND_ART,...BEAST_ART,...HOSTILE_ART,...ELEMENT_ART,
 ] as const;
 interface Cell { x:number; y:number; hash:number; iron:boolean; temperature:number; left:boolean; right:boolean; front:boolean; back:boolean }
 interface Actor {
@@ -322,6 +325,15 @@ export class ArkView {
       if(glow)c.restore();
       if(actor.fire)this.paintFire(c,actor,p,w.tick);
       paintElementAura(c,w,actor,p,s);
+    }
+    const parcel:Record<string,string>={driftwood:'driftwood',coal_chunk:'coal-chunk',frost_iron_scrap:'iron',
+      raw_root:'raw-root',cloud_fish:'cloud-fish',raw_meat:'raw-meat',beast_feed:'beast-feed'};
+    for(const event of transportEvents(w)){
+      const t=Math.min(event.path.length-1,(w.tick-event.tick)/22*(event.path.length-1));
+      const i=Math.floor(t),a=event.path[i],b=event.path[Math.min(i+1,event.path.length-1)];
+      const pos=project(a.x+(b.x-a.x)*(t-i),a.y+(b.y-a.y)*(t-i));
+      const icon=parcel[event.item]??'driftwood';
+      this.art.paint(c,'icon-'+icon,pos.x,pos.y-s*.18,s,{width:.28,height:.28,rotation:.12});
     }
     if(g.active)this.paintHook(c,w,held);
     paintWeaponCombat(c,w,project,s);

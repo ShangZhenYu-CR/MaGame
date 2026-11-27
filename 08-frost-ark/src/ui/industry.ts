@@ -1,3 +1,4 @@
+import { addFuelToHopper,changeRoute } from '../sim/industry';
 import { buildKinds, buildCosts, buildDefinitions, countItem, itemNames, type BuildKind } from '../sim/ark';
 import { collectIndustry, industryPanel, pendingDismantle, startIndustry, techOptions, undoDismantle, unlockTech } from '../sim/industry';
 import type { ItemStack, WorldState } from '../sim/types';
@@ -6,6 +7,7 @@ import { bindTooltips } from './tooltip';
 
 const el=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id)! as T;
 const descriptions:Partial<Record<BuildKind,string>>={
+ fuel_hopper:'自动给紧邻的主炉或熔炉补燃料。',steam_chute:'将相邻分拣臂与远端容器相连。',
  wind_door:'E 开关，关闭时可封住房间。',frost_airlock:'只为马楠和伙伴打开，离开后自动闭合。',
  frost_turret:'远射自动防御塔，暖区供能时拦截敌袭。',
  fire_oil_turret:'近距火油喷射，可连片驱散冰兽，严寒时须供暖。',
@@ -42,11 +44,11 @@ export function createIndustryUi(cb:Callbacks){
  const catalog=el('build-catalog'),station=el('industry-panel'),lift=el<HTMLMeterElement>('buoyancy-gauge');
  const spare=el('buoyancy-spare'),undo=el('dismantle-undo'),progress=el<HTMLProgressElement>('undo-progress');
  const collect=el<HTMLButtonElement>('industry-collect'),closeTip=bindTooltips(el('app'),el('ui-tip'));
- let activeStation:string|null=null,catalogKey='',stationKey='',liftKey='';
+ let activeStation:string|null=null,catalogKey='',stationKey='',liftKey='',routeKey='';
  const buttons=new Map<BuildKind,HTMLButtonElement>();
  const itemIcon=(id:string)=>cb.icon(id.replaceAll('_','-'))??cb.icon(materialIcons[id]??'');
- const lateBlueprints=new Set<string>(['beast_den','feed_trough','frost_turret','fire_oil_turret','wind_door','frost_airlock']);
- const categoryGroup=(kind:BuildKind)=>el(['workbench','furnace','stove','catch_net','sorter_arm','greenhouse','beast_den','feed_trough'].includes(kind)?'catalog-industry':'catalog-structure');
+ const lateBlueprints=new Set<string>(['beast_den','feed_trough','frost_turret','fire_oil_turret','wind_door','frost_airlock','fuel_hopper','steam_chute']);
+ const categoryGroup=(kind:BuildKind)=>el(['workbench','furnace','stove','catch_net','sorter_arm','greenhouse','beast_den','feed_trough','fuel_hopper','steam_chute'].includes(kind)?'catalog-industry':'catalog-structure');
  for(const kind of buildKinds){
   const def=buildDefinitions[kind],[gw,gh]=def.size;
   const lift=def.buoyancyDelta>0?`+${def.buoyancyDelta} 浮力`:def.buoyancyDelta<0?`占用 ${-def.buoyancyDelta} 浮力`:'不占浮力';
@@ -102,7 +104,23 @@ export function createIndustryUi(cb:Callbacks){
  function updateStation(){
   if(!activeStation)return;
   const info=industryPanel(cb.state(),activeStation);if(!info){showStation(null);return;}
-  const {id,defId,recipes,job,output,intake,efficiency,status}=info;
+  const {id,defId,recipes,job,output,intake,efficiency,status,logistics,fuel}=info;
+  const route=el<HTMLSelectElement>('logistics-route'),displays=logistics!==null;
+  el('logistics-panel').hidden=!displays;
+  el('hopper-buttons').hidden=defId!=='fuel_hopper';
+  el('logistics-route-label').hidden=defId!=='sorter_arm'&&defId!=='steam_chute';
+  if(logistics){
+    const {mode,options,stats}=logistics,key=JSON.stringify([id,mode,options]);
+    if(routeKey!==key){
+      routeKey=key;
+      const opts=[['buffer','保留在设备内'],['auto','自动对接'],...options.map(a=>[a.id,`${a.name} (${a.gx},${a.gy}) · ${a.hops} 段`])];
+      if(!opts.some(v=>v[0]===mode))opts.push([mode,'连接已断开']);
+      route.replaceChildren(...opts.map(([v,n])=>{const o=document.createElement('option');o.value=v;o.textContent=n;return o;}));
+      route.value=mode;
+    }
+    text(el('logistics-line'),defId==='fuel_hopper'?'已供炉 '+((stats?.hearthRefills??0)+(stats?.furnaceRefills??0))+' 次':defId==='furnace'?
+      '自动燃料 '+Math.ceil(fuel):options.length+' 个可达设备 · 已传 '+(stats?.delivered??0)+' 件');
+  }
   station.dataset.buildingId=id;station.dataset.defId=defId;el('bench-research').hidden=defId!=='workbench';
   text(el('industry-title'),info.name);text(el('industry-status'),`${status} · 效率 ${Math.round(efficiency*100)}%`);
   const progress=el<HTMLProgressElement>('industry-progress');el('industry-job').hidden=!job;
@@ -112,10 +130,10 @@ export function createIndustryUi(cb:Callbacks){
    progress.max=job.duration;progress.value=job.progress;
   }
   const key=JSON.stringify([id,recipes,!!job,output,intake]);if(key===stationKey)return;stationKey=key;
-  el('industry-intake-section').hidden=!intake.length&&defId!=='catch_net';
+  el('industry-intake-section').hidden=!intake.length&&defId!=='catch_net'&&defId!=='fuel_hopper';
   el('industry-intake').replaceChildren(...stackRows(intake,'网内暂空'));
   el('industry-output').replaceChildren(...stackRows(output,'暂无产出'));
-  collect.textContent=defId==='catch_net'?'收取网内物资':'收取产出';collect.disabled=!(output.length||intake.length);
+  collect.textContent=defId==='catch_net'?'收取网内物资':defId==='fuel_hopper'?'取回库存燃料':'收取产出';collect.disabled=!(output.length||intake.length);
   el('industry-recipes-section').hidden=recipes.length===0;
   const focusId=(document.activeElement as HTMLElement|null)?.dataset.recipeId;
   el('industry-recipes').replaceChildren(...recipes.map(r=>{
@@ -131,6 +149,12 @@ export function createIndustryUi(cb:Callbacks){
  }
  function undoAction(){
   if(pendingDismantle(cb.state()))cb.message(undoDismantle(cb.state()),'已撤销拆除，原样放回。','undo');
+ }
+ el<HTMLSelectElement>('logistics-route').onchange=e=>{
+  if(activeStation){cb.message(changeRoute(cb.state(),activeStation,(e.currentTarget as HTMLSelectElement).value),'输送目标已更新。');updateStation();}
+ };
+ for(const [button,id] of [['hopper-wood','driftwood'],['hopper-coal','coal_chunk']]){
+  el(button).onclick=()=>{if(activeStation){cb.message(addFuelToHopper(cb.state(),activeStation,id),'燃料已装入料斗。');updateStation();}};
  }
  collect.onclick=()=>{if(activeStation){cb.message(collectIndustry(cb.state(),activeStation),'物资已收入背包。','craft');updateStation();}};
  el('catalog-close').onclick=()=>{showCatalog(false);el('build-catalog-toggle').focus();};

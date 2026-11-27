@@ -347,3 +347,5 @@ button[aria-disabled=true]{opacity:.62}
 @media(min-width:621px){.key-note{bottom:8px}}
 
 #indoor-status{margin:3px 0 1px;font-size:10px;color:#ffd18d}
+
+#logistics-panel select{width:100%;background:#20374a;color:#e5edf4;border:1px solid var(--edge);border-radius:4px;padding:4px}#hopper-buttons button{font-size:11px}

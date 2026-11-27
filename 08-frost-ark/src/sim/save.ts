@@ -52,12 +52,15 @@ function validBuilding(b:unknown):b is BuildingInstance {
 }
 function validStation(value:unknown,defId:string):boolean {
   if(!record(value)||!num(value.cycle)||value.cycle<0||value.cycle>=TICK_RATE)return false;
+  if(value.route!==undefined&&(!['sorter_arm','steam_chute'].includes(defId)||
+    typeof value.route!=='string'||!/^[a-z0-9_-]{1,96}$/.test(value.route)))return false;
   for(const bin of [value.output,value.intake])
     if(!Array.isArray(bin)||bin.length>8||!bin.every(stack)||new Set(bin.map(s=>s.itemId)).size!==bin.length)return false;
   const j=value.job;
   const recipe=record(j)&&typeof j.recipeId==='string'?recipeDefs.get(j.recipeId):undefined;
   if(j===null)return true;
   if(!record(j)||recipe?.station!==defId||!recipe.seconds||
+    (j.networkFuel!==undefined&&(defId!=='furnace'||typeof j.networkFuel!=='boolean'))||
     !num(j.progress)||!num(j.duration)||j.progress<0||j.duration!==recipe.seconds*TICK_RATE||j.progress>j.duration||
     !num(j.cold)||!Number.isInteger(j.cold)||j.cold<0||j.cold>=30*TICK_RATE)return false;
   const paid=j.paid;
@@ -109,7 +112,7 @@ function validateFauna(p:Record<string,unknown>,ids:Set<string>):void{
 
 export function deserializeWorld(raw: string): WorldState {
   const p:unknown=JSON.parse(raw);
-  if(!record(p)||![1,2,3,4,5,6,7,8,9,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
+  if(!record(p)||![1,2,3,4,5,6,7,8,9,10,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
     throw new Error('存档版本不受支持');
   if(p.saveVersion===1){
     if(record(p.player))p.player.rescue={startedAt:null,shieldUntil:0};

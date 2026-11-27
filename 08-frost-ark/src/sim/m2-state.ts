@@ -1,9 +1,9 @@
 import type { BuildingInstance, ItemStack, WorldState } from './types';
 export interface IndustryJob {
-  recipeId:string; progress:number; duration:number; cold:number; paid?:ItemStack[];
+  recipeId:string; progress:number; duration:number; cold:number; paid?:ItemStack[]; networkFuel?:boolean;
 }
 export interface IndustryStation {
-  intake:ItemStack[]; output:ItemStack[]; job:IndustryJob|null; cycle:number;
+  intake:ItemStack[]; output:ItemStack[]; job:IndustryJob|null; cycle:number; route?:string;
 }
 export interface RemovalSnapshot {
   gx:number; gy:number; deck:number; building:BuildingInstance|null; station:IndustryStation|null; expires:number;

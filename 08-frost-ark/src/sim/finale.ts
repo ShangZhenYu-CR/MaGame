@@ -1,3 +1,4 @@
+import { burnDamage,frozen,resolveElement,type Element } from './elements';
 import { emitJuice } from './juice';
 import { damagePlayer } from './rescue';
 import phases from '../data/whale.json';
@@ -83,15 +84,16 @@ export function attackWhale(w:WorldState):string|null{
   return null;
 }
 
-export function strikeWhaleWithWeapon(w:WorldState,damage:number):boolean{
+export function strikeWhaleWithWeapon(w:WorldState,damage:number,element?:Element):boolean{
   const f=get(w),b=f?.whale;
   if(!f||!b||f.mode!=='battle'||!coast(w)||w.tick>=b.recovery||w.player.hp<=0)return false;
-  damageWhale(w,f,b,damage);return true;
+  const direct=element?resolveElement(w,'whale',damage,element):{damage,critical:false};
+  damageWhale(w,f,b,direct.damage,false,direct.critical);return true;
 }
 
-function damageWhale(w:WorldState,f:FinaleState,b:Whale,damage:number):void{
+function damageWhale(w:WorldState,f:FinaleState,b:Whale,damage:number,dot=false,melt=false):void{
   const before=b.hp;b.hp=Math.max(0,b.hp-damage);
-  emitJuice(w,'hit',b,before-b.hp,{target:'whale',critical:true});
+  emitJuice(w,dot?'burn':'hit',b,before-b.hp,{target:'whale',critical:!dot,melt});
   if(b.hp>0)return;
   if(b.phase===phases.length-1){win(w,f);return;}
   b.phase++;b.hp=phases[b.phase].hp;b.warning=null;b.recovery=0;b.next=w.tick+56;
@@ -105,6 +107,8 @@ export function stepFinale(w:WorldState):void{
     b.warning=null;b.recovery=0;b.next=w.tick+35;
     return;
   }
+  if(burnDamage(w,'whale')){const phase=b.phase;damageWhale(w,f,b,3,true);if(!f.whale||b.phase!==phase)return;}
+  if(frozen(w,'whale'))return;
   if(b.warning){
     if(w.tick<b.warning.until)return;
     const target=b.warning;

@@ -2416,6 +2416,70 @@
         60
       ],
       "bytes": 7576
+    },
+    "icon-status-burn": {
+      "file": "icon-status-burn.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        10,
+        2,
+        53,
+        60
+      ],
+      "bytes": 5604
+    },
+    "icon-status-chill": {
+      "file": "icon-status-chill.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        10,
+        2,
+        55,
+        60
+      ],
+      "bytes": 4977
+    },
+    "icon-status-frozen": {
+      "file": "icon-status-frozen.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        59,
+        60
+      ],
+      "bytes": 7811
+    },
+    "icon-status-broken": {
+      "file": "icon-status-broken.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        8,
+        2,
+        56,
+        60
+      ],
+      "bytes": 7218
     }
   }
 }

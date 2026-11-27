@@ -1,4 +1,5 @@
 import { verifyM5 } from './m5';
+import { validElements } from './elements';
 import { ROLL_TICKS } from './roll';
 import { RESCUE_SHIELD_TICKS } from './rescue';
 import { isMeal, MAX_MEAL_TICKS } from './food';
@@ -236,6 +237,7 @@ export function deserializeWorld(raw: string): WorldState {
       active.size!==island.size||active.offsetX!==island.offsetX||active.offsetY!==island.offsetY)throw invalidNavigation();
     world.activeIsland=island;
   }else if(area==='void'||active!==null)throw invalidNavigation();
+  if(!validElements(world))throw new Error('元素状态存档不符合方舟格式');
   if(!verifyM5(world))throw new Error('寒潮、首领或火种存档不符合方舟格式');
   return world;
 }

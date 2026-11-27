@@ -1,3 +1,5 @@
+import { ELEMENT_ART,paintElementAura,paintElementSigns } from './element-view';
+import { thawedDeck } from '../sim/elements';
 import { JuiceView } from './juice-view';
 import { paintWeaponCombat } from './weapon-view';
 import { contourHull, HULL_NORTH, HULL_EAST, HULL_SOUTH, HULL_WEST, type HullProfile } from '../sim/hull';
@@ -46,7 +48,7 @@ const ironDeck='building-iron-deck';
 const required=[
   ...deckIds,'boss-frost-whale-1','boss-frost-whale-2','boss-frost-whale-3','solar-hearth','aurora-crystal','manan-south','manan-north','manan-west','manan-east','latte-sleep','latte-alert','latte-walk','latte-walk-alt',
   'hearth-1','hearth-2','hearth-3','rail','corner','rock','icicles',ironDeck,...Object.values(buildingVisuals).map(v=>v.art),
-  'debris-wood','debris-iron','debris-rope','debris-heavy','clouds','rail-side','rock-side','frost-frame',...ISLAND_ART,...BEAST_ART,...HOSTILE_ART,
+  'debris-wood','debris-iron','debris-rope','debris-heavy','clouds','rail-side','rock-side','frost-frame',...ISLAND_ART,...BEAST_ART,...HOSTILE_ART,...ELEMENT_ART,
 ] as const;
 interface Cell { x:number; y:number; hash:number; iron:boolean; temperature:number; left:boolean; right:boolean; front:boolean; back:boolean }
 interface Actor {
@@ -157,12 +159,12 @@ export class ArkView {
       dataHull(this.canvas,this.hull);
     }
     const hull=this.hull;
-    const cells:Cell[]=[];
+    const cells:Cell[]=[],thawed=thawedDeck(w);
     const a=this.worldBounds();
     for(let y=a.top;y<=a.bottom;y++) for(let x=a.left;x<=a.right;x++){
       if(!deck(x,y))continue;
       const i=y*w.ark.size+x,mask=hull.edges[i];
-      cells.push({x,y,hash:hash(x,y),iron:w.ark.decks[i]===2,temperature:w.ark.heatGrid[i]??w.ambientTemp,
+      cells.push({x,y,hash:hash(x,y),iron:w.ark.decks[i]===2,temperature:(w.ark.heatGrid[i]??w.ambientTemp)+(thawed?.has(i)?9:0),
         left:!!(mask&HULL_WEST),right:!!(mask&HULL_EAST),front:!!(mask&HULL_SOUTH),back:!!(mask&HULL_NORTH)});
     }
 
@@ -315,6 +317,7 @@ export class ArkView {
       this.art.paint(c,actor.art,p.x,p.y-(actor.float??0)-this.juice.bounce(actor.id,now)*s,s,actor);
       if(glow)c.restore();
       if(actor.fire)this.paintFire(c,actor,p,w.tick);
+      paintElementAura(c,w,actor,p,s);
     }
     if(g.active)this.paintHook(c,w,held);
     paintWeaponCombat(c,w,project,s);
@@ -327,6 +330,7 @@ export class ArkView {
     paintM5CombatEffects(c,w,project,s);
     for(const hostile of hostiles)paintHostileBar(c,project(hostile.x,hostile.y),hostile,s);
     for(const b of beasts)paintBeastCues(c,project(b.x,b.y),b,s,w.tick);
+    paintElementSigns(c,this.art,actors,w,project,s);
     this.juice.paint(c,project,s,now);
     // Aiming is a control cue, not world geometry. Keep it above night tint,
     // snow and frost so a reachable endpoint stays visible in all weather.

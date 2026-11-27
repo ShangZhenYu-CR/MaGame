@@ -3,7 +3,7 @@ import type { Vec2 } from '../sim/types';
 import { clamp,ovalGlow } from './atmosphere';
 
 const colors:Record<JuiceType,string>={
- hit:'#ff8776',hurt:'#f18c87',heal:'#a7ecad',warmth:'#ffd591',wood:'#c69766',ore:'#ffcf84',build:'#c0ae93',
+ hit:'#ff8776',burn:'#ffc17c',hurt:'#f18c87',heal:'#a7ecad',warmth:'#ffd591',wood:'#c69766',ore:'#ffcf84',build:'#c0ae93',
 };
 const loud=new Set<JuiceType>(['hit','hurt']);
 type Effect=JuiceEvent&{at:number;serial:number;offset:number};
@@ -53,7 +53,7 @@ export class JuiceView{
   for(const e of this.current){
    const p=project(e.x,e.y),age=(now-e.at),t=clamp(age/700);
    if(p.x<-s||p.x>c.canvas.width+s||p.y<-s||p.y>c.canvas.height+s)continue;
-   const damage=loud.has(e.type),flying=e.type==='wood'||e.type==='ore'||e.type==='build';
+   const damage=loud.has(e.type)||e.type==='burn',flying=e.type==='wood'||e.type==='ore'||e.type==='build';
    const y=p.y-s*(damage?.65:.37);
    if((damage||flying)&&age<490){
     const u=age/490,tail=1-u,wood=e.type==='wood',build=e.type==='build';
@@ -73,7 +73,7 @@ export class JuiceView{
    }
    if(e.amount<=0)continue;
    const num=Math.round(e.amount),bold=e.critical?25:20;
-   const label=damage?(e.critical?'暴击 −':'−')+num:e.type==='warmth'?'+ '+num+' 体温':'+ '+num;
+   const label=damage?(e.melt?'融化暴击 −':e.critical?'暴击 −':'−')+num:e.type==='warmth'?'+ '+num+' 体温':'+ '+num;
    const px=p.x+(e.offset===0?0:e.offset%2===0?-1:1)*(15+10*e.offset)+Math.sin(e.serial*2.1)*6*t;
    const py=y-13*t-23*Math.sqrt(t)-e.offset*26;
    c.globalAlpha=1-clamp((age-510)/300);

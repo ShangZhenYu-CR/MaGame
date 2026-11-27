@@ -1,3 +1,4 @@
+import { armorBroken,burnDamage,elementalSpeed,frozen,resolveElement,type Element } from './elements';
 import { emitJuice } from './juice';
 import { damagePlayer } from './rescue';
 import specs from '../data/combat_m5.json';
@@ -62,20 +63,21 @@ export function claimIslandCacheSeed(w:WorldState,nodeKey:string):boolean{
   return (id==='sulfur_furnace'||id==='permafrost_ruins')&&nodeKey==='chest_2068'&&claimSunSeed(w,id);
 }
 
-function hurt(w:WorldState,e:WildEntity,damage:number,bypassArmor=false,penetration=0){
-  const arm=specs.hostiles[e.defId as HostileId]?.armor??0;
+function hurt(w:WorldState,e:WildEntity,damage:number,bypassArmor=false,penetration=0,element?:Element,dot=false){
+  const arm=armorBroken(w,e.id)?0:(specs.hostiles[e.defId as HostileId]?.armor??0);
+  const effect=element?resolveElement(w,e.id,damage,element):{damage,critical:false};
   const before=e.hp;
-  e.hp=Math.max(0,e.hp-Math.max(1,damage-(bypassArmor?0:Math.max(0,arm-penetration))));
-  emitJuice(w,'hit',e,before-e.hp,{target:e.id,critical:e.kind==='boss'&&!e.hp});
+  e.hp=Math.max(0,e.hp-Math.max(1,effect.damage-(bypassArmor?0:Math.max(0,arm-penetration))));
+  emitJuice(w,dot?'burn':'hit',e,before-e.hp,{target:e.id,melt:effect.critical,critical:effect.critical||(!dot&&e.kind==='boss'&&!e.hp)});
   if(e.hp||e.kind!=='boss'||!isOwned(e))return;
   const island=w.sky.islands.find(n=>n.id===w.activeIsland?.nodeId);
   if(!island||bossByIsland[island.id]!==e.defId)return;
   island.bossDefeated=true;
   claimSunSeed(w,island.id as M5SeedId);
 }
-export function strikeHostileWithWeapon(w:WorldState,e:WildEntity,damage:number,penetration:number):boolean {
+export function strikeHostileWithWeapon(w:WorldState,e:WildEntity,damage:number,penetration:number,element?:Element):boolean {
   if(!isOwned(e)||e.hp<=0)return false;
-  hurt(w,e,damage,false,penetration);return true;
+  hurt(w,e,damage,false,penetration,element);return true;
 }
 function add(w:WorldState,defId:HostileId,id:string,kind:'boss'|'raider',p:Vec2){
   const d=specs.hostiles[defId];
@@ -121,7 +123,7 @@ function spawnWave(w:WorldState,s:M5State){
 function move(w:WorldState,e:WildEntity,p:Vec2,speed:number){
   const gap=length(e,p);
   if(gap<.08)return;
-  const k=Math.min(gap,speed/TICK_RATE)/gap;
+  const k=Math.min(gap,speed*elementalSpeed(w,e.id)/TICK_RATE)/gap;
   const xx=e.x+(p.x-e.x)*k,yy=e.y+(p.y-e.y)*k;
   const pass=(x:number,y:number)=>e.kind==='boss'?areaAt(w,x,y)==='island':onDeck(w,{x,y});
   if(pass(xx,e.y))e.x=xx;
@@ -138,8 +140,8 @@ function stepTurrets(w:WorldState,s:M5State){
     const target=enemies.filter(e=>e.hp>0&&length(from,e)<=def.range).sort((a,c)=>length(from,a)-length(from,c))[0];
     if(!target)continue;
     const fire=b.defId==='fire_oil_turret';
-    hurt(w,target,def.damage,fire);
-    if(fire)for(const nearby of enemies)if(nearby!==target&&nearby.hp>0&&length(target,nearby)<1.3)hurt(w,nearby,Math.floor(def.damage/2),true);
+    hurt(w,target,def.damage,fire,0,fire?'fire':'ice');
+    if(fire)for(const nearby of enemies)if(nearby!==target&&nearby.hp>0&&length(target,nearby)<1.3)hurt(w,nearby,Math.floor(def.damage/2),true,0,'fire');
     flash(w,from,target,fire?'fire':'arrow');
     s.turretClocks[b.id]=w.tick+def.cadence;
   }
@@ -147,6 +149,9 @@ function stepTurrets(w:WorldState,s:M5State){
 function stepEnemy(w:WorldState,e:WildEntity,s:M5State){
   const d=specs.hostiles[e.defId as HostileId];
   const clock=s.clocks[e.id]??={cooldown:0,strike:0,target:''};
+  if(burnDamage(w,e.id))hurt(w,e,3,true,0,undefined,true);
+  if(e.hp<=0)return;
+  if(frozen(w,e.id)){if(clock.strike)clock.strike++;return;}
   const building=(id:string)=>w.ark.buildings.find(b=>b.id===id&&b.hp>0);
   const candidate=e.kind==='boss'||(w.player.hp>0&&onDeck(w,w.player)&&length(e,w.player)<2.4)?'player':
     w.ark.buildings.filter(b=>b.hp>0).sort((a,b)=>length(e,center(a))-length(e,center(b)))[0]?.id??'';
@@ -191,7 +196,7 @@ function stepCompanions(w:WorldState){
     const target=w.wildEntities.find(e=>isOwned(e)&&e.hp>0&&length(b,e)<=2.4&&
       (w.activeIsland?e.kind==='boss':e.kind==='raider'));
     if(!target)continue;
-    hurt(w,target,beastAttack.get(b.defId)??10,b.defId==='burrowback'||b.defId==='magmalisk');
+    hurt(w,target,beastAttack.get(b.defId)??10,b.defId==='burrowback'||b.defId==='magmalisk',0,b.defId==='magmalisk'?'fire':undefined);
     flash(w,b,target,b.defId==='magmalisk'?'fire':'strike');
   }
 }

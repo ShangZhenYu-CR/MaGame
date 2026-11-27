@@ -18,6 +18,7 @@ import { stepFinale } from './finale';
 import { stepRescue } from './rescue';
 import { stepHunger } from './food';
 import { stepWeapons } from './weapons';
+import { cleanElements } from './elements';
 import { rollMotion,stepRoll } from './roll';
 
 export function createInitialWorld(seed = 202608): WorldState {
@@ -152,5 +153,6 @@ export function stepWorld(world: WorldState, ticks = 1, direction: Vec2 = {x: 0,
     stepM5(world);
     stepRescue(world);
     stepRoll(world);
+    cleanElements(world);
   }
 }

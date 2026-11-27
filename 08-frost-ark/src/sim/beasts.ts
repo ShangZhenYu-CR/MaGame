@@ -1,3 +1,4 @@
+import { burnDamage,elementalSpeed,frozen,resolveElement,type Element } from './elements';
 import { emitJuice } from './juice';
 import { equippedItem } from './equipment';
 import { isGrappleItem } from './grapple-tools';
@@ -90,10 +91,11 @@ export function strikeWildBeast(w:WorldState,id:string):string|null{
   return null;
 }
 
-export function strikeWildWithWeapon(w:WorldState,e:WildEntity,damage:number):boolean{
+export function strikeWildWithWeapon(w:WorldState,e:WildEntity,damage:number,element?:Element):boolean{
   if(!activeWild(w,e))return false;
-  const before=e.hp;e.hp=Math.max(0,e.hp-damage);
-  emitJuice(w,'hit',e,before-e.hp,{target:e.id});
+  const effect=element?resolveElement(w,e.id,damage,element):{damage,critical:false};
+  const before=e.hp;e.hp=Math.max(0,e.hp-effect.damage);
+  emitJuice(w,'hit',e,before-e.hp,{target:e.id,critical:effect.critical,melt:effect.critical});
   e.hostile=e.hp>e.maxHp*.35&&!e.stunnedTicks;return true;
 }
 
@@ -291,10 +293,12 @@ export function stepBeasts(w:WorldState):void{
   for(const e of w.wildEntities){
     if(e.kind!=='beast'||e.hp<=0)continue;
     if(e.stunnedTicks)e.stunnedTicks--;
-    if(!activeWild(w,e)||e.stunnedTicks||!e.hostile)continue;
+    if(!activeWild(w,e))continue;
+    if(burnDamage(w,e.id)){const before=e.hp;e.hp=Math.max(0,e.hp-3);emitJuice(w,'burn',e,before-e.hp,{target:e.id});}
+    if(!e.hp||e.stunnedTicks||!e.hostile||frozen(w,e.id))continue;
     const p=w.player,d=distance(p,e);
     if(d>5){e.hostile=false;continue;}
-    if(d>.8)moveToward(e,p.x,p.y,.047,w);
+    if(d>.8)moveToward(e,p.x,p.y,.047*elementalSpeed(w,e.id),w);
     else if(w.tick%(TICK_RATE*2)===0)damagePlayer(w,(beastDefinitions.get(e.defId)?.attack??6)*.28);
   }
   let companionIndex=0;

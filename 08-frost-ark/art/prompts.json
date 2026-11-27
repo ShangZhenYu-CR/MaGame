@@ -56,7 +56,8 @@
     "p207-icon-ember-hammer": "Original illustrated inventory icon for the fictional fantasy survival game Frost Ark. Hand-painted 2.5D game sprite, soft cool upper-left light and restrained weathered pigments. Compact iconic silhouette, centered single prop, crisply legible at 32px, no text or diagrams. Uniform solid bright magenta #FF00FF matte to every edge, no ground shadow, no background decorations, no text or watermark.\nA very chunky illustrated blacksmith's maul with a broad slate head, short oak grip, brushed bronze collar and subtle internal warm amber stone in its flat face. Small fantasy workshop inventory item, distinct broad silhouette.",
     "p207-icon-ice-repeater": "Original illustrated inventory icon for the fictional fantasy survival game Frost Ark. Hand-painted 2.5D game sprite, soft cool upper-left light and restrained weathered pigments. Compact iconic silhouette, centered single prop, crisply legible at 32px, no text or diagrams. Uniform solid bright magenta #FF00FF matte to every edge, no ground shadow, no background decorations, no text or watermark.\nA clearly fictional fantasy frozen-relic icon shaped like a compact stylized crossbow: smooth old wood body, solid translucent blue crystal wing shapes on both sides, no individual mechanical details, toy-like iconic geometry. Hand-painted collectible sprite.",
     "p207-icon-fire-oil-flask": "Original illustrated inventory icon for the fictional fantasy survival game Frost Ark. Hand-painted 2.5D game sprite, soft cool upper-left light and restrained weathered pigments. Compact iconic silhouette, centered single prop, crisply legible at 32px, no text or diagrams. Uniform solid bright magenta #FF00FF matte to every edge, no ground shadow, no background decorations, no text or watermark.\nA small rounded sealed fantasy amber potion bottle, with dark gray cork stopper, smooth glass body, warm peach liquid and one decorative string tied around the neck. A thick muted leather scallop around the base. No wick, no labels or hazard signs.",
-    "p207-icon-magma-sprayer": "Original illustrated inventory icon for the fictional fantasy survival game Frost Ark. Hand-painted 2.5D game sprite, soft cool upper-left light and restrained weathered pigments. Compact iconic silhouette, centered single prop, crisply legible at 32px, no text or diagrams. Uniform solid bright magenta #FF00FF matte to every edge, no ground shadow, no background decorations, no text or watermark.\nA small ornate fictional portable steam kettle with ribbed copper bulb, side carrying ring, short downturned meteor-stone mouth and a glowing amber porthole in the rounded closed body. This is a fantastical plumbing tool sprite, heavily stylized, simple solid silhouette."
+    "p207-icon-magma-sprayer": "Original illustrated inventory icon for the fictional fantasy survival game Frost Ark. Hand-painted 2.5D game sprite, soft cool upper-left light and restrained weathered pigments. Compact iconic silhouette, centered single prop, crisply legible at 32px, no text or diagrams. Uniform solid bright magenta #FF00FF matte to every edge, no ground shadow, no background decorations, no text or watermark.\nA small ornate fictional portable steam kettle with ribbed copper bulb, side carrying ring, short downturned meteor-stone mouth and a glowing amber porthole in the rounded closed body. This is a fantastical plumbing tool sprite, heavily stylized, simple solid silhouette.",
+    "p2-elemental-icons": "Frost Ark original hand-painted indie survival game elemental status icon props, four equally sized images exact square 2 by 2 regular quadrant grid. Each motif distinctly centered in its quadrant, completely separated by wide pure fuchsia #FF00FF. Painterly 2.5D three-quarter top-down viewed 40° above, cool soft light from upper left, fine muted slate-brown edges, warm muted amber and frosted mineral blue, deeply readable at tiny 24 pixels. No text, no numbers, no card, no dividing marks, no outline around cells, no badge frame, no background shadows, flat pure solid saturated #FF00FF chroma key all around and between single glyphs. Precisely this order: top left single warm orange ember plume with rounded flame tongues (burning); top right thin asymmetrical pale icy-blue crystal with one long oblique shard and only two smaller broken side shards (slow); bottom left one distinctive chunky ice-blue translucent cube angled three-quarters enclosing a deep blue frost star silhouette (frozen); bottom right one moderately warm ochre iron shield icon broken in two by a wide diagonal blue-slate crack, clearly readable negative space through the split (armor broken). Compelling detailed painterly object silhouettes, no dark square base, no scenery, no purple. Large open space around every single icon, no clipping. Render square contact sheet."
   },
   "assets": [
     {
@@ -2998,6 +2999,74 @@
       "key": "magenta",
       "tileW": 1,
       "tileH": 1
+    },
+    {
+      "id": "icon-status-burn",
+      "source": "status.png",
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "tileW": 1,
+      "tileH": 1,
+      "crop": [
+        0,
+        0,
+        627,
+        627
+      ]
+    },
+    {
+      "id": "icon-status-chill",
+      "source": "status.png",
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "tileW": 1,
+      "tileH": 1,
+      "crop": [
+        627,
+        0,
+        1254,
+        627
+      ]
+    },
+    {
+      "id": "icon-status-frozen",
+      "source": "status.png",
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "tileW": 1,
+      "tileH": 1,
+      "crop": [
+        0,
+        627,
+        627,
+        1254
+      ]
+    },
+    {
+      "id": "icon-status-broken",
+      "source": "status.png",
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "tileW": 1,
+      "tileH": 1,
+      "crop": [
+        627,
+        627,
+        1254,
+        1254
+      ]
     }
   ],
   "batchReferences": [

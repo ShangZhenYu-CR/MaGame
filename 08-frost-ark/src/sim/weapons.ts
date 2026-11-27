@@ -5,6 +5,7 @@ import { strikeWildWithWeapon } from './beasts';
 import { finaleStatus,strikeWhaleWithWeapon } from './finale';
 import { areaAt } from './island';
 import { strikeHostileWithWeapon } from './m5';
+import type { Element } from './elements';
 import { rolling } from './roll';
 import { incapacitated } from './rescue';
 import type { Vec2,WildEntity,WorldState } from './types';
@@ -61,11 +62,13 @@ function targets(w:WorldState):Target[]{
   if(f.atAurora&&f.mode==='battle'&&f.whale)t.push({x:f.whale.x,y:f.whale.y,enemy:null});
   return t;
 }
+const elementFor:Record<WeaponStyle,Element>={bolt:'ice',thrust:'break',sweep:'hammer',throw:'fire',flame:'fire'};
 function hit(w:WorldState,s:Spec,target:Target):boolean {
-  if(!target.enemy)return strikeWhaleWithWeapon(w,s.damage);
+  const element=elementFor[s.style];
+  if(!target.enemy)return strikeWhaleWithWeapon(w,s.damage,element);
   const e=target.enemy;
-  return e.kind==='beast'?strikeWildWithWeapon(w,e,s.damage):
-    strikeHostileWithWeapon(w,e,s.damage,s.pierce);
+  return e.kind==='beast'?strikeWildWithWeapon(w,e,s.damage,element):
+    strikeHostileWithWeapon(w,e,s.damage,s.pierce,element);
 }
 
 export function triggerWeapon(w:WorldState,at:Vec2):string|null{

@@ -2336,6 +2336,86 @@
         60
       ],
       "bytes": 6240
+    },
+    "icon-frost-iron-spear": {
+      "file": "icon-frost-iron-spear.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        5,
+        2,
+        59,
+        60
+      ],
+      "bytes": 3134
+    },
+    "icon-ember-hammer": {
+      "file": "icon-ember-hammer.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        10,
+        2,
+        55,
+        60
+      ],
+      "bytes": 5335
+    },
+    "icon-ice-repeater": {
+      "file": "icon-ice-repeater.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        9,
+        62,
+        60
+      ],
+      "bytes": 5796
+    },
+    "icon-fire-oil-flask": {
+      "file": "icon-fire-oil-flask.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        12,
+        2,
+        52,
+        60
+      ],
+      "bytes": 6120
+    },
+    "icon-magma-sprayer": {
+      "file": "icon-magma-sprayer.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        7,
+        62,
+        60
+      ],
+      "bytes": 7576
     }
   }
 }

@@ -689,3 +689,45 @@ assert.ok(jacketTry.player.hp-weatherTry.player.hp>1,'guard modifier is applied 
 const v5Gear=JSON.parse(serializeWorld(createInitialWorld()));v5Gear.saveVersion=5;delete v5Gear.player.gear;
 assert.deepEqual(deserializeWorld(JSON.stringify(v5Gear)).player.gear,{outer:null,guard:null,charm:null});
 console.log('[sim-smoke:P2-06] OK: all six recipes/equips, three exclusive slots, physical reduction, cold and v5 archive');
+
+import { chooseWeapon, craftWeapon, stepWeapons, triggerWeapon, weaponEffects, weaponRecipe, weaponShots, weaponSpecs } from '../src/sim/weapons';
+
+// P2-07: the five hand recipes and real sim geometry produce different
+// hit patterns; projectiles travel before they can deal damage.
+const armory=createInitialWorld(),ammunition=new Map<string,number>();
+for(const d of weaponSpecs)for(const m of weaponRecipe(d.id)!.inputs)ammunition.set(m.itemId,(ammunition.get(m.itemId)??0)+m.count);
+let armorySlot=3;for(const [itemId,count] of ammunition)armory.player.inventory[armorySlot++]={itemId,count};
+for(const d of weaponSpecs){
+  assert.equal(craftWeapon(armory,d.id),null);assert.ok(countItem(armory,d.id)>0);
+}
+assert.equal(chooseWeapon(armory,'ice_repeater'),null);
+assert.equal(deserializeWorld(serializeWorld(armory)).player.weapon,'ice_repeater');
+for(const d of weaponSpecs){
+  const trial=createInitialWorld(),p=trial.player;
+  p.inventory[3]={itemId:d.id,count:d.style==='throw'?2:1};
+  assert.equal(chooseWeapon(trial,d.id),null);
+  // Isolated stationary lures distinguish single-target and area geometry.
+  const away=d.style==='thrust'?2.3:d.style==='sweep'?1.45:d.style==='bolt'?6.25:d.style==='throw'?4.8:3.2;
+  const target={id:'crafted-target',defId:'icebreaker_beast',kind:'raider' as const,x:p.x-away,y:p.y,
+    hp:92,maxHp:92,stunnedTicks:0,tameProgress:0,hostile:true};
+  const offset=d.style==='sweep'?.65:d.style==='throw'?1:d.style==='flame'?.66:.85;
+  const neighbor={...target,id:'second-target',y:target.y+offset};
+  trial.wildEntities.push(target,neighbor);
+  assert.equal(triggerWeapon(trial,target),null);
+  assert.match(triggerWeapon(trial,target)!,/回手/);
+  if(d.speed>0){
+    assert.equal(target.hp,92,'projectile requires time to travel');
+    assert.equal(weaponShots(trial).length,1);
+    for(let t=0;t<44;t++){trial.tick++;stepWeapons(trial);}
+  }else assert.equal(weaponEffects(trial)[0].style,d.style);
+  assert.equal(target.hp,92-(d.damage-Math.max(0,5-d.pierce)));
+  assert.equal(neighbor.hp<92,d.style==='sweep'||d.style==='throw'||d.style==='flame');
+  if(d.style==='throw')assert.equal(countItem(trial,d.id),1,'a throw consumes exactly one flask');
+}
+console.log('[sim-smoke:P2-07] OK: recipes, aim geometry, projectile travel, penetration, sweep and ammunition');
+const unarmedLegacy=JSON.parse(serializeWorld(createInitialWorld()));unarmedLegacy.saveVersion=6;
+delete unarmedLegacy.player.weapon;delete unarmedLegacy.player.weaponReadyTick;
+assert.equal(deserializeWorld(JSON.stringify(unarmedLegacy)).player.weapon,null);
+assert.equal(deserializeWorld(JSON.stringify(unarmedLegacy)).player.weaponReadyTick,0);
+const downCombat=createInitialWorld();downCombat.player.hp=0;
+assert.match(triggerWeapon(downCombat,{x:27,y:25})!,/昏迷/);

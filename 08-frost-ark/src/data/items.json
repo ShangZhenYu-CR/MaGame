@@ -36,5 +36,10 @@
   {"id": "magma_insulated_coat", "name": "熔核隔热大衣", "category": "equipment", "stack": 1},
   {"id": "aurora_mithril_cloak", "name": "极光秘银披风", "category": "equipment", "stack": 1},
   {"id": "pocket_hand_warmer", "name": "便携暖手炉", "category": "equipment", "stack": 1},
-  {"id": "magnetic_salvage_buckle", "name": "磁力拾荒扣", "category": "equipment", "stack": 1}
+  {"id": "magnetic_salvage_buckle", "name": "磁力拾荒扣", "category": "equipment", "stack": 1},
+  {"id": "frost_iron_spear", "name": "霜铁长矛", "category": "weapon", "stack": 1},
+  {"id": "ember_hammer", "name": "燃炭重锤", "category": "weapon", "stack": 1},
+  {"id": "ice_repeater", "name": "寒冰连弩", "category": "weapon", "stack": 1},
+  {"id": "fire_oil_flask", "name": "火油投掷瓶", "category": "weapon", "stack": 18},
+  {"id": "magma_sprayer", "name": "熔核喷射器", "category": "weapon", "stack": 1}
 ]

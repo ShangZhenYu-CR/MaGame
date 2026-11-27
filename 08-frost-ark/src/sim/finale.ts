@@ -78,11 +78,21 @@ export function attackWhale(w:WorldState):string|null{
   const tier=axe&&axe.durability>0?axe.tier:0;
   const companions=w.beasts.filter(x=>x.role==='companion'&&x.hp>0&&x.warmth>12&&x.hunger>5&&gap(x,p)<=5.5);
   const escort=companions.reduce((n,x)=>n+(x.defId==='tempest_wyvern'?14:6),0);
-  b.hp=Math.max(0,b.hp-(18+tier*5+escort));f.strikeAt=w.tick+18;
-  if(b.hp>0)return null;
-  if(b.phase===phases.length-1){win(w,f);return null;}
-  b.phase++;b.hp=phases[b.phase].hp;b.warning=null;b.recovery=0;b.next=w.tick+56;
+  f.strikeAt=w.tick+18;damageWhale(w,f,b,18+tier*5+escort);
   return null;
+}
+
+export function strikeWhaleWithWeapon(w:WorldState,damage:number):boolean{
+  const f=get(w),b=f?.whale;
+  if(!f||!b||f.mode!=='battle'||!coast(w)||w.tick>=b.recovery||w.player.hp<=0)return false;
+  damageWhale(w,f,b,damage);return true;
+}
+
+function damageWhale(w:WorldState,f:FinaleState,b:Whale,damage:number):void{
+  b.hp=Math.max(0,b.hp-damage);
+  if(b.hp>0)return;
+  if(b.phase===phases.length-1){win(w,f);return;}
+  b.phase++;b.hp=phases[b.phase].hp;b.warning=null;b.recovery=0;b.next=w.tick+56;
 }
 
 export function stepFinale(w:WorldState):void{

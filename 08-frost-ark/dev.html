@@ -40,6 +40,7 @@
     <button type="button" id="bag" aria-expanded="false" aria-label="背包"><kbd>I</kbd><img alt=""><span>背包</span><output aria-hidden="true"></output></button>
   </nav>
   <button type="button" id="quick-meal" hidden><kbd>H</kbd><img alt=""><span></span><output class="numbers"></output></button>
+  <button id="weapon-toggle" type="button" aria-pressed="false" hidden><img alt=""><span></span><output class="numbers"></output></button>
   <aside id="inventory" class="inventory" aria-label="背包" hidden>
     <div class="panel-head"><div><div class="eyebrow">FIELD PACK</div><h2>背包</h2></div><button id="close" type="button" aria-label="关闭背包">关闭</button></div>
     <ul id="stacks"></ul>
@@ -51,6 +52,10 @@
     <details id="gear-panel">
       <summary>防寒装备 · 外衣／护具／饰品</summary>
       <div id="gear-slots"></div><p id="gear-bonuses" class="numbers"></p><div id="gear-recipes"></div>
+    </details>
+    <details id="weapon-panel">
+      <summary>武器工艺 · 左键出招</summary>
+      <p class="panel-intro">握持后朝鼠标方向点击。按 T 切换武器，按 Q 回到抓钩。</p><div id="weapon-recipes"></div>
     </details>
     <section id="expedition-toolcraft" aria-labelledby="expedition-toolcraft-title">
       <h3 id="expedition-toolcraft-title">远征工具</h3><p class="panel-intro">配齐手斧和矿镐，登岛时会自动选用。</p>

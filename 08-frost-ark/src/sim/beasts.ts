@@ -88,6 +88,11 @@ export function strikeWildBeast(w:WorldState,id:string):string|null{
   return null;
 }
 
+export function strikeWildWithWeapon(w:WorldState,e:WildEntity,damage:number):boolean{
+  if(!activeWild(w,e))return false;
+  e.hp=Math.max(0,e.hp-damage);e.hostile=e.hp>e.maxHp*.35&&!e.stunnedTicks;return true;
+}
+
 export function tameBeast(w:WorldState,id:string):string|null{
   const e=target(w,id);
   if(!e)return '走近云兽后再投喂';
@@ -242,7 +247,7 @@ export function beastPackContents(w:WorldState):readonly ItemStack[]{return getF
 const packAvailable=(w:WorldState)=>beastCompanions(w).some(b=>b.defId==='frostyak'&&distance(w.player,b)<=2.5);
 export function transferBeastPack(w:WorldState,itemId:string,direction:'deposit'|'withdraw'):string|null{
   if(!packAvailable(w))return '随行霜角牦牛不在身边';
-  if(direction==='deposit'&&equippedItem(w,itemId))return '请先卸下装备。';
+  if(direction==='deposit'&&(equippedItem(w,itemId)||w.player.weapon===itemId))return '请先卸下装备。';
   if(toolDefinition(itemId)||isGrappleItem(itemId))return '耐久工具和抓钩请留在身上';
   const state=ensureFauna(w),s=state.pack.find(v=>v.itemId===itemId);
   if(direction==='deposit'){

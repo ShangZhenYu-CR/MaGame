@@ -3,6 +3,7 @@ import { RESCUE_SHIELD_TICKS } from './rescue';
 import { isMeal, MAX_MEAL_TICKS } from './food';
 import { isGrappleItem } from './grapple-tools';
 import { equipmentById,gearSlots } from './equipment';
+import { weaponById } from './weapons';
 import items from '../data/items.json';
 import buildings from '../data/buildings.json';
 import recipes from '../data/recipes.json';
@@ -102,7 +103,7 @@ function validateFauna(p:Record<string,unknown>,ids:Set<string>):void{
 
 export function deserializeWorld(raw: string): WorldState {
   const p:unknown=JSON.parse(raw);
-  if(!record(p)||![1,2,3,4,5,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
+  if(!record(p)||![1,2,3,4,5,6,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
     throw new Error('存档版本不受支持');
   if(p.saveVersion===1){
     if(record(p.player))p.player.rescue={startedAt:null,shieldUntil:0};
@@ -119,6 +120,7 @@ export function deserializeWorld(raw: string): WorldState {
     }
   }
   if(p.saveVersion<6&&record(p.player))p.player.gear={outer:null,guard:null,charm:null};
+  if(p.saveVersion<7&&record(p.player)){p.player.weapon=null;p.player.weaponReadyTick=0;}
   p.saveVersion=SAVE_VERSION;
   const {ark, player, sky, latte}=p;
   if(!eachNumber(p,['seed','rngState','tick','day','timeOfDay','ambientTemp','skyheartCores'])||
@@ -207,6 +209,9 @@ export function deserializeWorld(raw: string): WorldState {
     const id=gear[slot];
     return id!==null&&(typeof id!=='string'||equipmentById.get(id)?.slot!==slot||!inventory.some(s=>s?.itemId===id));
   }))throw new Error('装备存档不符合方舟格式');
+  const weapon=player.weapon, ready=player.weaponReadyTick;
+  if((weapon!==null&&(typeof weapon!=='string'||!weaponById.has(weapon)||!inventory.some(s=>s?.itemId===weapon)))||
+    !num(ready)||!Number.isSafeInteger(ready)||ready<0||ready>p.tick+32)throw new Error('武器存档不符合方舟格式');
   const world=p as unknown as WorldState;
   if(!validFinale(world)||
     (world.ark.anchoredIslandId&&!canReachAurora(world,world.ark.anchoredIslandId))||

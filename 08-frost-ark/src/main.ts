@@ -25,6 +25,8 @@ import { nearestBeastFacility, nearestWildBeast } from './sim/beasts';
 import { nearestIslandNode } from './sim/island';
 import { beastUi } from './ui/beasts';
 import { equipmentUi } from './ui/equipment';
+import { weaponsUi } from './ui/weapons';
+import { chooseWeapon, selectedWeapon, triggerWeapon, weaponById } from './sim/weapons';
 import { combatM5Ui } from './ui/combat-m5';
 
 function el<T extends HTMLElement = HTMLElement>(id: string): T { return document.getElementById(id)! as T; }
@@ -39,7 +41,7 @@ const meter=el('meter'), bar=el('charge-bar'), panel=el('inventory'), input=el<H
 const keys=new Set<string>();
 const locker=el('storage-panel');
 let lockerSignature='';
-type Mode = 'hook' | 'dismantle' | BuildKind;
+type Mode = 'hook' | 'weapon' | 'dismantle' | BuildKind;
 const controls: Partial<Record<Mode,HTMLElement>>={ hook:el('hook'),wood_deck:el('build-deck'),torch_post:el('build-torch'),wind_wall:el('build-wall'),dismantle:el('dismantle-mode') };
 let mode: Mode='hook', w: WorldState=createInitialWorld(), pointer:{x:number;y:number}|null=null;
 let db: IDBDatabase|null=null, active=false, saveQueue=Promise.resolve();
@@ -72,6 +74,7 @@ const finale=finaleUi({state:()=>w,say:finishAction,sound:x=>audio.play(x),icon:
 const beastSprites=import.meta.glob<string>('./assets/art/beast-*.png',{eager:true,query:'?inline',import:'default'});
 const beastArt=(id:string)=>beastSprites['./assets/art/beast-'+id+'.png'];
 const beasts=beastUi({state:()=>w,msg:finishAction,icon:iconPath,art:beastArt});
+const weaponUi=weaponsUi({state:()=>w,icon:iconPath,activate:activateWeapon,lower:lowerWeapon,toggle:toggleWeapon,changed:()=>fillBag(),say:finishAction});
 const gearUi=equipmentUi({state:()=>w,art:iconPath,message:finishAction,change:()=>fillBag()});
 const m5Ui=combatM5Ui({state:()=>w,msg:finishAction});
 const skyToggle=el('sky-map-toggle');
@@ -181,6 +184,22 @@ function updateToolbar():void {
   count.forEach((n,i)=>toolbar[i].textContent=String(n));
 }
 
+function activateWeapon(id:string):void{
+  const issue=chooseWeapon(w,id);
+  if(issue){tell(issue);return;}
+  toggleBag(false);choose('weapon');tell('已握持：'+itemNames.get(id));void saveNow();
+}
+function lowerWeapon():void{
+  const issue=chooseWeapon(w,null);
+  if(issue){tell(issue);return;}
+  choose('hook');tell('武器已卸下，可存入储物箱。');fillBag();void saveNow();
+}
+function toggleWeapon():void{
+  if(mode==='weapon'){choose('hook');return;}
+  const id=w.player.weapon??w.player.inventory.find(v=>v&&weaponById.has(v.itemId))?.itemId;
+  if(id)activateWeapon(id);else tell('先在背包制作武器。');
+}
+
 function toast(text:string):void {
   if(text&&action.textContent!==text)action.textContent=text;
   const shown=String(Boolean(text));
@@ -236,7 +255,7 @@ function fillLocker():void {
   drawList('storage-deposit',carried,'deposit');
 }
 function fillBag():void {
-  const signature=JSON.stringify([w.player.inventory,w.player.diet.quick,w.player.gear]);
+  const signature=JSON.stringify([w.player.inventory,w.player.diet.quick,w.player.gear,w.player.weapon]);
   if(signature===stackSignature)return;
   stackSignature=signature;
   const entries=w.player.inventory.filter(s=>s!==null).map(s=>{
@@ -260,7 +279,7 @@ function fillBag():void {
   const hook=equippedGrapple(w);
   el<HTMLButtonElement>('craft-grapple').disabled=!!hook;
   el<HTMLButtonElement>('craft-frost-grapple').disabled=hook!== 'grapple_hook';
-  gearUi.update();
+  gearUi.update();weaponUi.update();
 }
 const foodShortcut=el<HTMLButtonElement>('quick-meal'),buff=el('meal-buff');
 let shownMeal:MealId|null=null, shownMealCount=-1, shownBuff:MealId|null=null;
@@ -304,10 +323,12 @@ function saveNow():Promise<void> {
 function safeWorld(next:WorldState):void {
   finale.reset();
   expedition.cancel();chart.hide(false);beasts.show(false);w=next;toggleStorage(false);industry.showStation(null);industry.showCatalog(false);lockerSignature='';cancelCharge(w);
-  caught=null;keys.clear();messageUntil=0;message='';stackSignature='';view.position(w);fillBag();
+  caught=null;keys.clear();messageUntil=0;message='';stackSignature='';
+  if(mode==='weapon'&&!w.player.weapon)choose('hook');
+  view.position(w);fillBag();
 }
 function ghostAt(): Ghost|null {
-  if(mode==='hook'||!pointer||expedition.area()!=='ark')return null;
+  if(mode==='hook'||mode==='weapon'||!pointer||expedition.area()!=='ark')return null;
   const at=view.world(pointer.x,pointer.y), x=Math.floor(at.x), y=Math.floor(at.y);
   const targeted=mode==='dismantle'?buildingAt(w,x,y):null;
   const issue=mode==='dismantle'?dismantleIssue(w,x,y):buildIssue(w,mode,x,y);
@@ -407,6 +428,7 @@ addEventListener('keydown',e=>{
   else if(k==='z')industry.undoAction();
   else if(k==='m')toggleMute();
   else if(k==='q')choose('hook');
+  else if(k==='t')toggleWeapon();
   else if(k==='1')choose('wood_deck');
   else if(k==='2')choose('torch_post');
   else if(k==='3')choose('wind_wall');
@@ -428,6 +450,11 @@ canvas.addEventListener('pointerdown',e=>{
   pointer={x:e.clientX,y:e.clientY};
   const at=view.world(e.clientX,e.clientY);
   const x=Math.floor(at.x),y=Math.floor(at.y);
+  if(mode==='weapon'){
+    const issue=triggerWeapon(w,at);
+    if(issue)tell(issue);else{audio.play('hit');void saveNow();}
+    return;
+  }
   if((mode==='hook'||expedition.area()!=='ark')&&expedition.pointer(at))return;
   if(mode==='hook'){
     const hit=buildingAt(w,x,y);
@@ -457,6 +484,7 @@ function simulation():void {
   const g=w.player.grapple;
   const pending=w.latte.autoLootUnlocked&&w.sky.debris.filter(isDeckDrop).length;
   const wasDown=incapacitated(w);
+  if(mode==='weapon'&&!w.player.weapon)choose('hook');
   stepWorld(w,1,{x:Number(keys.has('d'))-Number(keys.has('a')),y:Number(keys.has('s'))-Number(keys.has('w'))});
   if(!wasDown&&incapacitated(w)){
     keys.clear();expedition.cancel();chart.hide(false);beasts.show(false);
@@ -529,7 +557,7 @@ function frame(now:number):void {
   setVital(0,w.player.warmth,w.player.maxWarmth);
   setVital(1,w.player.hp,w.player.maxHp);
   setVital(2,h?.fuel??0,FUEL_MAX[Math.min(4,h?.level??0)]||120);
-  setVital(3,w.player.hunger,w.player.maxHunger);updateFoodHud();
+  setVital(3,w.player.hunger,w.player.maxHunger);updateFoodHud();weaponUi.frame(mode==='weapon');
   const reading=`脚下 ${local}°C`;
   if(localTemperature.textContent!==reading)localTemperature.textContent=reading;
   updateToolbar();
@@ -549,13 +577,14 @@ function frame(now:number):void {
   const contextHint=!overlay&&(context.kind==='storage'?'按 E 或点击储物箱存取物品':
     context.kind==='station'?'按 E 操作'+context.label:context.kind==='beasts'?'按 E 打开伙伴管理':'');
   const interactionHint=contextHint||(here==='island'?(beasts.target()?'靠近虚弱云兽可投喂 · V 查看伙伴':'靠近资源采集 · I 制作和修理工具'):
-    here==='gangway'?'沿跳板继续走 · 无需切换场景':mode==='hook'?'按住左键蓄力，松开抛钩':
+    here==='gangway'?'沿跳板继续走 · 无需切换场景':mode==='hook'?'按住左键蓄力，松开抛钩':mode==='weapon'?
+    (selectedWeapon(w)?'朝目标点击左键出招 · Q 切回抓钩':'先在背包装备武器'):
     mode==='wood_deck'?'移动鼠标贴合甲板直边，左键拼接':mode==='torch_post'?'先在背包手搓火把，再选空甲板放置':
     mode==='wind_wall'?'挡风墙放在空甲板，减缓周围热量散失':mode==='dismantle'?'点击选中拆除目标；可按 Z 撤销':
     `${buildDefinitions[mode].name} · 移到甲板预览后左键放置`);
   if(hint.textContent!==interactionHint)hint.textContent=interactionHint;
   meter.hidden=!g.charging;bar.style.width=(g.charge*100)+'%';
-  note.hidden=mode==='hook'||!pointer||here!=='ark';
+  note.hidden=mode==='hook'||mode==='weapon'||!pointer||here!=='ark';
   view.draw(w,ghostAt());
   if(!panel.hidden)fillBag();
   if(!locker.hidden)fillLocker();

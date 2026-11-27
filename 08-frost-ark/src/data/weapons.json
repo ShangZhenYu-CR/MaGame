@@ -1,0 +1,7 @@
+[
+  {"id":"frost_iron_spear","style":"thrust","range":2.8,"halfAngle":0.27,"damage":26,"pierce":3,"cooldown":17,"speed":0,"radius":0},
+  {"id":"ember_hammer","style":"sweep","range":1.95,"halfAngle":0.89,"damage":38,"pierce":1,"cooldown":32,"speed":0,"radius":0},
+  {"id":"ice_repeater","style":"bolt","range":8.5,"halfAngle":0,"damage":19,"pierce":5,"cooldown":13,"speed":0.51,"radius":0.40},
+  {"id":"fire_oil_flask","style":"throw","range":6.5,"halfAngle":0,"damage":29,"pierce":8,"cooldown":26,"speed":0.24,"radius":1.85},
+  {"id":"magma_sprayer","style":"flame","range":4.1,"halfAngle":0.47,"damage":16,"pierce":3,"cooldown":9,"speed":0,"radius":0}
+]

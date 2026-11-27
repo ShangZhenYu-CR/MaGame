@@ -1,3 +1,4 @@
+import { paintWeaponCombat } from './weapon-view';
 import { contourHull, HULL_NORTH, HULL_EAST, HULL_SOUTH, HULL_WEST, type HullProfile } from '../sim/hull';
 import { GROUND_FOOTPRINTS } from '../sim/ground-footprint';
 import { Lightmap } from './lightmap';
@@ -299,6 +300,7 @@ export class ArkView {
       if(actor.fire)this.paintFire(c,actor,p,w.tick);
     }
     if(g.active)this.paintHook(c,w,held);
+    paintWeaponCombat(c,w,project,s);
     // L4 and L5: Night/fire composite, then screen particles and hypothermia.
     const lens=this.art.offset(player.art,dir==='south'?.135:dir==='north'?.865:dir==='east'?.46:.54,.73,s*1.43,s*1.43);
     const feet=project(pl.x,pl.y);

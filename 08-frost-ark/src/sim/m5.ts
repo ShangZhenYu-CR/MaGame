@@ -61,14 +61,18 @@ export function claimIslandCacheSeed(w:WorldState,nodeKey:string):boolean{
   return (id==='sulfur_furnace'||id==='permafrost_ruins')&&nodeKey==='chest_2068'&&claimSunSeed(w,id);
 }
 
-function hurt(w:WorldState,e:WildEntity,damage:number,bypassArmor=false){
+function hurt(w:WorldState,e:WildEntity,damage:number,bypassArmor=false,penetration=0){
   const arm=specs.hostiles[e.defId as HostileId]?.armor??0;
-  e.hp=Math.max(0,e.hp-Math.max(1,damage-(bypassArmor?0:arm)));
+  e.hp=Math.max(0,e.hp-Math.max(1,damage-(bypassArmor?0:Math.max(0,arm-penetration))));
   if(e.hp||e.kind!=='boss'||!isOwned(e))return;
   const island=w.sky.islands.find(n=>n.id===w.activeIsland?.nodeId);
   if(!island||bossByIsland[island.id]!==e.defId)return;
   island.bossDefeated=true;
   claimSunSeed(w,island.id as M5SeedId);
+}
+export function strikeHostileWithWeapon(w:WorldState,e:WildEntity,damage:number,penetration:number):boolean {
+  if(!isOwned(e)||e.hp<=0)return false;
+  hurt(w,e,damage,false,penetration);return true;
 }
 function add(w:WorldState,defId:HostileId,id:string,kind:'boss'|'raider',p:Vec2){
   const d=specs.hostiles[defId];

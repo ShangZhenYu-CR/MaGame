@@ -171,5 +171,10 @@
   {"id": "craft_magma_insulated_coat", "station": "hand", "output": {"itemId": "magma_insulated_coat", "count": 1}, "inputs": [{"itemId": "warm_fur", "count": 4}, {"itemId": "sulfur_ore", "count": 2}, {"itemId": "frost_iron_ingot", "count": 2}]},
   {"id": "craft_aurora_mithril_cloak", "station": "hand", "output": {"itemId": "aurora_mithril_cloak", "count": 1}, "inputs": [{"itemId": "sky_mithril", "count": 3}, {"itemId": "warm_fur", "count": 4}, {"itemId": "frost_iron_ingot", "count": 1}]},
   {"id": "craft_pocket_hand_warmer", "station": "hand", "output": {"itemId": "pocket_hand_warmer", "count": 1}, "inputs": [{"itemId": "frost_iron_scrap", "count": 2}, {"itemId": "coal_chunk", "count": 2}]},
-  {"id": "craft_magnetic_salvage_buckle", "station": "hand", "output": {"itemId": "magnetic_salvage_buckle", "count": 1}, "inputs": [{"itemId": "frost_iron_ingot", "count": 2}, {"itemId": "rope", "count": 1}]}
+  {"id": "craft_magnetic_salvage_buckle", "station": "hand", "output": {"itemId": "magnetic_salvage_buckle", "count": 1}, "inputs": [{"itemId": "frost_iron_ingot", "count": 2}, {"itemId": "rope", "count": 1}]},
+  {"id": "craft_frost_iron_spear", "station": "hand", "output": {"itemId": "frost_iron_spear", "count": 1}, "inputs": [{"itemId": "frost_iron_ingot", "count": 2}, {"itemId": "driftwood", "count": 2}, {"itemId": "rope", "count": 1}]},
+  {"id": "craft_ember_hammer", "station": "hand", "output": {"itemId": "ember_hammer", "count": 1}, "inputs": [{"itemId": "frost_iron_ingot", "count": 3}, {"itemId": "coal_chunk", "count": 3}, {"itemId": "driftwood", "count": 1}]},
+  {"id": "craft_ice_repeater", "station": "hand", "output": {"itemId": "ice_repeater", "count": 1}, "inputs": [{"itemId": "frost_iron_ingot", "count": 2}, {"itemId": "rope", "count": 3}, {"itemId": "ice_shard", "count": 2}]},
+  {"id": "craft_fire_oil_flask", "station": "hand", "output": {"itemId": "fire_oil_flask", "count": 2}, "inputs": [{"itemId": "sulfur_ore", "count": 1}, {"itemId": "coal_chunk", "count": 1}, {"itemId": "rope", "count": 1}]},
+  {"id": "craft_magma_sprayer", "station": "hand", "output": {"itemId": "magma_sprayer", "count": 1}, "inputs": [{"itemId": "frost_iron_ingot", "count": 3}, {"itemId": "sulfur_ore", "count": 2}, {"itemId": "sky_mithril", "count": 1}]}
 ]

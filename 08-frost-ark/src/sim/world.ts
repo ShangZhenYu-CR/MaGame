@@ -17,6 +17,7 @@ import { nextRng } from './rng';
 import { stepFinale } from './finale';
 import { stepRescue } from './rescue';
 import { stepHunger } from './food';
+import { stepWeapons } from './weapons';
 
 export function createInitialWorld(seed = 202608): WorldState {
   const decks = new Array<number>(ARK_SIZE * ARK_SIZE).fill(0);
@@ -59,6 +60,7 @@ export function createInitialWorld(seed = 202608): WorldState {
       portraitMood: 0,
       selectedSlot: 0,
       gear: {outer:null,guard:null,charm:null},
+      weapon:null,weaponReadyTick:0,
       rescue: {startedAt:null, shieldUntil:0},
       diet: {warmUntil:0,last:null,quick:null},
       inventory: [
@@ -143,6 +145,7 @@ export function stepWorld(world: WorldState, ticks = 1, direction: Vec2 = {x: 0,
     stepIndustry(world);
     updateLatte(world);
     stepFinale(world);
+    stepWeapons(world);
     stepM5(world);
     stepRescue(world);
   }

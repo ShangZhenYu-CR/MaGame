@@ -282,3 +282,19 @@ button[aria-disabled=true]{opacity:.62}
 #gear-recipes article strong{font-size:12px;color:#e7dec5}
 #gear-recipes article small{color:#9cb5c3}
 #gear-recipes button{min-height:28px;white-space:nowrap;font-size:11px}
+
+#weapon-panel{padding:.42rem 0 .56rem;border-bottom:1px solid var(--edge)}
+#weapon-panel summary{cursor:pointer;color:#e9d3ad;font-size:12px;min-height:28px;padding:6px 0}
+#weapon-recipes article{display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid #34505f}
+#weapon-recipes article img{width:32px;height:32px;object-fit:contain}
+#weapon-recipes article strong,#weapon-recipes article small{display:block;line-height:1.5}
+#weapon-recipes article strong{font-size:12px;color:#e7dec5}
+#weapon-recipes article small{font-size:10px;color:#9cb5c3}
+.weapon-buttons{display:grid;gap:3px}
+.weapon-buttons button{min-height:28px;white-space:nowrap;font-size:11px}
+#weapon-toggle{position:absolute;z-index:5;left:calc(50% - 295px);bottom:37px;display:grid;grid-template-columns:30px 1fr;align-items:center;gap:2px 4px;padding:5px 7px;color:#e7d6b5;background:#152436ec;border:1px solid #778695;border-radius:6px;font-size:10px}
+#weapon-toggle[aria-pressed=true]{border-color:#d9a562}
+#weapon-toggle img{grid-row:span 2;width:28px;height:28px}
+#weapon-toggle output{color:#d9b681;text-align:right}
+#weapon-toggle[hidden]{display:none}
+@media(max-width:820px){#weapon-toggle{left:12px;bottom:113px}}

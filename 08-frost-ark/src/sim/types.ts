@@ -1,4 +1,4 @@
-export const SAVE_VERSION = 6;
+export const SAVE_VERSION = 7;
 export const TICK_RATE = 30;
 export const ARK_SIZE = 48;
 export const ISLAND_SIZE = 64;
@@ -35,6 +35,8 @@ export interface PlayerState {
   portraitMood: PortraitMood;
   selectedSlot: number;
   gear: Record<GearSlot,string|null>;
+  weapon: string | null;
+  weaponReadyTick: number;
   rescue: { startedAt: number | null; shieldUntil: number };
   diet: { warmUntil: number; last: import('./food').MealId | null; quick: import('./food').MealId | null };
   inventory: (ItemStack | null)[];

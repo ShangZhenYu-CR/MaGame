@@ -29,3 +29,11 @@
 - 门禁通过；对新 ZIP 解压后的主入口和 `dist/index.html` 逐个跑通抓钩、建造、储物和存档实机回归；已查看并上传第 6 张本地双击开局截图。
 - [GitHub Actions 在线构建](https://github.com/ShangZhenYu-CR/MaGame/actions/runs/45956832321) 已成功（构建提交 `3a9d058a443a113482565169c062ba63e7b8e748`）；已产出 `frost-ark-playtest` 和实机截图。Drive 上同一试玩包链接已替换为可双击的修正版。
 - **偏离报告**：此前门禁只测了 HTTP，现已把双击启动检查加入门禁。为响应在线构建，在专用分支新增一份 GitHub Actions 配置（GitHub 规定路径为 `.github/workflows/`）；不写 `main`，不更改现有 Pages 发布或共享资产。M1 未开始。
+
+## 2026-11-27 · M1 冷暖生存与开局美术
+
+- 保持原队列，完成 4 Hz 热扩散、可建挡风墙、昼／黄昏／暴雪夜、体温与生命、四张头像、1/4 冷暖光照、风雪火星、拿铁情绪以及二级炉暖区拾取。
+- 开局采用分层程序化云海、带厚度浮石和木板纹理、炉门和火焰、三类有独立轮廓的漂流残骸；马楠仍为原生 64×64 并补了衣褶、鞋带与头发细节。不改原四张头像和共享素材。
+- 同机位、同原生 1280×720 计算及同游戏缩放对比开局白昼和夜间；M0 夜间基线没有独立夜间美术，仍用相同夜间时段的 M0 画面，不后期造雪。[M1 验收图](https://drive.google.com/drive/folders/1Qwbi4tatTt1NeoD4XY7iigwhLU-aUXIl) · [试玩 ZIP](https://drive.google.com/file/d/1zK_fdQnU7cTU__9MRVoJjlGwC1X7GWpB/view)。
+- 本地及 [GitHub Actions](https://github.com/ShangZhenYu-CR/MaGame/actions/runs/45959659072) 门禁通过，保留既有测试。独立解压 ZIP 经 `file://` 走完试玩，四张头像均真实解码。当前代码验收 `fd6d263`。
+- 【偏离报告】无功能删减。为保证 M1 的表情都能在离线包使用，发布包和 CI 的独立解压门禁加入其余三张共享头像的只读原件；源码仍在专用分支，Pages 只更新已授权游戏目录。M2 等待用户确认。

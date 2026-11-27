@@ -23,6 +23,11 @@
       <div class="survival-row nutrition-row numbers"><label for="hunger-meter">饱食</label><meter id="hunger-meter" min="0" max="100"></meter><output id="hunger-value"></output></div>
       <div class="survival-row stamina-row numbers"><label for="stamina-meter">体力</label><meter id="stamina-meter" min="0" max="100"></meter><output id="stamina-value"></output></div>
       <div id="meal-buff" hidden><img alt=""><span>暖胃抗寒</span><output class="numbers"></output></div>
+      <div id="status-buffs" aria-label="当前状态" hidden>
+        <span data-buff="cold" hidden><img alt=""><span>抗寒</span></span>
+        <span data-buff="shield" hidden><img alt=""><span>复苏</span><output class="numbers"></output></span>
+        <span data-buff="comfort" hidden><img alt=""><span>舒适</span></span>
+      </div>
       <div class="survival-row lift-row numbers"><label for="buoyancy-gauge">浮力</label><meter id="buoyancy-gauge" min="0" max="64"></meter><output id="buoyancy-spare"></output></div>
       <section class="m5-seeds numbers" id="m5-seed-count" aria-label="天穹火种进度"></section>
     </div>
@@ -33,13 +38,21 @@
   </section>
   <div id="action" class="toast" role="status" data-shown="false"></div>
   <div class="meter" id="meter" hidden><div id="charge-bar"></div></div>
+  <div class="quickdock" aria-label="九格快捷栏">
   <nav class="toolbar" aria-label="方舟操作">
     <button type="button" id="hook" aria-pressed="true" aria-label="抓钩"><kbd>Q</kbd><img alt=""><span>抓钩</span><output aria-hidden="true"></output></button>
-    <button type="button" id="build-deck" aria-pressed="false" aria-label="甲板"><kbd>1</kbd><img alt=""><span>甲板</span><output aria-hidden="true"></output></button>
-    <button type="button" id="build-torch" aria-pressed="false" aria-label="火把"><kbd>2</kbd><img alt=""><span>火把</span><output aria-hidden="true"></output></button>
-    <button type="button" id="build-wall" aria-pressed="false" aria-label="挡风"><kbd>3</kbd><img alt=""><span>挡风</span><output aria-hidden="true"></output></button>
+    <button type="button" id="build-deck" data-quick-slot="1" aria-pressed="false" aria-label="甲板"><kbd>1</kbd><img alt=""><span>甲板</span><output aria-hidden="true"></output></button>
+    <button type="button" id="build-torch" data-quick-slot="2" aria-pressed="false" aria-label="火把"><kbd>2</kbd><img alt=""><span>火把</span><output aria-hidden="true"></output></button>
+    <button type="button" id="build-wall" data-quick-slot="3" aria-pressed="false" aria-label="挡风"><kbd>3</kbd><img alt=""><span>挡风</span><output aria-hidden="true"></output></button>
     <button type="button" id="bag" aria-expanded="false" aria-label="背包"><kbd>I</kbd><img alt=""><span>背包</span><output aria-hidden="true"></output></button>
   </nav>
+    <button type="button" class="extra-quick-slot" data-quick-slot="4" aria-pressed="false"><kbd>4</kbd><img alt="" hidden><span>未绑定</span><output aria-hidden="true"></output></button>
+    <button type="button" class="extra-quick-slot" data-quick-slot="5" aria-pressed="false"><kbd>5</kbd><img alt="" hidden><span>未绑定</span><output aria-hidden="true"></output></button>
+    <button type="button" class="extra-quick-slot" data-quick-slot="6" aria-pressed="false"><kbd>6</kbd><img alt="" hidden><span>未绑定</span><output aria-hidden="true"></output></button>
+    <button type="button" class="extra-quick-slot" data-quick-slot="7" aria-pressed="false"><kbd>7</kbd><img alt="" hidden><span>未绑定</span><output aria-hidden="true"></output></button>
+    <button type="button" class="extra-quick-slot" data-quick-slot="8" aria-pressed="false"><kbd>8</kbd><img alt="" hidden><span>未绑定</span><output aria-hidden="true"></output></button>
+    <button type="button" class="extra-quick-slot" data-quick-slot="9" aria-pressed="false"><kbd>9</kbd><img alt="" hidden><span>未绑定</span><output aria-hidden="true"></output></button>
+  </div>
   <button type="button" id="quick-meal" hidden><kbd>H</kbd><img alt=""><span></span><output class="numbers"></output></button>
   <button id="weapon-toggle" type="button" aria-pressed="false" hidden><img alt=""><span></span><output class="numbers"></output></button>
   <aside id="inventory" class="inventory" aria-label="背包" hidden>
@@ -62,6 +75,7 @@
       <h3 id="expedition-toolcraft-title">远征工具</h3><p class="panel-intro">配齐手斧和矿镐，登岛时会自动选用。</p>
       <div id="toolcraft-actions"></div>
     </section>
+    <details id="quickbar-editor"><summary>编排 1–9 快捷栏</summary><p>从背包拖入物品或在这里选择，拖动快捷栏里的图标可换位置。</p><div id="quickbar-bindings"></div></details>
     <details id="feedback-settings"><summary>画面设置</summary><label class="feedback-switch"><input type="checkbox" id="critical-shake"> 暴击时轻微震屏</label></details>
     <footer><button id="export" type="button">导出 JSON</button><button id="import" type="button">导入 JSON</button><input type="file" id="save-file" accept=".json,application/json" hidden></footer>
   </aside>

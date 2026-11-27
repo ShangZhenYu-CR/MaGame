@@ -1,3 +1,4 @@
+import { heldTool } from './hotbar';
 import { emitJuice } from './juice';
 import { claimIslandCacheSeed } from './m5';
 import recipes from '../data/recipes.json';
@@ -48,7 +49,7 @@ export function normalizeToolDurability(stack: ItemStack): number | undefined {
     : def.maxDurability;
 }
 
-export function toolStatus(w: WorldState, kind: ToolKind): ToolStatus | null {
+export function toolStatus(w: WorldState, kind: ToolKind, preferHeld=false): ToolStatus | null {
   const available: ToolStatus[] = [];
   w.player.inventory.forEach((stack, slot) => {
     if (!stack) return;
@@ -56,6 +57,10 @@ export function toolStatus(w: WorldState, kind: ToolKind): ToolStatus | null {
     if (def?.kind !== kind) return;
     available.push({ ...def, slot, durability: normalizeToolDurability(stack)! });
   });
+  if(preferHeld){
+    const held=available.find(s=>s.id===heldTool(w)&&s.durability>0);
+    if(held)return held;
+  }
   return available.sort((a, b) =>
     Number(b.durability > 0) - Number(a.durability > 0) || b.tier - a.tier || b.durability - a.durability
   )[0] ?? null;
@@ -134,7 +139,7 @@ export function repairTool(w: WorldState, kind: ToolKind): ToolResult {
 }
 
 export function harvestWithTool(w: WorldState, kind: ToolKind, rewards: ItemStack[]): ToolResult {
-  const current = toolStatus(w, kind);
+  const current = toolStatus(w, kind,true);
   if (!current) return failed(`需要${toolDefinition(kind)!.name}，请先制作。`);
   if (!current.durability) return failed(`${current.name}已损坏，请先修理。`);
   if (!rewards.length || rewards.some(s => !Number.isSafeInteger(s.count) || s.count <= 0 || !itemNames.has(s.itemId))) {

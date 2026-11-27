@@ -137,7 +137,7 @@ export class ArkView {
       y:((clientY-b.top)*this.canvas.height/Math.max(1,b.height)-this.origin.y)/this.scale};
   }
 
-  draw(w:WorldState,ghost:Ghost|null,now=performance.now()):void {
+  draw(w:WorldState,ghost:Ghost|null,now=performance.now(),weaponAim:Vec2|null=null):void {
     this.position(w);
     const tremor=this.juice.shake(now);this.origin.x+=tremor.x;this.origin.y+=tremor.y;
     const c=this.ctx,s=this.scale;
@@ -335,6 +335,13 @@ export class ArkView {
     // Aiming is a control cue, not world geometry. Keep it above night tint,
     // snow and frost so a reachable endpoint stays visible in all weather.
     if(g.charging)this.paintGrapplePreview(c,w);
+    const aim=weaponAim?project(weaponAim.x,weaponAim.y):null;
+    if(aim){
+      c.save();c.lineWidth=2;c.strokeStyle='#ffe0a7';
+      for(let i=0;i<4;i++){c.beginPath();c.ellipse(aim.x,aim.y,s*.32,s*.17,0,i*Math.PI/2+.17,(i+1)*Math.PI/2-.17);c.stroke();}
+      c.restore();
+    }
+    if(this.canvas.dataset.aimLocked!==String(!!aim))this.canvas.dataset.aimLocked=String(!!aim);
     if(this.canvas.dataset.artReady!=='true')this.canvas.dataset.artReady='true';
   }
 

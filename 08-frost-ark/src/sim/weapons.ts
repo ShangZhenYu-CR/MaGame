@@ -71,6 +71,22 @@ function hit(w:WorldState,s:Spec,target:Target):boolean {
     strikeHostileWithWeapon(w,e,s.damage,s.pierce,element);
 }
 
+export function weaponHover(w:WorldState,at:Vec2):Vec2|null{
+  const spec=selectedWeapon(w),p=w.player;
+  if(!spec||rolling(w))return null;
+  const delta=Math.hypot(at.x-p.x,at.y-p.y);
+  if(!Number.isFinite(delta)||delta<.1)return null;
+  let best:Vec2|null=null,score=Infinity;
+  for(const t of targets(w)){
+    const dist=gap(t,p);
+    if(dist>spec.range||dist<.02)continue;
+    const near=Math.min(gap(at,t),Math.hypot(at.x-t.x,at.y-t.y+.38));
+    const angular=((at.x-p.x)*(t.x-p.x)+(at.y-p.y)*(t.y-p.y))/(dist*delta);
+    if(near>.61||angular<.974||near>=score)continue;
+    best=t;score=near;
+  }
+  return best?point(best):null;
+}
 export function triggerWeapon(w:WorldState,at:Vec2):string|null{
   if(incapacitated(w))return '昏迷中，等待救援。';
   if(rolling(w))return '翻滚时不能攻击。';
@@ -79,6 +95,7 @@ export function triggerWeapon(w:WorldState,at:Vec2):string|null{
   if(weaponCooldown(w))return '武器正在回手。';
   const here=areaAt(w,p.x,p.y);
   if(here!=='ark'&&here!=='island')return '站稳甲板或岛面才能出招。';
+  if(!s.speed)at=weaponHover(w,at)??at;
   const d=gap(p,at);
   if(!Number.isFinite(d)||d<.10)return '把准星移到人物身外再出招。';
   const dx=(at.x-p.x)/d,dy=(at.y-p.y)/d;

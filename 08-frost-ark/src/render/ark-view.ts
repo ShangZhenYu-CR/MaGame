@@ -176,7 +176,8 @@ export class ArkView {
     if(g.active || g.charging) {
       const end=g.charging?aimEnd(w,{x:g.targetX,y:g.targetY}):hookTip(w);
       const q=this.pixel(end.x,end.y);
-      c.beginPath();c.moveTo(p.x,p.y);c.lineTo(q.x,q.y);
+      const gripX=p.x+Math.sign(q.x-p.x)*s*.29, gripY=p.y-s*.39;
+      c.beginPath();c.moveTo(Math.round(gripX),Math.round(gripY));c.lineTo(q.x,q.y);
       c.strokeStyle=g.charging?P.hearthCore:P.uiAccentWarm;
       c.lineWidth=g.charging?2:3;c.setLineDash(g.charging?[6,7]:[]);c.stroke();c.setLineDash([]);
       c.strokeStyle=P.hearthCore;c.strokeRect(q.x-4,q.y-4,8,8);

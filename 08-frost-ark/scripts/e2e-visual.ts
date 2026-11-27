@@ -133,6 +133,47 @@ try {
   await page.locator('#inventory').waitFor({state:'hidden'});
   console.log('[e2e-visual:M0] OK: grapple + build + inventory + IndexedDB reload + JSON export/import');
 
+  // M0 refinement: walk to the chest, persist a stack, retrieve it and import it back.
+  await page.keyboard.down('d');
+  await page.getByText('按 E 或点击储物箱存取物品',{exact:true}).waitFor({timeout:4000});
+  await page.keyboard.up('d');
+  await page.keyboard.press('e');
+  await page.getByRole('heading',{name:'储物箱',exact:true}).waitFor();
+  await page.getByRole('button',{name:'存入 旧缆绳',exact:true}).click();
+  await page.locator('#storage-stacks').getByText('旧缆绳 ×1',{exact:true}).waitFor();
+  await page.locator('#storage-deposit').getByText('旧缆绳 ×2',{exact:true}).waitFor();
+  await page.screenshot({path:resolve(outDir,'04-storage-in-use.png')});
+  await page.waitForFunction(()=>new Promise<boolean>(done=>{
+    const request=indexedDB.open('manan-frost-ark',1);
+    request.onerror=()=>done(false);
+    request.onsuccess=()=>{
+      const db=request.result;
+      const get=db.transaction('saves').objectStore('saves').get('world-M0');
+      get.onsuccess=()=>{db.close();done(typeof get.result==='string'&&JSON.parse(get.result).storageM0?.[0]?.itemId==='rope');};
+      get.onerror=()=>{db.close();done(false);};
+    };
+  }));
+  await page.reload({waitUntil:'networkidle'});
+  await page.locator('#save-label[data-saved=true]').waitFor();
+  await page.keyboard.press('e');
+  await page.locator('#storage-stacks').getByText('旧缆绳 ×1',{exact:true}).waitFor();
+  await page.keyboard.press('Escape');
+  await page.keyboard.press('i');
+  const stashDownload=page.waitForEvent('download');
+  await page.getByRole('button',{name:'导出 JSON'}).click();
+  const stashExport=readFileSync((await (await stashDownload).path())!);
+  assert.deepEqual(JSON.parse(stashExport.toString()).storageM0,[{itemId:'rope',count:1}]);
+  await page.keyboard.press('e');
+  await page.getByRole('button',{name:'取出 旧缆绳',exact:true}).click();
+  await page.locator('#storage-stacks').getByText('箱内空着',{exact:true}).waitFor();
+  await page.locator('#storage-deposit').getByText('旧缆绳 ×3',{exact:true}).waitFor();
+  await page.keyboard.press('i');
+  await page.locator('#save-file').setInputFiles({name:'locker.json',mimeType:'application/json',buffer:stashExport});
+  await page.getByText('已载入 JSON 存档。',{exact:true}).waitFor();
+  await page.keyboard.press('e');
+  await page.locator('#storage-stacks').getByText('旧缆绳 ×1',{exact:true}).waitFor();
+  console.log('[e2e-visual:M0-refinement] OK: walk to locker, deposit/withdraw, local reload and JSON round-trip');
+
   if (errors.length > 0) {
     throw new Error(errors.join('\n'));
   }

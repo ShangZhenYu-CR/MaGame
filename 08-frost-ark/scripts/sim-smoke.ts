@@ -71,3 +71,40 @@ assert.deepEqual(roundTrip,fishing,'Save after catch and building retains all st
 assert.throws(()=>deserializeWorld('{"saveVersion":1}'),/存档数据/,'Reject malformed same-version save');
 assert.throws(()=>deserializeWorld('{"saveVersion":99}'),/存档版本/,'Reject unsupported save version');
 console.log('[sim-smoke:M0] OK: movement, cloud loot, grapple, expansion, craft, validation and save round-trip');
+
+// M0 refinement: native artwork and transactional storage on the unchanged world contract.
+import { nearestStorage, storageContents, transferStorage } from '../src/sim/storage-box';
+import { MANAN_FRAME, MANAN_POSES, mananPixels, type Direction } from '../src/render/manan-atlas';
+const lockerWorld=createInitialWorld();
+assert.equal(nearestStorage(lockerWorld),undefined,'Starting point is outside locker interaction range');
+assert.notEqual(transferStorage(lockerWorld,'rope','deposit'),null);
+stepWorld(lockerWorld,11,{x:1,y:0});
+assert.ok(nearestStorage(lockerWorld));
+assert.equal(transferStorage(lockerWorld,'rope','deposit'),null);
+assert.equal(countItem(lockerWorld,'rope'),3);
+assert.deepEqual(storageContents(lockerWorld),[{itemId:'rope',count:1}]);
+const lockerReload=deserializeWorld(serializeWorld(lockerWorld));
+assert.deepEqual(storageContents(lockerReload),storageContents(lockerWorld));
+assert.throws(()=>deserializeWorld(JSON.stringify({...lockerWorld,storageM0:[{itemId:'rope',count:999}]})),/储物箱数据/);
+assert.equal(transferStorage(lockerReload,'rope','withdraw'),null);
+assert.equal(countItem(lockerReload,'rope'),4);
+assert.equal(storageContents(lockerReload).length,0);
+assert.equal(storageContents(deserializeWorld(serializeWorld(createInitialWorld()))).length,0,'Old saves can omit the storage extension');
+const noSpace=deserializeWorld(serializeWorld(lockerWorld));
+noSpace.player.inventory=noSpace.player.inventory.map(()=>({itemId:'driftwood',count:99}));
+assert.notEqual(transferStorage(noSpace,'rope','withdraw'),null);
+assert.deepEqual(storageContents(noSpace),[{itemId:'rope',count:1}],'Failed withdrawal cannot consume the locker stack');
+
+assert.equal(MANAN_FRAME,64);
+assert.equal(MANAN_POSES,5);
+const frameBytes=new Set<string>();
+for(let d=0;d<4;d++)for(let p=0;p<MANAN_POSES;p++){
+  const art=mananPixels(d as Direction,p);
+  assert.equal(art.length,64*64*4);
+  const colors=new Set<string>();
+  for(let j=0;j<art.length;j+=4)if(art[j+3])colors.add(art.slice(j,j+3).join(','));
+  assert.ok(colors.size>=13,'each direction has real native shade clusters, not a placeholder');
+  frameBytes.add(Buffer.from(art).toString('base64'));
+}
+assert.equal(frameBytes.size,20,'four directional idle poses and sixteen distinct walk frames');
+console.log('[sim-smoke:M0-refinement] OK: locker transfers, overflow protection, old-save load, native 64×64 ×20');

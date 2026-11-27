@@ -99,8 +99,9 @@ export function mananPixels(dir: Direction, phase: number): Uint8ClampedArray {
       r(35,17,3,1,C.skinLit);r(30,19,5,1,C.skinDeep);r(32,20,2,1,C.skinLit);r(29,22,6,1,C.skinDeep);
     }
   }
-  const lanternX=profile?42:43, lanternY=43+(north?-2:0)+Math.round(-stride*.21);
-  r(lanternX+2,lanternY-4,3,4,C.tint);
+  const lanternX=profile?37+Math.round(-stride*.52):43;
+  const lanternY=43+(north?-2:0)+(profile?0:Math.round(-stride*.21));
+  r(lanternX+(profile?1:2),lanternY-4,2,4,C.tint);
   r(lanternX,lanternY-1,8,8,C.edge);
   r(lanternX+1,lanternY,6,5,C.flame);
   r(lanternX+2,lanternY+1,4,3,C.amber);

@@ -86,6 +86,21 @@ function add(w:WorldState,defId:HostileId,id:string,kind:'boss'|'raider',p:Vec2)
   const d=specs.hostiles[defId];
   w.wildEntities.push({id,defId,kind,x:p.x,y:p.y,hp:d.hp,maxHp:d.hp,stunnedTicks:0,tameProgress:0,hostile:true});
 }
+export function beginSkyRaid(w:WorldState,id:string):void{
+ const edge=w.ark.decks.flatMap((v,i)=>{
+  if(!v)return [];
+  const x=i%w.ark.size,y=Math.floor(i/w.ark.size);
+  return !isDeck(w,x+1,y)&&!w.ark.buildings.some(b=>b.gx===x&&b.gy===y)?[{x:x+.5,y:y+.5}]:[];
+ });
+ const living=w.wildEntities.filter(e=>isOwned(e)).length;
+ if(living>6||!edge.length)return;
+ const use=[Math.floor(edge.length*.3),Math.floor(edge.length*.75)];
+ for(let i=0;i<use.length;i++){
+  const slot=edge[use[i]];
+  if(i===0||slot!==edge[use[0]])add(w,'froststalker','skyraid_'+id+'_'+i,'raider',slot);
+ }
+ live(w);
+}
 function resetEntities(w:WorldState,drop:(e:WildEntity)=>boolean){
   const s=live(w);
   w.wildEntities=w.wildEntities.filter(e=>{
@@ -95,6 +110,9 @@ function resetEntities(w:WorldState,drop:(e:WildEntity)=>boolean){
   });
 }
 
+export function endSkyRaid(w:WorldState,id:string):void{
+ resetEntities(w,e=>e.id.startsWith('skyraid_'+id+'_'));
+}
 function stepBoss(w:WorldState,s:M5State){
   const island=w.activeIsland,id=island?.nodeId??null;
   if(id!==s.bossIsland){resetEntities(w,e=>e.kind==='boss');s.bossIsland=id;}
@@ -209,9 +227,9 @@ export function stepM5(w:WorldState):void{
   if(w.weather!=='whiteout'&&!w.activeIsland&&!get(w))return;
   const s=live(w);
   if(w.weather==='whiteout'){
-    if(s.raidDay!==w.day){resetEntities(w,e=>e.kind==='raider');s.raidDay=w.day;s.wave=0;s.nextWave=w.tick;}
+    if(s.raidDay!==w.day){resetEntities(w,e=>e.kind==='raider'&&!e.id.startsWith('skyraid_'));s.raidDay=w.day;s.wave=0;s.nextWave=w.tick;}
     if(w.tick>=s.nextWave&&s.wave<specs.waves.length)spawnWave(w,s);
-  }else resetEntities(w,e=>e.kind==='raider');
+  }else resetEntities(w,e=>e.kind==='raider'&&!e.id.startsWith('skyraid_'));
   stepBoss(w,s);
   stepTurrets(w,s);
   stepCompanions(w);

@@ -34,6 +34,10 @@
     </div>
   </header>
   <aside class="sector"><div class="eyebrow">SKY SECTOR <span>01</span></div><strong id="sector-name">碎云浅海</strong><div id="weather-status" class="numbers"></div><div id="latte-status"></div><div class="hearth-tools"><button id="fuel-hearth" type="button"><kbd>R</kbd> 添柴</button><button id="upgrade-hearth" type="button" title="浮木板 ×4、冻铁废件 ×2"><kbd>U</kbd> 升炉</button></div>
+    <section id="sky-event-brief" class="sky-event-brief" hidden>
+      <img id="sky-event-icon" alt=""><div><b id="sky-event-title"></b><small id="sky-event-detail"></small>
+      <button type="button" id="sky-event-moor" hidden><kbd>E</kbd> 靠泊交易</button></div>
+    </section>
     <button type="button" id="heat-radar-toggle" aria-expanded="false" aria-controls="heat-radar"><kbd>Y</kbd> 热力雷达</button>
     <section id="heat-radar" aria-label="方舟热力地图" hidden>
       <canvas id="heat-radar-map" width="180" height="128" aria-label="暖区、冷区与入侵者位置"></canvas>
@@ -175,6 +179,13 @@
     <div class="expedition-tool"><img alt="" id="axe-art" hidden><label for="axe-durability">手斧</label><meter id="axe-durability" min="0" max="1" value="0"></meter><output id="axe-condition"></output></div>
     <div class="expedition-tool"><img alt="" id="pickaxe-art" hidden><label for="pickaxe-durability">矿镐</label><meter id="pickaxe-durability" min="0" max="1" value="0"></meter><output id="pickaxe-condition"></output></div>
   </aside>
+  <dialog id="sky-trader" aria-labelledby="sky-trader-title">
+    <header class="sky-map-head"><div><div class="eyebrow">FLOATING MARKET</div><h2 id="sky-trader-title">云海游商 · 以物易物</h2></div>
+      <button id="sky-trader-close" type="button" aria-label="关闭游商交易">离开</button>
+      <p>方舟已系缆。每种货物本次可交换一次。</p>
+    </header>
+    <div id="sky-trader-stock"></div><output id="sky-trader-result" aria-live="polite"></output>
+  </dialog>
   <dialog id="sky-map" aria-labelledby="sky-map-title">
     <header class="sky-map-head">
       <div><div class="eyebrow">SKY ATLAS <span>／</span> 方舟领航台</div><h2 id="sky-map-title">云海航图</h2></div>

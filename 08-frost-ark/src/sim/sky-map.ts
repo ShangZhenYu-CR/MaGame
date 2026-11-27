@@ -1,3 +1,4 @@
+import { eventWindDrag } from './sky-events';
 import { dockSide,docks } from './dock-direction';
 import { rigDrive,sailingRig } from './rigging';
 import { buildingAt, isDeck } from './ark';
@@ -116,7 +117,7 @@ function findDock(w:WorldState){
 }
 
 export function cruiseSpeed(w:WorldState,dx=w.sky.headingX,dy=w.sky.headingY){
-  return CRUISE_SPEED*crewCruiseMultiplier(w)*(w.weather==='whiteout'?.7:w.weather==='snow'?.85:1)*rigDrive(w,dx,dy).multiplier;
+  return CRUISE_SPEED*crewCruiseMultiplier(w)*(w.weather==='whiteout'?.7:w.weather==='snow'?.85:1)*rigDrive(w,dx,dy).multiplier*eventWindDrag(w);
 }
 export function stepNavigation(w:WorldState):void{
   if(!w.sky.cruising)return;

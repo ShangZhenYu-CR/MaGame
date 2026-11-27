@@ -369,3 +369,20 @@ button[aria-disabled=true]{opacity:.62}
 #fishing-track[data-ready="true"] #fishing-window{background:#e7ad5d}
 #fishing-cursor{position:absolute;top:50%;left:var(--cast-progress);translate:-50% -50%;width:20px;height:20px;object-fit:contain;pointer-events:none}
 #fishing-use img{width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:4px}
+
+.sky-event-brief{margin-top:.45rem;padding:.34rem .36rem;border:1px solid #6d775f;border-radius:4px;background:#203643;display:grid;grid-template-columns:25px minmax(0,1fr);gap:.34rem;text-align:left}
+.sky-event-brief img{width:25px;height:25px;object-fit:contain}
+.sky-event-brief b,.sky-event-brief small{display:block;line-height:1.37}
+.sky-event-brief b{font-size:11px;color:#f0d6a1}
+.sky-event-brief small{font-size:10px;color:#b2cad9}
+.sky-event-brief button{margin-top:4px;font-size:11px}
+#sky-trader{width:min(545px,calc(100vw - 25px));max-height:calc(100vh - 29px);border:1px solid #77979d;padding:16px;background:#172837;color:#e7edf3;border-radius:7px;overflow:auto}
+#sky-trader::backdrop{background:#12202cc8}
+#sky-trader h2{margin:.16rem 0 .10rem;font-size:22px}
+#sky-trader .sky-map-head p{grid-column:1/-1;margin:0;color:#adc2d2;font-size:12px}
+#sky-trader-stock{display:grid;gap:6px;margin:13px 0}
+.sky-offer{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:9px;align-items:center;padding:7px 8px;border:1px solid #405b6a;border-radius:4px;background:#213545}
+.sky-offer img{width:34px;height:34px;object-fit:contain}
+.sky-offer strong,.sky-offer small{display:block;line-height:1.35}
+.sky-offer small{color:#b2c7d2}
+#sky-trader-result{display:block;min-height:19px;color:#f0cc99}

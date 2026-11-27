@@ -1,3 +1,4 @@
+import { EVENT_ART,paintSkyEvent } from './sky-events-view';
 import { activeCave,caveEntrance,caveEntranceArt,caveGuard,CAVE_OFFSET,CAVE_SIZE } from '../sim/cave';
 import { CAVE_ART,paintCave } from './cave-view';
 import { fishingPanel,islandForage,patchReady,quarryDrops } from '../sim/forage';
@@ -73,7 +74,7 @@ const ironDeck='building-iron-deck';
 const required=[
   ...deckIds,'boss-frost-whale-1','boss-frost-whale-2','boss-frost-whale-3','solar-hearth','aurora-crystal','manan-south','manan-north','manan-west','manan-east','latte-sleep','latte-alert','latte-walk','latte-walk-alt',
   'hearth-1','hearth-2','hearth-3','rail','corner','rock','icicles',ironDeck,...Object.values(buildingVisuals).map(v=>v.art),
-  'debris-wood','debris-iron','debris-rope','debris-heavy','clouds','rail-side','rock-side','frost-frame','floor-insulated','icon-driftwood','icon-coal-chunk','icon-iron','icon-raw-root','icon-cloud-fish','icon-raw-meat','icon-beast-feed','building-wind-door-open','building-airlock-open','forage-berries','forage-grass','forage-tubers','forage-crystal','icon-fishing-bobber',...ISLAND_ART,...LANDMARK_ART,...CAVE_ART,...BEAST_ART,...HOSTILE_ART,...ELEMENT_ART,
+  'debris-wood','debris-iron','debris-rope','debris-heavy','clouds','rail-side','rock-side','frost-frame','floor-insulated','icon-driftwood','icon-coal-chunk','icon-iron','icon-raw-root','icon-cloud-fish','icon-raw-meat','icon-beast-feed','building-wind-door-open','building-airlock-open','forage-berries','forage-grass','forage-tubers','forage-crystal','icon-fishing-bobber',...ISLAND_ART,...LANDMARK_ART,...CAVE_ART,...EVENT_ART,...BEAST_ART,...HOSTILE_ART,...ELEMENT_ART,
 ] as const;
 interface Cell { x:number; y:number; hash:number; iron:boolean; insulated:boolean; temperature:number; left:boolean; right:boolean; front:boolean; back:boolean }
 interface Actor {
@@ -224,6 +225,7 @@ export class ArkView {
     cloudscape(c,this.art.image('clouds'),w,{
       x:this.origin.x+w.sky.x*3.5,y:this.origin.y+w.sky.y*1.9,
     });
+    paintSkyEvent(c,this.art,w,project,s);
     // Free-floating scrap belongs to the lower air lane. Hull silhouettes can
     // occlude it; deck drops only enter the foreground after a grab/placement.
     const pl=w.player,g=pl.grapple;

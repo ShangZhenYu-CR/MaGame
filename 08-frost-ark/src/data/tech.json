@@ -27,5 +27,6 @@
       "unlocksRecipes": ["cook_warm_hay", "cook_berry_soup", "cook_magma_steak", "cook_mithril_roast", "grow_roots", "grow_berries", "craft_repair_hammer"]
     },
     {"id":"ancient_cave_craft","name":"冰窟图纸工艺","prerequisite":"tier1_basics","researchCost":[{"itemId":"ancient_cave_blueprint","count":1}],"unlocksBuildings":[],"unlocksRecipes":["cave_compact_refine"]}
+    ,{"id":"merchant_route_craft","name":"游商交换工艺","prerequisite":"tier1_basics","researchCost":[{"itemId":"merchant_route_blueprint","count":1}],"unlocksBuildings":[],"unlocksRecipes":["merchant_forage_bait"]}
   ]
 }

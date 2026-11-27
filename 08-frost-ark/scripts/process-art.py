@@ -184,6 +184,14 @@ def defringe_magenta(image):
     return image
 
 
+def grade_aurora_teal(image):
+    """Neutralize colored spill in the soft aurora mask while keeping its alpha."""
+    image = image.convert("RGBA")
+    pixels = image.get_flattened_data() if hasattr(image, "get_flattened_data") else image.getdata()
+    image.putdata([(min(r, g), g, min(b, g+12), a) if a else (0, 0, 0, 0) for r, g, b, a in pixels])
+    return image
+
+
 def encode(image, fmt, limit):
     # Prefer full RGBA without palette quantization. If PNG is too big, try
     # progressively smaller RGBA palettes, letting Pillow quantize alpha too.
@@ -272,6 +280,8 @@ def build(config_path, source_dir, output_dir, review_path):
             processed, anchor_x, anchor_y = prepare(image, asset, size)
             if asset.get("postDefringe") == "magenta":
                 processed = defringe_magenta(processed)
+            if asset.get("gradePalette") == "aurora-teal":
+                processed = grade_aurora_teal(processed)
             limit = min(asset.get("maxBytes", 180_000 if asset.get("key") == "none" else 90_000),
                         180_000 if asset.get("key") == "none" else 90_000)
             data = encode(processed, fmt, positive(limit, "maxBytes"))

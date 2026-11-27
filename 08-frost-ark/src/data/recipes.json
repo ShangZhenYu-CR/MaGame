@@ -195,5 +195,6 @@
   {"id":"field_aurora_soup","name":"野菜暖汤 · 极光桑果","station":"stove","seconds":6,"output":{"itemId":"warm_berry_soup","count":1},"inputs":[{"itemId":"aurora_mulberry","count":1},{"itemId":"frost_lotus","count":1}]},
   {"id":"field_prism_fish","name":"风区腌味 · 虹棱鱼","station":"stove","seconds":6,"output":{"itemId":"cured_cloud_fish","count":1},"inputs":[{"itemId":"prism_fish","count":1},{"itemId":"blue_salt","count":1}]},
   {"id":"field_ice_squid","name":"风区腌味 · 冰幕鱿","station":"stove","seconds":6,"output":{"itemId":"cured_cloud_fish","count":1},"inputs":[{"itemId":"ice_squid","count":1},{"itemId":"blue_salt","count":1}]},
-  {"id":"cave_compact_refine","name":"冰窟工艺 · 精炼霜铁","station":"furnace","seconds":7,"output":{"itemId":"frost_iron_ingot","count":2},"inputs":[{"itemId":"frost_iron_scrap","count":3},{"itemId":"white_salt","count":1}]}
+  {"id":"cave_compact_refine","name":"冰窟工艺 · 精炼霜铁","station":"furnace","seconds":7,"output":{"itemId":"frost_iron_ingot","count":2},"inputs":[{"itemId":"frost_iron_scrap","count":3},{"itemId":"white_salt","count":1}]},
+  {"id":"merchant_forage_bait","name":"游商方 · 咸鲜云鱼","station":"stove","seconds":5,"output":{"itemId":"cured_cloud_fish","count":2},"inputs":[{"itemId":"cloud_fish","count":1},{"itemId":"white_salt","count":1}]}
 ]

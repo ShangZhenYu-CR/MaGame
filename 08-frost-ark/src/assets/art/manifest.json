@@ -4384,6 +4384,166 @@
         57
       ],
       "bytes": 6630
+    },
+    "event-merchant": {
+      "file": "event-merchant.png",
+      "width": 176,
+      "height": 176,
+      "anchorX": 88,
+      "anchorY": 158,
+      "tileW": 3.8,
+      "tileH": 4.9,
+      "contentBox": [
+        19,
+        14,
+        157,
+        174
+      ],
+      "bytes": 13336
+    },
+    "event-pirates": {
+      "file": "event-pirates.png",
+      "width": 160,
+      "height": 160,
+      "anchorX": 80,
+      "anchorY": 139,
+      "tileW": 3.7,
+      "tileH": 3.5,
+      "contentBox": [
+        8,
+        12,
+        153,
+        158
+      ],
+      "bytes": 8451
+    },
+    "event-salvage": {
+      "file": "event-salvage.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 111,
+      "tileW": 3.6,
+      "tileH": 2.6,
+      "contentBox": [
+        2,
+        44,
+        126,
+        121
+      ],
+      "bytes": 20731
+    },
+    "icon-event-thunder": {
+      "file": "icon-event-thunder.png",
+      "width": 74,
+      "height": 74,
+      "anchorX": 37,
+      "anchorY": 37,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        11,
+        72,
+        63
+      ],
+      "bytes": 8042
+    },
+    "icon-event-warm": {
+      "file": "icon-event-warm.png",
+      "width": 74,
+      "height": 74,
+      "anchorX": 37,
+      "anchorY": 37,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        5,
+        31,
+        70,
+        42
+      ],
+      "bytes": 1604
+    },
+    "icon-merchant-route-blueprint": {
+      "file": "icon-merchant-route-blueprint.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        4,
+        2,
+        61,
+        62
+      ],
+      "bytes": 8943
+    },
+    "icon-event-merchant": {
+      "file": "icon-event-merchant.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        58,
+        62
+      ],
+      "bytes": 3330
+    },
+    "icon-event-pirates": {
+      "file": "icon-event-pirates.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        2,
+        61,
+        62
+      ],
+      "bytes": 6553
+    },
+    "icon-event-salvage": {
+      "file": "icon-event-salvage.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        14,
+        62,
+        51
+      ],
+      "bytes": 5652
+    },
+    "event-aurora-drape": {
+      "file": "event-aurora-drape.png",
+      "width": 448,
+      "height": 144,
+      "anchorX": 224,
+      "anchorY": 72,
+      "tileW": 12,
+      "tileH": 3,
+      "contentBox": [
+        4,
+        38,
+        445,
+        106
+      ],
+      "bytes": 31037
     }
   }
 }

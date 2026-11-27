@@ -1,3 +1,4 @@
+import { stepSkyEvents } from './sky-events';
 import { stepCave } from './cave';
 import { stepLandmarks } from './landmarks';
 import { stepM5 } from './m5';
@@ -145,6 +146,7 @@ export function stepWorld(world: WorldState, ticks = 1, direction: Vec2 = {x: 0,
     const motion=rollMotion(world,direction);
     walkExpedition(world,motion.direction,motion.scale);
     stepNavigation(world);
+    stepSkyEvents(world);
     stepCloud(world);
     advanceClimate(world);
     stepHeat(world);

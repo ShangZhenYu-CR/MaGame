@@ -1,3 +1,5 @@
+import { couldMoorTrader } from './sim/sky-events';
+import { skyEventsUi } from './ui/sky-events-ui';
 import { activeCave,caveMelee } from './sim/cave';
 import { cancelFishing,FISH_CHEST,fishingAction,fishingPanel,nearFishing,openFishChest,stepFishing } from './sim/forage';
 import './ui/ark.css';
@@ -110,10 +112,12 @@ const helmIcon=iconPath('helm');
 if(helmIcon){const img=document.createElement('img');img.alt='';img.src=helmIcon;skyToggle.prepend(img);}
 const radar=setupHeatRadar();
 const quickbar=setupHotbar({state:()=>w,mode:()=>mode,icon:iconPath,action:runShortcut,changed:()=>{void saveNow();}});
+const skyEvents=skyEventsUi({state:()=>w,icon:iconPath,save:()=>{void saveNow();},toast:tell});
 const regions=new Map(biomes.map(b=>[b.id,b.name]));
 
 function toggleChart(show=!chart.open()):void{
   if(!show){chart.hide();industry.closeTip();return;}
+  if(skyEvents.open())skyEvents.close();
   if(activeCave(w)){tell('先回到地表再打开航图。');return;}
   keys.clear();cancelFishing(w);cancelCharge(w);expedition.cancel();industry.closeTip();chart.show();
 }
@@ -155,19 +159,20 @@ function finishAction(issue:string|null,success:string,event?:'craft'|'undo'|'di
   if(event)audio.play(event);
   void saveNow();
 }
-type PrimaryInteraction={kind:'expedition'|'fishing'|'feed'|'storage'|'beasts'|'close-storage'|'close-station'|'close-beasts'|'none'}|
+type PrimaryInteraction={kind:'expedition'|'trader'|'fishing'|'feed'|'storage'|'beasts'|'close-storage'|'close-station'|'close-beasts'|'none'}|
   {kind:'station';id:string;label:string}|{kind:'door';id:string;open:boolean};
 function primaryInteraction():PrimaryInteraction{
   if(beasts.open())return {kind:'close-beasts'};
   if(industry.stationOpen())return {kind:'close-station'};
   if(!locker.hidden)return {kind:'close-storage'};
-  if(chart.open()||finale.arena())return {kind:'none'};
+  if(chart.open()||finale.arena()||skyEvents.open())return {kind:'none'};
   const here=expedition.area(),travel=expedition.keyAction();
   if(here==='island'){
     const wild=nearestWildBeast(w);
     if(travel!=='cave-enter'&&wild&&(wild.stunnedTicks>0||wild.hp<=wild.maxHp*.35||(travel!=='landmark'&&travel!=='forage'&&travel!=='quarry'&&!nearestIslandNode(w,1.8))))return {kind:'feed'};
   }
   if(fishingPanel(w))return {kind:'fishing'};
+  if(panel.hidden&&!industry.catalogOpen()&&couldMoorTrader(w))return {kind:'trader'};
   if(travel&&travel!=='helm')return {kind:'expedition'};
   if(here!=='ark')return {kind:'none'};
   const door=nearestManualDoor(w),box=nearestStorage(w),station=nearestIndustry(w),animal=nearestBeastFacility(w);
@@ -205,6 +210,7 @@ function useNearby():void{
     case 'feed':beasts.tame();break;
     case 'expedition':expedition.use();break;
     case 'fishing':triggerFishing();break;
+    case 'trader':skyEvents.show();break;
     case 'beasts':toggleBeastRoster(true);break;
     case 'door':finishAction(operateWindDoor(w,action.id),action.open?'防风门已关上。':'防风门已打开。');break;
     case 'station':openIndustry(action.id);break;
@@ -215,7 +221,7 @@ function openIndustry(id:string):void{
   closeOtherPanels('industry');cancelCharge(w);keys.clear();industry.showStation(id);
 }
 function closeOtherPanels(except:'bag'|'locker'|'catalog'|'industry'|'beasts'):void{
-  cancelFishing(w);
+  cancelFishing(w);skyEvents.close();
   if(except!=='bag')toggleBag(false);
   if(except!=='locker')locker.hidden=true;
   if(except!=='catalog')industry.showCatalog(false);
@@ -440,7 +446,7 @@ function saveNow():Promise<void> {
   return saveQueue;
 }
 function safeWorld(next:WorldState):void {
-  finale.reset();view.juice.reset();cancelFishing(w);
+  finale.reset();view.juice.reset();cancelFishing(w);skyEvents.close();
   expedition.cancel();chart.hide(false);beasts.show(false);w=next;toggleStorage(false);industry.showStation(null);industry.showCatalog(false);lockerSignature='';cancelCharge(w);
   caught=null;keys.clear();messageUntil=0;message='';stackSignature='';
   if(mode==='weapon'&&!w.player.weapon||mode==='tool'&&!heldTool(w))choose('hook');
@@ -517,6 +523,11 @@ addEventListener('keydown',e=>{
   if(e.ctrlKey||e.metaKey||e.altKey||e.target===input)return;
   if(e.target instanceof HTMLSelectElement&&k!=='escape')return;
   if(finale.blocking()||incapacitated(w))return;
+  if(skyEvents.open()){
+    if(!e.repeat&&k==='escape'){e.preventDefault();skyEvents.close();}
+    else if(!e.repeat&&k==='m')toggleMute();
+    return;
+  }
   if(finale.open()){
     if(!e.repeat&&(k==='j'||k==='escape')){e.preventDefault();finale.showCodex(false);}
     if(!e.repeat&&k==='m')toggleMute();
@@ -584,7 +595,7 @@ canvas.addEventListener('pointermove',e=>{
 });
 canvas.addEventListener('pointerleave',()=>{pointer=null;});
 canvas.addEventListener('pointerdown',e=>{
-  if(!active||incapacitated(w)||rolling(w)||e.button!==0||fishingPanel(w)||chart.open()||finale.open()||finale.blocking())return;
+  if(!active||incapacitated(w)||rolling(w)||skyEvents.open()||e.button!==0||fishingPanel(w)||chart.open()||finale.open()||finale.blocking())return;
   pointer={x:e.clientX,y:e.clientY};
   const at=view.world(e.clientX,e.clientY);
   const x=Math.floor(at.x),y=Math.floor(at.y);
@@ -626,7 +637,7 @@ function simulation():void {
   if(mode==='weapon'&&!w.player.weapon)choose('hook');
   stepWorld(w,1,{x:Number(keys.has('d'))-Number(keys.has('a')),y:Number(keys.has('s'))-Number(keys.has('w'))});
   if(!wasDown&&incapacitated(w)){
-    keys.clear();expedition.cancel();chart.hide(false);beasts.show(false);
+    keys.clear();expedition.cancel();chart.hide(false);beasts.show(false);skyEvents.close();
     toggleStorage(false);toggleBag(false);industry.showStation(null);industry.showCatalog(false);
     caught=null;messageUntil=0;void saveNow();
   }else if(wasDown&&!incapacitated(w)){
@@ -687,15 +698,16 @@ function frame(now:number):void {
       fire:h&&h.fuel>0?Math.min(1,Math.max(0,(local+8)/44)):0});
   }
   industry.update();chart.paint(false,now);
-  const overlay=down||chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||beasts.open();
+  const overlay=down||skyEvents.open()||chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||beasts.open();
   radar.update(w,!overlay&&!w.activeIsland&&!finale.open()&&!finale.blocking());
   const context=primaryInteraction();
-  const here=expedition.update(now,overlay||finale.arena()||context.kind==='fishing',context.kind==='expedition');
+  const here=expedition.update(now,overlay||finale.arena()||context.kind==='fishing'||context.kind==='trader',context.kind==='expedition');
   const feedKey=el('wild-feed').querySelector('kbd')!;
   feedKey.hidden=context.kind!=='feed';
   beasts.update(now,overlay);m5Ui.update(now,overlay);
   canvas.dataset.primaryInteraction=context.kind;
   paintFishing(overlay||finale.arena(),context.kind==='fishing');
+  skyEvents.frame(down||finale.arena(),context.kind==='trader');
   toolUi.update(here);
   finale.update(chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||finale.open());
   const region=regions.get(w.activeIsland?.biomeId??w.sky.islands.find(n=>n.id===w.ark.anchoredIslandId)?.biomeId??'')??'碎云浅海';

@@ -7,8 +7,8 @@
     {
       "id": "tier1_basics",
       "name": "初燃余烬",
-      "unlocksBuildings": ["wood_deck", "wind_wall", "torch_post", "workbench", "storage_box", "stove"],
-      "unlocksRecipes": ["craft_torch", "craft_grapple", "cook_baked_root", "cook_warm_jerky", "cook_cured_fish"]
+      "unlocksBuildings": ["fishing_spot", "wood_deck", "wind_wall", "torch_post", "workbench", "storage_box", "stove"],
+      "unlocksRecipes": ["field_cloud_roots","field_cloud_soup","field_silver_cloud_carp","field_mist_shrimp","field_frostpine_roots","field_frostpine_soup","field_winter_salmon","field_glass_crab","field_sulfur_roots","field_sulfur_soup","field_cinder_trout","field_ash_eel","field_aurora_roots","field_aurora_soup","field_prism_fish","field_ice_squid", "craft_torch", "craft_grapple", "cook_baked_root", "cook_warm_jerky", "cook_cured_fish"]
     },
     {
       "id": "tier2_automation",

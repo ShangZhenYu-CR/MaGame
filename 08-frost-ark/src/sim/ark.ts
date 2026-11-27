@@ -16,7 +16,7 @@ import type { BuildingInstance, ItemStack, Vec2, WorldState } from './types';
 export const buildKinds = [
   'wood_deck','torch_post','wind_wall','workbench','furnace','stove','heat_relay',
   'catch_net','sorter_arm','greenhouse','warm_wall','buoyancy_core','iron_deck','beast_den','feed_trough',
-  'frost_turret','fire_oil_turret','wind_door','frost_airlock','fuel_hopper','steam_chute','wind_sail','steam_thruster','wind_vane','heat_pipe','insulated_floor','repair_station','warm_cot','tea_table','latte_climber','water_purifier','wall_lamp',
+  'frost_turret','fire_oil_turret','wind_door','frost_airlock','fuel_hopper','steam_chute','wind_sail','steam_thruster','wind_vane','heat_pipe','insulated_floor','repair_station','warm_cot','tea_table','latte_climber','water_purifier','wall_lamp','fishing_spot',
 ] as const;
 export type BuildKind = typeof buildKinds[number];
 export const itemNames = new Map(items.map(({ id, name }) => [id, name]));
@@ -172,6 +172,7 @@ export function buildIssue(w: WorldState, kind: BuildKind, x: number, y: number)
       if(buildingAt(w,x+dx,y+dy)||playerOverTile(w,x+dx,y+dy))return '这里被占用';
     }
     if(kind==='catch_net'&&!isEdgeDeck(w,x,y))return '捕捞网须靠开放的甲板外侧';
+    if(kind==='fishing_spot'&&!isEdgeDeck(w,x,y))return '垂钓位须靠开放的甲板外侧';
   }
   const reserve=pending?.building?Math.max(0,-(buildingDefs.get(pending.building.defId)?.buoyancyDelta??0)):pending?.deck??0;
   if(delta>0&&w.ark.buoyancyUsed+reserve+delta>w.ark.buoyancyMax)return '浮力不足，先建浮力核心或拆除负重';

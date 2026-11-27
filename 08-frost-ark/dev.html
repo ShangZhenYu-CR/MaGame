@@ -166,6 +166,11 @@
     <button type="button" id="expedition-interact"><kbd>E</kbd><span>互动</span></button>
     <progress id="expedition-progress" max="1" value="0" aria-label="采集进度" hidden></progress>
   </div>
+  <div id="fishing-hud" class="expedition-context fishing-hud" hidden aria-labelledby="fishing-title">
+    <div><span class="eyebrow">CLOUD FISHING</span><strong id="fishing-title">云海垂钓位</strong><small id="fishing-detail"></small></div>
+    <button type="button" id="fishing-use"><kbd>E</kbd><span>抛线</span></button>
+    <div id="fishing-track" hidden aria-label="垂钓收线时机"><span id="fishing-window"></span><img alt="" id="fishing-cursor"></div>
+  </div>
   <aside id="expedition-tools" class="expedition-tools" aria-label="远征工具耐久" hidden>
     <div class="expedition-tool"><img alt="" id="axe-art" hidden><label for="axe-durability">手斧</label><meter id="axe-durability" min="0" max="1" value="0"></meter><output id="axe-condition"></output></div>
     <div class="expedition-tool"><img alt="" id="pickaxe-art" hidden><label for="pickaxe-durability">矿镐</label><meter id="pickaxe-durability" min="0" max="1" value="0"></meter><output id="pickaxe-condition"></output></div>

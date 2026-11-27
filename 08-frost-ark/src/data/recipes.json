@@ -178,5 +178,21 @@
   {"id": "craft_fire_oil_flask", "station": "hand", "output": {"itemId": "fire_oil_flask", "count": 2}, "inputs": [{"itemId": "sulfur_ore", "count": 1}, {"itemId": "coal_chunk", "count": 1}, {"itemId": "rope", "count": 1}]},
   {"id": "craft_magma_sprayer", "station": "hand", "output": {"itemId": "magma_sprayer", "count": 1}, "inputs": [{"itemId": "frost_iron_ingot", "count": 3}, {"itemId": "sulfur_ore", "count": 2}, {"itemId": "sky_mithril", "count": 1}]},
   {"id": "craft_repair_hammer", "name": "制作修理锤", "station": "workbench", "seconds": 3, "output": {"itemId": "repair_hammer", "count": 1}, "inputs": [{"itemId": "driftwood", "count": 2}, {"itemId": "frost_iron_ingot", "count": 1}]},
-  {"id": "purify_ice", "name": "融冰净水", "station": "water_purifier", "seconds": 5, "output": {"itemId": "fresh_water", "count": 2}, "inputs": [{"itemId": "ice_shard", "count": 2}]}
+  {"id": "purify_ice", "name": "融冰净水", "station": "water_purifier", "seconds": 5, "output": {"itemId": "fresh_water", "count": 2}, "inputs": [{"itemId": "ice_shard", "count": 2}]},
+  {"id":"field_cloud_roots","name":"田野焗根 · 风根萝卜","station":"stove","seconds":6,"output":{"itemId":"baked_root","count":1},"inputs":[{"itemId":"wind_parsnip","count":1},{"itemId":"cloud_barley","count":1}]},
+  {"id":"field_cloud_soup","name":"野菜暖汤 · 雪盐叶","station":"stove","seconds":6,"output":{"itemId":"warm_berry_soup","count":1},"inputs":[{"itemId":"saltleaf","count":1},{"itemId":"snowpea","count":1}]},
+  {"id":"field_silver_cloud_carp","name":"风区腌味 · 银云鲤","station":"stove","seconds":6,"output":{"itemId":"cured_cloud_fish","count":1},"inputs":[{"itemId":"silver_cloud_carp","count":1},{"itemId":"white_salt","count":1}]},
+  {"id":"field_mist_shrimp","name":"风区腌味 · 雾隐虾","station":"stove","seconds":6,"output":{"itemId":"cured_cloud_fish","count":1},"inputs":[{"itemId":"mist_shrimp","count":1},{"itemId":"white_salt","count":1}]},
+  {"id":"field_frostpine_roots","name":"田野焗根 · 冻甜菜","station":"stove","seconds":6,"output":{"itemId":"baked_root","count":1},"inputs":[{"itemId":"ice_beet","count":1},{"itemId":"star_mushroom","count":1}]},
+  {"id":"field_frostpine_soup","name":"野菜暖汤 · 松莓","station":"stove","seconds":6,"output":{"itemId":"warm_berry_soup","count":1},"inputs":[{"itemId":"pine_berry","count":1},{"itemId":"frost_oat","count":1}]},
+  {"id":"field_winter_salmon","name":"风区腌味 · 冬云鲑","station":"stove","seconds":6,"output":{"itemId":"cured_cloud_fish","count":1},"inputs":[{"itemId":"winter_salmon","count":1},{"itemId":"snow_salt","count":1}]},
+  {"id":"field_glass_crab","name":"风区腌味 · 玻晶蟹","station":"stove","seconds":6,"output":{"itemId":"cured_cloud_fish","count":1},"inputs":[{"itemId":"glass_crab","count":1},{"itemId":"snow_salt","count":1}]},
+  {"id":"field_sulfur_roots","name":"田野焗根 · 赤壤薯","station":"stove","seconds":6,"output":{"itemId":"baked_root","count":1},"inputs":[{"itemId":"red_earth_yam","count":1},{"itemId":"ember_chestnut","count":1}]},
+  {"id":"field_sulfur_soup","name":"野菜暖汤 · 余烬果","station":"stove","seconds":6,"output":{"itemId":"warm_berry_soup","count":1},"inputs":[{"itemId":"ember_berry","count":1},{"itemId":"smoke_sage","count":1}]},
+  {"id":"field_cinder_trout","name":"风区腌味 · 烬鳞鳟","station":"stove","seconds":6,"output":{"itemId":"cured_cloud_fish","count":1},"inputs":[{"itemId":"cinder_trout","count":1},{"itemId":"volcanic_salt","count":1}]},
+  {"id":"field_ash_eel","name":"风区腌味 · 灰尾鳗","station":"stove","seconds":6,"output":{"itemId":"cured_cloud_fish","count":1},"inputs":[{"itemId":"ash_eel","count":1},{"itemId":"volcanic_salt","count":1}]},
+  {"id":"field_aurora_roots","name":"田野焗根 · 冰脉根","station":"stove","seconds":6,"output":{"itemId":"baked_root","count":1},"inputs":[{"itemId":"glacial_root","count":1},{"itemId":"sky_orchid_petals","count":1}]},
+  {"id":"field_aurora_soup","name":"野菜暖汤 · 极光桑果","station":"stove","seconds":6,"output":{"itemId":"warm_berry_soup","count":1},"inputs":[{"itemId":"aurora_mulberry","count":1},{"itemId":"frost_lotus","count":1}]},
+  {"id":"field_prism_fish","name":"风区腌味 · 虹棱鱼","station":"stove","seconds":6,"output":{"itemId":"cured_cloud_fish","count":1},"inputs":[{"itemId":"prism_fish","count":1},{"itemId":"blue_salt","count":1}]},
+  {"id":"field_ice_squid","name":"风区腌味 · 冰幕鱿","station":"stove","seconds":6,"output":{"itemId":"cured_cloud_fish","count":1},"inputs":[{"itemId":"ice_squid","count":1},{"itemId":"blue_salt","count":1}]}
 ]

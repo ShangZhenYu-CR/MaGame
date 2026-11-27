@@ -65,7 +65,12 @@
     "p2-home-comfort": "Six NEW isolated painted sprites in an EXACT square contact sheet of 3 equally wide columns and 2 evenly tall rows for Frost Ark, a refined snow-survival ark game. Reference the attachments solely for materials, proper straight-frontal 40° elevated orthographic three-quarter top-down, daylight from upper left, soft slate-brown dark outlines and worn muted timber, waxed wool and copper. Work with distinct interior-cozy amber highlights. Every subject is centered in its own cell with clean generous solid pure #FF00FF magenta separation, including interior gaps. NO text, labels, borders, decorations outside asset, contact shadow on magenta, photographic backdrop, dark floor, perspective yaw, neon purple, emitted particles or UI frame. TOP row LEFT: an expedition WARM COT, one-person snug stormcloth canvas bed with dark frostwood frame, sturdy squat legs, neatly stitched tawny dense wool blanket, small blue-grey pillow, amber cozy hint, visible sleeping surface in 3/4. TOP row CENTER: a small circular sturdy tea table with a beautiful rustic oil-aged copper kettle and two low mugs attached on the top, aged rounded wood warms, three foothold supports visible, minimal silhouette. TOP row RIGHT: a miniature ship cat climb tower with two staggered tan fleece-covered landing shelves and one worn rope-wrapped scratching pole, cozy dark grey oak base and no real cat, cute but sturdy silhouette. BOTTOM row LEFT: a compact naval ice-melt water purifier for one tile, low naval frame with two geometric copper coils, small transparent blue-grey clean-water tank held behind iron bands and clearly visible spout, no high heat or flames, dark maritime copper, recognizable distinct shape. BOTTOM row CENTER: a tiny cozy wall-mounted windproof lamp isolated with its bronze wall bracket but without any actual wall, curved dark cool metal bracket and small octagonal brass lantern body with glowing amber glass within its outline, handle and cylinder visible at top in 40 degree camera. BOTTOM row RIGHT: a tiny game inventory bottle of freshly purified pale blue water, translucent rounded faceted glass with stopper and dark pale bronze bands, no writing, small surface glint, clear 32px silhouette under same light. Do not copy reference pictures. Art finely painted, motifs simple and readable.",
     "p2-18-terrain": "Create an original painterly game environment texture ATLAS for Frost Ark, no other objects, following the attached palette reference only. SQUARE atlas, EXACT 4 columns × 4 rows of equal square panels, straight edges without seams, dividers or labels between panels, sixteen independent textures. Columns left to right distinct materials: 1 desaturated gray-blue slate with windswept traces of frost, 2 frosty pale blue snow packed over dark granite, 3 charcoal dark burnt volcanic stone with subtle dust ochre flecks (not bright lava), 4 muted teal-grey glacier ice with low contrast mineral fragments. ALL rows show flat overhead game ground FILL all the way to each panel edge (not a cutout); no purple or magenta, no frame, no letters, no hard outlines around panel edges, no decorative objects larger than 5% of a square. Row 1 in each material: smooth irregular weathered granular ground with tiny chipped specks; row 2 in each material: softly dusted ground weathered into amorphous uneven patches without strong stripes; row 3 in each material: gently eroded grain with very small pinprick fracture and scattered grit; row 4 in each material: small interlaced irregular pebbles embedded in same base. All 4 variants within each column have consistently matched mean value and NO prominent gradient or obvious light-to-dark transitions. Natural painterly forms, carefully non-symmetrical, no repeating visible motifs, no concentric forms, no grids within each sample, no rotated or mirrored motifs. These sixteen low-contrast textures will be feather blended into one seamless, convincing ship game landscape; keep the small physical details grounded and artistic, no photograph. Align exact 4×4 boundaries.",
     "p2-18-coast": "Draw exactly twelve separate original 2.5D environmental hand-painted sprite CUTOUTS for Frost Ark. Precise contact atlas layout: FOUR equal columns and THREE equal rows. Wide clear gutters within each cell. Flat pure solid #FF00FF chroma key background even in gaps, no image borders/text/cell lines/no stray details in margin. Attachment for material and camera, do not repeat sprite shape. Camera plane three-quarter straight 40 degrees above, cool softly from upper left, visible subtle dark cool-brown outline. Each column is one wind biome with coherent materials. Left to right column palette: C1 cold slate grey with restrained white frost, C2 pale snowy mineral blue-grey granite, C3 smoky dark basalt with finely muted orange ochre sulfur accent, C4 translucent silver-cyan mineral glacial ice. TOP ROW four irregular front attached cliff wall sections, wide with gently uneven horizontal ledge on TOP which visibly anchors into land, thick fractured layered sidewall below, unequal low angular downward protuberances on bottom; organic asymmetric silhouette, left slope noticeably unlike right slope, scalloped irregular geological striations. Short hanging icicles only in glacier and snow, don't form a generic inverted triangle, no hanging islands alone, no props on top. MIDDLE ROW four small isolated irregular low scattered environmental decals: C1 single cluster of three angular scattered slate fragments and grit, C2 one loose faint uneven blue-white wind-blown snow pillow with a couple gray pebbles, C3 a cluster of distinct dark crumbled lava gravel shards with a subtle orange-ochre dusty mottling in interior, C4 small cracked cyan ice scattered shards patch with little bright white. BOTTOM ROW four additional low irregular decal cutouts: C1 sharp fine pale worn branching frost crust lines in a patch, C2 one jagged grey mostly buried granite rock dusted with low white snow and two fragments, C3 a few understated fine oxidized ochre veins and dark fissure cracks coming together irregularly (not emitted light), C4 one branching intricate translucent irregular dark teal hairline fracture with light ice reflecting on one side. For middle and bottom rows make low elongated asymmetrical visual silhouettes, ground-plane details without rectangular backgrounds, no glow or shadows drawn on magenta. Center all 12 cells, unframed, art separable, restrained worn painterly brushwork, legible small.",
-    "p2-19-landmarks": "Draw six original painterly environmental props for Frost Ark survival game on an exact 3 columns × 2 rows isolated sprite atlas. Use the visual reference ONLY to match weathered handpainted materials and subdued palette. 40 degree orthographic straight-front elevated three-quarter camera, faint slate-dark brown contours, cool directional diffuse light from upper left. One full sprite centered per cell, generous pure #FF00FF solid magenta margins and gutters, no overlap between cells, no type frame, no letters, no ground cast shadow, all distinct from each other. All background outside object including holes perfectly solid magenta. TOP ROW, from left to right: (1) frozen expedition outpost, miniature 2-person low weathered stormcloth A-frame tent with stitched tall warm tan front fold, limited dark blue-gray gear and one low broad open salvage crate, canvas and snow, both on a small irregular contiguous snow base with granular contour, no characters. (2) geothermal heat pool, low oval shallow irregular gray-slate rock basin with 5 rounded broken rim stones, luminous subdued cool jade-blue thermal water revealing colored minerals, sparsely snow-dusted, no floating steam (will render later), no rectangular base, gentle warmer edges. (3) dormant ancient heating obelisk, whole centered distinctive crooked vertical slate monolithic cairn about twice as high as wide, wide dark chamfered pedestal, two slight brass vein outlines and a clearly distinct deep blue central inset, several icy chips right at base, no ground. BOTTOM ROW: (4) sulfur vent, low dark gray volcanic rock with ochre encrustations and distinct cracked small opening top clearly visible, 3 muted ochre tipped spikes around the opening, no lava or particle effects, silhouette almost ground level. (5) weathered wreck of small fantasy airship suspended hull segment only, icy horizontal broken dark wood bronze-ribbed short boat with a diagonal half-section curved propeller and crumpled narrow weathered sail fabric jammed inside, wreck body with snow, no ropes outside or canvas flying. (6) lit warmth obelisk: exact same size/shape/colors/footprint/camera as dormant slate pedestal at top right, except the visible deep blue inset now warmly glowing bright copper-gold and narrow warm vein accents, no glow or effect outside the sprite. Refined textures, realistic tactile hues, no neon purple. Strong concise shapes readable when 1–3 grid tiles tall."
+    "p2-19-landmarks": "Draw six original painterly environmental props for Frost Ark survival game on an exact 3 columns × 2 rows isolated sprite atlas. Use the visual reference ONLY to match weathered handpainted materials and subdued palette. 40 degree orthographic straight-front elevated three-quarter camera, faint slate-dark brown contours, cool directional diffuse light from upper left. One full sprite centered per cell, generous pure #FF00FF solid magenta margins and gutters, no overlap between cells, no type frame, no letters, no ground cast shadow, all distinct from each other. All background outside object including holes perfectly solid magenta. TOP ROW, from left to right: (1) frozen expedition outpost, miniature 2-person low weathered stormcloth A-frame tent with stitched tall warm tan front fold, limited dark blue-gray gear and one low broad open salvage crate, canvas and snow, both on a small irregular contiguous snow base with granular contour, no characters. (2) geothermal heat pool, low oval shallow irregular gray-slate rock basin with 5 rounded broken rim stones, luminous subdued cool jade-blue thermal water revealing colored minerals, sparsely snow-dusted, no floating steam (will render later), no rectangular base, gentle warmer edges. (3) dormant ancient heating obelisk, whole centered distinctive crooked vertical slate monolithic cairn about twice as high as wide, wide dark chamfered pedestal, two slight brass vein outlines and a clearly distinct deep blue central inset, several icy chips right at base, no ground. BOTTOM ROW: (4) sulfur vent, low dark gray volcanic rock with ochre encrustations and distinct cracked small opening top clearly visible, 3 muted ochre tipped spikes around the opening, no lava or particle effects, silhouette almost ground level. (5) weathered wreck of small fantasy airship suspended hull segment only, icy horizontal broken dark wood bronze-ribbed short boat with a diagonal half-section curved propeller and crumpled narrow weathered sail fabric jammed inside, wreck body with snow, no ropes outside or canvas flying. (6) lit warmth obelisk: exact same size/shape/colors/footprint/camera as dormant slate pedestal at top right, except the visible deep blue inset now warmly glowing bright copper-gold and narrow warm vein accents, no glow or effect outside the sprite. Refined textures, realistic tactile hues, no neon purple. Strong concise shapes readable when 1–3 grid tiles tall.",
+    "p2-20-props": "Original refined illustrated cutouts for the Frost Ark painterly sky survival game. Exact 3 columns x 2 rows equal contact atlas cells, all 6 individual assets centered in their own cell with a generous pure solid saturated #FF00FF matte in gutters and around separated pieces; no text, no numbers, no lines or frames. Use reference only for tonal compatibility: slightly dark weathered outlines, soft top left winter skylight, authentic painterly tactile materials. Straight-front orthographic 40 degree elevated 3/4 terrain props, no isometric diamond. TOP LEFT: compact wild northern berry bush, handful of vivid subdued ember-red berries and curling frosted leaves, drab dusty green foliage, brown twigs and small thin irregular shallow snowy root base, not Christmas decor. TOP CENTER: windswept clump of short pale ochre tundra grass, a little silvery white snow glaze near root tips and dark frosted slate clotted pebbles, bending blades and seed heads naturally angled, rich taper and irregular edges. TOP RIGHT: patch of edible wild winter tubers with rounded dull purple-brown exposed bulbs with short rich umber stems and greenish frost grey elongated leaves, a small irregular shallow earth footprint lightly rimmed with ice, not potted. BOTTOM LEFT: low irregular already-exposed mineral crystal salt vein, naturally rough 3 cream ice blue × pale yellow rock crystal shards half embedded in a low charcoal stone ledge, a few crumbs attached, not neon. BOTTOM CENTER: freestanding low nautical wooden and metal compact fishing station attached to one small weathered oak edge brace, short copper spool, resilient long ash fishing rod leaning right low over the side, no rope spool over floor, no rectangular floor tile, slight frost, purposeful light design, see full silhouette uninterrupted in its cell. BOTTOM RIGHT: inventory icon of a small salvaged floating fishing treasure chest, tapered reinforced copper fittings and a raised oval clasp, weathered blue-gray frost wood with subdued brass highlights, full concise small-scale silhouette, no scenery. No cast shadows on magenta, no effects outside objects, no human characters, no residual particles around subjects.",
+    "p2-20-herbs0": "Refined hand-painted Frost Ark game 32 pixel inventory icon atlas. Exact 4 columns × 2 rows of eight individually centered icons, entirely flat pure saturated #FF00FF magenta around each object and in the large gutters, NO labels/numbers/dividers, no circular backplates, no grounding floor or effects outside the object. Camera is straight-front elevated 40° 3/4, muted tactile painterly pigments, soft light from upper left, delicate cool gray-brown contours like attached style. Each nearly fills its individual quadrant with deliberate visual silhouette and no overlap. TOP row left→right: (1) one broad saltleaf with off-white granular veins and gray olive lobes; (2) curved pale-green snowpea pod open with three peas in same pod; (3) one slender tapered pale ivory parsnip with two short dark leaves; (4) three golden cloud-barley heads tied in a tiny amber sheaf. BOTTOM row: (5) small pile of dull ivory salt granules with little slate fleck; (6) three blue-red glossy pine-berries with needle sprig; (7) low pale-ochre frosted oat stack with diamond heads; (8) single round reddish-purple ice-beet with pale roots and two short icy blue leaves.",
+    "p2-20-herbs1": "Refined hand-painted Frost Ark game 32 pixel inventory icon atlas. Exact 4 columns × 2 rows of eight individually centered icons, entirely flat pure saturated #FF00FF magenta around each object and in the large gutters, NO labels/numbers/dividers, no circular backplates, no grounding floor or effects outside the object. Camera is straight-front elevated 40° 3/4, muted tactile painterly pigments, soft light from upper left, delicate cool gray-brown contours like attached style. Each nearly fills its individual quadrant with deliberate visual silhouette and no overlap. TOP left→right: (1) two edible icy star mushrooms, compact umbrella caps pale sapphire with subtle cream flecks; (2) small frosty pale blue snow salt flakes heaped together, crystals only; (3) clustered ember berries deep rust-red on a dark twig with ONE ochre leaf; (4) smoke-sage three elongated bronze green leaves with serrated edges; BOTTOM: (5) copper-red knobbly earth yam with small roots and textured pale ridges; (6) two splitting burnt-brown edible chestnuts and one pale inner flesh visible; (7) small mixed grey-charcoal salt mound with a few pale visible halite flecks, not coal; (8) bunch of dusky purple aurora mulberries with bent short muted pine-green stem and tiny dew beads.",
+    "p2-20-herbs2": "Refined hand-painted Frost Ark game 32 pixel inventory icon atlas. Exact 4 columns × 2 rows of eight individually centered icons, entirely flat pure saturated #FF00FF magenta around each object and in the large gutters, NO labels/numbers/dividers, no circular backplates, no grounding floor or effects outside the object. Camera is straight-front elevated 40° 3/4, muted tactile painterly pigments, soft light from upper left, delicate cool gray-brown contours like attached style. Each nearly fills its individual quadrant with deliberate visual silhouette and no overlap. TOP left→right: (1) layered icy frost-lotus translucent pale blue edible petal bud, no stalk; (2) white glacier root tapering into lilac hints with tiny dangling root hairs and knotted cream top; (3) three compact star-shaped ivory-gold sky orchid edible flower petals joined at stub, not full plant; (4) tiny heap of bright slate-blue translucent edible mineral salt cubes with pearl highlights. BOTTOM: (5) slim silver cold-water wild cloud carp, gentle C curve and small rounded silver scales; (6) small bent pale icy-pink shrimp, curved shell segments and short antennae; (7) single plump rosy winter salmon silver with dark small speckles and thick mouth; (8) small bluish translucent glass crab, simple rounded shell and two small spread claws. Painted individual prop shapes, exaggerated tiny readability.",
+    "p2-20-fish": "Refined hand-painted Frost Ark game 32 pixel inventory icon atlas. Exact 4 columns × 2 rows of eight individually centered icons, entirely flat pure saturated #FF00FF magenta around each object and in the large gutters, NO labels/numbers/dividers, no circular backplates, no grounding floor or effects outside the object. Camera is straight-front elevated 40° 3/4, muted tactile painterly pigments, soft light from upper left, delicate cool gray-brown contours like attached style. Each nearly fills its individual quadrant with deliberate visual silhouette and no overlap. TOP left→right: (1) slim fiery rust-copper cinder trout deeply muted dark scales and one off-white fin; (2) sinuous dark smoky blue-green ash eel forming gentle S curve, head readable, not snake; (3) turquoise silver prism fish with stocky oblong sparkling navy-and-blue scales and angular twin fins, no emitted glow; (4) compact small silvery grey-blue edible squid, tapered finned hood and five short curling tentacles. BOTTOM left→right: (5) compact edge-line hook indicator: small copper fishing hook with tightly tied blue-white thread; (6) pale cork fishing bobber with dark slate and rusty red half-paint; (7) single clean cold indigo splash droplet with small surrounding drops; (8) rolled gray brown paper fish journal clipping tied in small cinnamon thread, NO text or graphical markings."
   },
   "assets": [
     {
@@ -4461,6 +4466,1042 @@
       "tileW": 1.34,
       "tileH": 2.15,
       "maxBytes": 32000
+    },
+    {
+      "id": "forage-berries",
+      "source": "p220-props.png",
+      "crop": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "size": [
+        96,
+        96
+      ],
+      "key": "magenta",
+      "keyClear": 52,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.91
+      ],
+      "targetAnchor": [
+        0.5,
+        0.91
+      ],
+      "tileW": 1.15,
+      "tileH": 1.18,
+      "maxBytes": 26000
+    },
+    {
+      "id": "forage-grass",
+      "source": "p220-props.png",
+      "crop": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "size": [
+        96,
+        96
+      ],
+      "key": "magenta",
+      "keyClear": 52,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.91
+      ],
+      "targetAnchor": [
+        0.5,
+        0.91
+      ],
+      "tileW": 1.13,
+      "tileH": 1.06,
+      "maxBytes": 26000
+    },
+    {
+      "id": "forage-tubers",
+      "source": "p220-props.png",
+      "crop": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "size": [
+        96,
+        96
+      ],
+      "key": "magenta",
+      "keyClear": 52,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.91
+      ],
+      "targetAnchor": [
+        0.5,
+        0.91
+      ],
+      "tileW": 1.13,
+      "tileH": 1.09,
+      "maxBytes": 26000
+    },
+    {
+      "id": "forage-crystal",
+      "source": "p220-props.png",
+      "crop": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "size": [
+        96,
+        96
+      ],
+      "key": "magenta",
+      "keyClear": 52,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.89
+      ],
+      "targetAnchor": [
+        0.5,
+        0.89
+      ],
+      "tileW": 1.12,
+      "tileH": 0.91,
+      "maxBytes": 26000
+    },
+    {
+      "id": "building-fishing-spot",
+      "source": "p220-props.png",
+      "crop": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "size": [
+        160,
+        128
+      ],
+      "key": "magenta",
+      "keyClear": 52,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.28,
+        0.9
+      ],
+      "targetAnchor": [
+        0.4,
+        0.9
+      ],
+      "tileW": 1.43,
+      "tileH": 1.24,
+      "maxBytes": 26000
+    },
+    {
+      "id": "icon-drift-treasure",
+      "source": "p220-props.png",
+      "crop": [
+        1024,
+        512,
+        1536,
+        1024
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 52,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.55
+      ],
+      "targetAnchor": [
+        0.5,
+        0.55
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8000
+    },
+    {
+      "id": "icon-saltleaf",
+      "source": "p220-herbs0.png",
+      "crop": [
+        0,
+        0,
+        443,
+        443
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-snowpea",
+      "source": "p220-herbs0.png",
+      "crop": [
+        443,
+        0,
+        887,
+        443
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-wind-parsnip",
+      "source": "p220-herbs0.png",
+      "crop": [
+        887,
+        0,
+        1330,
+        443
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-cloud-barley",
+      "source": "p220-herbs0.png",
+      "crop": [
+        1330,
+        0,
+        1774,
+        443
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-white-salt",
+      "source": "p220-herbs0.png",
+      "crop": [
+        0,
+        443,
+        443,
+        887
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-pine-berry",
+      "source": "p220-herbs0.png",
+      "crop": [
+        443,
+        443,
+        887,
+        887
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-frost-oat",
+      "source": "p220-herbs0.png",
+      "crop": [
+        887,
+        443,
+        1330,
+        887
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-ice-beet",
+      "source": "p220-herbs0.png",
+      "crop": [
+        1330,
+        443,
+        1774,
+        887
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-star-mushroom",
+      "source": "p220-herbs1.png",
+      "crop": [
+        0,
+        0,
+        443,
+        443
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-snow-salt",
+      "source": "p220-herbs1.png",
+      "crop": [
+        443,
+        0,
+        887,
+        443
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-ember-berry",
+      "source": "p220-herbs1.png",
+      "crop": [
+        887,
+        0,
+        1330,
+        443
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-smoke-sage",
+      "source": "p220-herbs1.png",
+      "crop": [
+        1330,
+        0,
+        1774,
+        443
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-red-earth-yam",
+      "source": "p220-herbs1.png",
+      "crop": [
+        0,
+        443,
+        443,
+        887
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-ember-chestnut",
+      "source": "p220-herbs1.png",
+      "crop": [
+        443,
+        443,
+        887,
+        887
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-volcanic-salt",
+      "source": "p220-herbs1.png",
+      "crop": [
+        887,
+        443,
+        1330,
+        887
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-aurora-mulberry",
+      "source": "p220-herbs1.png",
+      "crop": [
+        1330,
+        443,
+        1774,
+        887
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-frost-lotus",
+      "source": "p220-herbs2.png",
+      "crop": [
+        0,
+        0,
+        443,
+        443
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-glacial-root",
+      "source": "p220-herbs2.png",
+      "crop": [
+        443,
+        0,
+        887,
+        443
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-sky-orchid-petals",
+      "source": "p220-herbs2.png",
+      "crop": [
+        887,
+        0,
+        1330,
+        443
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-blue-salt",
+      "source": "p220-herbs2.png",
+      "crop": [
+        1330,
+        0,
+        1774,
+        443
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-silver-cloud-carp",
+      "source": "p220-herbs2.png",
+      "crop": [
+        0,
+        443,
+        443,
+        887
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-mist-shrimp",
+      "source": "p220-herbs2.png",
+      "crop": [
+        443,
+        443,
+        887,
+        887
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-winter-salmon",
+      "source": "p220-herbs2.png",
+      "crop": [
+        887,
+        443,
+        1330,
+        887
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-glass-crab",
+      "source": "p220-herbs2.png",
+      "crop": [
+        1330,
+        443,
+        1774,
+        887
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-cinder-trout",
+      "source": "p220-fish.png",
+      "crop": [
+        0,
+        0,
+        443,
+        443
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-ash-eel",
+      "source": "p220-fish.png",
+      "crop": [
+        443,
+        0,
+        887,
+        443
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-prism-fish",
+      "source": "p220-fish.png",
+      "crop": [
+        887,
+        0,
+        1330,
+        443
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-ice-squid",
+      "source": "p220-fish.png",
+      "crop": [
+        1330,
+        0,
+        1774,
+        443
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-fishing-hook",
+      "source": "p220-fish.png",
+      "crop": [
+        0,
+        443,
+        443,
+        887
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-fishing-bobber",
+      "source": "p220-fish.png",
+      "crop": [
+        443,
+        443,
+        887,
+        887
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 55,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
+    },
+    {
+      "id": "icon-fishing-spot",
+      "source": "p220-props.png",
+      "crop": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 52,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.52
+      ],
+      "targetAnchor": [
+        0.5,
+        0.52
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 8500
     }
   ],
   "batchReferences": [
@@ -4544,6 +5585,15 @@
         "island-t1-cliff",
         "island-t3-cliff",
         "island-t4-cliff"
+      ]
+    },
+    {
+      "batch": "P2-20",
+      "sourceStyles": [
+        "icon-raw-root",
+        "icon-cloud-fish",
+        "icon-raw-meat",
+        "island-t2-cliff"
       ]
     }
   ]

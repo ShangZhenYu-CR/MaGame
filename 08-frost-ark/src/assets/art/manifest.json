@@ -3568,6 +3568,598 @@
         158
       ],
       "bytes": 23400
+    },
+    "forage-berries": {
+      "file": "forage-berries.png",
+      "width": 96,
+      "height": 96,
+      "anchorX": 48,
+      "anchorY": 87,
+      "tileW": 1.15,
+      "tileH": 1.18,
+      "contentBox": [
+        2,
+        16,
+        94,
+        94
+      ],
+      "bytes": 17140
+    },
+    "forage-grass": {
+      "file": "forage-grass.png",
+      "width": 96,
+      "height": 96,
+      "anchorX": 48,
+      "anchorY": 87,
+      "tileW": 1.13,
+      "tileH": 1.06,
+      "contentBox": [
+        2,
+        21,
+        94,
+        93
+      ],
+      "bytes": 14602
+    },
+    "forage-tubers": {
+      "file": "forage-tubers.png",
+      "width": 96,
+      "height": 96,
+      "anchorX": 48,
+      "anchorY": 87,
+      "tileW": 1.13,
+      "tileH": 1.09,
+      "contentBox": [
+        2,
+        16,
+        93,
+        94
+      ],
+      "bytes": 17528
+    },
+    "forage-crystal": {
+      "file": "forage-crystal.png",
+      "width": 96,
+      "height": 96,
+      "anchorX": 48,
+      "anchorY": 85,
+      "tileW": 1.12,
+      "tileH": 0.91,
+      "contentBox": [
+        2,
+        34,
+        94,
+        91
+      ],
+      "bytes": 11363
+    },
+    "building-fishing-spot": {
+      "file": "building-fishing-spot.png",
+      "width": 160,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 115,
+      "tileW": 1.43,
+      "tileH": 1.24,
+      "contentBox": [
+        28,
+        16,
+        157,
+        126
+      ],
+      "bytes": 16216
+    },
+    "icon-drift-treasure": {
+      "file": "icon-drift-treasure.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 35,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        10,
+        62,
+        55
+      ],
+      "bytes": 7384
+    },
+    "icon-saltleaf": {
+      "file": "icon-saltleaf.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        4,
+        62,
+        61
+      ],
+      "bytes": 8076
+    },
+    "icon-snowpea": {
+      "file": "icon-snowpea.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        4,
+        62,
+        59
+      ],
+      "bytes": 5363
+    },
+    "icon-wind-parsnip": {
+      "file": "icon-wind-parsnip.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        8,
+        2,
+        57,
+        62
+      ],
+      "bytes": 3804
+    },
+    "icon-cloud-barley": {
+      "file": "icon-cloud-barley.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        57,
+        62
+      ],
+      "bytes": 6272
+    },
+    "icon-white-salt": {
+      "file": "icon-white-salt.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        12,
+        62,
+        52
+      ],
+      "bytes": 5572
+    },
+    "icon-pine-berry": {
+      "file": "icon-pine-berry.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        3,
+        2,
+        61,
+        62
+      ],
+      "bytes": 7751
+    },
+    "icon-frost-oat": {
+      "file": "icon-frost-oat.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        10,
+        62,
+        54
+      ],
+      "bytes": 7242
+    },
+    "icon-ice-beet": {
+      "file": "icon-ice-beet.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        8,
+        2,
+        57,
+        62
+      ],
+      "bytes": 5895
+    },
+    "icon-star-mushroom": {
+      "file": "icon-star-mushroom.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        5,
+        62,
+        59
+      ],
+      "bytes": 6218
+    },
+    "icon-snow-salt": {
+      "file": "icon-snow-salt.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        14,
+        62,
+        51
+      ],
+      "bytes": 4852
+    },
+    "icon-ember-berry": {
+      "file": "icon-ember-berry.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        4,
+        62,
+        59
+      ],
+      "bytes": 6722
+    },
+    "icon-smoke-sage": {
+      "file": "icon-smoke-sage.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        2,
+        62,
+        61
+      ],
+      "bytes": 6483
+    },
+    "icon-red-earth-yam": {
+      "file": "icon-red-earth-yam.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        5,
+        62,
+        59
+      ],
+      "bytes": 7536
+    },
+    "icon-ember-chestnut": {
+      "file": "icon-ember-chestnut.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        6,
+        62,
+        59
+      ],
+      "bytes": 7005
+    },
+    "icon-volcanic-salt": {
+      "file": "icon-volcanic-salt.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        13,
+        62,
+        51
+      ],
+      "bytes": 5494
+    },
+    "icon-aurora-mulberry": {
+      "file": "icon-aurora-mulberry.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        4,
+        2,
+        59,
+        62
+      ],
+      "bytes": 7861
+    },
+    "icon-frost-lotus": {
+      "file": "icon-frost-lotus.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        6,
+        62,
+        59
+      ],
+      "bytes": 7609
+    },
+    "icon-glacial-root": {
+      "file": "icon-glacial-root.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        5,
+        2,
+        61,
+        62
+      ],
+      "bytes": 6362
+    },
+    "icon-sky-orchid-petals": {
+      "file": "icon-sky-orchid-petals.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        6,
+        62,
+        59
+      ],
+      "bytes": 6144
+    },
+    "icon-blue-salt": {
+      "file": "icon-blue-salt.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        10,
+        62,
+        54
+      ],
+      "bytes": 5644
+    },
+    "icon-silver-cloud-carp": {
+      "file": "icon-silver-cloud-carp.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        4,
+        62,
+        60
+      ],
+      "bytes": 5644
+    },
+    "icon-mist-shrimp": {
+      "file": "icon-mist-shrimp.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        9,
+        62,
+        55
+      ],
+      "bytes": 6196
+    },
+    "icon-winter-salmon": {
+      "file": "icon-winter-salmon.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        9,
+        62,
+        55
+      ],
+      "bytes": 5285
+    },
+    "icon-glass-crab": {
+      "file": "icon-glass-crab.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        14,
+        62,
+        49
+      ],
+      "bytes": 5450
+    },
+    "icon-cinder-trout": {
+      "file": "icon-cinder-trout.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        9,
+        62,
+        55
+      ],
+      "bytes": 4455
+    },
+    "icon-ash-eel": {
+      "file": "icon-ash-eel.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        4,
+        62,
+        59
+      ],
+      "bytes": 5414
+    },
+    "icon-prism-fish": {
+      "file": "icon-prism-fish.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        8,
+        62,
+        56
+      ],
+      "bytes": 5834
+    },
+    "icon-ice-squid": {
+      "file": "icon-ice-squid.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        4,
+        62,
+        60
+      ],
+      "bytes": 6064
+    },
+    "icon-fishing-hook": {
+      "file": "icon-fishing-hook.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        8,
+        2,
+        57,
+        62
+      ],
+      "bytes": 4240
+    },
+    "icon-fishing-bobber": {
+      "file": "icon-fishing-bobber.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        12,
+        2,
+        51,
+        62
+      ],
+      "bytes": 5564
+    },
+    "icon-fishing-spot": {
+      "file": "icon-fishing-spot.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 33,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        6,
+        62,
+        57
+      ],
+      "bytes": 4623
     }
   }
 }

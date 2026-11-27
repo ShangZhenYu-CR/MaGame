@@ -16,6 +16,7 @@ export const GROUND_FOOTPRINTS: Readonly<Record<string, {
   furnace:        { anchorY:  .8,  bounds: [.09, .39, .91, .8] },
   stove:          { anchorY:  .8,  bounds: [.015, .41, .985, .8] },
   heat_relay:     { anchorY:  .8,  bounds: [.23, .48, .77, .8] },
+  fishing_spot:  { anchorY: .91, bounds: [.26, .67, .74, .91] },
   catch_net:      { anchorY:  .92, bounds: [0, .67, 1, .92] },
   sorter_arm:     { anchorY:  .8,  bounds: [.255, .54, .745, .8] },
   greenhouse:     { anchorY: 1.76, bounds: [.06, .72, 1.94, 1.76] },

@@ -1077,3 +1077,63 @@ stepWorld(sulfurVent,60);
 assert.ok(sulfurVent.player.hp<startVentHealth);
 assert.throws(()=>deserializeWorld(JSON.stringify({...obelisk,landmarksP2:{[obeliskMark.id]:{litUntil:10**8}}})),/地标/);
 console.log('[sim-smoke:P2-19] OK: 56 island seeds, three landmarks per biome, one-time and full inventory transactions, two passive heat sources, sulfur warning+damage and strict old-compatible archive');
+
+import { cancelFishing,collectQuarry,FISH_CHEST,fishingAction,fishingPanel,foodSources,harvestForage,islandForage,openFishChest,patchReady } from '../src/sim/forage';
+import allFoods from '../src/data/items.json';
+import { strikeWildWithWeapon } from '../src/sim/beasts';
+import { TICK_RATE } from '../src/sim/types';
+const discoveredFood=new Set<string>();
+for(const [i,id] of terrainZones.entries()){
+ const w=coastFixture(id),plants=islandForage(w);
+ assert.equal(plants.length,4,id+' has four guaranteed ecology patches');
+ for(const plant of plants){
+  Object.assign(w.player,plant);
+  assert.equal(harvestForage(w,plant),null);
+  assert.equal(patchReady(w,plant),false);
+  assert.match(harvestForage(w,plant)!,/明天/);
+  for(const item of plant.items){
+   assert.ok(countItem(w,item)>0,item);
+   if(allFoods.find(v=>v.id===item)?.category==='food')discoveredFood.add(item);
+  }
+ }
+ const again=deserializeWorld(serializeWorld(w));
+ assert.ok(islandForage(again).every(p=>!patchReady(again,p)));
+ again.day++;assert.ok(islandForage(again).every(p=>patchReady(again,p)));
+ const fishing=createInitialWorld();
+ if(i>0){
+   fishing.sky.islands=w.sky.islands;
+   const island=fishing.sky.islands.find(n=>n.id===id)!;
+   Object.assign(fishing.sky,{x:island.skyX,y:island.skyY});
+ }
+ assert.ok(build(fishing,'fishing_spot',24,27));
+ assert.equal(build(fishing,'fishing_spot',25,23),false);
+ const harvests=[];
+ for(let strike=0;strike<5;strike++){
+  assert.equal(fishingAction(fishing).issue,null);
+  const panel=fishingPanel(fishing)!;
+  if(strike===0){
+   assert.match(fishingAction(fishing).issue!,/太早/);
+   assert.equal(fishingAction(fishing).issue,null);
+  }
+  stepWorld(fishing,Math.ceil(((panel.left+panel.right)*.5)*3.5*TICK_RATE));
+  const catchNow=fishingAction(fishing);
+  assert.equal(catchNow.issue,null);
+  assert.ok(catchNow.caught);harvests.push(catchNow.caught);discoveredFood.add(catchNow.caught);
+ }
+ const expected=Object.values(foodSources)[i].fish;
+ assert.deepEqual(harvests,['cloud_fish',expected[0],expected[1],'cloud_fish',expected[0]]);
+ assert.equal(countItem(fishing,FISH_CHEST),1);
+ assert.equal(openFishChest(fishing),null);
+ assert.equal(countItem(fishing,FISH_CHEST),0);
+ const saved=deserializeWorld(serializeWorld(fishing));
+ assert.equal(fishingAction(saved).issue,null);cancelFishing(saved);assert.equal(fishingPanel(saved),null);
+}
+const hunt=coastFixture('shallows_lantern');stepWorld(hunt,1);
+const prey=hunt.wildEntities.find(e=>e.kind==='beast')!;
+Object.assign(hunt.player,{x:prey.x,y:prey.y});
+assert.ok(strikeWildWithWeapon(hunt,prey,prey.maxHp));
+assert.equal(collectQuarry(hunt,prey.id),null);
+assert.equal(countItem(hunt,'raw_meat'),2);discoveredFood.add('raw_meat');
+assert.match(collectQuarry(deserializeWorld(serializeWorld(hunt)),prey.id)!,/没有/);
+assert.equal(discoveredFood.size,32,'32 different raw foods from direct natural sources, no crate lottery');
+console.log('[sim-smoke:P2-20] OK: 32 directly accessible raw foods across four biomes, daily forage regrowth, timing cycle, treasure, real hunt and old-compatible persistent state');

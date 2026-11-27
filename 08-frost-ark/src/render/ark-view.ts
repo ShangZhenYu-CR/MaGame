@@ -1,3 +1,4 @@
+import { fishingPanel,islandForage,patchReady,quarryDrops } from '../sim/forage';
 import { LANDMARK_ART,landmarkScene } from './landmark-view';
 import { docks,downDock } from '../sim/dock-direction';
 import { catPerch } from '../sim/home';
@@ -19,7 +20,7 @@ import { finaleStatus } from '../sim/finale';
 import { rollAge,rollTrail,rolling,ROLL_TICKS } from '../sim/roll';
 import { incapacitated, RESCUE_TICKS, rescuePoint } from '../sim/rescue';
 import { isDeckDrop } from '../sim/latte';
-import { buildingDefs } from '../sim/ark';
+import { buildingDefs,isDeck } from '../sim/ark';
 import { getIndustrySave } from '../sim/m2-state';
 import { dockedIsland, gangwayGeometry, islandNodes, islandNodeRemaining } from '../sim/island';
 import { helmPoint } from '../sim/sky-map';
@@ -41,6 +42,7 @@ const buildingVisuals:Readonly<Record<string,BuildingVisual>>={
   furnace:{art:'building-smelter',width:1.25,height:1.42,shadow:.51},
   stove:{art:'building-stove',width:1.20,height:1.33,shadow:.50},
   heat_relay:{art:'building-heat-relay',width:1.22,height:1.5,shadow:.45},
+  fishing_spot:{art:'building-fishing-spot',width:1.43,height:1.24,shadow:.27},
   catch_net:{art:'building-net',width:1.23,height:1.20,shadow:.45},
   sorter_arm:{art:'building-sorter',width:1.20,height:1.46,shadow:.47},
   greenhouse:{art:'building-greenhouse',width:2.26,height:2.17,shadow:.98},
@@ -69,7 +71,7 @@ const ironDeck='building-iron-deck';
 const required=[
   ...deckIds,'boss-frost-whale-1','boss-frost-whale-2','boss-frost-whale-3','solar-hearth','aurora-crystal','manan-south','manan-north','manan-west','manan-east','latte-sleep','latte-alert','latte-walk','latte-walk-alt',
   'hearth-1','hearth-2','hearth-3','rail','corner','rock','icicles',ironDeck,...Object.values(buildingVisuals).map(v=>v.art),
-  'debris-wood','debris-iron','debris-rope','debris-heavy','clouds','rail-side','rock-side','frost-frame','floor-insulated','icon-driftwood','icon-coal-chunk','icon-iron','icon-raw-root','icon-cloud-fish','icon-raw-meat','icon-beast-feed','building-wind-door-open','building-airlock-open',...ISLAND_ART,...LANDMARK_ART,...BEAST_ART,...HOSTILE_ART,...ELEMENT_ART,
+  'debris-wood','debris-iron','debris-rope','debris-heavy','clouds','rail-side','rock-side','frost-frame','floor-insulated','icon-driftwood','icon-coal-chunk','icon-iron','icon-raw-root','icon-cloud-fish','icon-raw-meat','icon-beast-feed','building-wind-door-open','building-airlock-open','forage-berries','forage-grass','forage-tubers','forage-crystal','icon-fishing-bobber',...ISLAND_ART,...LANDMARK_ART,...BEAST_ART,...HOSTILE_ART,...ELEMENT_ART,
 ] as const;
 interface Cell { x:number; y:number; hash:number; iron:boolean; insulated:boolean; temperature:number; left:boolean; right:boolean; front:boolean; back:boolean }
 interface Actor {
@@ -265,6 +267,17 @@ export class ArkView {
     const actors:Actor[]=[...this.edgeActors(cells,w,ghost,gangway,hull),...deckDrops];
     if(island){
       actors.push(...landmarkScene(c,this.art,w,project,s));
+      for(const item of quarryDrops(w))actors.push({x:item.x,y:item.y,art:'icon-raw-meat',shadow:.21,width:.45,height:.41});
+      for(const patch of islandForage(w)){
+        const at=project(patch.x,patch.y);
+        if(at.x<-s*2||at.x>width+s*2||at.y<-s*2||at.y>height+s*2)continue;
+        const art='forage-'+patch.kind;
+        if(patchReady(w,patch))actors.push({...patch,art,shadow:.23});
+        else {
+          c.save();c.globalAlpha=.46;
+          this.art.paint(c,art,at.x,at.y,s,{width:.67,height:.42});c.restore();
+        }
+      }
       for(const node of islandNodes(w)){
         const p=project(node.x,node.y);
         if(p.x< -s*2||p.x>width+s*2||p.y< -s*2||p.y>height+s*3)continue;
@@ -406,6 +419,18 @@ export class ArkView {
       const pos=project(a.x+(b.x-a.x)*(t-i),a.y+(b.y-a.y)*(t-i));
       const icon=parcel[event.item]??'driftwood';
       this.art.paint(c,'icon-'+icon,pos.x,pos.y-s*.18,s,{width:.28,height:.28,rotation:.12});
+    }
+    const cast=fishingPanel(w),fish=cast&&w.ark.buildings.find(b=>b.id===cast.station);
+    if(fish){
+      const shore=[[0,1],[1,0],[-1,0],[0,-1]].find(([x,y])=>!isDeck(w,fish.gx+x,fish.gy+y));
+      if(shore){
+        const [dx,dy]=shore,base=project(fish.gx+.89,fish.gy+.15);
+        const end=project(fish.gx+.5+dx*1.56,fish.gy+.5+dy*1.56);
+        const bob=Math.sin(w.tick*.23)*s*.04;
+        c.save();c.strokeStyle='rgba(213,205,179,.71)';c.lineWidth=1.15;c.beginPath();
+        c.moveTo(base.x,base.y);c.quadraticCurveTo((base.x+end.x)/2,(base.y+end.y)/2+s*.18,end.x,end.y+bob);c.stroke();
+        this.art.paint(c,'icon-fishing-bobber',end.x,end.y+bob,s,{width:.34,height:.38});c.restore();
+      }
     }
     if(g.active)this.paintHook(c,w,held);
     paintWeaponCombat(c,w,project,s);

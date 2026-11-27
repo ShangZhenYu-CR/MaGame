@@ -361,3 +361,11 @@ button[aria-disabled=true]{opacity:.62}
 .heat-radar-legend{display:flex;justify-content:center;align-items:center;gap:3px;margin-top:2px;font-size:10px}
 .heat-radar-legend i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#dc8e4b}
 .heat-radar-legend i:nth-of-type(2){background:#577eaf}.heat-radar-legend i:nth-of-type(3){background:#c9d3cf}.heat-radar-legend i:nth-of-type(4){background:#fb7569}
+
+.fishing-hud{min-width:min(342px,calc(100% - 22px))}
+.fishing-hud button span{margin-left:.35em}
+#fishing-track{grid-column:1/-1;position:relative;margin:8px 3px 6px;height:14px;border:1px solid #658095;background:#162e40;border-radius:5px}
+#fishing-window{position:absolute;top:1px;bottom:1px;left:var(--bite-left);width:var(--bite-width);background:#936738;border:1px solid #ddae70;border-radius:2px}
+#fishing-track[data-ready="true"] #fishing-window{background:#e7ad5d}
+#fishing-cursor{position:absolute;top:50%;left:var(--cast-progress);translate:-50% -50%;width:20px;height:20px;object-fit:contain;pointer-events:none}
+#fishing-use img{width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:4px}

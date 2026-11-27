@@ -1,3 +1,4 @@
+import { cancelFishing,FISH_CHEST,fishingAction,fishingPanel,nearFishing,openFishChest,stepFishing } from './sim/forage';
 import './ui/ark.css';
 import './ui/finale.css';
 import { finaleUi } from './ui/finale-ui';
@@ -112,7 +113,7 @@ const regions=new Map(biomes.map(b=>[b.id,b.name]));
 
 function toggleChart(show=!chart.open()):void{
   if(!show){chart.hide();industry.closeTip();return;}
-  keys.clear();cancelCharge(w);expedition.cancel();industry.closeTip();chart.show();
+  keys.clear();cancelFishing(w);cancelCharge(w);expedition.cancel();industry.closeTip();chart.show();
 }
 skyToggle.onclick=()=>toggleChart();
 function toggleBeastRoster(show=!beasts.open()):void{
@@ -121,13 +122,38 @@ function toggleBeastRoster(show=!beasts.open()):void{
 }
 el('beast-roster-toggle').onclick=()=>toggleBeastRoster();
 
+function triggerFishing():void{
+  const result=fishingAction(w);finishAction(result.issue,result.message,result.caught?'hit':'place');
+  cancelCharge(w);
+}
+const fishHud=el('fishing-hud'),fishTrack=el('fishing-track');
+const fishUse=el<HTMLButtonElement>('fishing-use'),fishLabel=fishUse.querySelector('span')!;
+const bobber=iconPath('fishing-bobber');
+if(bobber)el<HTMLImageElement>('fishing-cursor').src=bobber;
+const fishHook=iconPath('fishing-hook');
+if(fishHook){const img=document.createElement('img');img.alt='';img.src=fishHook;fishUse.prepend(img);}
+fishUse.onclick=triggerFishing;
+function paintFishing(hide:boolean,selected:boolean):void{
+  const event=stepFishing(w);if(event&&!incapacitated(w))tell(event);
+  const cast=fishingPanel(w);fishHud.hidden=hide||!(selected||cast);
+  fishTrack.hidden=!cast;fishHud.dataset.phase=cast?'cast':'idle';
+  const label=cast?'收线':'抛线',detail=cast?'游标进入亮区时按 E 或空格 · Esc 收竿':'停船后抛线，抓准咬钩时机。';
+  if(fishLabel.textContent!==label)fishLabel.textContent=label;
+  if(el('fishing-detail').textContent!==detail)el('fishing-detail').textContent=detail;
+  if(!cast)return;
+  fishTrack.style.setProperty('--bite-left',cast.left*100+'%');
+  fishTrack.style.setProperty('--bite-width',(cast.right-cast.left)*100+'%');
+  fishTrack.style.setProperty('--cast-progress',cast.peek*100+'%');
+  fishTrack.dataset.ready=String(cast.peek>=cast.left&&cast.peek<=cast.right);
+}
+
 function finishAction(issue:string|null,success:string,event?:'craft'|'undo'|'dismantle'|'place'|'hit'):void{
   tell(issue??success);
   if(issue)return;
   if(event)audio.play(event);
   void saveNow();
 }
-type PrimaryInteraction={kind:'expedition'|'feed'|'storage'|'beasts'|'close-storage'|'close-station'|'close-beasts'|'none'}|
+type PrimaryInteraction={kind:'expedition'|'fishing'|'feed'|'storage'|'beasts'|'close-storage'|'close-station'|'close-beasts'|'none'}|
   {kind:'station';id:string;label:string}|{kind:'door';id:string;open:boolean};
 function primaryInteraction():PrimaryInteraction{
   if(beasts.open())return {kind:'close-beasts'};
@@ -137,8 +163,9 @@ function primaryInteraction():PrimaryInteraction{
   const here=expedition.area(),travel=expedition.keyAction();
   if(here==='island'){
     const wild=nearestWildBeast(w);
-    if(wild&&(wild.stunnedTicks>0||wild.hp<=wild.maxHp*.35||(travel!=='landmark'&&!nearestIslandNode(w,1.8))))return {kind:'feed'};
+    if(wild&&(wild.stunnedTicks>0||wild.hp<=wild.maxHp*.35||(travel!=='landmark'&&travel!=='forage'&&travel!=='quarry'&&!nearestIslandNode(w,1.8))))return {kind:'feed'};
   }
+  if(fishingPanel(w))return {kind:'fishing'};
   if(travel&&travel!=='helm')return {kind:'expedition'};
   if(here!=='ark')return {kind:'none'};
   const door=nearestManualDoor(w),box=nearestStorage(w),station=nearestIndustry(w),animal=nearestBeastFacility(w);
@@ -147,6 +174,12 @@ function primaryInteraction():PrimaryInteraction{
     const others=[box,station,animal].filter(b=>b!==undefined);
     if(others.every(b=>dist<=Math.hypot(b.gx+.5-w.player.x,b.gy+.5-w.player.y)+.24))
       return {kind:'door',id:door.id,open:doorOpen(door)};
+  }
+  const fish=panel.hidden&&!industry.catalogOpen()?nearFishing(w):undefined;
+  if(fish){
+    const distance=Math.hypot(fish.gx+.50-w.player.x,fish.gy+.72-w.player.y);
+    if([box,station,animal].filter(v=>v!==undefined).every(v=>distance<=industryDistance(w,v)+.16)&&
+      (travel!=='helm'||distance+.12<Math.hypot(helmPoint(w).x-w.player.x,helmPoint(w).y-w.player.y)))return {kind:'fishing'};
   }
   // A relocated helm can share an enclosed room with furniture. Preserve E
   // at the helm itself, but let nearer machinery take priority when the
@@ -169,6 +202,7 @@ function useNearby():void{
     case 'close-storage':toggleStorage(false);break;
     case 'feed':beasts.tame();break;
     case 'expedition':expedition.use();break;
+    case 'fishing':triggerFishing();break;
     case 'beasts':toggleBeastRoster(true);break;
     case 'door':finishAction(operateWindDoor(w,action.id),action.open?'防风门已关上。':'防风门已打开。');break;
     case 'station':openIndustry(action.id);break;
@@ -179,6 +213,7 @@ function openIndustry(id:string):void{
   closeOtherPanels('industry');cancelCharge(w);keys.clear();industry.showStation(id);
 }
 function closeOtherPanels(except:'bag'|'locker'|'catalog'|'industry'|'beasts'):void{
+  cancelFishing(w);
   if(except!=='bag')toggleBag(false);
   if(except!=='locker')locker.hidden=true;
   if(except!=='catalog')industry.showCatalog(false);
@@ -227,7 +262,7 @@ function updateToolbar():void {
 }
 
 function runShortcut(a:Command,source:'key'|'click'):void{
-  if(incapacitated(w)||rolling(w)||chart.open()||finale.blocking()||finale.open())return;
+  if(incapacitated(w)||rolling(w)||chart.open()||finale.blocking()||finale.open()||fishingPanel(w))return;
   // Keep the original click-to-build workflow usable while crafting in
   // the visible bag. Numeric shortcuts remain inactive in all panels.
   if(!panel.hidden&&!(source==='click'&&(a.kind==='building'||a.kind==='hook')))return;
@@ -332,6 +367,10 @@ function fillBag():void {
       pin.setAttribute('aria-label','设为快捷食物：'+itemNames.get(id));
       pin.onclick=()=>{w.player.diet.quick=id;fillBag();void saveNow();};
       actions.append(eat,pin);li.append(actions);
+    }else if(s.itemId===FISH_CHEST){
+      const open=document.createElement('button');open.type='button';open.textContent='开宝匣';
+      open.dataset.fishTreasure='true';open.setAttribute('aria-label','打开稀有漂流宝匣');
+      open.onclick=()=>{finishAction(openFishChest(w),'打开宝匣，获得冻铁、缆绳与冰晶。','craft');fillBag();};li.append(open);
     }
     return li;
   });
@@ -399,7 +438,7 @@ function saveNow():Promise<void> {
   return saveQueue;
 }
 function safeWorld(next:WorldState):void {
-  finale.reset();view.juice.reset();
+  finale.reset();view.juice.reset();cancelFishing(w);
   expedition.cancel();chart.hide(false);beasts.show(false);w=next;toggleStorage(false);industry.showStation(null);industry.showCatalog(false);lockerSignature='';cancelCharge(w);
   caught=null;keys.clear();messageUntil=0;message='';stackSignature='';
   if(mode==='weapon'&&!w.player.weapon||mode==='tool'&&!heldTool(w))choose('hook');
@@ -465,7 +504,7 @@ input.onchange=async()=>{
   }catch(e){tell('导入失败：'+(e instanceof Error?e.message:'文件无法读取'));}
 };
 addEventListener('resize',()=>view.resize(w));
-addEventListener('blur',()=>{keys.clear();cancelCharge(w);expedition.cancel();});
+addEventListener('blur',()=>{keys.clear();cancelFishing(w);cancelCharge(w);expedition.cancel();});
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden){ keys.clear();cancelCharge(w);void saveNow(); }
 });
@@ -487,6 +526,12 @@ addEventListener('keydown',e=>{
   if(chart.open()){
     if(!e.repeat&&(k==='escape'||k==='n')){e.preventDefault();toggleChart(false);}
     else if(!e.repeat&&k==='m')toggleMute();
+    return;
+  }
+  if(fishingPanel(w)&&!e.repeat&&(k==='e'||k==='escape'||e.code==='Space')){
+    e.preventDefault();
+    if(k==='escape'){cancelFishing(w);tell('鱼线已收回。');}
+    else triggerFishing();
     return;
   }
   if(e.code==='Space'&&panel.hidden&&locker.hidden&&!industry.catalogOpen()&&!industry.stationOpen()&&!beasts.open()){
@@ -532,7 +577,7 @@ canvas.addEventListener('pointermove',e=>{
 });
 canvas.addEventListener('pointerleave',()=>{pointer=null;});
 canvas.addEventListener('pointerdown',e=>{
-  if(!active||incapacitated(w)||rolling(w)||e.button!==0||chart.open()||finale.open()||finale.blocking())return;
+  if(!active||incapacitated(w)||rolling(w)||e.button!==0||fishingPanel(w)||chart.open()||finale.open()||finale.blocking())return;
   pointer={x:e.clientX,y:e.clientY};
   const at=view.world(e.clientX,e.clientY);
   const x=Math.floor(at.x),y=Math.floor(at.y);
@@ -638,11 +683,12 @@ function frame(now:number):void {
   const overlay=down||chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||beasts.open();
   radar.update(w,!overlay&&!w.activeIsland&&!finale.open()&&!finale.blocking());
   const context=primaryInteraction();
-  const here=expedition.update(now,overlay||finale.arena(),context.kind==='expedition');
+  const here=expedition.update(now,overlay||finale.arena()||context.kind==='fishing',context.kind==='expedition');
   const feedKey=el('wild-feed').querySelector('kbd')!;
   feedKey.hidden=context.kind!=='feed';
   beasts.update(now,overlay);m5Ui.update(now,overlay);
   canvas.dataset.primaryInteraction=context.kind;
+  paintFishing(overlay||finale.arena(),context.kind==='fishing');
   toolUi.update(here);
   finale.update(chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||finale.open());
   const region=regions.get(w.activeIsland?.biomeId??w.sky.islands.find(n=>n.id===w.ark.anchoredIslandId)?.biomeId??'')??'碎云浅海';

@@ -1,3 +1,4 @@
+import { collectQuarry, harvestForage, nearQuarry, nearForage, patchContents, patchReady, patchTitles, type Patch } from '../sim/forage';
 import { actionLandmark, landmarkPrompt, nearLandmark, type Landmark } from '../sim/landmarks';
 import { docks } from '../sim/dock-direction';
 import { areaAt, gangwayGeometry, islandNodeRemaining, islandNodes, nearestIslandNode, nearGangway, toggleGangway,
@@ -5,11 +6,11 @@ import { areaAt, gangwayGeometry, islandNodeRemaining, islandNodes, nearestIslan
 import { helmPoint, nearHelm, toggleCruise } from '../sim/sky-map';
 import { harvestIslandResource, toolStatus } from '../sim/tools';
 import { itemNames } from '../sim/ark';
-import type { Vec2, WorldState } from '../sim/types';
+import type { Vec2,WildEntity, WorldState } from '../sim/types';
 
 const byId=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id)! as T;
 const set=(node:HTMLElement,s:string)=>{if(node.textContent!==s)node.textContent=s;};
-type ContextAction='helm'|'deploy'|'stow'|'gather'|'open-cache'|'landmark'|'return'|'board'|'dock'|'none';
+type ContextAction='helm'|'deploy'|'stow'|'gather'|'open-cache'|'landmark'|'forage'|'quarry'|'return'|'board'|'dock'|'none';
 const duration=350;
 export type ExpeditionArea=ReturnType<typeof areaAt>;
 interface Hooks{
@@ -42,20 +43,31 @@ export function expeditionUi(hooks:Hooks){
   }
   const now=performance.now();gathering={node:target,finish:now+duration,world:w};progress.hidden=false;progress.value=0;
  }
- function chosenMark():Landmark|undefined{
-  const w=hooks.state(),mark=nearLandmark(w),node=nearestIslandNode(w,1.8);
-  if(!mark)return;
-  if(!node||Math.hypot(mark.x-w.player.x,mark.y-w.player.y)<Math.hypot(node.x-w.player.x,node.y-w.player.y))
-    return mark;
+ type IslandChoice={tag:'mark';point:Landmark}|{tag:'forage';point:Patch}|{tag:'node';point:IslandResource}|{tag:'quarry';point:WildEntity};
+ function islandChoice():IslandChoice|undefined{
+  const w=hooks.state(),mark=nearLandmark(w),node=nearestIslandNode(w,1.8),patch=nearForage(w),quarry=nearQuarry(w);
+  const candidates:IslandChoice[]=[];
+  if(mark)candidates.push({tag:'mark',point:mark});
+  if(node)candidates.push({tag:'node',point:node});
+  if(patch)candidates.push({tag:'forage',point:patch});
+  if(quarry)candidates.push({tag:'quarry',point:quarry});
+  const distance=(c:IslandChoice)=>Math.hypot(c.point.x-w.player.x,c.point.y-w.player.y);
+  // A harvested patch is informational only. Never let it suppress an
+  // available resource or an actionable landmark in the same vicinity.
+  const actionable=(c:IslandChoice)=>c.tag==='node'||c.tag==='quarry'||(c.tag==='mark'?!!landmarkPrompt(w,c.point).label:patchReady(w,c.point));
+  return candidates.sort((a,b)=>Number(actionable(b))-Number(actionable(a))||distance(a)-distance(b))[0];
  }
+ function useForage(p:Patch){hooks.message(harvestForage(hooks.state(),p),'已采集：'+patchContents(p)+'。','hit');}
  function useLandmark(mark:Landmark){const result=actionLandmark(hooks.state(),mark);hooks.message(result.issue,result.message,'place');}
  function keyAction(){
   const w=hooks.state(),here=area();
   if(here==='island'){
-   const mark=chosenMark();
-   if(mark&&landmarkPrompt(w,mark).label)return 'landmark';
-   if(mark)return null;
-   return nearestIslandNode(w,1.8)?'harvest':null;
+   const choice=islandChoice();
+   if(choice?.tag==='mark'&&landmarkPrompt(w,choice.point).label)return 'landmark';
+   if(choice?.tag==='forage'&&patchReady(w,choice.point))return 'forage';
+   if(choice?.tag==='node')return 'harvest';
+   if(choice?.tag==='quarry')return 'quarry';
+   return null;
   }
   if(here!=='ark')return null;
   if(w.ark.anchoredIslandId&&nearGangway(w))return 'gangway';
@@ -64,7 +76,10 @@ export function expeditionUi(hooks:Hooks){
  }
  function use():boolean{
   const action=keyAction();
-  if(action==='landmark'){const mark=chosenMark();if(!mark)return false;useLandmark(mark);return true;}
+  if(action==='landmark'){const mark=islandChoice();if(mark?.tag!=='mark')return false;useLandmark(mark.point);return true;}
+  if(action==='quarry'){const v=islandChoice();if(v?.tag!=='quarry')return false;
+    hooks.message(collectQuarry(hooks.state(),v.point.id),'已拾取冻云兽肉 ×2。','hit');return true;}
+  if(action==='forage'){const patch=islandChoice();if(patch?.tag!=='forage')return false;useForage(patch.point);return true;}
   if(action==='harvest'){harvest();return true;}
   if(action==='gangway'){gangway();return true;}
   if(action==='helm'){cruise();return true;}
@@ -74,8 +89,9 @@ export function expeditionUi(hooks:Hooks){
  function pointer(at:Vec2):boolean{
   const w=hooks.state(),a=area();
   if(a==='island'){
-   const mark=chosenMark();
-   if(mark&&Math.hypot(at.x-mark.x,at.y-mark.y)<1.25&&landmarkPrompt(w,mark).label){useLandmark(mark);return true;}
+   const v=islandChoice();
+   if(v?.tag==='mark'&&Math.hypot(at.x-v.point.x,at.y-v.point.y)<1.25&&landmarkPrompt(w,v.point).label){useLandmark(v.point);return true;}
+   if(v?.tag==='forage'&&Math.hypot(at.x-v.point.x,at.y-v.point.y)<.9&&patchReady(w,v.point)){useForage(v.point);return true;}
    const picked=islandNodes(w).filter(n=>Math.hypot(at.x-n.x,at.y-n.y)<.8&&islandNodeRemaining(w,n)>0)
       .sort((p,q)=>Math.hypot(at.x-p.x,at.y-p.y)-Math.hypot(at.x-q.x,at.y-q.y))[0];
    if(picked&&Math.hypot(w.player.x-picked.x,w.player.y-picked.y)<=1.8)harvest(picked);
@@ -90,7 +106,8 @@ export function expeditionUi(hooks:Hooks){
  }
  function cancel(){gathering=null;progress.hidden=true;}
  function update(now:number,hide=false,primary=true):ExpeditionArea{
-  const w=hooks.state(),here=area(),box=gangwayGeometry(w),node=here==='island'?nearestIslandNode(w,1.8):undefined;
+  const w=hooks.state(),here=area(),box=gangwayGeometry(w),v=here==='island'?islandChoice():undefined;
+  const node=v?.tag==='node'?v.point:undefined;
   if(gathering){
    if(gathering.world!==w||here!=='island'||Math.hypot(gathering.node.x-w.player.x,gathering.node.y-w.player.y)>1.8)cancel();
    else if(now>=gathering.finish){
@@ -100,11 +117,17 @@ export function expeditionUi(hooks:Hooks){
    }else progress.value=1-(gathering.finish-now)/duration;
   }
   let action:ContextAction='none',title='',detail='',label='';
-  const mark=here==='island'?chosenMark():undefined;
+  const mark=v?.tag==='mark'?v.point:undefined,patch=v?.tag==='forage'?v.point:undefined;
   if(here==='island'){
    if(mark){
     action='landmark';
     ({title,detail,label}=landmarkPrompt(w,mark));
+   }else if(patch){
+    const available=patchReady(w,patch);
+    action='forage';title=patchTitles[patch.kind];detail=available?patchContents(patch):'已采收，次日再生。';
+    label=available?'采集':'';
+   }else if(v?.tag==='quarry'){
+    action='quarry';title='狩猎掉落';detail='收下冻云兽肉 ×2，可带回方舟加工。';label='拾取';
    }else if(!node){action='return';title='浮岛探索';detail='靠近树林、矿脉和遗迹箱可采集；沿来时的跳板回船。';}
    else {
     const kind=node.kind==='tree'?'wood_axe':node.kind==='ore'?'mining_pick':undefined;
@@ -130,7 +153,7 @@ export function expeditionUi(hooks:Hooks){
    action='dock';title='已靠泊';detail='走到'+(box?docks[box.side].label:'舷侧')+'登岛口搭跳板。';
   }
   if(current!==action){current=action;root.dataset.action=action;view.dataset.context=action;}
-  root.dataset.area=here;root.dataset.anchored=String(!!w.ark.anchoredIslandId);root.dataset.resourceKind=mark?'':node?.kind??'';root.dataset.landmark=mark?.kind??'';
+  root.dataset.area=here;root.dataset.anchored=String(!!w.ark.anchoredIslandId);root.dataset.resourceKind=mark?'':node?.kind??'';root.dataset.landmark=mark?.kind??'';root.dataset.forage=patch?.kind??'';root.dataset.forageReady=String(!!patch&&patchReady(w,patch));
   root.hidden=hide||action==='none';interact.hidden=!label;interact.disabled=!!gathering;
   interact.querySelector('kbd')!.hidden=!primary;
   if(title)set(byId('expedition-title'),title);

@@ -1,0 +1,18 @@
+{
+  "cloud_shallows":{
+    "berries":["saltleaf","warm_berry"],"grass":["snowpea","cloud_barley","frost_grass"],
+    "tubers":["wind_parsnip","raw_root"],"crystal":["white_salt","ice_shard"],"fish":["silver_cloud_carp","mist_shrimp"]
+  },
+  "frostpine_isles":{
+    "berries":["pine_berry","warm_berry"],"grass":["frost_oat","star_mushroom","frost_grass"],
+    "tubers":["ice_beet","raw_root"],"crystal":["snow_salt","ice_shard"],"fish":["winter_salmon","glass_crab"]
+  },
+  "sulfur_rift":{
+    "berries":["ember_berry","warm_berry"],"grass":["smoke_sage","ember_chestnut","frost_grass"],
+    "tubers":["red_earth_yam","raw_root"],"crystal":["volcanic_salt","ice_shard"],"fish":["cinder_trout","ash_eel"]
+  },
+  "aurora_zenith":{
+    "berries":["aurora_mulberry","warm_berry"],"grass":["frost_lotus","sky_orchid_petals","frost_grass"],
+    "tubers":["glacial_root","raw_root"],"crystal":["blue_salt","ice_shard"],"fish":["prism_fish","ice_squid"]
+  }
+}

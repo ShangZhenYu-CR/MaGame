@@ -5,6 +5,7 @@ import {
   type WorldState,
   type Vec2,
 } from './types';
+import { seedDrift, stepCloud } from './cloud';
 import { makeBuilding, walk } from './ark';
 import { nextRng } from './rng';
 
@@ -27,7 +28,7 @@ export function createInitialWorld(seed = 202608): WorldState {
 
   const rng1 = nextRng(seed);
 
-  return {
+  const world: WorldState = {
     saveVersion: SAVE_VERSION,
     seed,
     rngState: rng1.state,
@@ -112,12 +113,15 @@ export function createInitialWorld(seed = 202608): WorldState {
     skyheartCores: 0,
     bossDefeated: false,
   };
+  seedDrift(world);
+  return world;
 }
 
 export function stepWorld(world: WorldState, ticks = 1, direction: Vec2 = {x: 0, y: 0}): void {
   for (let i = 0; i < ticks; i++) {
     world.tick += 1;
     walk(world, direction);
+    stepCloud(world);
     world.timeOfDay = (world.timeOfDay + 1 / DAY_TICKS) % 1;
     if (world.tick % DAY_TICKS === 0) {
       world.day += 1;

@@ -410,7 +410,12 @@ try {
     const catalog=m2.locator('#build-catalog');
     const bench=catalog.locator('[data-build-kind=workbench]');
     await bench.hover();await m2.locator('#ui-tip').getByText(/研究蓝图/).waitFor();
-    assert.equal(await catalog.locator('[data-build-kind] img').count(),13);
+    // Preserve the exact 13-icon assertion for the original catalog, and
+    // verify the later S4 fishing station separately instead of masking any missing icon.
+    assert.equal(await catalog.locator('[data-build-kind]:not([data-build-kind=fishing_spot]) img').count(),13);
+    const fishingIcon=catalog.locator('[data-build-kind=fishing_spot] img');
+    assert.equal(await fishingIcon.count(),1);
+    assert.ok(await fishingIcon.evaluate((i:HTMLImageElement)=>i.complete&&i.naturalWidth>0));
     await m2.mouse.move(1000,350);await m2.locator('#ui-tip').waitFor({state:'hidden'});
     await shot('09-blueprints');await bench.click();
     await catalog.waitFor({state:'hidden'});

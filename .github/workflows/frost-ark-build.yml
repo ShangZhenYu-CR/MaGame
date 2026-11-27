@@ -1,0 +1,48 @@
+name: Frost Ark build and browser checks
+on:
+  push:
+    branches: [game/08-frost-ark]
+    paths:
+      - '08-frost-ark/**'
+      - '.github/workflows/frost-ark-build.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frost-ark-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: 08-frost-ark
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: 08-frost-ark/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run gate
+      - name: Package the double-clickable preview
+        run: |
+          cd ..
+          zip -qr 08-frost-ark/artifacts/frost-ark-playtest.zip             08-frost-ark/index.html 08-frost-ark/dist assets/character/head-0.png
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: frost-ark-playtest
+          path: 08-frost-ark/artifacts/frost-ark-playtest.zip
+          if-no-files-found: error
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: frost-ark-browser-screenshots
+          path: 08-frost-ark/artifacts/e2e/*.png
+          if-no-files-found: error

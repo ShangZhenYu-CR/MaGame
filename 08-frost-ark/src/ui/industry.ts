@@ -6,6 +6,7 @@ import { bindTooltips } from './tooltip';
 
 const el=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id)! as T;
 const descriptions:Partial<Record<BuildKind,string>>={
+ wind_door:'E 开关，关闭时可封住房间。',frost_airlock:'只为马楠和伙伴打开，离开后自动闭合。',
  frost_turret:'远射自动防御塔，暖区供能时拦截敌袭。',
  fire_oil_turret:'近距火油喷射，可连片驱散冰兽，严寒时须供暖。',
  wood_deck:'扩建可行走的甲板，须连接方舟边缘。',iron_deck:'更耐损的甲板，须连接方舟边缘。',torch_post:'近处小型热源。',
@@ -44,7 +45,7 @@ export function createIndustryUi(cb:Callbacks){
  let activeStation:string|null=null,catalogKey='',stationKey='',liftKey='';
  const buttons=new Map<BuildKind,HTMLButtonElement>();
  const itemIcon=(id:string)=>cb.icon(id.replaceAll('_','-'))??cb.icon(materialIcons[id]??'');
- const lateBlueprints=new Set<string>(['beast_den','feed_trough','frost_turret','fire_oil_turret']);
+ const lateBlueprints=new Set<string>(['beast_den','feed_trough','frost_turret','fire_oil_turret','wind_door','frost_airlock']);
  const categoryGroup=(kind:BuildKind)=>el(['workbench','furnace','stove','catch_net','sorter_arm','greenhouse','beast_den','feed_trough'].includes(kind)?'catalog-industry':'catalog-structure');
  for(const kind of buildKinds){
   const def=buildDefinitions[kind],[gw,gh]=def.size;

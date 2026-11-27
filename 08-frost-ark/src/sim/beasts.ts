@@ -1,3 +1,4 @@
+import { doorBlocksFeet,isDoor } from './rooms';
 import { burnDamage,elementalSpeed,frozen,resolveElement,type Element } from './elements';
 import { emitJuice } from './juice';
 import { equippedItem } from './equipment';
@@ -187,8 +188,9 @@ function moveToward(b:{x:number;y:number},x:number,y:number,speed:number,w:World
   const d=Math.hypot(x-b.x,y-b.y);
   if(d>.08){
     const n=Math.min(d,speed)/d,dx=(x-b.x)*n,dy=(y-b.y)*n;
-    if(areaAt(w,b.x+dx,b.y)!=='void')b.x+=dx;
-    if(areaAt(w,b.x,b.y+dy)!=='void')b.y+=dy;
+    const pass=(x:number,y:number)=>areaAt(w,x,y)!=='void'&&!w.ark.buildings.some(s=>isDoor(s.defId)&&doorBlocksFeet(s,{x,y},.15));
+    if(pass(b.x+dx,b.y))b.x+=dx;
+    if(pass(b.x,b.y+dy))b.y+=dy;
   }
 }
 function moveCompanion(w:WorldState,b:BeastEntity,index:number){

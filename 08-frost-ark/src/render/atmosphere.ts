@@ -140,8 +140,12 @@ export class WeatherFinish {
   private frozen=0;
   private lastTick=-1;
 
-  paint(c:CanvasRenderingContext2D,w:WorldState,frostFrame:HTMLImageElement):void{
-    if(w.weather!=='clear')paintSnow(c,w);
+  paint(c:CanvasRenderingContext2D,w:WorldState,frostFrame:HTMLImageElement,openAir?:Path2D):void{
+    if(w.weather!=='clear'){
+      if(openAir){c.save();c.clip(openAir,'evenodd');}
+      paintSnow(c,w);
+      if(openAir)c.restore();
+    }
     const {width:W,height:H}=c.canvas;
     const cold=clamp((45-w.player.warmth)/45);
     if(w.tick!==this.lastTick){

@@ -1,3 +1,4 @@
+import { doorOpen,indoor } from './rooms';
 import { damagePlayer, healPlayer } from './rescue';
 import { gearModifiers } from './equipment';
 import { mealRemaining } from './food';
@@ -94,10 +95,10 @@ export function advanceClimate(w:WorldState):void{
 
 export function solveHeat(w:WorldState):void{
   const {size,decks,heatGrid,buildings}=w.ark;
-  const insulation=new Float32Array(size*size);
+  const insulation=new Float32Array(size*size),sealed=indoor(w).inside;
   for(const b of buildings){
     const d=definitions.get(b.defId);
-    if(d?.insulation)insulation[b.gy*size+b.gx]=d.insulation;
+    if(d?.insulation&&!doorOpen(b))insulation[b.gy*size+b.gx]=d.insulation;
   }
   const sources=emitters(w);
   const next=new Array<number>(size*size).fill(w.ambientTemp);
@@ -119,7 +120,7 @@ export function solveHeat(w:WorldState):void{
       flow+=(other-heatGrid[i])*(inside?.12:.058)*(1-resistance);
     }
     // Flux to neighbours and exposed air, then gradual convergence to radiant sources.
-    next[i]=clamp(heatGrid[i]+flow+(w.ambientTemp+radiation-heatGrid[i])*.19*(1-shield*.72)
+    next[i]=clamp(heatGrid[i]+flow+(radiation+(w.ambientTemp-heatGrid[i])*(sealed[i]?.45:1))*.19*(1-shield*.72)
       +radiation*.035*shield,w.ambientTemp,85);
   }
   w.ark.heatGrid=next;

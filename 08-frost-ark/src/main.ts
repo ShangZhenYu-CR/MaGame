@@ -27,6 +27,7 @@ import { beastUi } from './ui/beasts';
 import { equipmentUi } from './ui/equipment';
 import { weaponsUi } from './ui/weapons';
 import { chooseWeapon, selectedWeapon, triggerWeapon, weaponHover, weaponById } from './sim/weapons';
+import { doorCenter,doorOpen,indoorsAt,nearestManualDoor,operateWindDoor } from './sim/rooms';
 import { gearModifiers } from './sim/equipment';
 import { heldTool,holdTool } from './sim/hotbar';
 import { setupHotbar,type Command } from './ui/hotbar';
@@ -121,7 +122,7 @@ function finishAction(issue:string|null,success:string,event?:'craft'|'undo'|'di
   void saveNow();
 }
 type PrimaryInteraction={kind:'expedition'|'feed'|'storage'|'beasts'|'close-storage'|'close-station'|'close-beasts'|'none'}|
-  {kind:'station';id:string;label:string};
+  {kind:'station';id:string;label:string}|{kind:'door';id:string;open:boolean};
 function primaryInteraction():PrimaryInteraction{
   if(beasts.open())return {kind:'close-beasts'};
   if(industry.stationOpen())return {kind:'close-station'};
@@ -134,7 +135,13 @@ function primaryInteraction():PrimaryInteraction{
   }
   if(expedition.keyAction())return {kind:'expedition'};
   if(here!=='ark')return {kind:'none'};
-  const box=nearestStorage(w),station=nearestIndustry(w),animal=nearestBeastFacility(w);
+  const door=nearestManualDoor(w),box=nearestStorage(w),station=nearestIndustry(w),animal=nearestBeastFacility(w);
+  if(door){
+    const {x,y}=doorCenter(door),dist=Math.hypot(x-w.player.x,y-w.player.y);
+    const others=[box,station,animal].filter(b=>b!==undefined);
+    if(others.every(b=>dist<=Math.hypot(b.gx+.5-w.player.x,b.gy+.5-w.player.y)+.24))
+      return {kind:'door',id:door.id,open:doorOpen(door)};
+  }
   if(animal&&(!box||industryDistance(w,animal)<industryDistance(w,box))&&
     (!station||industryDistance(w,animal)<industryDistance(w,station)))return {kind:'beasts'};
   if(station&&(!box||industryDistance(w,station)<industryDistance(w,box)))
@@ -150,6 +157,7 @@ function useNearby():void{
     case 'feed':beasts.tame();break;
     case 'expedition':expedition.use();break;
     case 'beasts':toggleBeastRoster(true);break;
+    case 'door':finishAction(operateWindDoor(w,action.id),action.open?'防风门已关上。':'防风门已打开。');break;
     case 'station':openIndustry(action.id);break;
     case 'storage':toggleStorage(true);break;
   }
@@ -642,7 +650,8 @@ function frame(now:number):void {
   if(mood!==w.player.portraitMood){mood=w.player.portraitMood;portrait.src=portraits[mood]??portraits[0];}
   toast(caught?'正在拉回：'+catchName:g.charging?'抓钩蓄力 '+Math.round(g.charge*100)+'%':
     g.active?'抓钩已抛出…':now<messageUntil?message:'');
-  const contextHint=!overlay&&(context.kind==='storage'?'按 E 或点击储物箱存取物品':
+  const room=el('indoor-status'),sheltered=indoorsAt(w,w.player);if(room.hidden===sheltered)room.hidden=!sheltered;
+  const contextHint=!overlay&&(context.kind==='door'?'按 E '+(context.open?'关上防风门':'打开防风门'):context.kind==='storage'?'按 E 或点击储物箱存取物品':
     context.kind==='station'?'按 E 操作'+context.label:context.kind==='beasts'?'按 E 打开伙伴管理':'');
   const interactionHint=contextHint||(here==='island'?(beasts.target()?'靠近虚弱云兽可投喂 · V 查看伙伴':'靠近资源采集 · I 制作和修理工具'):
     here==='gangway'?'沿跳板继续走 · 无需切换场景':mode==='hook'?'按住左键蓄力，松开抛钩':mode==='weapon'?

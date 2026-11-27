@@ -57,7 +57,8 @@
     "p207-icon-ice-repeater": "Original illustrated inventory icon for the fictional fantasy survival game Frost Ark. Hand-painted 2.5D game sprite, soft cool upper-left light and restrained weathered pigments. Compact iconic silhouette, centered single prop, crisply legible at 32px, no text or diagrams. Uniform solid bright magenta #FF00FF matte to every edge, no ground shadow, no background decorations, no text or watermark.\nA clearly fictional fantasy frozen-relic icon shaped like a compact stylized crossbow: smooth old wood body, solid translucent blue crystal wing shapes on both sides, no individual mechanical details, toy-like iconic geometry. Hand-painted collectible sprite.",
     "p207-icon-fire-oil-flask": "Original illustrated inventory icon for the fictional fantasy survival game Frost Ark. Hand-painted 2.5D game sprite, soft cool upper-left light and restrained weathered pigments. Compact iconic silhouette, centered single prop, crisply legible at 32px, no text or diagrams. Uniform solid bright magenta #FF00FF matte to every edge, no ground shadow, no background decorations, no text or watermark.\nA small rounded sealed fantasy amber potion bottle, with dark gray cork stopper, smooth glass body, warm peach liquid and one decorative string tied around the neck. A thick muted leather scallop around the base. No wick, no labels or hazard signs.",
     "p207-icon-magma-sprayer": "Original illustrated inventory icon for the fictional fantasy survival game Frost Ark. Hand-painted 2.5D game sprite, soft cool upper-left light and restrained weathered pigments. Compact iconic silhouette, centered single prop, crisply legible at 32px, no text or diagrams. Uniform solid bright magenta #FF00FF matte to every edge, no ground shadow, no background decorations, no text or watermark.\nA small ornate fictional portable steam kettle with ribbed copper bulb, side carrying ring, short downturned meteor-stone mouth and a glowing amber porthole in the rounded closed body. This is a fantastical plumbing tool sprite, heavily stylized, simple solid silhouette.",
-    "p2-elemental-icons": "Frost Ark original hand-painted indie survival game elemental status icon props, four equally sized images exact square 2 by 2 regular quadrant grid. Each motif distinctly centered in its quadrant, completely separated by wide pure fuchsia #FF00FF. Painterly 2.5D three-quarter top-down viewed 40° above, cool soft light from upper left, fine muted slate-brown edges, warm muted amber and frosted mineral blue, deeply readable at tiny 24 pixels. No text, no numbers, no card, no dividing marks, no outline around cells, no badge frame, no background shadows, flat pure solid saturated #FF00FF chroma key all around and between single glyphs. Precisely this order: top left single warm orange ember plume with rounded flame tongues (burning); top right thin asymmetrical pale icy-blue crystal with one long oblique shard and only two smaller broken side shards (slow); bottom left one distinctive chunky ice-blue translucent cube angled three-quarters enclosing a deep blue frost star silhouette (frozen); bottom right one moderately warm ochre iron shield icon broken in two by a wide diagonal blue-slate crack, clearly readable negative space through the split (armor broken). Compelling detailed painterly object silhouettes, no dark square base, no scenery, no purple. Large open space around every single icon, no clipping. Render square contact sheet."
+    "p2-elemental-icons": "Frost Ark original hand-painted indie survival game elemental status icon props, four equally sized images exact square 2 by 2 regular quadrant grid. Each motif distinctly centered in its quadrant, completely separated by wide pure fuchsia #FF00FF. Painterly 2.5D three-quarter top-down viewed 40° above, cool soft light from upper left, fine muted slate-brown edges, warm muted amber and frosted mineral blue, deeply readable at tiny 24 pixels. No text, no numbers, no card, no dividing marks, no outline around cells, no badge frame, no background shadows, flat pure solid saturated #FF00FF chroma key all around and between single glyphs. Precisely this order: top left single warm orange ember plume with rounded flame tongues (burning); top right thin asymmetrical pale icy-blue crystal with one long oblique shard and only two smaller broken side shards (slow); bottom left one distinctive chunky ice-blue translucent cube angled three-quarters enclosing a deep blue frost star silhouette (frozen); bottom right one moderately warm ochre iron shield icon broken in two by a wide diagonal blue-slate crack, clearly readable negative space through the split (armor broken). Compelling detailed painterly object silhouettes, no dark square base, no scenery, no purple. Large open space around every single icon, no clipping. Render square contact sheet.",
+    "p2-warm-room-doors": "Create four NEW matching environmental sprites for the Frost Ark top-down indie survival game. The two provided images are only material/camera reference: a frost-weathered low wood ship wall and an insulated light-tan wool-panel wall. Match their exact straight frontal three-quarter top-down orthographic camera (40 degree above, no isometric diamond and no yaw), soft cold light from upper left, muted grey-and-brown hand-painted palette and same visible top compressed depth. Each of these four new sprites is a one tile wide DOOR module only, a centered rectilinear doorpost frame with two feet, front bottom baseline level, slightly taller than the low peer wall, tight on the sides for neighboring modules. Square 2×2 contact sheet, each asset centered alone in a separate quadrant with broad pure RGB(255,0,255) MAGENTA margin; backdrop must be entirely solid magenta, including open door openings, NO floor, NO shadow cast on magenta, no lettering, no cell lines, no labels, no watermark, no ground, NO surrounding architecture, NO people or props. TOP LEFT: wooden storm door closed, small heavy brown rough planks with bronze horizontal iron straps, round tarnished brass latch on the right side, snow on dark frame top. TOP RIGHT: exactly SAME frame, heights and wood door material, now opened hinged to the LEFT at about 100°, visible magenta opening in middle and right, slim low threshold. BOTTOM LEFT: sophisticated frosted steel automatic airlock closed, narrow blue-gray bolted steel pylons and solid two sliding panel leaves with darker center seam, subtle very small warm copper pneumatic accents and top frost, same physical silhouette as top row but distinct material. BOTTOM RIGHT: EXACT matching same steel airlock pylons and top frame, two steel leaves retracted into side housings leaving a clear wide solid-magenta gap, narrow passive threshold along bottom. Each quadrant separated and no additional pieces. Clear silhouettes for 64px independent sprites, artwork textured hand-painted not voxel, no neon, no glow halo on backgrounds, no molten violet. The provided two PNG neighbors are references, do not include them."
   },
   "assets": [
     {
@@ -3065,6 +3066,108 @@
         627,
         627,
         1254,
+        1254
+      ]
+    },
+    {
+      "id": "building-wind-door",
+      "source": "wood-airlock.png",
+      "size": [
+        128,
+        128
+      ],
+      "key": "magenta",
+      "tileW": 1.17,
+      "tileH": 1.17,
+      "crop": [
+        0,
+        0,
+        627,
+        627
+      ]
+    },
+    {
+      "id": "building-wind-door-open",
+      "source": "wood-airlock.png",
+      "size": [
+        128,
+        128
+      ],
+      "key": "magenta",
+      "tileW": 1.17,
+      "tileH": 1.17,
+      "crop": [
+        627,
+        0,
+        1254,
+        627
+      ]
+    },
+    {
+      "id": "building-airlock",
+      "source": "wood-airlock.png",
+      "size": [
+        128,
+        128
+      ],
+      "key": "magenta",
+      "tileW": 1.17,
+      "tileH": 1.17,
+      "crop": [
+        0,
+        627,
+        627,
+        1254
+      ]
+    },
+    {
+      "id": "building-airlock-open",
+      "source": "wood-airlock.png",
+      "size": [
+        128,
+        128
+      ],
+      "key": "magenta",
+      "tileW": 1.17,
+      "tileH": 1.17,
+      "crop": [
+        627,
+        627,
+        1254,
+        1254
+      ]
+    },
+    {
+      "id": "icon-wind-door",
+      "source": "wood-airlock.png",
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "tileW": 1.17,
+      "tileH": 1.17,
+      "crop": [
+        0,
+        0,
+        627,
+        627
+      ]
+    },
+    {
+      "id": "icon-frost-airlock",
+      "source": "wood-airlock.png",
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "tileW": 1.17,
+      "tileH": 1.17,
+      "crop": [
+        0,
+        627,
+        627,
         1254
       ]
     }

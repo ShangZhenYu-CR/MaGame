@@ -18,6 +18,7 @@ import { stepFinale } from './finale';
 import { stepRescue } from './rescue';
 import { stepHunger } from './food';
 import { stepWeapons } from './weapons';
+import { stepAirlocks } from './rooms';
 import { cleanElements } from './elements';
 import { rollMotion,stepRoll } from './roll';
 
@@ -138,6 +139,7 @@ export function createInitialWorld(seed = 202608): WorldState {
 export function stepWorld(world: WorldState, ticks = 1, direction: Vec2 = {x: 0, y: 0}): void {
   for (let i = 0; i < ticks; i++) {
     world.tick += 1;
+    stepAirlocks(world);
     const motion=rollMotion(world,direction);
     walkExpedition(world,motion.direction,motion.scale);
     stepNavigation(world);

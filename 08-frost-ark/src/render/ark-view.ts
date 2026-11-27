@@ -1,3 +1,4 @@
+import { doorOpen,indoor } from '../sim/rooms';
 import { ELEMENT_ART,paintElementAura,paintElementSigns } from './element-view';
 import { thawedDeck } from '../sim/elements';
 import { JuiceView } from './juice-view';
@@ -37,6 +38,8 @@ const buildingVisuals:Readonly<Record<string,BuildingVisual>>={
   catch_net:{art:'building-net',width:1.23,height:1.20,shadow:.45},
   sorter_arm:{art:'building-sorter',width:1.20,height:1.46,shadow:.47},
   greenhouse:{art:'building-greenhouse',width:2.26,height:2.17,shadow:.98},
+  wind_door:{art:'building-wind-door',width:1.12,height:1.14,shadow:.45},
+  frost_airlock:{art:'building-airlock',width:1.12,height:1.14,shadow:.47},
   warm_wall:{art:'building-insulated-wall',width:1.18,height:1.25,shadow:.55},
   frost_turret:{art:'building-frost-arrow-turret',width:1.29,height:1.52,shadow:.59},
   fire_oil_turret:{art:'building-fire-oil-turret',width:1.33,height:1.53,shadow:.62},
@@ -48,7 +51,7 @@ const ironDeck='building-iron-deck';
 const required=[
   ...deckIds,'boss-frost-whale-1','boss-frost-whale-2','boss-frost-whale-3','solar-hearth','aurora-crystal','manan-south','manan-north','manan-west','manan-east','latte-sleep','latte-alert','latte-walk','latte-walk-alt',
   'hearth-1','hearth-2','hearth-3','rail','corner','rock','icicles',ironDeck,...Object.values(buildingVisuals).map(v=>v.art),
-  'debris-wood','debris-iron','debris-rope','debris-heavy','clouds','rail-side','rock-side','frost-frame',...ISLAND_ART,...BEAST_ART,...HOSTILE_ART,...ELEMENT_ART,
+  'debris-wood','debris-iron','debris-rope','debris-heavy','clouds','rail-side','rock-side','frost-frame','building-wind-door-open','building-airlock-open',...ISLAND_ART,...BEAST_ART,...HOSTILE_ART,...ELEMENT_ART,
 ] as const;
 interface Cell { x:number; y:number; hash:number; iron:boolean; temperature:number; left:boolean; right:boolean; front:boolean; back:boolean }
 interface Actor {
@@ -159,7 +162,7 @@ export class ArkView {
       dataHull(this.canvas,this.hull);
     }
     const hull=this.hull;
-    const cells:Cell[]=[],thawed=thawedDeck(w);
+    const cells:Cell[]=[],thawed=thawedDeck(w),rooms=indoor(w);
     const a=this.worldBounds();
     for(let y=a.top;y<=a.bottom;y++) for(let x=a.left;x<=a.right;x++){
       if(!deck(x,y))continue;
@@ -265,7 +268,8 @@ export class ArkView {
       const working=getIndustrySave(w)?.stations[bld.id]?.job;
       const effect=bld.defId==='torch_post'?'torch':bld.defId==='heat_relay'?'relay':
         working?(bld.defId==='furnace'?'forge':bld.defId==='stove'?'stove':undefined):undefined;
-      actors.push({...visuals,id:bld.id,x:gx+spanX*.5,y:gy+(GROUND_FOOTPRINTS[bld.defId]?.anchorY??spanY*.80),fire:effect});
+      const doorArt=doorOpen(bld)?visuals.art+'-open':visuals.art;
+      actors.push({...visuals,art:doorArt,id:bld.id,x:gx+spanX*.5,y:gy+(GROUND_FOOTPRINTS[bld.defId]?.anchorY??spanY*.80),fire:effect});
     }
     const latte=w.latte;
     const catWalking=fire?Math.hypot(latte.x-fire.gx-2.4,latte.y-fire.gy-2.4)>.23:false;
@@ -326,7 +330,22 @@ export class ArkView {
     const feet=project(pl.x,pl.y);
     this.lightmap.paint(c,w,project,s,{x:feet.x+lens.x,y:feet.y+lens.y-(player.float??0)});
     if(b && w.weather!=='clear')this.lowClouds(c,b,w.tick,true);
-    this.weather.paint(c,w,this.art.image('frost-frame'));
+    const snowMask=rooms.spans.length?new Path2D():undefined;
+    if(snowMask){
+      snowMask.rect(0,0,width,height);
+      c.save();c.globalCompositeOperation='screen';c.fillStyle='rgba(180,107,48,.11)';
+      const warmth=new Path2D();
+      for(const span of rooms.spans){
+        const p=project(span.x,span.y),x=Math.max(0,p.x),y=Math.max(0,p.y);
+        const right=Math.min(width,p.x+s*span.width),bottom=Math.min(height,p.y+s);
+        if(right<=x||bottom<=y)continue;
+        snowMask.rect(x,y,right-x,bottom-y);warmth.rect(x,y,right-x,bottom-y);
+      }
+      c.fill(warmth);c.restore();
+    }
+    const cellCount=String(rooms.tiles);
+    if(this.canvas.dataset.indoorTiles!==cellCount)this.canvas.dataset.indoorTiles=cellCount;
+    this.weather.paint(c,w,this.art.image('frost-frame'),snowMask);
     paintM5CombatEffects(c,w,project,s);
     for(const hostile of hostiles)paintHostileBar(c,project(hostile.x,hostile.y),hostile,s);
     for(const b of beasts)paintBeastCues(c,project(b.x,b.y),b,s,w.tick);

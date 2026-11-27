@@ -1,3 +1,4 @@
+import { envelope,indoorsAt } from './rooms';
 import { armorBroken,burnDamage,elementalSpeed,frozen,resolveElement,type Element } from './elements';
 import { emitJuice } from './juice';
 import { damagePlayer } from './rescue';
@@ -125,7 +126,7 @@ function move(w:WorldState,e:WildEntity,p:Vec2,speed:number){
   if(gap<.08)return;
   const k=Math.min(gap,speed*elementalSpeed(w,e.id)/TICK_RATE)/gap;
   const xx=e.x+(p.x-e.x)*k,yy=e.y+(p.y-e.y)*k;
-  const pass=(x:number,y:number)=>e.kind==='boss'?areaAt(w,x,y)==='island':onDeck(w,{x,y});
+  const pass=(x:number,y:number)=>e.kind==='boss'?areaAt(w,x,y)==='island':onDeck(w,{x,y})&&!w.ark.buildings.some(b=>envelope(b.defId)&&b.gx===Math.floor(x)&&b.gy===Math.floor(y));
   if(pass(xx,e.y))e.x=xx;
   if(pass(e.x,yy))e.y=yy;
 }
@@ -153,7 +154,7 @@ function stepEnemy(w:WorldState,e:WildEntity,s:M5State){
   if(e.hp<=0)return;
   if(frozen(w,e.id)){if(clock.strike)clock.strike++;return;}
   const building=(id:string)=>w.ark.buildings.find(b=>b.id===id&&b.hp>0);
-  const candidate=e.kind==='boss'||(w.player.hp>0&&onDeck(w,w.player)&&length(e,w.player)<2.4)?'player':
+  const candidate=e.kind==='boss'||(w.player.hp>0&&onDeck(w,w.player)&&!indoorsAt(w,w.player)&&length(e,w.player)<2.4)?'player':
     w.ark.buildings.filter(b=>b.hp>0).sort((a,b)=>length(e,center(a))-length(e,center(b)))[0]?.id??'';
   const target=clock.strike?clock.target:candidate;
   const obj=target==='player'?null:building(target);
@@ -164,7 +165,7 @@ function stepEnemy(w:WorldState,e:WildEntity,s:M5State){
     clock.cooldown=w.tick+d.cadence;
     if(pos&&length(e,pos)<=d.range+.17){
       if(obj)obj.hp=Math.max(1,obj.hp-d.damage); // critical fixtures remain recoverable after a failed night
-      else if(!damagePlayer(w,d.damage))return;
+      else if((e.kind==='raider'&&indoorsAt(w,w.player))||!damagePlayer(w,d.damage))return;
       flash(w,e,pos,'strike');
     }
     return;

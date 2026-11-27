@@ -345,3 +345,5 @@ button[aria-disabled=true]{opacity:.62}
 .quickdock output,.quickdock .toolbar output{top:4px;bottom:auto}
 @media(min-width:781px){.quickdock button,.quickdock .toolbar button{width:60px}}
 @media(min-width:621px){.key-note{bottom:8px}}
+
+#indoor-status{margin:3px 0 1px;font-size:10px;color:#ffd18d}

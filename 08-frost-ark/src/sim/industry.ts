@@ -1,3 +1,4 @@
+import { invalidateRoomTopology } from './rooms';
 import recipes from '../data/recipes.json';
 import tech from '../data/tech.json';
 import { buildingAt, buildingDefs, hasCost, inventoryChange, isDeck, isEdgeDeck, itemNames, itemStackLimits,
@@ -226,6 +227,7 @@ export function dismantle(w:WorldState,gx:number,gy:number):string|null {
     building:b??null,station:b?(state.stations[b.id]??null):null,expires:w.tick+UNDO_TICKS};
   if(b){w.ark.buildings=w.ark.buildings.filter(x=>x!==b);delete state.stations[b.id];}
   else w.ark.decks[at]=0;
+  invalidateRoomTopology(w);
   refreshBuoyancy(w);
   return null;
 }
@@ -244,6 +246,7 @@ export function undoDismantle(w:WorldState):string|null {
     w.ark.heatGrid[r.gy*w.ark.size+r.gx]=w.ambientTemp;
   }
   state.removal=null;
+  invalidateRoomTopology(w);
   refreshBuoyancy(w);
   return null;
 }

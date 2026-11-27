@@ -1,3 +1,4 @@
+import { runP2Room } from './p2-room-e2e';
 import { runP2Hotbar } from './p2-hotbar-e2e';
 import { runP2Elements } from './p2-elements-e2e';
 import { runP2Juice } from './p2-juice-e2e';
@@ -634,6 +635,7 @@ try {
   await runP2Juice(browser,baseUrl,outDir,errors);
   await runP2Elements(browser,baseUrl,outDir,errors);
   await runP2Hotbar(browser,baseUrl,outDir,errors);
+  await runP2Room(browser,baseUrl,outDir,errors);
 
   if (errors.length > 0) {
     throw new Error(errors.join('\n'));

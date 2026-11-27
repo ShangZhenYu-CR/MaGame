@@ -1,3 +1,4 @@
+import { doorBlocksFeet,invalidateRoomTopology,isDoor } from './rooms';
 import { emitJuice } from './juice';
 import { incapacitated } from './rescue';
 import { feetSupported, GROUND_FOOTPRINTS, PLAYER_FOOT_RADIUS } from './ground-footprint';
@@ -13,7 +14,7 @@ import type { BuildingInstance, ItemStack, Vec2, WorldState } from './types';
 export const buildKinds = [
   'wood_deck','torch_post','wind_wall','workbench','furnace','stove','heat_relay',
   'catch_net','sorter_arm','greenhouse','warm_wall','buoyancy_core','iron_deck','beast_den','feed_trough',
-  'frost_turret','fire_oil_turret',
+  'frost_turret','fire_oil_turret','wind_door','frost_airlock',
 ] as const;
 export type BuildKind = typeof buildKinds[number];
 export const itemNames = new Map(items.map(({ id, name }) => [id, name]));
@@ -43,6 +44,7 @@ export function hasBuildingContact(w: WorldState, px: number, py: number): boole
   return w.ark.buildings.some(b => {
     const [sx, sy] = buildingDefs.get(b.defId)?.size ?? [1, 1];
     const [left, top, right, bottom] = GROUND_FOOTPRINTS[b.defId]?.bounds ?? [0, 0, sx, sy];
+    if(isDoor(b.defId))return doorBlocksFeet(b,{x:px,y:py},r);
     return px + r > b.gx + left && px - r < b.gx + right &&
            py + r > b.gy + top && py - r < b.gy + bottom;
   });
@@ -50,7 +52,8 @@ export function hasBuildingContact(w: WorldState, px: number, py: number): boole
 
 export function makeBuilding(defId: string, gx: number, gy: number, id: string): BuildingInstance {
   const { maxHp } = buildingDefs.get(defId)!;
-  return { id, defId, gx, gy, hp: maxHp, maxHp, fuel: 0, level: 1, frozen: false };
+  return { id, defId, gx, gy, hp: maxHp, maxHp, fuel: 0, level: 1, frozen: false,
+    ...(isDoor(defId)?{door:{open:false,nearbyUntil:0}}:{}) };
 }
 
 export function countItem(w: WorldState, id: string): number {
@@ -168,6 +171,7 @@ export function build(w: WorldState, kind: BuildKind, x: number, y: number): boo
     w.ark.decks[y*w.ark.size+x]=kind==='wood_deck'?1:2;
   }else w.ark.buildings.push(makeBuilding(kind,x,y,`${kind}_${x}_${y}`));
   const [span]=buildingDefs.get(kind)?.size??[1,1];
+  invalidateRoomTopology(w);
   emitJuice(w,'build',{x:x+span*.5,y:y+.78},0,{target:`${kind}_${x}_${y}`});
   refreshBuoyancy(w);
   return true;

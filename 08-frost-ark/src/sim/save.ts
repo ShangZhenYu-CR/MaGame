@@ -1,4 +1,5 @@
 import { verifyM5 } from './m5';
+import { isDoor } from './rooms';
 import { validHotbar } from './hotbar';
 import { validElements } from './elements';
 import { ROLL_TICKS } from './roll';
@@ -45,7 +46,9 @@ function validBuilding(b:unknown):b is BuildingInstance {
   if(!record(b)||typeof b.id!=='string'||typeof b.defId!=='string'||!grid(b.gx)||!grid(b.gy))return false;
   const def=buildDefs.get(b.defId);
   return !!def&&b.gx+def.size[0]<=ARK_SIZE&&b.gy+def.size[1]<=ARK_SIZE&&
-    eachNumber(b,['hp','maxHp','fuel','level'])&&typeof b.frozen==='boolean';
+    eachNumber(b,['hp','maxHp','fuel','level'])&&typeof b.frozen==='boolean'&&
+    (b.door===undefined||(isDoor(b.defId)&&record(b.door)&&typeof b.door.open==='boolean'&&
+      num(b.door.nearbyUntil)&&Number.isSafeInteger(b.door.nearbyUntil)&&b.door.nearbyUntil>=0));
 }
 function validStation(value:unknown,defId:string):boolean {
   if(!record(value)||!num(value.cycle)||value.cycle<0||value.cycle>=TICK_RATE)return false;
@@ -106,7 +109,7 @@ function validateFauna(p:Record<string,unknown>,ids:Set<string>):void{
 
 export function deserializeWorld(raw: string): WorldState {
   const p:unknown=JSON.parse(raw);
-  if(!record(p)||![1,2,3,4,5,6,7,8,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
+  if(!record(p)||![1,2,3,4,5,6,7,8,9,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
     throw new Error('存档版本不受支持');
   if(p.saveVersion===1){
     if(record(p.player))p.player.rescue={startedAt:null,shieldUntil:0};
@@ -224,6 +227,8 @@ export function deserializeWorld(raw: string): WorldState {
   if((weapon!==null&&(typeof weapon!=='string'||!weaponById.has(weapon)||!inventory.some(s=>s?.itemId===weapon)))||
     !num(ready)||!Number.isSafeInteger(ready)||ready<0||ready>p.tick+32)throw new Error('武器存档不符合方舟格式');
   const world=p as unknown as WorldState;
+  if(world.ark.buildings.some(b=>b.door&&b.door.nearbyUntil>world.tick+TICK_RATE))
+    throw new Error('防风门存档不符合方舟格式');
   if(!validFinale(world)||
     (world.ark.anchoredIslandId&&!canReachAurora(world,world.ark.anchoredIslandId))||
     (nav&&record(nav)&&typeof nav.targetId==='string'&&!canReachAurora(world,nav.targetId)))

@@ -1,4 +1,4 @@
-export const SAVE_VERSION = 9;
+export const SAVE_VERSION = 10;
 export const TICK_RATE = 30;
 export const ARK_SIZE = 48;
 export const ISLAND_SIZE = 64;
@@ -68,6 +68,7 @@ export interface BuildingInstance {
   fuel: number;
   level: number;
   frozen: boolean;
+  door?: {open:boolean;nearbyUntil:number};
 }
 
 export interface ArkState {

@@ -2480,6 +2480,102 @@
         60
       ],
       "bytes": 7218
+    },
+    "building-wind-door": {
+      "file": "building-wind-door.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.17,
+      "tileH": 1.17,
+      "contentBox": [
+        8,
+        2,
+        120,
+        121
+      ],
+      "bytes": 33568
+    },
+    "building-wind-door-open": {
+      "file": "building-wind-door-open.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.17,
+      "tileH": 1.17,
+      "contentBox": [
+        8,
+        2,
+        120,
+        121
+      ],
+      "bytes": 25769
+    },
+    "building-airlock": {
+      "file": "building-airlock.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.17,
+      "tileH": 1.17,
+      "contentBox": [
+        8,
+        2,
+        120,
+        121
+      ],
+      "bytes": 33251
+    },
+    "building-airlock-open": {
+      "file": "building-airlock-open.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.17,
+      "tileH": 1.17,
+      "contentBox": [
+        8,
+        2,
+        120,
+        121
+      ],
+      "bytes": 23010
+    },
+    "icon-wind-door": {
+      "file": "icon-wind-door.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1.17,
+      "tileH": 1.17,
+      "contentBox": [
+        5,
+        2,
+        59,
+        60
+      ],
+      "bytes": 8943
+    },
+    "icon-frost-airlock": {
+      "file": "icon-frost-airlock.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1.17,
+      "tileH": 1.17,
+      "contentBox": [
+        5,
+        2,
+        59,
+        60
+      ],
+      "bytes": 8750
     }
   }
 }

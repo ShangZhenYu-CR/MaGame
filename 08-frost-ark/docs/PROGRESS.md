@@ -121,3 +121,10 @@
 - **双门禁**：`npm run gate` 和全新路径独立解压试玩 ZIP 后的 `file://` 浏览器全回归均通过；保留 M0–M6 与 P2-01 至 P2-17 断言，双路径页面异常和控制台错误都为 0。真实物流分别跑满 181.3 秒、5,432 tick 和 181.0 秒、5,420 tick，确认入库、续燃和加工，另有一轮 265.5 秒逐条运输痕迹。
 - **交付**：[32 张实机截图与双背景审片](https://drive.google.com/drive/folders/1DwG6MGIr-eHBdmhVdb2OQuVLp7YIlyMn) · [S3 实机试玩 ZIP](https://drive.google.com/file/d/1riUI4WR79zlq1h5jMCN2tZjAcpARf0SL/view) · [报告](https://drive.google.com/file/d/1RSccWSzj93hjH_OXnhL96Jzjl4Y8UNSy/view) · [双门禁、物流与性能原始记录](https://drive.google.com/file/d/1FnVCmHkac01I2uouQ5bs3qBKpgLYP3DH/view)。S3 可玩构建 `44e1933ba103a87dcca0210e18084f2fd0b635e7`，存档 v15，正式美术 189 件合计 3,492,385 字节。
 - **【偏离报告】**：核心玩法无删减。云端软件绘制的 1080p 暴雪测试中，21×21 方舟的中位帧间隔从约 700 ms 降到约 67 ms，与同环境 7×7 开局船相当，不代表达到 60 FPS 或正式巨舰终验。S3 使用专项准备档，既不替代自然新档，也不替代 P2-42 后的七组终验。`main` 和 Pages 不动，继续 S4，P2-18、P2-19 随后一单一推。
+
+## 2026-11-28（北京时间） · Phase 2 / S4 浮岛生态、洞窟和航路验收
+
+- **P2-18 至 P2-23**：四区地表重绘与非镜像纹理，能搜、能取暖或需避开的五类地标，四区 32 种可实取食材，舷边垂钓小游戏，三个档位地下洞窟和守卫图纸，五种航路事件，雷达更新并可实际航行至无尽的新信号。保留 8 座主线岛。
+- **门禁**：`npm run gate` 完整通过；独立解压交付 ZIP 后 `file://` 浏览器整套回归通过；保留 M0–M6 和 P2-01 至 P2-23 的断言，两条路径页面异常与控制台错误均为 0。实机普通巡航遇到游商并实付 3 浮木换 1 暖莓汤；下洞、打守卫、刷新、拿图纸、返回地表；新版捕网物流两条路径持续实跑各超过 180 秒。
+- **交付**：[46 张实机图、对照和双背景审片](https://drive.google.com/drive/folders/1wZbvsAi9AgX7IzVC7fdNDFBN7gOzVu8n) · [解压试玩 ZIP](https://drive.google.com/file/d/1z4IjWcEGd89Jg5e_ZrGXDZOeytVIXzCn/view) · [验收报告](https://drive.google.com/file/d/1bHSRFlVV8keUCEXHwJPqXWH9EAdVpJoQ/view) · [双套门禁日志及实机数据](https://drive.google.com/file/d/11Lr8EJuL9tlW6nTKud-hRrYkJNUiMown/view)。S4 构建 `2181d8bb4d82a0d97ab22ab522b6a4b3bba8746e`、存档 v20；284 件正式美术共 4,338,338 字节。
+- **【偏离报告】**：旧 M2 图标计数原来把 P2-20 新钓位算成旧卡，第 14 张并非遗失或多出旧内容；保持原 13 张图标精确检查，另独立断言新图标正确解码。离线截图等待改为等待 Toast 真正隐藏，不删任何玩法断言。实际发现气球重叠已靠泊岛岸，已修复。准备档不替代 P2-42 后的七组终验。开发继续 S5，未触碰 `main` 或 Pages。

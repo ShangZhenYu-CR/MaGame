@@ -131,7 +131,7 @@ function generatedAtDock(w:WorldState):GeneratedIsland|null{
   if(g.side==='east')return generate(point,g.x+g.width-PORT_X,g.y-PORT_Y);
   const s=ISLAND_SIZE,port=rotateDockPoint(g.side,s,PORT_X+.5,PORT_Y+.5);
   const offsetX=g.landing.x-port.x,offsetY=g.landing.y-port.y;
-  const cacheKey='rot:'+point.id+':'+g.side+':'+offsetX+':'+offsetY;
+  const cacheKey=['rot',point.id,point.seed,point.biomeId,g.side,offsetX,offsetY].join(':');
   const cached=cache.get(cacheKey);if(cached)return cached;
   const raw=generate(point,0,0),tiles=new Array<number>(s*s).fill(0);
   for(let y=0;y<s;y++)for(let x=0;x<s;x++){

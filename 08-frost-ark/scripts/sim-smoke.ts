@@ -1008,3 +1008,25 @@ assert.equal(giant.ark.decks.filter(Boolean).length,21*21);
 assert.ok(giant.ark.heatGrid.filter((v,i)=>giant.ark.decks[i]&&v>=15).length>0);
 assert.ok(giant.ark.heatGrid.filter((v,i)=>giant.ark.decks[i]&&v<=-16).length>300);
 console.log('[sim-smoke:P2-17] OK: real 21×21 construction, mixed heat, alternate dock, every launch direction and safe 4-way retraction');
+
+import { coastFixture,terrainZones } from './p2-coast-fixture';
+import artManifest from '../src/assets/art/manifest.json';
+for(const [i,id] of terrainZones.entries()){
+ const coast=coastFixture(id),map=coast.activeIsland!,direction={x:1,y:1};
+ assert.equal(map.size,64);
+ assert.equal(map.tiles.length,4096);
+ assert.ok(new Set(map.tiles).size>=4);
+ const from={...coast.player};
+ assert.equal(startRoll(coast,direction),null);
+ stepWorld(coast,44,direction);
+ assert.equal(areaAt(coast,coast.player.x,coast.player.y),'island',id+' walkable coast');
+ assert.ok(Math.hypot(from.x-coast.player.x,from.y-coast.player.y)>.75,id+' diagonal progress');
+ const loaded=deserializeWorld(serializeWorld(coast));
+ assert.deepEqual(loaded.activeIsland,map);
+ const suffixes=['terrain-0','terrain-1','terrain-2','terrain-3','ground-decal-0','ground-decal-1','cliff-natural'];
+ for(const suffix of suffixes)assert.ok(Object.hasOwn(artManifest.assets,'island-t'+(i+1)+'-'+suffix));
+}
+const portA=sideTrial('west'),portB=sideTrial('west');
+portB.sky.islands.find(n=>n.id==='shallows_lantern')!.seed+=100;
+assert.notDeepEqual(dockedIsland(portA)!.tiles,dockedIsland(portB)!.tiles,'a different seed at the same rotated dock must not reuse the old island');
+console.log('[sim-smoke:P2-18] OK: four deterministic 64×64 terrain masks, diagonal traversal, exact reload and approved paint manifest');

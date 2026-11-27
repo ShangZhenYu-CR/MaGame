@@ -163,6 +163,27 @@ def prepare(image, asset, size):
     return result, round(x * size[0]), round(y * size[1])
 
 
+def defringe_magenta(image):
+    """Opt-in final composite-safe edge cleanup for palettes without purple.
+
+    Saturated backing that survives the first key is transparent. Preserve the
+    warm/cold hue of remaining semi-transparent details by removing only their
+    shared magenta excess, including the resizer's ringing pixels.
+    """
+    cleaned = []
+    image = image.convert("RGBA")
+    pixels = image.get_flattened_data() if hasattr(image, "get_flattened_data") else image.getdata()
+    for r, g, b, a in pixels:
+        bias = min(r, b) - g
+        if a < 4 or (bias > 48 and abs(r-b) <= 100):
+            cleaned.append((0, 0, 0, 0))
+            continue
+        excess = max(0, bias - 10)
+        cleaned.append((r-excess, g, b-excess, a))
+    image.putdata(cleaned)
+    return image
+
+
 def encode(image, fmt, limit):
     # Prefer full RGBA without palette quantization. If PNG is too big, try
     # progressively smaller RGBA palettes, letting Pillow quantize alpha too.
@@ -249,6 +270,8 @@ def build(config_path, source_dir, output_dir, review_path):
                     raise ValueError(f"crop outside source {image.size}: {asset['crop']}")
                 image = image.crop((left, top, right, bottom))
             processed, anchor_x, anchor_y = prepare(image, asset, size)
+            if asset.get("postDefringe") == "magenta":
+                processed = defringe_magenta(processed)
             limit = min(asset.get("maxBytes", 180_000 if asset.get("key") == "none" else 90_000),
                         180_000 if asset.get("key") == "none" else 90_000)
             data = encode(processed, fmt, positive(limit, "maxBytes"))

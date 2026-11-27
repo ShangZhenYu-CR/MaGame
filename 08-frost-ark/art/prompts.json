@@ -62,7 +62,9 @@
     "p2-logistics": "Create exactly two new standalone hand-painted 2.5D top-down 3/4 sprites for the Frost Ark indie survival game, inspired by the attached two used sprites ONLY as camera/palette/material reference: bronze robotic sorting arm and frosty iron smelter. Camera 40° overhead orthographic and straight front, see front and top, no diamond/isometric yaw, upper-left soft icy light, rich painterly distressed articulation, muted slate blue-brown and antique amber, clean dark slate/brown contours never dead black. Square sprite sheet split into exactly TWO equal left and right columns; each asset centered whole, outside the gutter, with broad margins on ultra flat pure #FF00FF mage​nta through holes and surroundings. NO labels, no other objects, no ground, no shadow on backdrop, no particle effects, no stray markings. LEFT: compact nautical AUTOMATIC FUEL HOPPER, waist-high stout antique metal bin with a visibly half-full wide tapered rectangular coal mouth, distinct coal shapes visible at top, riveted steel side panel and small front-facing brass change chute with protective upper lever, frosty feet. No furnace fire, no glowing kiln, no straps that read weapon. RIGHT: low 1x1 STEAM TRANSFER CHUTE module, horizontally oriented left-to-right, open shallow copper and grey iron U-shaped trough on two low squat supports, steel rollers visibly crossing from back to front regularly, small insulated steam line along rear edge and right end with steam-copper coupling no plume, frosty ridged rail edges, front track and top clearly read like shipyard conveyor. Horizontal not diagonal; capacity to visually tile in a line, no boxes or food placed on it. Both independent dense painterly textured objects with full outlines. Match the two reference materials, DO NOT duplicate the existing sorter or furnace.",
     "p2-sailing-machinery": "A square contact sheet of 3 individual new Frost Ark nautical infrastructure sprites for a painterly 2.5D deck building game. 3 evenly divided COLUMNS, centered exactly one object per column with generous separation. Use attached bronze heat relay and wooden helm ONLY as examples of 40 degree orthographic top-down three-quarter frontal camera, no yaw and no diamond isometric view, upper left soft cool skylight, winter muted wood, bronze and grey cast iron, textured hand-painted realism, tapered slate-brown contours. The three isolated new sprites look buildable at one deck-tile width. No floor, no cast shadow off object, no dust or effects, no labels, no cell dividers, no silhouettes in the magenta margin, no accessories outside the object. Background perfectly flat 100% #FF00FF magenta in all unoccluded areas including holes. LEFT column: windbreak sailing mast, a very practical short thick frostwood mast fitted into a low square copper-banded ship bracket, compact broad warm taupe canvas sail billowing to left, worn seams, visible ropes tied close to poles, not a national flag, distinguishable taut fabric silhouette, wood with bronze hardware. CENTER column: frosty steam marine thruster, squat stocky two parallel copper-cylinder boiler prop on a blue-grey bronze cradle, two aft outlets pointing toward the lower edge of picture and small upper valve assembly, no fire or smoke baked in, reads as clean civilian engine not weapon, white frost highlights. RIGHT column: compact navigation wind vane, dark weathered slender woody-brass upright post on squat hexagonal frost base, clearly visible directional brass pointer arrow on top over a small circular wind compass, tiny burgundy slate canvas streamer attached to balancing tail, deliberate thin silhouette with crisp front face. Center each complete object independently and match scale and camera. NO existing attachment objects copied. Brushed canvas and solid iron paint.",
     "p2-heating-repair": "Create a clean two-by-two square contact sheet of FOUR isolated newly designed Frost Ark painterly survival game props. Attached sprites are styling examples only for timber grain, icy cool upper-left lighting, slate-cast outlines, and bronze. All four cells have exact flat saturated RGB(255,0,255) #FF00FF background, clean enclosed holes also magenta, broad separation between cells, no lines/labels, no text, no ground or background shadows, no effects. Three-dimensional props use 40 degree front orthographic top-down 3/4, visible front and top, not isometric diamond or turned yaw. TOP LEFT: low slim naval thermal conduit overlay, one compact horizontal pipe segment running left to right with two parallel muted bronze hot-air ducts bolted to small low storm-frosted steel ends, clearly slender low-profile across an entire tile so player could walk over it, few clean copper couplings and tiny heat regulator in middle (no glowing light or vapor baked in), no floor. TOP RIGHT: practical ARK MAINTENANCE BENCH, one compact rectangular marine work table, dark blue-gray forged cast-iron sides with a wide amber-edged blueprint drawer and clear single tall hand-cranked silver vice on left working surface; enough frost-weathered hardwood to match ref but distinctly grayer and more industrial than provided basic bench, no tools and ornaments outside silhouette. BOTTOM LEFT: isolated non-weapon rubber mallet repair tool icon, short dark hardwood handle, squat wide dark grey round padded mallet head with hammered bronze collar and tiny light icy highlight along the top, legible at 32 pixels, repair/shipwright prop, no other objects. BOTTOM RIGHT: SINGLE FLAT SQUARE insulated deck tile overlay shown perfectly face-on top-down, exact rectangular straight edges, thick caramel brown flat felt woven between parallels of gray driftwood slats, each seam softly frostproof caulked, no topographic shading or raised lip, no turn, no perspective trapezoid; reads as ship floor rather than carpeting, no projected side. Keep all colors non-neon muted tactile, cutouts centered within their own 4 squares, don't reuse attached sprites.",
-    "p2-home-comfort": "Six NEW isolated painted sprites in an EXACT square contact sheet of 3 equally wide columns and 2 evenly tall rows for Frost Ark, a refined snow-survival ark game. Reference the attachments solely for materials, proper straight-frontal 40° elevated orthographic three-quarter top-down, daylight from upper left, soft slate-brown dark outlines and worn muted timber, waxed wool and copper. Work with distinct interior-cozy amber highlights. Every subject is centered in its own cell with clean generous solid pure #FF00FF magenta separation, including interior gaps. NO text, labels, borders, decorations outside asset, contact shadow on magenta, photographic backdrop, dark floor, perspective yaw, neon purple, emitted particles or UI frame. TOP row LEFT: an expedition WARM COT, one-person snug stormcloth canvas bed with dark frostwood frame, sturdy squat legs, neatly stitched tawny dense wool blanket, small blue-grey pillow, amber cozy hint, visible sleeping surface in 3/4. TOP row CENTER: a small circular sturdy tea table with a beautiful rustic oil-aged copper kettle and two low mugs attached on the top, aged rounded wood warms, three foothold supports visible, minimal silhouette. TOP row RIGHT: a miniature ship cat climb tower with two staggered tan fleece-covered landing shelves and one worn rope-wrapped scratching pole, cozy dark grey oak base and no real cat, cute but sturdy silhouette. BOTTOM row LEFT: a compact naval ice-melt water purifier for one tile, low naval frame with two geometric copper coils, small transparent blue-grey clean-water tank held behind iron bands and clearly visible spout, no high heat or flames, dark maritime copper, recognizable distinct shape. BOTTOM row CENTER: a tiny cozy wall-mounted windproof lamp isolated with its bronze wall bracket but without any actual wall, curved dark cool metal bracket and small octagonal brass lantern body with glowing amber glass within its outline, handle and cylinder visible at top in 40 degree camera. BOTTOM row RIGHT: a tiny game inventory bottle of freshly purified pale blue water, translucent rounded faceted glass with stopper and dark pale bronze bands, no writing, small surface glint, clear 32px silhouette under same light. Do not copy reference pictures. Art finely painted, motifs simple and readable."
+    "p2-home-comfort": "Six NEW isolated painted sprites in an EXACT square contact sheet of 3 equally wide columns and 2 evenly tall rows for Frost Ark, a refined snow-survival ark game. Reference the attachments solely for materials, proper straight-frontal 40° elevated orthographic three-quarter top-down, daylight from upper left, soft slate-brown dark outlines and worn muted timber, waxed wool and copper. Work with distinct interior-cozy amber highlights. Every subject is centered in its own cell with clean generous solid pure #FF00FF magenta separation, including interior gaps. NO text, labels, borders, decorations outside asset, contact shadow on magenta, photographic backdrop, dark floor, perspective yaw, neon purple, emitted particles or UI frame. TOP row LEFT: an expedition WARM COT, one-person snug stormcloth canvas bed with dark frostwood frame, sturdy squat legs, neatly stitched tawny dense wool blanket, small blue-grey pillow, amber cozy hint, visible sleeping surface in 3/4. TOP row CENTER: a small circular sturdy tea table with a beautiful rustic oil-aged copper kettle and two low mugs attached on the top, aged rounded wood warms, three foothold supports visible, minimal silhouette. TOP row RIGHT: a miniature ship cat climb tower with two staggered tan fleece-covered landing shelves and one worn rope-wrapped scratching pole, cozy dark grey oak base and no real cat, cute but sturdy silhouette. BOTTOM row LEFT: a compact naval ice-melt water purifier for one tile, low naval frame with two geometric copper coils, small transparent blue-grey clean-water tank held behind iron bands and clearly visible spout, no high heat or flames, dark maritime copper, recognizable distinct shape. BOTTOM row CENTER: a tiny cozy wall-mounted windproof lamp isolated with its bronze wall bracket but without any actual wall, curved dark cool metal bracket and small octagonal brass lantern body with glowing amber glass within its outline, handle and cylinder visible at top in 40 degree camera. BOTTOM row RIGHT: a tiny game inventory bottle of freshly purified pale blue water, translucent rounded faceted glass with stopper and dark pale bronze bands, no writing, small surface glint, clear 32px silhouette under same light. Do not copy reference pictures. Art finely painted, motifs simple and readable.",
+    "p2-18-terrain": "Create an original painterly game environment texture ATLAS for Frost Ark, no other objects, following the attached palette reference only. SQUARE atlas, EXACT 4 columns × 4 rows of equal square panels, straight edges without seams, dividers or labels between panels, sixteen independent textures. Columns left to right distinct materials: 1 desaturated gray-blue slate with windswept traces of frost, 2 frosty pale blue snow packed over dark granite, 3 charcoal dark burnt volcanic stone with subtle dust ochre flecks (not bright lava), 4 muted teal-grey glacier ice with low contrast mineral fragments. ALL rows show flat overhead game ground FILL all the way to each panel edge (not a cutout); no purple or magenta, no frame, no letters, no hard outlines around panel edges, no decorative objects larger than 5% of a square. Row 1 in each material: smooth irregular weathered granular ground with tiny chipped specks; row 2 in each material: softly dusted ground weathered into amorphous uneven patches without strong stripes; row 3 in each material: gently eroded grain with very small pinprick fracture and scattered grit; row 4 in each material: small interlaced irregular pebbles embedded in same base. All 4 variants within each column have consistently matched mean value and NO prominent gradient or obvious light-to-dark transitions. Natural painterly forms, carefully non-symmetrical, no repeating visible motifs, no concentric forms, no grids within each sample, no rotated or mirrored motifs. These sixteen low-contrast textures will be feather blended into one seamless, convincing ship game landscape; keep the small physical details grounded and artistic, no photograph. Align exact 4×4 boundaries.",
+    "p2-18-coast": "Draw exactly twelve separate original 2.5D environmental hand-painted sprite CUTOUTS for Frost Ark. Precise contact atlas layout: FOUR equal columns and THREE equal rows. Wide clear gutters within each cell. Flat pure solid #FF00FF chroma key background even in gaps, no image borders/text/cell lines/no stray details in margin. Attachment for material and camera, do not repeat sprite shape. Camera plane three-quarter straight 40 degrees above, cool softly from upper left, visible subtle dark cool-brown outline. Each column is one wind biome with coherent materials. Left to right column palette: C1 cold slate grey with restrained white frost, C2 pale snowy mineral blue-grey granite, C3 smoky dark basalt with finely muted orange ochre sulfur accent, C4 translucent silver-cyan mineral glacial ice. TOP ROW four irregular front attached cliff wall sections, wide with gently uneven horizontal ledge on TOP which visibly anchors into land, thick fractured layered sidewall below, unequal low angular downward protuberances on bottom; organic asymmetric silhouette, left slope noticeably unlike right slope, scalloped irregular geological striations. Short hanging icicles only in glacier and snow, don't form a generic inverted triangle, no hanging islands alone, no props on top. MIDDLE ROW four small isolated irregular low scattered environmental decals: C1 single cluster of three angular scattered slate fragments and grit, C2 one loose faint uneven blue-white wind-blown snow pillow with a couple gray pebbles, C3 a cluster of distinct dark crumbled lava gravel shards with a subtle orange-ochre dusty mottling in interior, C4 small cracked cyan ice scattered shards patch with little bright white. BOTTOM ROW four additional low irregular decal cutouts: C1 sharp fine pale worn branching frost crust lines in a patch, C2 one jagged grey mostly buried granite rock dusted with low white snow and two fragments, C3 a few understated fine oxidized ochre veins and dark fissure cracks coming together irregularly (not emitted light), C4 one branching intricate translucent irregular dark teal hairline fracture with light ice reflecting on one side. For middle and bottom rows make low elongated asymmetrical visual silhouettes, ground-plane details without rectangular backgrounds, no glow or shadows drawn on magenta. Center all 12 cells, unframed, art separable, restrained worn painterly brushwork, legible small."
   },
   "assets": [
     {
@@ -3650,6 +3652,646 @@
         1536,
         1024
       ]
+    },
+    {
+      "id": "island-t1-terrain-0",
+      "source": "p218-terrain.png",
+      "crop": [
+        11,
+        12,
+        302,
+        301
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "none",
+      "fit": "stretch",
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 25500
+    },
+    {
+      "id": "island-t1-terrain-1",
+      "source": "p218-terrain.png",
+      "crop": [
+        11,
+        325,
+        302,
+        615
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "none",
+      "fit": "stretch",
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 25500
+    },
+    {
+      "id": "island-t1-terrain-2",
+      "source": "p218-terrain.png",
+      "crop": [
+        11,
+        639,
+        302,
+        928
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "none",
+      "fit": "stretch",
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 25500
+    },
+    {
+      "id": "island-t1-terrain-3",
+      "source": "p218-terrain.png",
+      "crop": [
+        11,
+        952,
+        302,
+        1242
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "none",
+      "fit": "stretch",
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 25500
+    },
+    {
+      "id": "island-t1-cliff-natural",
+      "source": "p218-coast.png",
+      "crop": [
+        0,
+        0,
+        362,
+        362
+      ],
+      "size": [
+        160,
+        128
+      ],
+      "key": "magenta",
+      "anchor": [
+        0.5,
+        0.16
+      ],
+      "targetAnchor": [
+        0.5,
+        0.18
+      ],
+      "tileW": 1.4,
+      "tileH": 1.45,
+      "maxBytes": 32000,
+      "postDefringe": "magenta",
+      "keyClear": 52
+    },
+    {
+      "id": "island-t1-ground-decal-0",
+      "source": "p218-coast.png",
+      "crop": [
+        0,
+        362,
+        362,
+        724
+      ],
+      "size": [
+        96,
+        64
+      ],
+      "key": "magenta",
+      "anchor": [
+        0.5,
+        0.54
+      ],
+      "targetAnchor": [
+        0.5,
+        0.55
+      ],
+      "tileW": 0.82,
+      "tileH": 0.47,
+      "maxBytes": 15000,
+      "postDefringe": "magenta",
+      "keyClear": 52
+    },
+    {
+      "id": "island-t1-ground-decal-1",
+      "source": "p218-coast.png",
+      "crop": [
+        0,
+        724,
+        362,
+        1086
+      ],
+      "size": [
+        96,
+        64
+      ],
+      "key": "magenta",
+      "anchor": [
+        0.5,
+        0.54
+      ],
+      "targetAnchor": [
+        0.5,
+        0.55
+      ],
+      "tileW": 0.82,
+      "tileH": 0.47,
+      "maxBytes": 15000,
+      "postDefringe": "magenta",
+      "keyClear": 52
+    },
+    {
+      "id": "island-t2-terrain-0",
+      "source": "p218-terrain.png",
+      "crop": [
+        324,
+        12,
+        616,
+        301
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "none",
+      "fit": "stretch",
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 25500
+    },
+    {
+      "id": "island-t2-terrain-1",
+      "source": "p218-terrain.png",
+      "crop": [
+        324,
+        325,
+        616,
+        615
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "none",
+      "fit": "stretch",
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 25500
+    },
+    {
+      "id": "island-t2-terrain-2",
+      "source": "p218-terrain.png",
+      "crop": [
+        324,
+        639,
+        616,
+        928
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "none",
+      "fit": "stretch",
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 25500
+    },
+    {
+      "id": "island-t2-terrain-3",
+      "source": "p218-terrain.png",
+      "crop": [
+        324,
+        952,
+        616,
+        1242
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "none",
+      "fit": "stretch",
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 25500
+    },
+    {
+      "id": "island-t2-cliff-natural",
+      "source": "p218-coast.png",
+      "crop": [
+        362,
+        0,
+        724,
+        362
+      ],
+      "size": [
+        160,
+        128
+      ],
+      "key": "magenta",
+      "anchor": [
+        0.5,
+        0.16
+      ],
+      "targetAnchor": [
+        0.5,
+        0.18
+      ],
+      "tileW": 1.4,
+      "tileH": 1.45,
+      "maxBytes": 32000,
+      "postDefringe": "magenta",
+      "keyClear": 52
+    },
+    {
+      "id": "island-t2-ground-decal-0",
+      "source": "p218-coast.png",
+      "crop": [
+        362,
+        362,
+        724,
+        724
+      ],
+      "size": [
+        96,
+        64
+      ],
+      "key": "magenta",
+      "anchor": [
+        0.5,
+        0.54
+      ],
+      "targetAnchor": [
+        0.5,
+        0.55
+      ],
+      "tileW": 0.82,
+      "tileH": 0.47,
+      "maxBytes": 15000,
+      "postDefringe": "magenta",
+      "keyClear": 52
+    },
+    {
+      "id": "island-t2-ground-decal-1",
+      "source": "p218-coast.png",
+      "crop": [
+        362,
+        724,
+        724,
+        1086
+      ],
+      "size": [
+        96,
+        64
+      ],
+      "key": "magenta",
+      "anchor": [
+        0.5,
+        0.54
+      ],
+      "targetAnchor": [
+        0.5,
+        0.55
+      ],
+      "tileW": 0.82,
+      "tileH": 0.47,
+      "maxBytes": 15000,
+      "postDefringe": "magenta",
+      "keyClear": 52
+    },
+    {
+      "id": "island-t3-terrain-0",
+      "source": "p218-terrain.png",
+      "crop": [
+        638,
+        12,
+        929,
+        301
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "none",
+      "fit": "stretch",
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 25500
+    },
+    {
+      "id": "island-t3-terrain-1",
+      "source": "p218-terrain.png",
+      "crop": [
+        638,
+        325,
+        929,
+        615
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "none",
+      "fit": "stretch",
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 25500
+    },
+    {
+      "id": "island-t3-terrain-2",
+      "source": "p218-terrain.png",
+      "crop": [
+        638,
+        639,
+        929,
+        928
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "none",
+      "fit": "stretch",
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 25500
+    },
+    {
+      "id": "island-t3-terrain-3",
+      "source": "p218-terrain.png",
+      "crop": [
+        638,
+        952,
+        929,
+        1242
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "none",
+      "fit": "stretch",
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 25500
+    },
+    {
+      "id": "island-t3-cliff-natural",
+      "source": "p218-coast.png",
+      "crop": [
+        724,
+        0,
+        1086,
+        362
+      ],
+      "size": [
+        160,
+        128
+      ],
+      "key": "magenta",
+      "anchor": [
+        0.5,
+        0.16
+      ],
+      "targetAnchor": [
+        0.5,
+        0.18
+      ],
+      "tileW": 1.4,
+      "tileH": 1.45,
+      "maxBytes": 32000,
+      "postDefringe": "magenta",
+      "keyClear": 52
+    },
+    {
+      "id": "island-t3-ground-decal-0",
+      "source": "p218-coast.png",
+      "crop": [
+        724,
+        362,
+        1086,
+        724
+      ],
+      "size": [
+        96,
+        64
+      ],
+      "key": "magenta",
+      "anchor": [
+        0.5,
+        0.54
+      ],
+      "targetAnchor": [
+        0.5,
+        0.55
+      ],
+      "tileW": 0.82,
+      "tileH": 0.47,
+      "maxBytes": 15000,
+      "postDefringe": "magenta",
+      "keyClear": 52
+    },
+    {
+      "id": "island-t3-ground-decal-1",
+      "source": "p218-coast.png",
+      "crop": [
+        724,
+        724,
+        1086,
+        1086
+      ],
+      "size": [
+        96,
+        64
+      ],
+      "key": "magenta",
+      "anchor": [
+        0.5,
+        0.54
+      ],
+      "targetAnchor": [
+        0.5,
+        0.55
+      ],
+      "tileW": 0.82,
+      "tileH": 0.47,
+      "maxBytes": 15000,
+      "postDefringe": "magenta",
+      "keyClear": 52
+    },
+    {
+      "id": "island-t4-terrain-0",
+      "source": "p218-terrain.png",
+      "crop": [
+        951,
+        12,
+        1243,
+        301
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "none",
+      "fit": "stretch",
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 25500
+    },
+    {
+      "id": "island-t4-terrain-1",
+      "source": "p218-terrain.png",
+      "crop": [
+        951,
+        325,
+        1243,
+        615
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "none",
+      "fit": "stretch",
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 25500
+    },
+    {
+      "id": "island-t4-terrain-2",
+      "source": "p218-terrain.png",
+      "crop": [
+        951,
+        639,
+        1243,
+        928
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "none",
+      "fit": "stretch",
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 25500
+    },
+    {
+      "id": "island-t4-terrain-3",
+      "source": "p218-terrain.png",
+      "crop": [
+        951,
+        952,
+        1243,
+        1242
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "none",
+      "fit": "stretch",
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 25500
+    },
+    {
+      "id": "island-t4-cliff-natural",
+      "source": "p218-coast.png",
+      "crop": [
+        1086,
+        0,
+        1448,
+        362
+      ],
+      "size": [
+        160,
+        128
+      ],
+      "key": "magenta",
+      "anchor": [
+        0.5,
+        0.16
+      ],
+      "targetAnchor": [
+        0.5,
+        0.18
+      ],
+      "tileW": 1.4,
+      "tileH": 1.45,
+      "maxBytes": 32000,
+      "postDefringe": "magenta",
+      "keyClear": 52
+    },
+    {
+      "id": "island-t4-ground-decal-0",
+      "source": "p218-coast.png",
+      "crop": [
+        1086,
+        362,
+        1448,
+        724
+      ],
+      "size": [
+        96,
+        64
+      ],
+      "key": "magenta",
+      "anchor": [
+        0.5,
+        0.54
+      ],
+      "targetAnchor": [
+        0.5,
+        0.55
+      ],
+      "tileW": 0.82,
+      "tileH": 0.47,
+      "maxBytes": 15000,
+      "postDefringe": "magenta",
+      "keyClear": 52
+    },
+    {
+      "id": "island-t4-ground-decal-1",
+      "source": "p218-coast.png",
+      "crop": [
+        1086,
+        724,
+        1448,
+        1086
+      ],
+      "size": [
+        96,
+        64
+      ],
+      "key": "magenta",
+      "anchor": [
+        0.5,
+        0.54
+      ],
+      "targetAnchor": [
+        0.5,
+        0.55
+      ],
+      "tileW": 0.82,
+      "tileH": 0.47,
+      "maxBytes": 15000,
+      "postDefringe": "magenta",
+      "keyClear": 52
     }
   ],
   "batchReferences": [
@@ -3716,6 +4358,15 @@
         "hearth-2.png",
         "building-buoyancy-core.png",
         "island-ruin-closed.png"
+      ]
+    },
+    {
+      "batch": "P2-18",
+      "sourceStyles": [
+        "island-t1-ground-1",
+        "island-t2-cliff",
+        "island-t3-ground-1",
+        "island-t4-cliff"
       ]
     }
   ]

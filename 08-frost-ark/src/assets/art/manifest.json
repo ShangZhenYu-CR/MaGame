@@ -3024,6 +3024,454 @@
         60
       ],
       "bytes": 5813
+    },
+    "island-t1-terrain-0": {
+      "file": "island-t1-terrain-0.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 5610
+    },
+    "island-t1-terrain-1": {
+      "file": "island-t1-terrain-1.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 6137
+    },
+    "island-t1-terrain-2": {
+      "file": "island-t1-terrain-2.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 5993
+    },
+    "island-t1-terrain-3": {
+      "file": "island-t1-terrain-3.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 6581
+    },
+    "island-t1-cliff-natural": {
+      "file": "island-t1-cliff-natural.png",
+      "width": 160,
+      "height": 128,
+      "anchorX": 80,
+      "anchorY": 23,
+      "tileW": 1.4,
+      "tileH": 1.45,
+      "contentBox": [
+        2,
+        5,
+        158,
+        116
+      ],
+      "bytes": 31517
+    },
+    "island-t1-ground-decal-0": {
+      "file": "island-t1-ground-decal-0.png",
+      "width": 96,
+      "height": 64,
+      "anchorX": 48,
+      "anchorY": 35,
+      "tileW": 0.82,
+      "tileH": 0.47,
+      "contentBox": [
+        2,
+        15,
+        94,
+        52
+      ],
+      "bytes": 6328
+    },
+    "island-t1-ground-decal-1": {
+      "file": "island-t1-ground-decal-1.png",
+      "width": 96,
+      "height": 64,
+      "anchorX": 48,
+      "anchorY": 35,
+      "tileW": 0.82,
+      "tileH": 0.47,
+      "contentBox": [
+        2,
+        14,
+        94,
+        52
+      ],
+      "bytes": 4724
+    },
+    "island-t2-terrain-0": {
+      "file": "island-t2-terrain-0.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 6966
+    },
+    "island-t2-terrain-1": {
+      "file": "island-t2-terrain-1.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 7223
+    },
+    "island-t2-terrain-2": {
+      "file": "island-t2-terrain-2.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 7326
+    },
+    "island-t2-terrain-3": {
+      "file": "island-t2-terrain-3.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 7750
+    },
+    "island-t2-cliff-natural": {
+      "file": "island-t2-cliff-natural.png",
+      "width": 160,
+      "height": 128,
+      "anchorX": 80,
+      "anchorY": 23,
+      "tileW": 1.4,
+      "tileH": 1.45,
+      "contentBox": [
+        2,
+        5,
+        158,
+        118
+      ],
+      "bytes": 8882
+    },
+    "island-t2-ground-decal-0": {
+      "file": "island-t2-ground-decal-0.png",
+      "width": 96,
+      "height": 64,
+      "anchorX": 48,
+      "anchorY": 35,
+      "tileW": 0.82,
+      "tileH": 0.47,
+      "contentBox": [
+        2,
+        19,
+        92,
+        49
+      ],
+      "bytes": 5507
+    },
+    "island-t2-ground-decal-1": {
+      "file": "island-t2-ground-decal-1.png",
+      "width": 96,
+      "height": 64,
+      "anchorX": 48,
+      "anchorY": 35,
+      "tileW": 0.82,
+      "tileH": 0.47,
+      "contentBox": [
+        2,
+        17,
+        94,
+        51
+      ],
+      "bytes": 6475
+    },
+    "island-t3-terrain-0": {
+      "file": "island-t3-terrain-0.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 25124
+    },
+    "island-t3-terrain-1": {
+      "file": "island-t3-terrain-1.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 25356
+    },
+    "island-t3-terrain-2": {
+      "file": "island-t3-terrain-2.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 5840
+    },
+    "island-t3-terrain-3": {
+      "file": "island-t3-terrain-3.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 6078
+    },
+    "island-t3-cliff-natural": {
+      "file": "island-t3-cliff-natural.png",
+      "width": 160,
+      "height": 128,
+      "anchorX": 80,
+      "anchorY": 23,
+      "tileW": 1.4,
+      "tileH": 1.45,
+      "contentBox": [
+        2,
+        5,
+        158,
+        119
+      ],
+      "bytes": 8067
+    },
+    "island-t3-ground-decal-0": {
+      "file": "island-t3-ground-decal-0.png",
+      "width": 96,
+      "height": 64,
+      "anchorX": 48,
+      "anchorY": 35,
+      "tileW": 0.82,
+      "tileH": 0.47,
+      "contentBox": [
+        2,
+        16,
+        94,
+        51
+      ],
+      "bytes": 5572
+    },
+    "island-t3-ground-decal-1": {
+      "file": "island-t3-ground-decal-1.png",
+      "width": 96,
+      "height": 64,
+      "anchorX": 48,
+      "anchorY": 35,
+      "tileW": 0.82,
+      "tileH": 0.47,
+      "contentBox": [
+        2,
+        13,
+        93,
+        52
+      ],
+      "bytes": 3857
+    },
+    "island-t4-terrain-0": {
+      "file": "island-t4-terrain-0.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 6710
+    },
+    "island-t4-terrain-1": {
+      "file": "island-t4-terrain-1.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 6501
+    },
+    "island-t4-terrain-2": {
+      "file": "island-t4-terrain-2.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 7020
+    },
+    "island-t4-terrain-3": {
+      "file": "island-t4-terrain-3.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 7096
+    },
+    "island-t4-cliff-natural": {
+      "file": "island-t4-cliff-natural.png",
+      "width": 160,
+      "height": 128,
+      "anchorX": 80,
+      "anchorY": 23,
+      "tileW": 1.4,
+      "tileH": 1.45,
+      "contentBox": [
+        2,
+        5,
+        158,
+        117
+      ],
+      "bytes": 31877
+    },
+    "island-t4-ground-decal-0": {
+      "file": "island-t4-ground-decal-0.png",
+      "width": 96,
+      "height": 64,
+      "anchorX": 48,
+      "anchorY": 35,
+      "tileW": 0.82,
+      "tileH": 0.47,
+      "contentBox": [
+        2,
+        17,
+        94,
+        50
+      ],
+      "bytes": 4649
+    },
+    "island-t4-ground-decal-1": {
+      "file": "island-t4-ground-decal-1.png",
+      "width": 96,
+      "height": 64,
+      "anchorX": 48,
+      "anchorY": 35,
+      "tileW": 0.82,
+      "tileH": 0.47,
+      "contentBox": [
+        2,
+        10,
+        92,
+        57
+      ],
+      "bytes": 4543
     }
   }
 }

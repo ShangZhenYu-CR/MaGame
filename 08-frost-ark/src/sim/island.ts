@@ -1,7 +1,7 @@
-import { PLAYER_FOOT_RADIUS } from './ground-footprint';
+import { feetSupported, PLAYER_FOOT_RADIUS } from './ground-footprint';
 import { highTierCache, highTierOre } from './m5-zones';
 import biomes from '../data/biomes.json';
-import { hasBuildingContact, isDeck, walk } from './ark';
+import { fitsOnDeck, hasBuildingContact, isDeck, walk, walkOnGround } from './ark';
 import { getNavigation } from './m3-state';
 import { nextRng } from './rng';
 import { ISLAND_SIZE, type IslandNode, type IslandState, type ItemStack, type Vec2, type WorldState } from './types';
@@ -167,27 +167,38 @@ const distanceToDock=(w:WorldState)=>{
 };
 export const nearGangway=(w:WorldState):boolean=>areaAt(w,w.player.x,w.player.y)==='ark'&&distanceToDock(w)<=1.35;
 
+/** The centre is already aboard. Move no further than the shoe margin
+ * before removing the floor beneath the remaining overhang. */
+function stepBackFromDockSeam(w:WorldState,g:NonNullable<ReturnType<typeof gangwayGeometry>>):boolean {
+  const p=w.player,r=PLAYER_FOOT_RADIUS,x=g.x-r-.001;
+  if(p.x>=g.x||p.x<g.x-r||p.y<g.y||p.y>=g.y+g.height||
+    !fitsOnDeck(w,x,p.y)||hasBuildingContact(w,x,p.y))return false;
+  p.x=x;p.vx=p.vy=0;
+  return true;
+}
+
 export function toggleGangway(w:WorldState):string|null{
   const dock=getNavigation(w)?.dock;
   if(!dock||w.sky.cruising)return '请先靠泊浮岛';
   if(!nearGangway(w))return '走到右舷登岛口后再操作';
+  if(dock.deployed&&!fitsOnDeck(w,w.player.x,w.player.y)&&
+    !stepBackFromDockSeam(w,gangwayGeometry(w)!))return '先退回甲板站稳，再收跳板';
   dock.deployed=!dock.deployed;
   return null;
 }
 
 export function walkExpedition(w:WorldState,direction:Vec2):void{
-  if(!gangwayGeometry(w)?.deployed){walk(w,direction);return;}
-  const p=w.player,len=Math.hypot(direction.x,direction.y);
-  p.vx=p.vy=0;
-  if(!len||!Number.isFinite(len))return;
-  const dx=direction.x/len,dy=direction.y/len;
-  p.facing={x:dx,y:dy};
+  const g=gangwayGeometry(w),p=w.player;
+  if(!g?.deployed){
+    // Older saves could retract the bridge while the player's centre was on the
+    // ship but their feet still overlapped the seam. Let a step back free them
+    // without moving any valid old-save position, even on an irregular deck.
+    if(g&&direction.x<0&&!fitsOnDeck(w,p.x,p.y))stepBackFromDockSeam(w,g);
+    walk(w,direction);
+    return;
+  }
   const speed=areaAt(w,p.x,p.y)==='island'?.087:.095;
-  const r=PLAYER_FOOT_RADIUS;
-  const allowed=(x:number,y:number)=>!hasBuildingContact(w,x,y)&&
-    [-r,r].every(ox=>[-r,r].every(oy=>areaAt(w,x+ox,y+oy)!=='void'));
-  if(allowed(p.x+dx*speed,p.y)){p.x+=dx*speed;p.vx=dx*speed;}
-  if(allowed(p.x,p.y+dy*speed)){p.y+=dy*speed;p.vy=dy*speed;}
+  walkOnGround(w,direction,speed,(x,y)=>feetSupported(x,y,(px,py)=>areaAt(w,px,py)!=='void'));
   const area=areaAt(w,p.x,p.y);
   if(area!=='ark'&&(p.grapple.charging||p.grapple.active)){
     p.grapple.charging=p.grapple.active=false;p.grapple.caughtDebrisId=null;p.grapple.charge=0;

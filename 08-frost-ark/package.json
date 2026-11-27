@@ -7,7 +7,7 @@
     "dev": "vite --open /dev.html",
     "typecheck": "tsc --noEmit",
     "check:data": "node --import tsx scripts/check-data.ts",
-    "test:sim": "node --import tsx scripts/sim-smoke.ts && node --import tsx scripts/m3-tools-smoke.ts && node --import tsx scripts/m4-beasts-smoke.ts && node --import tsx scripts/m5-smoke.ts && node --import tsx scripts/m6-finale-smoke.ts && node --import tsx scripts/footprints-smoke.ts",
+    "test:sim": "node --import tsx scripts/sim-smoke.ts && node --import tsx scripts/m3-tools-smoke.ts && node --import tsx scripts/m4-beasts-smoke.ts && node --import tsx scripts/m5-smoke.ts && node --import tsx scripts/m6-finale-smoke.ts && node --import tsx scripts/footprints-smoke.ts && node --import tsx scripts/deck-movement-smoke.ts",
     "test:e2e": "node --import tsx scripts/e2e-visual.ts",
     "build": "vite build && node scripts/publish-entry.mjs",
     "gate:headless": "npm run check:data && npm run typecheck && npm run build && npm run test:sim",

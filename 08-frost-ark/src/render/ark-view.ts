@@ -18,7 +18,7 @@ import { PALETTE as P } from './palette';
 
 export interface Ghost { x:number; y:number; ok:boolean; defId?:string; torch?:boolean; wall?:boolean }
 const deckIds=['deck-1','deck-2','deck-3','deck-4'];
-interface BuildingVisual { art:string; width:number; height:number; shadow:number; ground?:number }
+interface BuildingVisual { art:string; width:number; height:number; shadow:number }
 const buildingVisuals:Readonly<Record<string,BuildingVisual>>={
   storage_box:{art:'storage',width:1.26,height:1.23,shadow:.51},
   wind_wall:{art:'wall',width:1.18,height:1.24,shadow:.57},
@@ -27,13 +27,13 @@ const buildingVisuals:Readonly<Record<string,BuildingVisual>>={
   furnace:{art:'building-smelter',width:1.25,height:1.42,shadow:.51},
   stove:{art:'building-stove',width:1.20,height:1.33,shadow:.50},
   heat_relay:{art:'building-heat-relay',width:1.22,height:1.5,shadow:.45},
-  catch_net:{art:'building-net',width:1.23,height:1.20,shadow:.45,ground:.92},
+  catch_net:{art:'building-net',width:1.23,height:1.20,shadow:.45},
   sorter_arm:{art:'building-sorter',width:1.20,height:1.46,shadow:.47},
-  greenhouse:{art:'building-greenhouse',width:2.26,height:2.17,shadow:.98,ground:.88},
+  greenhouse:{art:'building-greenhouse',width:2.26,height:2.17,shadow:.98},
   warm_wall:{art:'building-insulated-wall',width:1.18,height:1.25,shadow:.55},
   frost_turret:{art:'building-frost-arrow-turret',width:1.29,height:1.52,shadow:.59},
   fire_oil_turret:{art:'building-fire-oil-turret',width:1.33,height:1.53,shadow:.62},
-  beast_den:{art:'building-beast-den',width:2.28,height:2.15,shadow:1.01,ground:.86},
+  beast_den:{art:'building-beast-den',width:2.28,height:2.15,shadow:1.01},
   feed_trough:{art:'building-feed-trough',width:1.20,height:1.00,shadow:.54},
   buoyancy_core:{art:'building-buoyancy-core',width:1.20,height:1.38,shadow:.50},
 };
@@ -232,7 +232,7 @@ export class ArkView {
     const fire=primaryHearth(w);
     for(const bld of w.ark.buildings){
       const {gx,gy}=bld;
-      if(bld.defId==='hearth_core')actors.push({x:gx+1,y:gy+1.76,art:bld.level>=4?'solar-hearth':bld.level>=2?'hearth-2':'hearth-1',
+      if(bld.defId==='hearth_core')actors.push({x:gx+1,y:gy+GROUND_FOOTPRINTS.hearth_core!.anchorY,art:bld.level>=4?'solar-hearth':bld.level>=2?'hearth-2':'hearth-1',
         width:2.65,height:2.43,shadow:1.15,fire:bld.fuel>0?'hearth':undefined,hearthLevel:bld.level});
       const visuals=buildingVisuals[bld.defId];
       if(!visuals)continue;
@@ -240,7 +240,7 @@ export class ArkView {
       const working=getIndustrySave(w)?.stations[bld.id]?.job;
       const effect=bld.defId==='torch_post'?'torch':bld.defId==='heat_relay'?'relay':
         working?(bld.defId==='furnace'?'forge':bld.defId==='stove'?'stove':undefined):undefined;
-      actors.push({...visuals,x:gx+spanX*.5,y:gy+spanY*(GROUND_FOOTPRINTS[bld.defId]?.anchorY??visuals.ground??.80),fire:effect});
+      actors.push({...visuals,x:gx+spanX*.5,y:gy+(GROUND_FOOTPRINTS[bld.defId]?.anchorY??spanY*.80),fire:effect});
     }
     const latte=w.latte;
     const catWalking=fire?Math.hypot(latte.x-fire.gx-2.4,latte.y-fire.gy-2.4)>.23:false;
@@ -435,7 +435,7 @@ export class ArkView {
     const visual=buildingVisuals[id];
     c.globalAlpha=ghost.ok?.57:.30;
     if(visual){
-      this.art.paint(c,visual.art,p.x+s*spanX*.5,p.y+s*spanY*(GROUND_FOOTPRINTS[id]?.anchorY??visual.ground??.80),s,visual);
+      this.art.paint(c,visual.art,p.x+s*spanX*.5,p.y+s*(GROUND_FOOTPRINTS[id]?.anchorY??spanY*.80),s,visual);
     }else if(id==='wood_deck'||id==='iron_deck'){
       this.art.paintTile(c,id==='iron_deck'?ironDeck:deckIds[hash(ghost.x,ghost.y)%4],p.x,p.y,s,s);
     }

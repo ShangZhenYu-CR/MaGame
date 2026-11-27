@@ -92,7 +92,7 @@ export function expeditionUi(hooks:Hooks){
   else if(box&&nearGangway(w)){
    action=box.deployed?'stow':'deploy';
    title=box.deployed?'跳板已搭好':'已靠泊 · 右舷登岛口';
-   detail=box.deployed?'沿跳板向右走即可登岛；离港前可收回。':'搭跳板后沿板向右走，进入浮岛。';
+   detail=box.deployed?'沿跳板向右走即可登岛；回到甲板后可收回。':'搭跳板后沿板向右走，进入浮岛。';
    label=box.deployed?'收跳板':'搭跳板';
   }else if(nearHelm(w)){
    action='helm';title='方舟舵轮';detail='按 N 打开航图，选择目标浮岛。';

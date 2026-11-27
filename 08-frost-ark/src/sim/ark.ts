@@ -1,4 +1,4 @@
-import { GROUND_FOOTPRINTS, PLAYER_FOOT_RADIUS } from './ground-footprint';
+import { feetSupported, GROUND_FOOTPRINTS, PLAYER_FOOT_RADIUS } from './ground-footprint';
 import buildings from '../data/buildings.json';
 import recipes from '../data/recipes.json';
 import items from '../data/items.json';
@@ -117,8 +117,9 @@ export function refreshBuoyancy(w: WorldState): void {
 }
 
 export function playerOverTile(w: WorldState, x: number, y: number): boolean {
-  return w.player.x + .21 > x && w.player.x - .21 < x+1 &&
-         w.player.y + .21 > y && w.player.y - .21 < y+1;
+  const r=PLAYER_FOOT_RADIUS;
+  return w.player.x + r > x && w.player.x - r < x+1 &&
+         w.player.y + r > y && w.player.y - r < y+1;
 }
 
 export function buildIssue(w: WorldState, kind: BuildKind, x: number, y: number): string | null {
@@ -167,18 +168,35 @@ export function build(w: WorldState, kind: BuildKind, x: number, y: number): boo
   return true;
 }
 
-export function walk(w: WorldState, direction: Vec2): void {
-  const p = w.player;
-  const length = Math.hypot(direction.x, direction.y);
-  p.vx = p.vy = 0;
-  if (!length || !Number.isFinite(length)) return;
-  const dx = direction.x / length;
-  const dy = direction.y / length;
-  p.facing = { x: dx, y: dy };
-  const r = PLAYER_FOOT_RADIUS;
-  const clear = (px: number, py: number) => !hasBuildingContact(w,px,py) &&
-    [-r,r].every(ox => [-r,r].every(oy => isDeck(w,Math.floor(px+ox),Math.floor(py+oy))));
-  const speed = 0.095;
-  if (clear(p.x + dx * speed, p.y)) { p.x += dx * speed; p.vx = dx * speed; }
-  if (clear(p.x, p.y + dy * speed)) { p.y += dy * speed; p.vy = dy * speed; }
+export function fitsOnDeck(w:WorldState,x:number,y:number):boolean {
+  return feetSupported(x,y,(px,py)=>isDeck(w,Math.floor(px),Math.floor(py)));
+}
+
+/** Sweep each axis and use the free part of a blocked step, rather than losing
+ * the last full frame of travel in short gaps and at inside corners. */
+export function walkOnGround(w:WorldState,direction:Vec2,speed:number,supported:(x:number,y:number)=>boolean):void {
+  const p=w.player, length=Math.hypot(direction.x,direction.y);
+  p.vx=p.vy=0;
+  if(!length||!Number.isFinite(length))return;
+  p.facing={x:direction.x/length,y:direction.y/length};
+  const clear=(x:number,y:number)=>supported(x,y)&&!hasBuildingContact(w,x,y);
+  function advance(dx:number,dy:number):number {
+    if(!dx&&!dy)return 0;
+    if(clear(p.x+dx,p.y+dy))return 1;
+    if(!clear(p.x,p.y))return 0;
+    let lo=0,hi=1;
+    for(let i=0;i<7;i++){
+      const mid=(hi+lo)/2;
+      if(clear(p.x+dx*mid,p.y+dy*mid))lo=mid;
+      else hi=mid;
+    }
+    return lo;
+  }
+  const dx=p.facing.x*speed,dy=p.facing.y*speed;
+  p.vx=dx*advance(dx,0);p.x+=p.vx;
+  p.vy=dy*advance(0,dy);p.y+=p.vy;
+}
+
+export function walk(w:WorldState,direction:Vec2):void {
+  walkOnGround(w,direction,.095,(x,y)=>fitsOnDeck(w,x,y));
 }

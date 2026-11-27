@@ -6,6 +6,7 @@ import { ensureNavigationState } from '../src/sim/m3-state';
 import { deserializeWorld } from '../src/sim/save';
 import type { WorldState } from '../src/sim/types';
 import { createInitialWorld } from '../src/sim/world';
+import { overlayKind } from '../src/sim/utilities';
 
 const walk=(w:WorldState,x:number,y:number,ticks=28)=>{
   for(let i=0;i<ticks;i++)walkExpedition(w,{x,y});
@@ -15,7 +16,7 @@ const dock=(w:WorldState)=>{
   w.ark.anchoredIslandId=nodeId;
   return ensureNavigationState(w).dock={nodeId,gx:27,gy:24,deployed:true};
 };
-const solids=[...buildingDefs.values()].filter(d=>d.id!=='wood_deck'&&d.id!=='iron_deck');
+const solids=[...buildingDefs.values()].filter(d=>d.id!=='wood_deck'&&d.id!=='iron_deck'&&!overlayKind(d.id));
 assert.equal(Object.keys(GROUND_FOOTPRINTS).length,solids.length,'every deck obstacle has a measured profile');
 
 for(const moored of [false,true]){

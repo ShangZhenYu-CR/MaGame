@@ -25,7 +25,7 @@ export class Lightmap {
     curtain.addColorStop(1,`rgba(9,24,41,${Math.min(.88,darkness*1.045)})`);
     g.fillStyle=curtain;g.fillRect(0,0,sw,sh);
 
-    const sources:Source[]=emitters(world).map(e=>{
+    const sources:Source[]=emitters(world).filter(e=>e.kind!=='heat_pipe').map(e=>{
       const p=project(e.x,e.y);
       return {x:p.x/4,y:(p.y-tile*(e.kind==='hearth_core'?-.32:.47))/4,
         groundY:p.y/4,radius:tile*e.radius*(e.kind==='hearth_core'?.57:.55)/4,small:false};

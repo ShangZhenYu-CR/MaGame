@@ -41,5 +41,6 @@
   {"id": "ember_hammer", "name": "燃炭重锤", "category": "weapon", "stack": 1},
   {"id": "ice_repeater", "name": "寒冰连弩", "category": "weapon", "stack": 1},
   {"id": "fire_oil_flask", "name": "火油投掷瓶", "category": "weapon", "stack": 18},
-  {"id": "magma_sprayer", "name": "熔核喷射器", "category": "weapon", "stack": 1}
+  {"id": "magma_sprayer", "name": "熔核喷射器", "category": "weapon", "stack": 1},
+  {"id": "repair_hammer", "name": "修理锤", "category": "tool", "stack": 1}
 ]

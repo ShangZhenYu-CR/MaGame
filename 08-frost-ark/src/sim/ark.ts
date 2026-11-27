@@ -1,3 +1,4 @@
+import { overlayKind,utilityAt } from './utilities';
 import { doorBlocksFeet,invalidateRoomTopology,isDoor } from './rooms';
 import { emitJuice } from './juice';
 import { incapacitated } from './rescue';
@@ -14,7 +15,7 @@ import type { BuildingInstance, ItemStack, Vec2, WorldState } from './types';
 export const buildKinds = [
   'wood_deck','torch_post','wind_wall','workbench','furnace','stove','heat_relay',
   'catch_net','sorter_arm','greenhouse','warm_wall','buoyancy_core','iron_deck','beast_den','feed_trough',
-  'frost_turret','fire_oil_turret','wind_door','frost_airlock','fuel_hopper','steam_chute','wind_sail','steam_thruster','wind_vane',
+  'frost_turret','fire_oil_turret','wind_door','frost_airlock','fuel_hopper','steam_chute','wind_sail','steam_thruster','wind_vane','heat_pipe','insulated_floor','repair_station',
 ] as const;
 export type BuildKind = typeof buildKinds[number];
 export const itemNames = new Map(items.map(({ id, name }) => [id, name]));
@@ -33,6 +34,7 @@ export function isDeck(w: WorldState, x: number, y: number): boolean {
 
 export function buildingAt(w: WorldState, x: number, y: number): BuildingInstance | undefined {
   return w.ark.buildings.find(b => {
+    if(overlayKind(b.defId))return false;
     const [sx, sy] = buildingDefs.get(b.defId)?.size ?? [1, 1];
     return x >= b.gx && y >= b.gy && x < b.gx + sx && y < b.gy + sy;
   });
@@ -42,6 +44,7 @@ export function buildingAt(w: WorldState, x: number, y: number): BuildingInstanc
 export function hasBuildingContact(w: WorldState, px: number, py: number): boolean {
   const r = PLAYER_FOOT_RADIUS;
   return w.ark.buildings.some(b => {
+    if(overlayKind(b.defId))return false;
     const [sx, sy] = buildingDefs.get(b.defId)?.size ?? [1, 1];
     const [left, top, right, bottom] = GROUND_FOOTPRINTS[b.defId]?.bounds ?? [0, 0, sx, sy];
     if(isDoor(b.defId))return doorBlocksFeet(b,{x:px,y:py},r);
@@ -134,7 +137,7 @@ export function buildIssue(w: WorldState, kind: BuildKind, x: number, y: number)
   const [sw,sh]=def.size;
   if(!Number.isInteger(x)||!Number.isInteger(y)||x<0||y<0||x+sw>w.ark.size||y+sh>w.ark.size)return '超出方舟范围';
   const dock=getNavigation(w)?.dock;
-  if(dock && ((x<=dock.gx&&x+sw>dock.gx&&y<=dock.gy&&y+sh>dock.gy&&kind!=='wood_deck'&&kind!=='iron_deck') ||
+  if(dock && ((x<=dock.gx&&x+sw>dock.gx&&y<=dock.gy&&y+sh>dock.gy&&kind!=='wood_deck'&&kind!=='iron_deck'&&!overlayKind(kind)) ||
     (x>dock.gx&&y<=dock.gy&&y+sh>dock.gy)))return '给登岛跳板留出右舷航道';
   if(w.activeIsland)return '返回方舟后才能建造';
 
@@ -151,6 +154,9 @@ export function buildIssue(w: WorldState, kind: BuildKind, x: number, y: number)
       if(kind!=='iron_deck'||w.ark.decks[y*w.ark.size+x]!==1)return '这里已有甲板';
       delta+=buildDefinitions.wood_deck.buoyancyDelta;
     }else if(!cardinal.some(([dx,dy])=>isDeck(w,x+dx,y+dy)))return '须吸附到甲板直边';
+  }else if(overlayKind(kind)){
+    if(!isDeck(w,x,y))return '先铺设这格甲板';
+    if(utilityAt(w,x,y,kind))return '这里已有同类铺装';
   }else{
     for(let dy=0;dy<sh;dy++)for(let dx=0;dx<sw;dx++){
       if(!isDeck(w,x+dx,y+dy))return '建筑须完整放在甲板上';

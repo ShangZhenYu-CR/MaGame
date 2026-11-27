@@ -2736,6 +2736,118 @@
         60
       ],
       "bytes": 3720
+    },
+    "building-heat-pipe": {
+      "file": "building-heat-pipe.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.18,
+      "tileH": 1.18,
+      "contentBox": [
+        2,
+        97,
+        126,
+        121
+      ],
+      "bytes": 7967
+    },
+    "building-repair-station": {
+      "file": "building-repair-station.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.18,
+      "tileH": 1.18,
+      "contentBox": [
+        2,
+        30,
+        126,
+        121
+      ],
+      "bytes": 24184
+    },
+    "icon-repair-hammer": {
+      "file": "icon-repair-hammer.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1.18,
+      "tileH": 1.18,
+      "contentBox": [
+        2,
+        2,
+        61,
+        60
+      ],
+      "bytes": 5432
+    },
+    "floor-insulated": {
+      "file": "floor-insulated.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.18,
+      "tileH": 1.18,
+      "contentBox": [
+        3,
+        2,
+        125,
+        121
+      ],
+      "bytes": 39243
+    },
+    "icon-heat-pipe": {
+      "file": "icon-heat-pipe.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1.18,
+      "tileH": 1.18,
+      "contentBox": [
+        2,
+        48,
+        62,
+        60
+      ],
+      "bytes": 2440
+    },
+    "icon-repair-station": {
+      "file": "icon-repair-station.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1.18,
+      "tileH": 1.18,
+      "contentBox": [
+        2,
+        16,
+        62,
+        60
+      ],
+      "bytes": 6592
+    },
+    "icon-insulated-floor": {
+      "file": "icon-insulated-floor.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1.18,
+      "tileH": 1.18,
+      "contentBox": [
+        2,
+        2,
+        62,
+        60
+      ],
+      "bytes": 9165
     }
   }
 }

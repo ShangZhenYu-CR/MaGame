@@ -98,6 +98,12 @@
     <button id="bench-research" type="button" hidden>查阅研究蓝图</button>
     <div id="industry-job" class="industry-job" hidden><label for="industry-progress" id="industry-job-label"></label><progress id="industry-progress" max="1" value="0"></progress></div>
     <section id="industry-recipes-section" aria-labelledby="industry-recipes-title" hidden><h3 id="industry-recipes-title">配方</h3><div id="industry-recipes"></div></section>
+    <section id="repair-panel" hidden aria-labelledby="repair-title">
+      <h3 id="repair-title">维修工单</h3>
+      <p id="repair-summary" class="numbers"></p>
+      <ul id="repair-targets"></ul>
+      <button type="button" id="repair-all">修复全船</button>
+    </section>
     <section id="logistics-panel" hidden aria-labelledby="logistics-title">
       <h3 id="logistics-title">自动物流</h3>
       <label id="logistics-route-label">送往 <select id="logistics-route" aria-label="输送目标"></select></label>

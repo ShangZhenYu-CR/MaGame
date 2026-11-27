@@ -176,5 +176,6 @@
   {"id": "craft_ember_hammer", "station": "hand", "output": {"itemId": "ember_hammer", "count": 1}, "inputs": [{"itemId": "frost_iron_ingot", "count": 3}, {"itemId": "coal_chunk", "count": 3}, {"itemId": "driftwood", "count": 1}]},
   {"id": "craft_ice_repeater", "station": "hand", "output": {"itemId": "ice_repeater", "count": 1}, "inputs": [{"itemId": "frost_iron_ingot", "count": 2}, {"itemId": "rope", "count": 3}, {"itemId": "ice_shard", "count": 2}]},
   {"id": "craft_fire_oil_flask", "station": "hand", "output": {"itemId": "fire_oil_flask", "count": 2}, "inputs": [{"itemId": "sulfur_ore", "count": 1}, {"itemId": "coal_chunk", "count": 1}, {"itemId": "rope", "count": 1}]},
-  {"id": "craft_magma_sprayer", "station": "hand", "output": {"itemId": "magma_sprayer", "count": 1}, "inputs": [{"itemId": "frost_iron_ingot", "count": 3}, {"itemId": "sulfur_ore", "count": 2}, {"itemId": "sky_mithril", "count": 1}]}
+  {"id": "craft_magma_sprayer", "station": "hand", "output": {"itemId": "magma_sprayer", "count": 1}, "inputs": [{"itemId": "frost_iron_ingot", "count": 3}, {"itemId": "sulfur_ore", "count": 2}, {"itemId": "sky_mithril", "count": 1}]},
+  {"id": "craft_repair_hammer", "name": "制作修理锤", "station": "workbench", "seconds": 3, "output": {"itemId": "repair_hammer", "count": 1}, "inputs": [{"itemId": "driftwood", "count": 2}, {"itemId": "frost_iron_ingot", "count": 1}]}
 ]

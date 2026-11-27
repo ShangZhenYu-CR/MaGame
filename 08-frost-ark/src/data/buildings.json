@@ -231,5 +231,8 @@
   {"id": "steam_chute", "name": "蒸汽传输滑道", "category": "industry", "size": [1, 1], "buoyancyDelta": -1, "maxHp": 105, "cost": [{"itemId": "frost_iron_scrap", "count": 2}, {"itemId": "driftwood", "count": 2}]},
   {"id": "wind_sail", "name": "防风帆", "category": "navigation", "size": [1, 1], "buoyancyDelta": -1, "maxHp": 115, "cost": [{"itemId": "driftwood", "count": 5}, {"itemId": "rope", "count": 3}, {"itemId": "warm_fur", "count": 2}]},
   {"id": "steam_thruster", "name": "霜汽推进器", "category": "navigation", "size": [1, 1], "buoyancyDelta": -2, "maxHp": 165, "cost": [{"itemId": "frost_iron_ingot", "count": 3}, {"itemId": "coal_chunk", "count": 1}, {"itemId": "ice_shard", "count": 2}]},
-  {"id": "wind_vane", "name": "导航风标", "category": "navigation", "size": [1, 1], "buoyancyDelta": -1, "maxHp": 95, "cost": [{"itemId": "driftwood", "count": 3}, {"itemId": "frost_iron_scrap", "count": 2}, {"itemId": "rope", "count": 1}]}
+  {"id": "wind_vane", "name": "导航风标", "category": "navigation", "size": [1, 1], "buoyancyDelta": -1, "maxHp": 95, "cost": [{"itemId": "driftwood", "count": 3}, {"itemId": "frost_iron_scrap", "count": 2}, {"itemId": "rope", "count": 1}]},
+  {"id": "heat_pipe", "name": "热力导气管", "category": "heat", "size": [1, 1], "buoyancyDelta": 0, "maxHp": 80, "cost": [{"itemId": "frost_iron_scrap", "count": 1}]},
+  {"id": "insulated_floor", "name": "防寒地板", "category": "structure", "size": [1, 1], "buoyancyDelta": 0, "maxHp": 90, "insulation": 0.42, "cost": [{"itemId": "driftwood", "count": 2}, {"itemId": "warm_fur", "count": 1}]},
+  {"id": "repair_station", "name": "修理台", "category": "industry", "size": [1, 1], "buoyancyDelta": -1, "maxHp": 150, "cost": [{"itemId": "driftwood", "count": 4}, {"itemId": "frost_iron_ingot", "count": 2}]}
 ]

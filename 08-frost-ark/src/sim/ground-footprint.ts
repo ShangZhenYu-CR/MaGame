@@ -19,6 +19,7 @@ export const GROUND_FOOTPRINTS: Readonly<Record<string, {
   catch_net:      { anchorY:  .92, bounds: [0, .67, 1, .92] },
   sorter_arm:     { anchorY:  .8,  bounds: [.255, .54, .745, .8] },
   greenhouse:     { anchorY: 1.76, bounds: [.06, .72, 1.94, 1.76] },
+  repair_station: { anchorY:.80, bounds:[.04,.41,.96,.80] },
   wind_sail:      { anchorY:.80, bounds:[.33,.58,.67,.80] },
   steam_thruster: { anchorY:.80, bounds:[.12,.44,.88,.80] },
   wind_vane:      { anchorY:.80, bounds:[.30,.57,.70,.80] },

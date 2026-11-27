@@ -1,3 +1,4 @@
+import { pipeHeat } from './utilities';
 import { doorOpen,indoor } from './rooms';
 import { damagePlayer, healPlayer } from './rescue';
 import { gearModifiers } from './equipment';
@@ -77,7 +78,7 @@ export function emitters(w:WorldState){
     }
     const gain=b.defId==='hearth_core'?(b.level>=4?1.82:b.level===3?1.55:b.level===2?1.28:1):1;
     return [{...middle(b),radius:d.heatRadius*gain,power:d.heatOutput*gain,kind:b.defId}];
-  }),...beastHeatEmitters(w)];
+  }),...beastHeatEmitters(w),...pipeHeat(w)];
 }
 
 export function advanceClimate(w:WorldState):void{
@@ -98,7 +99,7 @@ export function solveHeat(w:WorldState):void{
   const insulation=new Float32Array(size*size),sealed=indoor(w).inside;
   for(const b of buildings){
     const d=definitions.get(b.defId);
-    if(d?.insulation&&!doorOpen(b))insulation[b.gy*size+b.gx]=d.insulation;
+    if(d?.insulation&&!doorOpen(b)){const i=b.gy*size+b.gx;insulation[i]=Math.max(insulation[i],d.insulation);}
   }
   const sources=emitters(w);
   const next=new Array<number>(size*size).fill(w.ambientTemp);

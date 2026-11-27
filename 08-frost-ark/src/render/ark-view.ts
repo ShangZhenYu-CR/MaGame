@@ -1,3 +1,4 @@
+import { heatedPipes,overlayKind } from '../sim/utilities';
 import { cruiseSpeed } from '../sim/sky-map';
 import { transportEvents } from '../sim/logistics';
 import { doorOpen,indoor } from '../sim/rooms';
@@ -40,6 +41,8 @@ const buildingVisuals:Readonly<Record<string,BuildingVisual>>={
   catch_net:{art:'building-net',width:1.23,height:1.20,shadow:.45},
   sorter_arm:{art:'building-sorter',width:1.20,height:1.46,shadow:.47},
   greenhouse:{art:'building-greenhouse',width:2.26,height:2.17,shadow:.98},
+  repair_station:{art:'building-repair-station',width:1.23,height:1.19,shadow:.54},
+  heat_pipe:{art:'building-heat-pipe',width:1.12,height:1.09,shadow:0},
   wind_sail:{art:'building-wind-sail',width:1.40,height:1.50,shadow:.50},
   steam_thruster:{art:'building-steam-thruster',width:1.20,height:1.34,shadow:.50},
   wind_vane:{art:'building-wind-vane',width:1.16,height:1.38,shadow:.36},
@@ -58,9 +61,9 @@ const ironDeck='building-iron-deck';
 const required=[
   ...deckIds,'boss-frost-whale-1','boss-frost-whale-2','boss-frost-whale-3','solar-hearth','aurora-crystal','manan-south','manan-north','manan-west','manan-east','latte-sleep','latte-alert','latte-walk','latte-walk-alt',
   'hearth-1','hearth-2','hearth-3','rail','corner','rock','icicles',ironDeck,...Object.values(buildingVisuals).map(v=>v.art),
-  'debris-wood','debris-iron','debris-rope','debris-heavy','clouds','rail-side','rock-side','frost-frame','icon-driftwood','icon-coal-chunk','icon-iron','icon-raw-root','icon-cloud-fish','icon-raw-meat','icon-beast-feed','building-wind-door-open','building-airlock-open',...ISLAND_ART,...BEAST_ART,...HOSTILE_ART,...ELEMENT_ART,
+  'debris-wood','debris-iron','debris-rope','debris-heavy','clouds','rail-side','rock-side','frost-frame','floor-insulated','icon-driftwood','icon-coal-chunk','icon-iron','icon-raw-root','icon-cloud-fish','icon-raw-meat','icon-beast-feed','building-wind-door-open','building-airlock-open',...ISLAND_ART,...BEAST_ART,...HOSTILE_ART,...ELEMENT_ART,
 ] as const;
-interface Cell { x:number; y:number; hash:number; iron:boolean; temperature:number; left:boolean; right:boolean; front:boolean; back:boolean }
+interface Cell { x:number; y:number; hash:number; iron:boolean; insulated:boolean; temperature:number; left:boolean; right:boolean; front:boolean; back:boolean }
 interface Actor {
   id?:string;x:number;y:number;art:string;shadow:number;
   steam?:boolean;width?:number;height?:number;rotation?:number;scale?:number;flip?:boolean;float?:number;fire?:'hearth'|'torch'|'forge'|'stove'|'relay';hearthLevel?:number;
@@ -170,11 +173,12 @@ export class ArkView {
     }
     const hull=this.hull;
     const cells:Cell[]=[],thawed=thawedDeck(w),rooms=indoor(w);
+    const surface=new Set(w.ark.buildings.filter(b=>b.defId==='insulated_floor').map(b=>b.gy*w.ark.size+b.gx));
     const a=this.worldBounds();
     for(let y=a.top;y<=a.bottom;y++) for(let x=a.left;x<=a.right;x++){
       if(!deck(x,y))continue;
       const i=y*w.ark.size+x,mask=hull.edges[i];
-      cells.push({x,y,hash:hash(x,y),iron:w.ark.decks[i]===2,temperature:(w.ark.heatGrid[i]??w.ambientTemp)+(thawed?.has(i)?9:0),
+      cells.push({x,y,hash:hash(x,y),iron:w.ark.decks[i]===2,insulated:surface.has(i),temperature:(w.ark.heatGrid[i]??w.ambientTemp)+(thawed?.has(i)?9:0),
         left:!!(mask&HULL_WEST),right:!!(mask&HULL_EAST),front:!!(mask&HULL_SOUTH),back:!!(mask&HULL_NORTH)});
     }
 
@@ -218,6 +222,26 @@ export class ArkView {
     }
     if(island)paintIsland(c,this.art,island,project,s,w.tick);
     const b=this.deckStructure(c,cells,w,hull);
+    const hotPipes=heatedPipes(w),allPipes=w.ark.buildings.filter(b=>b.defId==='heat_pipe');
+    const pipeLocations=new Set(allPipes.map(b=>b.gy*w.ark.size+b.gx));
+    for(const pipe of allPipes){
+      const xx=pipe.gx,yy=pipe.gy,i=yy*w.ark.size+xx,p=project(xx+.5,yy+.50);
+      if(p.x< -s||p.y< -s||p.x>width+s||p.y>height+s)continue;
+      const northSouth=pipeLocations.has(i-w.ark.size)||pipeLocations.has(i+w.ark.size);
+      const side=pipeLocations.has(i-1)||pipeLocations.has(i+1);
+      const turned=northSouth&&!side,active=hotPipes.has(pipe.id);
+      const paint=()=>{
+        this.art.paint(c,'building-heat-pipe',0,s*.105,s,{width:1.09,height:1.0});
+      };
+      c.save();c.translate(p.x,p.y);if(turned)c.rotate(Math.PI/2);
+      paint();
+      if(active){
+        c.globalCompositeOperation='screen';c.globalAlpha=.59;
+        ovalGlow(c,0,s*.025,s*.44,s*.20,'rgba(255,161,81,.81)','rgba(212,117,70,0)');
+      }
+      c.restore();
+    }
+    const hot=String(hotPipes.size);if(this.canvas.dataset.warmPipes!==hot)this.canvas.dataset.warmPipes=hot;
     if(gangway?.deployed)paintGangway(c,this.art,gangway,project,s);
     const actors:Actor[]=[...this.edgeActors(cells,w,ghost,gangway,hull),...deckDrops];
     if(island){
@@ -266,6 +290,7 @@ export class ArkView {
     const fireArt=fire?.level===4?'solar-hearth':fire?.level===3?'hearth-3':fire?.level===2?'hearth-2':'hearth-1';
     if(this.canvas.dataset.hearthArt!==fireArt)this.canvas.dataset.hearthArt=fireArt;
     for(const bld of w.ark.buildings){
+      if(overlayKind(bld.defId))continue;
       const {gx,gy}=bld;
       if(bld.defId==='hearth_core')actors.push({x:gx+1,y:gy+GROUND_FOOTPRINTS.hearth_core!.anchorY,art:fireArt,
         width:2.65,height:2.43,shadow:1.15,fire:bld.fuel>0?'hearth':undefined,hearthLevel:bld.level});
@@ -443,7 +468,7 @@ export class ArkView {
     }
     for(const t of cells){
       const p=this.screen(t.x,t.y);
-      const id=t.iron?ironDeck:deckIds[t.hash%4];
+      const id=t.insulated?'floor-insulated':t.iron?ironDeck:deckIds[t.hash%4];
       this.art.paintTile(c,id,p.x,p.y,s,s);
       this.frost(c,t,p);
       for(const side of [t.left?-1:0,t.right?1:0]){
@@ -557,8 +582,8 @@ export class ArkView {
     c.globalAlpha=ghost.ok?.57:.30;
     if(visual){
       this.art.paint(c,visual.art,p.x+s*spanX*.5,p.y+s*(GROUND_FOOTPRINTS[id]?.anchorY??spanY*.80),s,visual);
-    }else if(id==='wood_deck'||id==='iron_deck'){
-      this.art.paintTile(c,id==='iron_deck'?ironDeck:deckIds[hash(ghost.x,ghost.y)%4],p.x,p.y,s,s);
+    }else if(id==='wood_deck'||id==='iron_deck'||id==='insulated_floor'){
+      this.art.paintTile(c,id==='insulated_floor'?'floor-insulated':id==='iron_deck'?ironDeck:deckIds[hash(ghost.x,ghost.y)%4],p.x,p.y,s,s);
     }
     c.globalAlpha=.96;c.strokeStyle=ghost.ok?P.uiConfirmTeal:P.uiDanger;
     c.fillStyle=ghost.ok?'rgba(56,168,157,.12)':'rgba(217,91,91,.14)';

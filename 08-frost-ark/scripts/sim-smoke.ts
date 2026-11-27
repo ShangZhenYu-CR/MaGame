@@ -26,7 +26,7 @@ console.log(
 );
 
 // M0: play the same world actions without Canvas or browser storage.
-import { build, countItem, craftTorch, isDeck, fitsOnDeck } from '../src/sim/ark';
+import { build, countItem, craftTorch, isDeck, fitsOnDeck, hasBuildingContact } from '../src/sim/ark';
 import { aim, fire, startCharge } from '../src/sim/cloud';
 const m0 = createInitialWorld(202608);
 const mid = m0.ark.size / 2;
@@ -926,3 +926,31 @@ const timings=[bareSail,riggedSail].map(trip=>{
 assert.ok(timings[1]<timings[0]*.83,'same in-world route, actual shorter sailing time');
 assert.equal(deserializeWorld(serializeWorld(riggedSail)).ark.buildings.filter(b=>['wind_sail','steam_thruster','wind_vane'].includes(b.defId)).length,3);
 console.log('[sim-smoke:P2-14] OK: counterwind resistance, rigid-mode sailing, timetabled speed and old/archive rig validation');
+
+import { utilityArk } from './p2-utilities-fixture';
+import { heatedPipes,repairAt,repairQuote,utilityAt } from '../src/sim/utilities';
+const noPipes=utilityArk(false),withPipes=utilityArk();
+const glass=(w:typeof withPipes)=>w.ark.buildings.find(b=>b.defId==='greenhouse')!;
+assert.equal(efficiencyAt(noPipes,glass(noPipes)),0);
+assert.ok(efficiencyAt(withPipes,glass(withPipes))>0,'a connected trunk heats distant glass, without relay');
+assert.ok(heatedPipes(withPipes).has(utilityAt(withPipes,31,25,'heat_pipe')!.id));
+assert.ok(!withPipes.ark.buildings.some(b=>b.defId==='heat_relay'));
+const brokenTrunk=deserializeWorld(serializeWorld(withPipes));
+brokenTrunk.ark.buildings=brokenTrunk.ark.buildings.filter(b=>b.id!=='heat_pipe_27_24');
+for(let i=0;i<70;i++)solveHeat(brokenTrunk);
+assert.equal(efficiencyAt(brokenTrunk,glass(brokenTrunk)),0);
+assert.equal(heatedPipes(brokenTrunk).has('heat_pipe_31_25'),false);
+assert.ok(fitsOnDeck(withPipes,29.5,24.5));
+assert.ok(!hasBuildingContact(withPipes,29.5,24.5),'utility overlay never becomes an air wall');
+const repairDesk=withPipes.ark.buildings.find(s=>s.defId==='repair_station')!;
+Object.assign(withPipes.player,{x:25.54,y:26.15});
+assert.match(repairAt(withPipes,repairDesk)!,/修理锤/);
+assert.ok(inventoryChange(withPipes,[],[{itemId:'repair_hammer',count:1}]));
+const [firstDefect,secondDefect]=repairQuote(withPipes).damaged;
+assert.equal(repairAt(withPipes,repairDesk,firstDefect.id),null);
+assert.equal(firstDefect.hp,firstDefect.maxHp);
+assert.notEqual(secondDefect.hp,secondDefect.maxHp);
+assert.equal(repairAt(withPipes,repairDesk),null);
+assert.equal(secondDefect.hp,secondDefect.maxHp);
+assert.ok(utilityAt(deserializeWorld(serializeWorld(withPipes)),31,25,'insulated_floor'));
+console.log('[sim-smoke:P2-15] OK: physical connected trunk, cut-line freeze, no overlay collision and atomic single+ship repair');

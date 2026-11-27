@@ -1,3 +1,4 @@
+import { overlayKind,repairAt,repairPanel,utilityAt } from './utilities';
 import { loadHopper,routePanel,runNetworkPass,setLogisticsRoute } from './logistics';
 import { invalidateRoomTopology } from './rooms';
 import recipes from '../data/recipes.json';
@@ -11,7 +12,7 @@ import { getNavigation } from './m3-state';
 import { crewFurnaceFuel, crewIndustryMultiplier, crewSmeltBonus } from './beasts';
 import { TICK_RATE, type BuildingInstance, type ItemStack, type WorldState } from './types';
 
-const processable=new Set(['workbench','furnace','stove','greenhouse','catch_net','sorter_arm','fuel_hopper','steam_chute']);
+const processable=new Set(['workbench','furnace','stove','greenhouse','catch_net','sorter_arm','fuel_hopper','steam_chute','repair_station']);
 const rows=new Map(recipes.map(r=>[r.id,r]));
 const nodeById=new Map(tech.nodes.map(n=>[n.id,n]));
 const UNDO_TICKS=4*TICK_RATE;
@@ -83,6 +84,7 @@ export function industryPanel(w:WorldState,buildingId:string){
     output:s?.output??[],intake:s?.intake??[],
     logistics:['fuel_hopper','steam_chute','sorter_arm','furnace'].includes(b.defId)?routePanel(w,b):null,
     fuel:b.fuel,
+    repair:b.defId==='repair_station'?repairPanel(w):null,
     status:!efficiency?'结冻停机':lockedNet?'请在网栏外侧留出一格开放云海':noNet?'附近没有捕捞网栏':
       b.defId==='catch_net'?'拦截漂流残骸，可手动取货':b.defId==='sorter_arm'?'自动收取三格内网栏物资':
       job?(efficiency<1?'低温减速，正在加工':'正在加工'):'待机',
@@ -114,6 +116,10 @@ export function collectIndustry(w:WorldState,buildingId:string):string|null {
   return null;
 }
 
+export function treatDamage(w:WorldState,id:string,target?:string):string|null{
+ const b=w.ark.buildings.find(s=>s.id===id);
+ return b&&near(w,b)?repairAt(w,b,target):'走近修理台后再动手';
+}
 export function changeRoute(w:WorldState,id:string,dest:string):string|null{
  const b=w.ark.buildings.find(s=>s.id===id);
  return b&&near(w,b)?setLogisticsRoute(w,b,dest):'走近设备再设定输送目标';
@@ -232,7 +238,7 @@ export function dismantleIssue(w:WorldState,gx:number,gy:number):string|null {
   if(dock?.gx===gx&&dock.gy===gy)return '靠泊期间不能拆除登岛口';
 
   if(getIndustrySave(w)?.removal)return '上一项仍在撤销期';
-  const b=buildingAt(w,gx,gy);
+  const b=buildingAt(w,gx,gy)??utilityAt(w,gx,gy);
   if(b?.defId==='hearth_core'||b?.id==='storage_main')return '开局主炉与储物箱不可拆除';
   if(b){
     const d=buildingDefs.get(b.defId)!;
@@ -247,7 +253,7 @@ export function dismantleIssue(w:WorldState,gx:number,gy:number):string|null {
 export function dismantle(w:WorldState,gx:number,gy:number):string|null {
   const issue=dismantleIssue(w,gx,gy);
   if(issue)return issue;
-  const b=buildingAt(w,gx,gy),state=ensureIndustrySave(w),at=gy*w.ark.size+gx;
+  const b=buildingAt(w,gx,gy)??utilityAt(w,gx,gy),state=ensureIndustrySave(w),at=gy*w.ark.size+gx;
   state.removal={gx:b?.gx??gx,gy:b?.gy??gy,deck:b?0:w.ark.decks[at],
     building:b??null,station:b?(state.stations[b.id]??null):null,expires:w.tick+UNDO_TICKS};
   if(b){w.ark.buildings=w.ark.buildings.filter(x=>x!==b);delete state.stations[b.id];}
@@ -262,7 +268,7 @@ export function undoDismantle(w:WorldState):string|null {
   if(r.building){
     const [sw,sh]=buildingDefs.get(r.building.defId)!.size;
     for(let y=0;y<sh;y++)for(let x=0;x<sw;x++) {
-      if(playerOverTile(w,r.gx+x,r.gy+y))return '先走出建筑占用的格子';
+      if(!overlayKind(r.building.defId)&&playerOverTile(w,r.gx+x,r.gy+y))return '先走出建筑占用的格子';
     }
     w.ark.buildings.push(r.building);
     if(r.station)state.stations[r.building.id]=r.station;

@@ -1,3 +1,5 @@
+import { activeCave,caveEntrance,caveEntranceArt,caveGuard,CAVE_OFFSET,CAVE_SIZE } from '../sim/cave';
+import { CAVE_ART,paintCave } from './cave-view';
 import { fishingPanel,islandForage,patchReady,quarryDrops } from '../sim/forage';
 import { LANDMARK_ART,landmarkScene } from './landmark-view';
 import { docks,downDock } from '../sim/dock-direction';
@@ -71,7 +73,7 @@ const ironDeck='building-iron-deck';
 const required=[
   ...deckIds,'boss-frost-whale-1','boss-frost-whale-2','boss-frost-whale-3','solar-hearth','aurora-crystal','manan-south','manan-north','manan-west','manan-east','latte-sleep','latte-alert','latte-walk','latte-walk-alt',
   'hearth-1','hearth-2','hearth-3','rail','corner','rock','icicles',ironDeck,...Object.values(buildingVisuals).map(v=>v.art),
-  'debris-wood','debris-iron','debris-rope','debris-heavy','clouds','rail-side','rock-side','frost-frame','floor-insulated','icon-driftwood','icon-coal-chunk','icon-iron','icon-raw-root','icon-cloud-fish','icon-raw-meat','icon-beast-feed','building-wind-door-open','building-airlock-open','forage-berries','forage-grass','forage-tubers','forage-crystal','icon-fishing-bobber',...ISLAND_ART,...LANDMARK_ART,...BEAST_ART,...HOSTILE_ART,...ELEMENT_ART,
+  'debris-wood','debris-iron','debris-rope','debris-heavy','clouds','rail-side','rock-side','frost-frame','floor-insulated','icon-driftwood','icon-coal-chunk','icon-iron','icon-raw-root','icon-cloud-fish','icon-raw-meat','icon-beast-feed','building-wind-door-open','building-airlock-open','forage-berries','forage-grass','forage-tubers','forage-crystal','icon-fishing-bobber',...ISLAND_ART,...LANDMARK_ART,...CAVE_ART,...BEAST_ART,...HOSTILE_ART,...ELEMENT_ART,
 ] as const;
 interface Cell { x:number; y:number; hash:number; iron:boolean; insulated:boolean; temperature:number; left:boolean; right:boolean; front:boolean; back:boolean }
 interface Actor {
@@ -130,7 +132,7 @@ export class ArkView {
     const deadzoneY=clamp(height/this.scale*.34-.55,.15,2.8);
     let cx=center+Math.sign(w.player.x-center)*Math.max(0,Math.abs(w.player.x-center)-deadzoneX);
     let cy=center+Math.sign(w.player.y-center)*Math.max(0,Math.abs(w.player.y-center)-deadzoneY);
-    const island=dockedIsland(w);
+    const cave=activeCave(w),island=cave?null:dockedIsland(w);
     let yFraming=.414;
     if(island){
       const bounds=islandCameraExtent(island);
@@ -153,6 +155,12 @@ export class ArkView {
       cy=cy*(1-landWeight)+landY*landWeight;
       yFraming+=landWeight*.064;
       }
+    }
+    if(cave){
+      if(!this.userScale)this.scale=Math.min(this.scale,Math.round(width/(CAVE_SIZE.x+1)));
+      cx=(CAVE_OFFSET.x+CAVE_SIZE.x/2)*.78+w.player.x*.22;
+      cy=CAVE_OFFSET.y+CAVE_SIZE.y*.52+(w.player.y-CAVE_OFFSET.y-CAVE_SIZE.y*.52)*.16;
+      yFraming=.51;
     }
     this.origin={x:Math.round(width/2-cx*this.scale),y:Math.round(height*yFraming+clamp((680-height)*.15,0,24)-cy*this.scale)};
     const data=this.canvas.dataset;
@@ -185,6 +193,15 @@ export class ArkView {
     c.imageSmoothingQuality='medium';
     const project=this.screen.bind(this);
     const {width,height}=c.canvas;
+    const cavern=activeCave(w);
+    if(cavern){
+      this.canvas.dataset.scene='cave';
+      this.canvas.dataset.caveGuardHp=String(Math.ceil(caveGuard(w)?.hp??0));
+      this.canvas.dataset.indoorTiles='0';
+      paintCave(c,this.art,w,cavern,project,s,now);
+      return;
+    }
+    if(this.canvas.dataset.scene!=='surface')this.canvas.dataset.scene='surface';
     const deck=(x:number,y:number)=>x>=0&&y>=0&&x<w.ark.size&&y<w.ark.size&&!!w.ark.decks[y*w.ark.size+x];
     const signature=w.ark.decks.join('');
     if(!this.hull||signature!==this.hullSignature){
@@ -267,6 +284,8 @@ export class ArkView {
     const actors:Actor[]=[...this.edgeActors(cells,w,ghost,gangway,hull),...deckDrops];
     if(island){
       actors.push(...landmarkScene(c,this.art,w,project,s));
+      const gate=caveEntrance(w);
+      if(gate)actors.push({...gate,art:caveEntranceArt(gate.tier),shadow:.65,width:2.18,height:1.76});
       for(const item of quarryDrops(w))actors.push({x:item.x,y:item.y,art:'icon-raw-meat',shadow:.21,width:.45,height:.41});
       for(const patch of islandForage(w)){
         const at=project(patch.x,patch.y);

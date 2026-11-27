@@ -1,3 +1,4 @@
+import { abandonCave } from './cave';
 import { emitJuice } from './juice';
 import { rollGuard } from './roll';
 import { gearModifiers } from './equipment';
@@ -62,6 +63,7 @@ export function stepRescue(w: WorldState): void {
   const spot=rescuePoint(w);
   p.x=spot.x;p.y=spot.y;p.facing={x:0,y:1};
   w.latte.x=spot.x+.36;w.latte.y=spot.y+.14;
+  abandonCave(w);
   w.activeIsland=null;
   const hearth=w.ark.buildings.find(b=>b.defId==='hearth_core');
   if(hearth&&hearth.fuel===0)hearth.fuel=14;

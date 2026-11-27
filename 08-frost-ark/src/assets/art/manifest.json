@@ -4160,6 +4160,230 @@
         57
       ],
       "bytes": 4623
+    },
+    "cave-gate-ice": {
+      "file": "cave-gate-ice.png",
+      "width": 160,
+      "height": 160,
+      "anchorX": 80,
+      "anchorY": 146,
+      "tileW": 2.18,
+      "tileH": 1.76,
+      "contentBox": [
+        2,
+        31,
+        158,
+        157
+      ],
+      "bytes": 11084
+    },
+    "cave-gate-basalt": {
+      "file": "cave-gate-basalt.png",
+      "width": 160,
+      "height": 160,
+      "anchorX": 80,
+      "anchorY": 146,
+      "tileW": 2.18,
+      "tileH": 1.76,
+      "contentBox": [
+        2,
+        30,
+        158,
+        157
+      ],
+      "bytes": 10418
+    },
+    "cave-gate-ruin": {
+      "file": "cave-gate-ruin.png",
+      "width": 160,
+      "height": 160,
+      "anchorX": 80,
+      "anchorY": 146,
+      "tileW": 2.18,
+      "tileH": 1.76,
+      "contentBox": [
+        14,
+        25,
+        147,
+        158
+      ],
+      "bytes": 10655
+    },
+    "cave-stairs": {
+      "file": "cave-stairs.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 113,
+      "tileW": 1.55,
+      "tileH": 1.13,
+      "contentBox": [
+        10,
+        18,
+        118,
+        126
+      ],
+      "bytes": 8061
+    },
+    "cave-chest-closed": {
+      "file": "cave-chest-closed.png",
+      "width": 112,
+      "height": 112,
+      "anchorX": 56,
+      "anchorY": 102,
+      "tileW": 1.19,
+      "tileH": 1.04,
+      "contentBox": [
+        2,
+        35,
+        110,
+        109
+      ],
+      "bytes": 6281
+    },
+    "cave-chest-open": {
+      "file": "cave-chest-open.png",
+      "width": 112,
+      "height": 112,
+      "anchorX": 56,
+      "anchorY": 102,
+      "tileW": 1.19,
+      "tileH": 1.04,
+      "contentBox": [
+        7,
+        21,
+        105,
+        110
+      ],
+      "bytes": 6552
+    },
+    "cave-floor-dark": {
+      "file": "cave-floor-dark.png",
+      "width": 112,
+      "height": 112,
+      "anchorX": 56,
+      "anchorY": 97,
+      "tileW": 0.92,
+      "tileH": 0.49,
+      "contentBox": [
+        0,
+        0,
+        112,
+        112
+      ],
+      "bytes": 5530
+    },
+    "cave-floor-ice": {
+      "file": "cave-floor-ice.png",
+      "width": 112,
+      "height": 112,
+      "anchorX": 56,
+      "anchorY": 97,
+      "tileW": 0.92,
+      "tileH": 0.49,
+      "contentBox": [
+        0,
+        0,
+        112,
+        112
+      ],
+      "bytes": 5161
+    },
+    "cave-floor-basalt": {
+      "file": "cave-floor-basalt.png",
+      "width": 112,
+      "height": 112,
+      "anchorX": 56,
+      "anchorY": 97,
+      "tileW": 0.92,
+      "tileH": 0.49,
+      "contentBox": [
+        0,
+        0,
+        112,
+        112
+      ],
+      "bytes": 4586
+    },
+    "cave-wall": {
+      "file": "cave-wall.png",
+      "width": 144,
+      "height": 96,
+      "anchorX": 72,
+      "anchorY": 84,
+      "tileW": 1.16,
+      "tileH": 0.82,
+      "contentBox": [
+        8,
+        23,
+        135,
+        94
+      ],
+      "bytes": 5333
+    },
+    "cave-spikes-set": {
+      "file": "cave-spikes-set.png",
+      "width": 96,
+      "height": 96,
+      "anchorX": 48,
+      "anchorY": 84,
+      "tileW": 0.92,
+      "tileH": 0.49,
+      "contentBox": [
+        2,
+        50,
+        94,
+        89
+      ],
+      "bytes": 7342
+    },
+    "cave-spikes-raised": {
+      "file": "cave-spikes-raised.png",
+      "width": 96,
+      "height": 96,
+      "anchorX": 48,
+      "anchorY": 84,
+      "tileW": 0.92,
+      "tileH": 0.82,
+      "contentBox": [
+        6,
+        23,
+        90,
+        94
+      ],
+      "bytes": 8688
+    },
+    "cave-guardian": {
+      "file": "cave-guardian.png",
+      "width": 160,
+      "height": 160,
+      "anchorX": 80,
+      "anchorY": 144,
+      "tileW": 1.64,
+      "tileH": 1.55,
+      "contentBox": [
+        2,
+        37,
+        158,
+        156
+      ],
+      "bytes": 10849
+    },
+    "icon-ancient-cave-blueprint": {
+      "file": "icon-ancient-cave-blueprint.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        8,
+        62,
+        57
+      ],
+      "bytes": 6630
     }
   }
 }

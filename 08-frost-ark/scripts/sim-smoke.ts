@@ -1137,3 +1137,58 @@ assert.equal(countItem(hunt,'raw_meat'),2);discoveredFood.add('raw_meat');
 assert.match(collectQuarry(deserializeWorld(serializeWorld(hunt)),prey.id)!,/没有/);
 assert.equal(discoveredFood.size,32,'32 different raw foods from direct natural sources, no crate lottery');
 console.log('[sim-smoke:P2-20] OK: 32 directly accessible raw foods across four biomes, daily forage regrowth, timing cycle, treasure, real hunt and old-compatible persistent state');
+
+import { activeCave,caveActive,caveChestTaken,caveContext,caveFloor,caveGuard,caveMelee,caveTemperature,CAVE_BLUEPRINT,CAVE_OFFSET,CAVE_SIZE,CAVE_TECH,enterCave,iceTrap,useCave } from '../src/sim/cave';
+import { outsideCave } from './p2-cave-fixture';
+for(const tier of [2,3,4]){
+ const {w,gate}=outsideCave(tier-1),origin=w.activeIsland!.nodeId;
+ assert.equal(enterCave(w),null);
+ const map=activeCave(w)!;
+ assert.equal(map.tier,tier);
+ assert.equal(map.tiles.length,CAVE_SIZE.x*CAVE_SIZE.y);
+ assert.equal(areaAt(w,w.player.x,w.player.y),'cave');
+ assert.equal(areaAt(w,24.5,26.2),'ark','surface automation continues while the player is under an island');
+ assert.equal(areaAt(w,CAVE_OFFSET.x+.6,CAVE_OFFSET.y+.4),'void');
+ assert.ok(caveTemperature(w,map.chest.x,map.chest.y)!<-25);
+ assert.equal(caveContext(w),'exit');
+ const resumed=deserializeWorld(serializeWorld(w));assert.equal(caveActive(resumed),origin);
+ assert.ok(iceTrap(w,map.traps[0].phase)==='active');
+ Object.assign(w.player,map.chest);
+ assert.match(useCave(w)!,/仍在巡逻/);
+ if(tier>2){
+  Object.assign(w.player,map.exit);
+  assert.equal(useCave(w),null);assert.equal(caveActive(w),null);
+  assert.equal(w.player.x,gate.x);assert.equal(w.player.y,gate.y);
+  continue;
+ }
+ Object.assign(w.player,{x:map.guardHome.x-1.4,y:map.guardHome.y});
+ for(let i=0;i<6&&(caveGuard(w)?.hp??0)>0;i++){
+  assert.equal(caveMelee(w),null);stepWorld(w,18);
+ }
+ assert.equal(caveGuard(w)?.hp,0);
+ Object.assign(w.player,map.chest);
+ assert.equal(useCave(w),null);
+ assert.equal(countItem(w,CAVE_BLUEPRINT),1);
+ assert.ok(w.unlockedTech.includes(CAVE_TECH));
+ const stored=deserializeWorld(serializeWorld(w));
+ assert.equal(caveChestTaken(stored),true);assert.equal(caveGuard(stored)?.hp,0);
+ assert.notEqual(useCave(stored),null);assert.equal(countItem(stored,CAVE_BLUEPRINT),1);
+ Object.assign(stored.player,map.exit);
+ assert.equal(startRoll(stored,{x:-1,y:-1}),null);
+ stepWorld(stored,40,{x:-1,y:-1});
+ assert.equal(areaAt(stored,stored.player.x,stored.player.y),'cave');
+ assert.ok(caveFloor(map,stored.player.x,stored.player.y));
+ Object.assign(stored.player,map.exit);
+ assert.equal(useCave(stored),null);assert.equal(caveActive(stored),null);
+ assert.equal(stored.activeIsland?.nodeId,origin);
+}
+const under=outsideCave().w;assert.equal(enterCave(under),null);
+damagePlayer(under,under.player.maxHp*2);
+assert.equal(under.player.hp,0);
+const underArchive=deserializeWorld(serializeWorld(under));
+stepWorld(underArchive,4*TICK_RATE+2,{x:1,y:1});
+assert.equal(caveActive(underArchive),null);
+assert.equal(underArchive.activeIsland,null);
+assert.equal(areaAt(underArchive,underArchive.player.x,underArchive.player.y),'ark');
+assert.ok(underArchive.player.hp>0);
+console.log('[sim-smoke:P2-21] OK: three seed-specific cave gates, cave isolation, active archive, guardian gate and unlock, diagonal edge and forced rescue to the ark');

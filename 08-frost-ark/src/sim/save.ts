@@ -1,3 +1,4 @@
+import { validCaveArchive } from './cave';
 import { validForageArchive } from './forage';
 import { validLandmarkArchive } from './landmarks';
 import { verifyM5 } from './m5';
@@ -115,7 +116,7 @@ function validateFauna(p:Record<string,unknown>,ids:Set<string>):void{
 
 export function deserializeWorld(raw: string): WorldState {
   const p:unknown=JSON.parse(raw);
-  if(!record(p)||![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
+  if(!record(p)||![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
     throw new Error('存档版本不受支持');
   if(p.saveVersion===1){
     if(record(p.player))p.player.rescue={startedAt:null,shieldUntil:0};
@@ -241,11 +242,12 @@ export function deserializeWorld(raw: string): WorldState {
     (world.ark.anchoredIslandId&&!canReachAurora(world,world.ark.anchoredIslandId))||
     (nav&&record(nav)&&typeof nav.targetId==='string'&&!canReachAurora(world,nav.targetId)))
     throw new Error('太阳方舟或终局存档不符合方舟格式');
+  if(!validCaveArchive(world))throw new Error('地下冰窟存档不符合方舟格式');
   const active=p.activeIsland;
   world.activeIsland=null;
   ensureNavigation(world);
   const area=areaAt(world,world.player.x,world.player.y);
-  if(area==='island'){
+  if(area==='island'||area==='cave'){
     const island=dockedIsland(world);
     if(!island||!record(active)||active.nodeId!==island.nodeId||active.biomeId!==island.biomeId||
       active.size!==island.size||active.offsetX!==island.offsetX||active.offsetY!==island.offsetY)throw invalidNavigation();

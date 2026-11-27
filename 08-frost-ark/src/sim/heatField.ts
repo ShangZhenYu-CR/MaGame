@@ -1,3 +1,4 @@
+import { caveTemperature } from './cave';
 import { fieldLandmarks } from './landmarks';
 import { downDock } from './dock-direction';
 import { roomComfort } from './home';
@@ -64,6 +65,7 @@ export function upgradeHearth(w:WorldState):string|null {
   return null;
 }
 export function heatAt(w:WorldState,x:number,y:number):number{
+  const depth=caveTemperature(w,x,y);if(depth!==null)return depth;
   const gx=Math.floor(x),gy=Math.floor(y);
   if(isDeck(w,gx,gy))return w.ark.heatGrid[gy*w.ark.size+gx];
   const ambient=expeditionTemperature(w,x,y)??w.ambientTemp;

@@ -25,6 +25,7 @@
       "name": "霜城防线与生态园",
       "unlocksBuildings": ["iron_deck", "warm_wall", "greenhouse", "frost_turret", "fire_oil_turret", "frost_airlock", "steam_thruster", "heat_pipe", "insulated_floor", "repair_station"],
       "unlocksRecipes": ["cook_warm_hay", "cook_berry_soup", "cook_magma_steak", "cook_mithril_roast", "grow_roots", "grow_berries", "craft_repair_hammer"]
-    }
+    },
+    {"id":"ancient_cave_craft","name":"冰窟图纸工艺","prerequisite":"tier1_basics","researchCost":[{"itemId":"ancient_cave_blueprint","count":1}],"unlocksBuildings":[],"unlocksRecipes":["cave_compact_refine"]}
   ]
 }

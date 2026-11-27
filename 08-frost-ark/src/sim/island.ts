@@ -1,3 +1,4 @@
+import { activeCave,caveFloor,caveTemperature } from './cave';
 import { landmarkFootClear } from './landmarks';
 import { dockSide,docks,downDock,rotateDockPoint,type DockSide } from './dock-direction';
 import { incapacitated } from './rescue';
@@ -181,8 +182,10 @@ export function consumeIslandNode(w:WorldState,node:IslandResource,amount=1):boo
   return true;
 }
 
-export function areaAt(w:WorldState,x:number,y:number):'ark'|'gangway'|'island'|'void'{
+export function areaAt(w:WorldState,x:number,y:number):'ark'|'gangway'|'island'|'cave'|'void'{
   if(!Number.isFinite(x)||!Number.isFinite(y))return 'void';
+  const cave=activeCave(w);
+  if(cave&&caveFloor(cave,x,y))return 'cave';
   if(isDeck(w,Math.floor(x),Math.floor(y)))return 'ark';
   const g=gangwayGeometry(w);
   if(!g?.deployed)return 'void';
@@ -227,6 +230,11 @@ export function toggleGangway(w:WorldState):string|null{
 export function walkExpedition(w:WorldState,direction:Vec2,pace=1):void{
   const g=gangwayGeometry(w),p=w.player;
   if(incapacitated(w)){p.vx=p.vy=0;return;}
+  const cave=activeCave(w);
+  if(cave){
+    walkOnGround(w,direction,.088*pace,(x,y)=>feetSupported(x,y,(a,b)=>caveFloor(cave,a,b)));
+    return;
+  }
   if(!g?.deployed){
     // Older saves could retract the bridge while the player's centre was on the
     // ship but their feet still overlapped the seam. Let a step back free them
@@ -248,6 +256,7 @@ export function walkExpedition(w:WorldState,direction:Vec2,pace=1):void{
 
 export function expeditionTemperature(w:WorldState,x:number,y:number):number|null{
   const area=areaAt(w,x,y);
+  if(area==='cave')return caveTemperature(w,x,y);
   if(area==='gangway')return w.ambientTemp-2;
   if(area!=='island')return null;
   const node=w.sky.islands.find(n=>n.id===w.ark.anchoredIslandId);

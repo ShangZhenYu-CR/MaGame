@@ -1,3 +1,4 @@
+import { activeCave,caveChestTaken,caveContext,caveEntrance,caveEntranceTitle,caveGuard,enterCave,nearCaveGate,useCave } from '../sim/cave';
 import { collectQuarry, harvestForage, nearQuarry, nearForage, patchContents, patchReady, patchTitles, type Patch } from '../sim/forage';
 import { actionLandmark, landmarkPrompt, nearLandmark, type Landmark } from '../sim/landmarks';
 import { docks } from '../sim/dock-direction';
@@ -10,7 +11,7 @@ import type { Vec2,WildEntity, WorldState } from '../sim/types';
 
 const byId=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id)! as T;
 const set=(node:HTMLElement,s:string)=>{if(node.textContent!==s)node.textContent=s;};
-type ContextAction='helm'|'deploy'|'stow'|'gather'|'open-cache'|'landmark'|'forage'|'quarry'|'return'|'board'|'dock'|'none';
+type ContextAction='helm'|'deploy'|'stow'|'gather'|'open-cache'|'landmark'|'forage'|'quarry'|'cave-enter'|'cave-chest'|'cave-exit'|'cave-hunt'|'return'|'board'|'dock'|'none';
 const duration=350;
 export type ExpeditionArea=ReturnType<typeof areaAt>;
 interface Hooks{
@@ -61,6 +62,10 @@ export function expeditionUi(hooks:Hooks){
  function useLandmark(mark:Landmark){const result=actionLandmark(hooks.state(),mark);hooks.message(result.issue,result.message,'place');}
  function keyAction(){
   const w=hooks.state(),here=area();
+  if(here==='cave'){
+   const d=caveContext(w);return d==='exit'?'cave-exit':d==='chest'?'cave-chest':null;
+  }
+  if(here==='island'&&nearCaveGate(w))return 'cave-enter';
   if(here==='island'){
    const choice=islandChoice();
    if(choice?.tag==='mark'&&landmarkPrompt(w,choice.point).label)return 'landmark';
@@ -76,6 +81,12 @@ export function expeditionUi(hooks:Hooks){
  }
  function use():boolean{
   const action=keyAction();
+  if(action==='cave-enter'||action==='cave-exit'||action==='cave-chest'){
+    const w=hooks.state();
+    const issue=action==='cave-enter'?enterCave(w):useCave(w);
+    hooks.message(issue,action==='cave-enter'?'已进入地下冰窟。':action==='cave-exit'?'已返回浮岛地表。':'获得冰窟稀有图纸与物资。','place');
+    return true;
+  }
   if(action==='landmark'){const mark=islandChoice();if(mark?.tag!=='mark')return false;useLandmark(mark.point);return true;}
   if(action==='quarry'){const v=islandChoice();if(v?.tag!=='quarry')return false;
     hooks.message(collectQuarry(hooks.state(),v.point.id),'已拾取冻云兽肉 ×2。','hit');return true;}
@@ -88,7 +99,15 @@ export function expeditionUi(hooks:Hooks){
  interact.onclick=use;
  function pointer(at:Vec2):boolean{
   const w=hooks.state(),a=area();
+  if(a==='cave'){
+   const c=activeCave(w),action=caveContext(w);
+   const point=action==='exit'?c?.exit:action==='chest'?c?.chest:null;
+   if(point&&Math.hypot(at.x-point.x,at.y-point.y)<1.1)use();
+   return true;
+  }
   if(a==='island'){
+   const gate=caveEntrance(w);
+   if(gate&&nearCaveGate(w)&&Math.hypot(at.x-gate.x,at.y-gate.y)<1.3){use();return true;}
    const v=islandChoice();
    if(v?.tag==='mark'&&Math.hypot(at.x-v.point.x,at.y-v.point.y)<1.25&&landmarkPrompt(w,v.point).label){useLandmark(v.point);return true;}
    if(v?.tag==='forage'&&Math.hypot(at.x-v.point.x,at.y-v.point.y)<.9&&patchReady(w,v.point)){useForage(v.point);return true;}
@@ -118,7 +137,15 @@ export function expeditionUi(hooks:Hooks){
   }
   let action:ContextAction='none',title='',detail='',label='';
   const mark=v?.tag==='mark'?v.point:undefined,patch=v?.tag==='forage'?v.point:undefined;
-  if(here==='island'){
+  if(here==='cave'){
+   const where=caveContext(w),guard=caveGuard(w);
+   if(where==='exit'){action='cave-exit';title='回到浮岛地表';detail='沿来时的石阶返回，可随时退出。';label='上石阶';}
+   else if(where==='chest'){action='cave-chest';title='古代图纸密室箱';detail=guard&&guard.hp>0?'仍有精英守卫。击败它再开箱。':'守卫已清除，可以领取图纸。';label='开密室箱';}
+   else{action='cave-hunt';title='地下冰窟';detail=guard&&guard.hp>0?'绕开预警冰刺；靠近后按 F 反击，也可用装备武器。':caveChestTaken(w)?'图纸已取，沿石阶回到地表。':'通道尽头的密室箱已解锁。';}
+  }else if(here==='island'&&nearCaveGate(w)){
+   const g=caveEntrance(w)!;
+   action='cave-enter';title=caveEntranceTitle(g.tier);detail='下面有寒气、冰刺和守卫，原路可以返回。';label='下到地底';
+  }else if(here==='island'){
    if(mark){
     action='landmark';
     ({title,detail,label}=landmarkPrompt(w,mark));

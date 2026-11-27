@@ -72,5 +72,6 @@
   {"id":"ash_eel","name":"灰尾鳗","category":"food","stack":40,"gatherable":true},
   {"id":"prism_fish","name":"虹棱鱼","category":"food","stack":40,"gatherable":true},
   {"id":"ice_squid","name":"冰幕鱿","category":"food","stack":40,"gatherable":true},
-  {"id":"drift_treasure","name":"稀有漂流宝匣","category":"loot","stack":15,"gatherable":true}
+  {"id":"drift_treasure","name":"稀有漂流宝匣","category":"loot","stack":15,"gatherable":true},
+  {"id":"ancient_cave_blueprint","name":"冰窟稀有图纸","category":"quest","stack":16,"gatherable":true}
 ]

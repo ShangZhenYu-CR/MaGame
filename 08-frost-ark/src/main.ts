@@ -1,3 +1,4 @@
+import { activeCave,caveMelee } from './sim/cave';
 import { cancelFishing,FISH_CHEST,fishingAction,fishingPanel,nearFishing,openFishChest,stepFishing } from './sim/forage';
 import './ui/ark.css';
 import './ui/finale.css';
@@ -113,6 +114,7 @@ const regions=new Map(biomes.map(b=>[b.id,b.name]));
 
 function toggleChart(show=!chart.open()):void{
   if(!show){chart.hide();industry.closeTip();return;}
+  if(activeCave(w)){tell('先回到地表再打开航图。');return;}
   keys.clear();cancelFishing(w);cancelCharge(w);expedition.cancel();industry.closeTip();chart.show();
 }
 skyToggle.onclick=()=>toggleChart();
@@ -163,7 +165,7 @@ function primaryInteraction():PrimaryInteraction{
   const here=expedition.area(),travel=expedition.keyAction();
   if(here==='island'){
     const wild=nearestWildBeast(w);
-    if(wild&&(wild.stunnedTicks>0||wild.hp<=wild.maxHp*.35||(travel!=='landmark'&&travel!=='forage'&&travel!=='quarry'&&!nearestIslandNode(w,1.8))))return {kind:'feed'};
+    if(travel!=='cave-enter'&&wild&&(wild.stunnedTicks>0||wild.hp<=wild.maxHp*.35||(travel!=='landmark'&&travel!=='forage'&&travel!=='quarry'&&!nearestIslandNode(w,1.8))))return {kind:'feed'};
   }
   if(fishingPanel(w))return {kind:'fishing'};
   if(travel&&travel!=='helm')return {kind:'expedition'};
@@ -567,7 +569,12 @@ addEventListener('keydown',e=>{
   else if(k==='u')warmthAction('upgrade');
   else if(k==='g')warmthAction('drop');
   else if(k==='h'){e.preventDefault();consumeMeal();}
-  else if(k==='f'&&!rolling(w)){if(!m5Ui.strike())warmthAction('pickup');}
+  else if(k==='f'&&!rolling(w)){
+    if(activeCave(w)){
+      if(panel.hidden&&locker.hidden&&!industry.stationOpen()&&!industry.catalogOpen()&&!beasts.open())
+        finishAction(caveMelee(w),'击中冰窟守卫。','hit');
+    }else if(!m5Ui.strike())warmthAction('pickup');
+  }
   else if(k==='i'){ e.preventDefault();toggleBag(); }
 });
 addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));

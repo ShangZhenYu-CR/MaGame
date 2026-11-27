@@ -1,3 +1,4 @@
+import { activeCave,caveFloor,caveGuard,caveHurt,caveSight } from './cave';
 import rows from '../data/weapons.json';
 import recipes from '../data/recipes.json';
 import { countItem,inventoryChange } from './ark';
@@ -31,7 +32,7 @@ function combat(w:WorldState){
 export const weaponEffects=(w:WorldState):readonly WeaponFx[]=>tracked.get(w)?.fx??[];
 export const weaponShots=(w:WorldState):readonly Shot[]=>tracked.get(w)?.shots??[];
 const gap=(a:Vec2,b:Vec2)=>Math.hypot(a.x-b.x,a.y-b.y);
-const zone=(w:WorldState)=>w.activeIsland?.nodeId??'ark';
+const zone=(w:WorldState)=>{const c=activeCave(w);return c?'cave:'+c.node:w.activeIsland?.nodeId??'ark';};
 const point=(p:Vec2):Vec2=>({x:p.x,y:p.y});
 function flash(w:WorldState,style:WeaponStyle,from:Vec2,to:Vec2,radius=0,hit=false,ttl=12){
   const fx=combat(w).fx;
@@ -53,8 +54,12 @@ export function chooseWeapon(w:WorldState,id:string|null):string|null{
   w.player.weapon=id;return null;
 }
 
-interface Target extends Vec2 { enemy:WildEntity|null }
+interface Target extends Vec2 { enemy:WildEntity|null; cave?:true }
 function targets(w:WorldState):Target[]{
+  if(activeCave(w)){
+    const e=caveGuard(w);
+    return e&&e.hp>0?[{x:e.x,y:e.y,enemy:null,cave:true}]:[];
+  }
   const isle=w.activeIsland?.nodeId, t=w.wildEntities
     .filter(e=>e.hp>0&&(isle?e.kind==='boss'||e.kind==='beast'&&e.homeIslandId===isle:e.kind==='raider'))
     .map(e=>({x:e.x,y:e.y,enemy:e} as Target));
@@ -65,6 +70,7 @@ function targets(w:WorldState):Target[]{
 const elementFor:Record<WeaponStyle,Element>={bolt:'ice',thrust:'break',sweep:'hammer',throw:'fire',flame:'fire'};
 function hit(w:WorldState,s:Spec,target:Target):boolean {
   const element=elementFor[s.style];
+  if(target.cave){const c=activeCave(w);return !!c&&caveSight(c,w.player,target)&&caveHurt(w,s.damage,element);}
   if(!target.enemy)return strikeWhaleWithWeapon(w,s.damage,element);
   const e=target.enemy;
   return e.kind==='beast'?strikeWildWithWeapon(w,e,s.damage,element):
@@ -94,7 +100,7 @@ export function triggerWeapon(w:WorldState,at:Vec2):string|null{
   if(!s||!countItem(w,s.id))return '先在背包装备武器。';
   if(weaponCooldown(w))return '武器正在回手。';
   const here=areaAt(w,p.x,p.y);
-  if(here!=='ark'&&here!=='island')return '站稳甲板或岛面才能出招。';
+  if(here!=='ark'&&here!=='island'&&here!=='cave')return '站稳甲板或岛面才能出招。';
   if(!s.speed)at=weaponHover(w,at)??at;
   const d=gap(p,at);
   if(!Number.isFinite(d)||d<.10)return '把准星移到人物身外再出招。';
@@ -132,6 +138,8 @@ export function stepWeapons(w:WorldState):void {
     const {spec}=shot, length=Math.hypot(shot.vx,shot.vy),step=Math.min(shot.remaining,length),k=step/length;
     const from=point(shot),dx=shot.vx*k,dy=shot.vy*k;
     shot.x+=dx;shot.y+=dy;shot.remaining-=step;
+    const c=activeCave(w);
+    if(c&&!caveFloor(c,shot.x,shot.y))return false;
     if(spec.style==='bolt'){
       const found=targets(w).flatMap(t=>{
         const dot=Math.max(0,Math.min(1,((t.x-from.x)*dx+(t.y-from.y)*dy)/Math.max(.0001,step*step)));

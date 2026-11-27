@@ -1,3 +1,4 @@
+import { caveActive } from './cave';
 import { dockSide,inverseDock,rotateDockPoint } from './dock-direction';
 import { doorBlocksFeet,isDoor } from './rooms';
 import { burnDamage,elementalSpeed,frozen,resolveElement,type Element } from './elements';
@@ -198,6 +199,7 @@ function moveToward(b:{x:number;y:number},x:number,y:number,speed:number,w:World
   }
 }
 function moveCompanion(w:WorldState,b:BeastEntity,index:number){
+  if(caveActive(w))return; // followers hold the surface post; ship workers still run
   const p=w.player;
   const angle=(index+1)*2.1;
   const x=p.x+Math.sin(angle)*.7,y=p.y+Math.cos(angle)*.65;

@@ -1,3 +1,4 @@
+import { stepCave } from './cave';
 import { stepLandmarks } from './landmarks';
 import { stepM5 } from './m5';
 import {
@@ -148,6 +149,7 @@ export function stepWorld(world: WorldState, ticks = 1, direction: Vec2 = {x: 0,
     advanceClimate(world);
     stepHeat(world);
     stepLandmarks(world);
+    stepCave(world);
     stepHunger(world);
     stepBeasts(world);
     stepIndustry(world);

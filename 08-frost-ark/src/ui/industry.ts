@@ -44,7 +44,7 @@ export function createIndustryUi(cb:Callbacks){
  let activeStation:string|null=null,catalogKey='',stationKey='',liftKey='';
  const buttons=new Map<BuildKind,HTMLButtonElement>();
  const itemIcon=(id:string)=>cb.icon(id.replaceAll('_','-'))??cb.icon(materialIcons[id]??'');
- const lateBlueprints=new Set<string>(['beast_den','feed_trough','fire_oil_turret']);
+ const lateBlueprints=new Set<string>(['beast_den','feed_trough','frost_turret','fire_oil_turret']);
  const categoryGroup=(kind:BuildKind)=>el(['workbench','furnace','stove','catch_net','sorter_arm','greenhouse','beast_den','feed_trough'].includes(kind)?'catalog-industry':'catalog-structure');
  for(const kind of buildKinds){
   const def=buildDefinitions[kind],[gw,gh]=def.size;

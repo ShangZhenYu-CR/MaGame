@@ -38,6 +38,10 @@ export async function runM5(browser:Browser,baseUrl:string,outDir:string,errors:
   deck.day=5;deck.timeOfDay=.67;stepWorld(deck,1);
   await fixture(deck,'m5-warning');
   await page.locator('#raid-alert[data-phase=warning]').waitFor();
+  await page.keyboard.press('b');
+  await page.locator('[data-build-kind=frost_turret] img').waitFor();
+  await page.locator('[data-build-kind=fire_oil_turret] img').waitFor();
+  await page.keyboard.press('Escape');
   deck.timeOfDay=.74;stepWorld(deck,1);
   await fixture(deck,'m5-raid');
   await page.locator('#raid-alert[data-phase=active][data-wave="1"]').waitFor();

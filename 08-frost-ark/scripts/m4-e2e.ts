@@ -45,7 +45,7 @@ export async function runM4(browser:Browser,baseUrl:string,outDir:string,errors:
   setup.player.x=g.x+g.width+.9;stepWorld(setup,10);
   const encounter=beastPanel(setup).wild.find(b=>b.defId==='burrowback');
   assert.ok(encounter,'first island reliably has a rock burrowback');
-  const at=[[0,.65],[.65,0],[-.65,0],[0,-.65],[0,0]].map(([x,y])=>[encounter.x+x,encounter.y+y]).find(([x,y])=>{
+  const at=[[.9,0],[-.9,0],[0,.85],[0,-.85],[0,0]].map(([x,y])=>[encounter.x+x,encounter.y+y]).find(([x,y])=>{
    if(areaAt(setup,x,y)!=='island')return false;
    return nearestWildBeast({...setup,player:{...setup.player,x,y}})?.id===encounter.id;
   });
@@ -65,6 +65,7 @@ export async function runM4(browser:Browser,baseUrl:string,outDir:string,errors:
   const progress=page.locator('#tame-progress');
   await page.waitForFunction(()=>Number((document.getElementById('tame-progress') as HTMLProgressElement)?.value)>0);
   assert.equal(await progress.evaluate((v:HTMLProgressElement)=>v.value),1);
+  await page.mouse.move(665,450);
   await shot('01-island-taming');
   for(let i=1;i<encounter.feedsRequired;i++)await page.locator('#wild-feed').click();
   await wild.waitFor({state:'hidden'});
@@ -73,7 +74,7 @@ export async function runM4(browser:Browser,baseUrl:string,outDir:string,errors:
   assert.equal(countItem(tamed,encounter.preferredBait),0);
   const resident=tamed.beasts.find(b=>b.defId==='burrowback');assert.ok(resident);
   // Move the party into the deck fixture without changing the live tamed animal.
-  tamed.player.x=22.9;tamed.player.y=25.2;tamed.activeIsland=null;
+  tamed.player.x=22.5;tamed.player.y=25.2;tamed.activeIsland=null;
   tamed.unlockedTech.push('tier2_automation');
   assert.ok(inventoryChange(tamed,[],[{itemId:'driftwood',count:12},{itemId:'rope',count:6},{itemId:'frost_iron_scrap',count:7}]));
   assert.ok(build(tamed,'beast_den',23,25));

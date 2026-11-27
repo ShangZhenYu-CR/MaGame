@@ -42,6 +42,8 @@ export function createIndustryUi(cb:Callbacks){
  let activeStation:string|null=null,catalogKey='',stationKey='',liftKey='';
  const buttons=new Map<BuildKind,HTMLButtonElement>();
  const itemIcon=(id:string)=>cb.icon(id.replaceAll('_','-'))??cb.icon(materialIcons[id]??'');
+ const lateBlueprints=new Set<string>(['beast_den','feed_trough','fire_oil_turret']);
+ const categoryGroup=(kind:BuildKind)=>el(['workbench','furnace','stove','catch_net','sorter_arm','greenhouse','beast_den','feed_trough'].includes(kind)?'catalog-industry':'catalog-structure');
  for(const kind of buildKinds){
   const def=buildDefinitions[kind],[gw,gh]=def.size;
   const lift=def.buoyancyDelta>0?`+${def.buoyancyDelta} 浮力`:def.buoyancyDelta<0?`占用 ${-def.buoyancyDelta} 浮力`:'不占浮力';
@@ -50,7 +52,7 @@ export function createIndustryUi(cb:Callbacks){
   if(src)b.append(image(src));
   const label=document.createElement('span'),cap=document.createElement('small');label.textContent=def.name;
   cap.textContent=`${gw}×${gh} · ${lift}`;label.append(cap);b.append(label);
-  el(['workbench','furnace','stove','catch_net','sorter_arm','greenhouse','beast_den','feed_trough'].includes(kind)?'catalog-industry':'catalog-structure').append(b);
+  if(!lateBlueprints.has(kind))categoryGroup(kind).append(b);
   buttons.set(kind,b);
  }
  function showCatalog(show:boolean){
@@ -67,6 +69,7 @@ export function createIndustryUi(cb:Callbacks){
   text(el('catalog-budget'),`已用 ${buoyancyUsed} / ${buoyancyMax} · 还能承重 ${Math.max(0,buoyancyMax-buoyancyUsed)}`);
   for(const [kind,b] of buttons){
    const costs=buildCosts[kind],locked=!w.unlockedTech.includes(buildingTech.get(kind)??'');
+   if(lateBlueprints.has(kind)){if(locked)b.remove();else if(!b.isConnected)categoryGroup(kind).append(b);}
    const details=costs.map(i=>`${name(i.itemId)} ${countItem(w,i.itemId)}/${i.count}`).join(' · ');
    b.dataset.affordable=String(!locked&&costs.every(i=>countItem(w,i.itemId)>=i.count)&&buoyancyUsed-buildDefinitions[kind].buoyancyDelta<=buoyancyMax);
    b.dataset.locked=String(locked);b.dataset.tip=(locked?'蓝图未研究 · ':'')+(descriptions[kind]??'')+(details?' 材料：'+details:'');

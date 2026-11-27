@@ -59,7 +59,7 @@ export function inventoryChange(w: WorldState, cost: ItemStack[], gains: ItemSta
     }
     if (remaining) return false;
   }
-  for (const { itemId, count } of gains) {
+  for (const { itemId, count, durability } of gains) {
     let remaining = count;
     const max = itemStackLimits.get(itemId) ?? 1;
     for (const stack of slots) {
@@ -71,7 +71,7 @@ export function inventoryChange(w: WorldState, cost: ItemStack[], gains: ItemSta
     for (const [i, stack] of slots.entries()) {
       if (stack || !remaining) continue;
       const n = Math.min(max, remaining);
-      slots[i] = { itemId, count: n };
+      slots[i] = durability===undefined ? { itemId, count: n } : { itemId, count: n, durability };
       remaining -= n;
     }
     if (remaining) return false;

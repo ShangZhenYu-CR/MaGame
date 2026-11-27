@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import { countItem } from '../src/sim/ark';
 import { craftTool, harvestIslandResource, harvestWithTool, repairTool, toolStatus, upgradeTool } from '../src/sim/tools';
 import { createInitialWorld } from '../src/sim/world';
+import { transferStorage } from '../src/sim/storage-box';
+import { deserializeWorld, serializeWorld } from '../src/sim/save';
 import { dockedIsland, islandNodes, islandNodeRemaining } from '../src/sim/island';
 import { ensureNavigationState } from '../src/sim/m3-state';
 
@@ -104,3 +106,14 @@ assert.equal(harvestIslandResource(expedition).ok, true);
 assert.equal(countItem(expedition, vein.itemId), vein.count);
 assert.equal(toolStatus(expedition, 'mining_pick')?.durability, 7);
 console.log('[m3-tools] expedition ranges, node authority, exact depletion, chest/ore full-bag atomicity OK');
+
+const storage=createInitialWorld();
+storage.player.x=25.7;storage.player.y=25.5;
+assert.ok(craftTool(storage,'wood_axe').ok);
+assert.ok(harvestWithTool(storage,'wood_axe',[{itemId:'driftwood',count:1}]).ok);
+assert.equal(toolStatus(storage,'wood_axe')?.durability,7);
+assert.equal(transferStorage(storage,'wood_axe','deposit'),null);
+const reopened=deserializeWorld(serializeWorld(storage));
+assert.equal(transferStorage(reopened,'wood_axe','withdraw'),null);
+assert.equal(toolStatus(reopened,'wood_axe')?.durability,7);
+console.log('[m3-tools] storage and an imported save preserve actual tool wear');

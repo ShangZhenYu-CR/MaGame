@@ -2,7 +2,7 @@
 
 2D 俯视生存建造沙盒（MaGame 独立云端分支）：融合**云海拾荒移动基地**、**方舟生态驯兽分工**与**暖橙火光 vs 冰蓝暴雪**热力生存。
 
-- **当前阶段**：M2 · 建造科技树与自动化拾荒（专用分支与试玩 ZIP）；公开 Pages 仍为 M1
+- **当前阶段**：M3 · 云海航图与浮岛远征（专用分支与试玩 ZIP）；公开 Pages 仍为 M1
 - **GitHub 分支**：[`game/08-frost-ark`](https://github.com/ShangZhenYu-CR/MaGame/tree/game/08-frost-ark)
 - **项目目录**：[`08-frost-ark/`](https://github.com/ShangZhenYu-CR/MaGame/tree/game/08-frost-ark/08-frost-ark)
 - **Google Drive 总目录**：[`MaGame-Dot/08-frost-ark`](https://drive.google.com/drive/folders/16oAjTkGj8PJpr86Cg5QJbPjgwLXsb6cV)
@@ -41,6 +41,13 @@
 - **X** 切换拆除，点选格子后 **Z** 在 4 秒内撤销，期间可继续走动。**M** 静音；**Esc** 先关当前工艺窗口，再退出建造或拆除。
 
 [M2 实机验收与试玩目录](https://drive.google.com/drive/folders/1LuNdwPYSwB_tJYCJqgd6r6CT9FT4bfYp)。
+
+## M3 · 开船去浮岛
+
+- **N** 打开航图。走到方舟北侧的舵轮旁，选目的地并设为航向，按 **E** 起航或停止。方舟驶入靠泊范围会自动靠泊。
+- 到右舷船边按 **E** 搭跳板，用 **WASD** 沿板走上浮岛；原路走回，不需要切换场景。离港前先收起跳板。
+- **I** 打开背包制作手斧或矿镐。走近树木、矿脉或遗迹箱按 **E** 采伐、开采或开箱。损坏工具可修理，也可用霜铁升级。已经收集的矿和箱不会因离岛或重开存档而刷新。
+- [M3 实机验收与试玩目录](https://drive.google.com/drive/folders/1TflYR2toV2rMVukhcDUTYSN3H4KT-9jD)。
 
 ## 开发与验收命令
 

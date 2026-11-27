@@ -24,14 +24,15 @@ export function transferStorage(w: WorldState, itemId:string, direction:'deposit
   const stack=current[idx];
   const newStacks=current.map(s=>({...s}));
   if(direction==='deposit'){
-    if(countItem(w,itemId)<1)return '背包里没有这件物品。';
+    const carried=w.player.inventory.find(s=>s?.itemId===itemId);
+    if(!carried||countItem(w,itemId)<1)return '背包里没有这件物品。';
     if((stack&&stack.count>=(limits.get(itemId)??0))||(!stack&&current.length>=STORAGE_SLOTS))return '储物箱放不下了。';
     if(!inventoryChange(w,[{itemId,count:1}],[]))return '无法存入。';
     if(stack)newStacks[idx].count++;
-    else newStacks.push({itemId,count:1});
+    else newStacks.push({...carried,count:1});
   } else {
     if(!stack)return '箱里没有这件物品。';
-    if(!inventoryChange(w,[],[{itemId,count:1}]))return '背包没有空位。';
+    if(!inventoryChange(w,[],[{...stack,count:1}]))return '背包没有空位。';
     if(!--newStacks[idx].count)newStacks.splice(idx,1);
   }
   (w as StorageSave).storageM0=newStacks;

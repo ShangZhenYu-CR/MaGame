@@ -6,6 +6,9 @@ import { extname, join, resolve } from 'node:path';
 import { chromium, type Page } from 'playwright';
 import { createInitialWorld, stepWorld } from '../src/sim/world';
 import { build, countItem, inventoryChange } from '../src/sim/ark';
+import { areaAt,dockedIsland,gangwayGeometry,islandNodes,islandNodeRemaining,nearestIslandNode } from '../src/sim/island';
+import { helmPoint, setDestination, toggleCruise } from '../src/sim/sky-map';
+import { deserializeWorld } from '../src/sim/save';
 
 const repoRoot = resolve(process.cwd(), '..');
 const outDir = resolve(process.cwd(), 'artifacts', 'e2e');
@@ -466,6 +469,132 @@ try {
     await loadM2(showcased,'m2-all-buildings');await toastGone();await shot('10-all-buildings');
     console.log('[e2e-visual:M2] OK: build grid, buoyancy, tech, 4s undo, sequential Escape, tooltip, Web Audio mute, relay heat, net→sorter and timed furnace');
   } finally { await m2.close(); }
+
+
+
+  // M3 plays from the board through the published launcher; fixture placement just
+  // shortens the walk to the helm/ramp and positions the player at a real resource cell.
+  const m3=await browser.newPage({viewport:{width:1280,height:720}});
+  try {
+    m3.on('pageerror',e=>errors.push('M3 pageerror: '+e.message));
+    m3.on('console',msg=>{if(msg.type()==='error')errors.push('M3 console.error: '+msg.text());});
+    await m3.goto(baseUrl,{waitUntil:'networkidle'});
+    await assertArtHud(m3);
+    const context=m3.locator('#expedition-context');
+    const chart=m3.locator('#sky-map');
+    const shipStatus=m3.locator('#sky-nav-status');
+    const frame=(name:string)=>m3.screenshot({path:resolve(outDir,'M3-'+name+'.png')});
+    const toastClear=()=>m3.locator('#action').waitFor({state:'hidden',timeout:5500});
+    const fixture=async(w:ReturnType<typeof createInitialWorld>,name:string)=>{
+      if(!await m3.locator('#inventory').isVisible())await m3.keyboard.press('i');
+      await m3.locator('#save-file').setInputFiles({name:name+'.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(w))});
+      await m3.getByText('已载入 JSON 存档。',{exact:true}).waitFor();
+      await m3.keyboard.press('Escape');
+      await m3.locator('#inventory').waitFor({state:'hidden'});
+    };
+    async function exportM3() {
+      await m3.keyboard.press('i');
+      const download=m3.waitForEvent('download');
+      await m3.getByRole('button',{name:'导出 JSON'}).click();
+      const raw=readFileSync((await (await download).path())!,'utf8');
+      assert.ok(!JSON.parse(raw).activeIsland?.tiles,'JSON contains an island reference, not 4096 terrain cells');
+      const result=deserializeWorld(raw);
+      await m3.keyboard.press('Escape');
+      await m3.locator('#inventory').waitFor({state:'hidden'});
+      return result;
+    }
+    const trip=createInitialWorld(202608);
+    const helm=helmPoint(trip);
+    trip.player.x=helm.x;trip.player.y=helm.y;
+    assert.ok(inventoryChange(trip,[],[{itemId:'frost_iron_scrap',count:4}]));
+    await fixture(trip,'m3-before-departure');
+    await m3.keyboard.press('n');
+    await chart.waitFor();
+    await shipStatus.and(m3.locator('[data-nav-state=stopped]')).waitFor();
+    const first=trip.sky.islands.filter(it=>it.tier===1).sort((a,b)=>Math.hypot(a.skyX,a.skyY)-Math.hypot(b.skyX,b.skyY))[0];
+    assert.ok(first,'starting chart exposes a nearby Tier 1 island');
+    assert.ok(trip.sky.islands.some(it=>it.tier===2),'chart has both M3 biomes');
+    await chart.locator('[data-island-id="'+first.id+'"]').click();
+    await chart.locator('#sky-set-course').click();
+    await chart.getByText('已设为目的地',{exact:true}).waitFor();
+    await frame('01-sky-route');
+    await m3.keyboard.press('Escape');await chart.waitFor({state:'hidden'});
+    await m3.keyboard.press('e');await m3.keyboard.press('n');
+    await shipStatus.and(m3.locator('[data-nav-state=cruising]')).waitFor({timeout:4500});
+    await shipStatus.and(m3.locator('[data-nav-state=docked]')).waitFor({timeout:22000});
+    await m3.keyboard.press('Escape');
+    const docked=await exportM3();
+    assert.equal(docked.ark.anchoredIslandId,first.id,'real browser cruise arrives at the selected node');
+    const bridge=gangwayGeometry(docked);
+    assert.ok(bridge&&!bridge.deployed,'ramp only exists once the player deploys it');
+    docked.player.x=bridge.x-.5;docked.player.y=bridge.y+.5;
+    await fixture(docked,'m3-dock-side');
+    await m3.keyboard.press('e');
+    await context.and(m3.locator('[data-action=stow],[data-action=board]')).waitFor();
+    await toastClear();
+    await frame('02-dock-gangway');
+    await m3.keyboard.down('d');
+    try { await m3.locator('#expedition-context[data-area=island]').waitFor({state:'attached',timeout:9000}); }
+    finally { await m3.keyboard.up('d'); }
+
+    const landed=await exportM3();
+    assert.equal(areaAt(landed,landed.player.x,landed.player.y),'island');
+    assert.equal(dockedIsland(landed)?.size,64);
+    assert.ok(dockedIsland(landed)?.tiles.length===4096);
+    const mine=islandNodes(landed).find(n=>n.kind==='ore'&&islandNodeRemaining(landed,n)>0);
+    assert.ok(mine,'seeded land has a mineable ore deposit');
+    const nearMine=[[0,.8],[.8,0],[-.8,0],[0,-.8],[0,0]].map(([x,y])=>[mine.x+x,mine.y+y]).find(([x,y])=>
+      areaAt(landed,x,y)==='island'&&nearestIslandNode({...landed,player:{...landed.player,x,y}})?.id===mine.id);
+    assert.ok(nearMine,'mine has a reachable interaction cell');
+    landed.player.x=nearMine[0];landed.player.y=nearMine[1];
+    await fixture(landed,'m3-at-ore');
+    await m3.keyboard.press('i');
+    await m3.locator('[data-tool-action=craft][data-tool-kind=mining_pick]').click();
+    await m3.keyboard.press('Escape');
+    const meter=m3.locator('#pickaxe-durability');
+    await meter.waitFor();
+    const remaining=await meter.evaluate(el=>(el as HTMLMeterElement).value);
+    assert.ok(remaining>0,'a crafted pick has real durability');
+    const beforeMining=await exportM3();
+    await m3.keyboard.press('e');
+    await m3.waitForFunction(n=>document.querySelector<HTMLMeterElement>('#pickaxe-durability')!.value===n-1,remaining);
+    await frame('03-island-mining');
+    const after=await exportM3();
+    assert.equal(countItem(after,mine.itemId),countItem(beforeMining,mine.itemId)+mine.count,'E mines the deposit into inventory');
+    assert.ok(Object.keys(after.sky.islands.find(n=>n.id===first.id)?.deltas??{}).length>0,'only a resource change is stored for a visited island');
+    // Save an actual mined depletion after walking back over the same bridge.
+    after.player.x=bridge.x+bridge.width+.64;after.player.y=bridge.y+.5;
+    await fixture(after,'m3-after-mining');
+    await m3.keyboard.down('a');
+    try { await m3.locator('#expedition-context[data-area=ark]').waitFor({state:'attached',timeout:9000}); }
+    finally { await m3.keyboard.up('a'); }
+    const returned=await exportM3();
+    assert.equal(returned.activeIsland,null);
+    assert.equal(returned.sky.islands.find(n=>n.id===first.id)?.deltas[mine.key],mine.count);
+
+    // Set up the longer second cruise at the same real sim entry, then board via browser.
+    const northern=createInitialWorld(202608);
+    const wheel=helmPoint(northern);northern.player.x=wheel.x;northern.player.y=wheel.y;
+    const t2=northern.sky.islands.find(i=>i.tier===2);
+    assert.ok(t2);
+    assert.equal(setDestination(northern,t2.id),null);
+    assert.equal(toggleCruise(northern),null);
+    stepWorld(northern,800);
+    assert.equal(northern.ark.anchoredIslandId,t2.id);
+    const northBridge=gangwayGeometry(northern);
+    assert.ok(northBridge);
+    northern.player.x=northBridge.x-.5;northern.player.y=northBridge.y+.5;
+    await fixture(northern,'m3-tier2-shore');
+    await m3.keyboard.press('e');
+    await context.and(m3.locator('[data-action=stow]')).waitFor();
+    await m3.keyboard.down('d');
+    try {
+      await m3.locator('#expedition-context[data-area=island]').waitFor({state:'attached',timeout:9000});
+      await m3.waitForTimeout(750);
+    } finally { await m3.keyboard.up('d'); }
+    await toastClear();await frame('04-tier2-frostpine');
+    console.log('[e2e-visual:M3] OK: chart, actual helm cruise, docking, E gangway, WASD crossing, 64×64 terrain, pick durability, mining and sparse save');
+  } finally { await m3.close(); }
 
 
   if (errors.length > 0) {

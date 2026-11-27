@@ -64,10 +64,30 @@
     <section id="industry-intake-section" aria-labelledby="industry-intake-title" hidden><h3 id="industry-intake-title">待分拣</h3><ul id="industry-intake"></ul></section>
     <section aria-labelledby="industry-output-title"><h3 id="industry-output-title">产出</h3><ul id="industry-output"></ul><button type="button" id="industry-collect">收取产出</button></section>
   </aside>
-  <div class="m2-tools" aria-label="建造操作">
+  <aside id="beast-roster" class="inventory beast-roster" aria-labelledby="beast-roster-title" hidden>
+    <div class="panel-head"><div><div class="eyebrow">ARK BESTIARY <span>／</span> 活体基地</div><h2 id="beast-roster-title">云兽伙伴</h2></div><button type="button" id="beast-roster-close">关闭</button></div>
+    <p id="beast-summary" class="panel-intro numbers"></p>
+    <div id="beast-feed-controls"><p id="beast-feed-details" class="numbers"></p><button type="button" id="beast-feed-load" data-tip="将背包里的一份云兽饲料放入饲料槽">加入饲料</button></div>
+    <div id="beast-list"></div>
+    <section id="beast-pack" hidden aria-labelledby="beast-pack-title"><h3 id="beast-pack-title">牦牛随行仓</h3><div id="beast-pack-contents"></div></section>
+  </aside>
+  <aside id="wild-encounter" class="wild-encounter" aria-labelledby="wild-species" hidden>
+    <div class="eyebrow">FIELD ENCOUNTER <span>／</span> 野外驯服</div>
+    <div class="wild-title"><h2 id="wild-species"></h2><span id="wild-status"></span></div>
+    <div class="wild-meters numbers"><label for="wild-hp">体力</label><meter id="wild-hp" min="0" max="1" value="0"></meter><label for="tame-progress">驯服</label><progress id="tame-progress" max="1" value="0"></progress><output id="wild-tame-count"></output></div>
+    <p id="wild-bait" class="panel-intro"></p>
+    <div class="wild-actions">
+      <button type="button" id="wild-strike" data-tip="压低云兽体力至 35% 以下再投喂">压制</button>
+      <button type="button" id="wild-net" data-tip="消耗一张麻痹冰网，暂时压制云兽">麻痹网</button>
+      <button type="button" id="wild-trap" data-tip="消耗一个兽夹，暂时压制云兽">兽夹</button>
+      <button type="button" id="wild-feed"><kbd>E</kbd> 投喂</button>
+    </div>
+  </aside>
+  <div class="m2-tools" aria-label="方舟扩展操作">
     <button type="button" id="build-catalog-toggle" aria-expanded="false" aria-controls="build-catalog" data-tip="选择蓝图，查看材料和浮力预算"><kbd>B</kbd> 建造手册</button>
     <button type="button" id="dismantle-mode" aria-pressed="false" data-tip="点击一处建筑或可拆甲板；拆除后可在 4 秒内撤销"><kbd>X</kbd> 拆除</button>
     <button type="button" id="sky-map-toggle" aria-expanded="false" aria-controls="sky-map" data-tip="打开航图，检查风区、可用岛屿与当前航向"><kbd>N</kbd> 航图</button>
+    <button type="button" id="beast-roster-toggle" aria-expanded="false" aria-controls="beast-roster" data-tip="查看云兽的饥饿、体温和分工"><kbd>V</kbd> 云兽</button>
     <button type="button" id="audio-toggle" aria-pressed="false" data-tip="开关炉火、风雪和施工音效"><kbd>M</kbd> 音效开</button>
   </div>
   <div id="expedition-context" class="expedition-context" hidden>

@@ -1,4 +1,5 @@
 import recipes from '../data/recipes.json';
+import items from '../data/items.json';
 import { countItem, inventoryChange, itemNames } from './ark';
 import { consumeIslandNode, harvestIssue, islandNodes, islandNodeRemaining, nearestIslandNode, type IslandResource } from './island';
 import type { ItemStack, WorldState } from './types';
@@ -22,7 +23,7 @@ export interface ToolResult {
 }
 
 function definition(id: ToolId, kind: ToolKind, tier: 1 | 2, maxDurability: number): ToolDefinition {
-  return { id, kind, tier, maxDurability, name: itemNames.get(id) ?? id };
+  return { id, kind, tier, maxDurability, name: items.find(item=>item.id===id)?.name ?? id };
 }
 const toolDefs = new Map<string, ToolDefinition>([
   ['wood_axe', definition('wood_axe', 'wood_axe', 1, 8)],

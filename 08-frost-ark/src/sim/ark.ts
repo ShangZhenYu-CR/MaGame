@@ -4,11 +4,12 @@ import items from '../data/items.json';
 import tech from '../data/tech.json';
 import { getIndustrySave } from './m2-state';
 import { getNavigation } from './m3-state';
+import { crewBuoyancyBonus } from './beasts';
 import type { BuildingInstance, ItemStack, Vec2, WorldState } from './types';
 
 export const buildKinds = [
   'wood_deck','torch_post','wind_wall','workbench','furnace','stove','heat_relay',
-  'catch_net','sorter_arm','greenhouse','warm_wall','buoyancy_core','iron_deck',
+  'catch_net','sorter_arm','greenhouse','warm_wall','buoyancy_core','iron_deck','beast_den','feed_trough',
 ] as const;
 export type BuildKind = typeof buildKinds[number];
 export const itemNames = new Map(items.map(({ id, name }) => [id, name]));
@@ -99,7 +100,7 @@ export function refreshBuoyancy(w: WorldState): void {
     if (n>0) capacity+=n; else used-=n;
   }
   w.ark.buoyancyUsed=used;
-  w.ark.buoyancyMax=capacity;
+  w.ark.buoyancyMax=Math.floor(capacity*(1+crewBuoyancyBonus(w)));
 }
 
 export function playerOverTile(w: WorldState, x: number, y: number): boolean {

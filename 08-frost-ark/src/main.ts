@@ -16,6 +16,9 @@ import { navigationUi } from './ui/navigation';
 import { expeditionUi } from './ui/expedition';
 import { expeditionToolsUi } from './ui/expedition-tools';
 import biomes from './data/biomes.json';
+import { nearestBeastFacility, nearestWildBeast } from './sim/beasts';
+import { nearestIslandNode } from './sim/island';
+import { beastUi } from './ui/beasts';
 
 function el<T extends HTMLElement = HTMLElement>(id: string): T { return document.getElementById(id)! as T; }
 const canvas=el<HTMLCanvasElement>('game-canvas'), view=new ArkView(canvas);
@@ -57,6 +60,9 @@ const industry=createIndustryUi({
 const chart=navigationUi({state:()=>w,icon:iconPath,close:()=>toggleChart(false),onCommand:finishAction});
 const expedition=expeditionUi({state:()=>w,message:finishAction});
 const toolUi=expeditionToolsUi({state:()=>w,icon:iconPath,message:finishAction});
+const beastSprites=import.meta.glob<string>('./assets/art/beast-*.png',{eager:true,query:'?inline',import:'default'});
+const beastArt=(id:string)=>beastSprites['./assets/art/beast-'+id+'.png'];
+const beasts=beastUi({state:()=>w,msg:finishAction,icon:iconPath,art:beastArt});
 const skyToggle=el('sky-map-toggle');
 const helmIcon=iconPath('helm');
 if(helmIcon){const img=document.createElement('img');img.alt='';img.src=helmIcon;skyToggle.prepend(img);}
@@ -67,6 +73,11 @@ function toggleChart(show=!chart.open()):void{
   keys.clear();cancelCharge(w);expedition.cancel();industry.closeTip();chart.show();
 }
 skyToggle.onclick=()=>toggleChart();
+function toggleBeastRoster(show=!beasts.open()):void{
+  if(show){closeOtherPanels('beasts');cancelCharge(w);expedition.cancel();keys.clear();}
+  beasts.show(show);
+}
+el('beast-roster-toggle').onclick=()=>toggleBeastRoster();
 
 function finishAction(issue:string|null,success:string,event?:'craft'|'undo'|'dismantle'|'place'|'hit'):void{
   tell(issue??success);
@@ -75,21 +86,29 @@ function finishAction(issue:string|null,success:string,event?:'craft'|'undo'|'di
   void saveNow();
 }
 function useNearby():void{
+  if(beasts.open()){toggleBeastRoster(false);return;}
   if(industry.stationOpen()){industry.showStation(null);return;}
   if(!locker.hidden){toggleStorage(false);return;}
+  if(expedition.area()==='island'){
+    const wild=nearestWildBeast(w);
+    if(wild&&(wild.stunnedTicks>0||wild.hp<=wild.maxHp*.35||!nearestIslandNode(w,1.8))&&beasts.tame())return;
+  }
   if(expedition.use())return;
-  const box=nearestStorage(w), station=nearestIndustry(w);
-  if(station&&(!box||industryDistance(w,station)<industryDistance(w,box)))openIndustry(station.id);
+  const box=nearestStorage(w),station=nearestIndustry(w),animal=nearestBeastFacility(w);
+  if(animal&&(!box||industryDistance(w,animal)<industryDistance(w,box))&&
+    (!station||industryDistance(w,animal)<industryDistance(w,station)))toggleBeastRoster(true);
+  else if(station&&(!box||industryDistance(w,station)<industryDistance(w,box)))openIndustry(station.id);
   else toggleStorage(true);
 }
 function openIndustry(id:string):void{
   closeOtherPanels('industry');cancelCharge(w);keys.clear();industry.showStation(id);
 }
-function closeOtherPanels(except:'bag'|'locker'|'catalog'|'industry'):void{
+function closeOtherPanels(except:'bag'|'locker'|'catalog'|'industry'|'beasts'):void{
   if(except!=='bag')toggleBag(false);
   if(except!=='locker')locker.hidden=true;
   if(except!=='catalog')industry.showCatalog(false);
   if(except!=='industry')industry.showStation(null);
+  if(except!=='beasts')beasts.show(false);
 }
 function toggleCatalog(show=!industry.catalogOpen()):void{
   if(show){closeOtherPanels('catalog');cancelCharge(w);keys.clear();}
@@ -203,7 +222,7 @@ function saveNow():Promise<void> {
   return saveQueue;
 }
 function safeWorld(next:WorldState):void {
-  expedition.cancel();chart.hide(false);w=next;toggleStorage(false);industry.showStation(null);industry.showCatalog(false);lockerSignature='';cancelCharge(w);
+  expedition.cancel();chart.hide(false);beasts.show(false);w=next;toggleStorage(false);industry.showStation(null);industry.showCatalog(false);lockerSignature='';cancelCharge(w);
   caught=null;keys.clear();messageUntil=0;message='';stackSignature='';view.position(w);fillBag();
 }
 function ghostAt(): Ghost|null {
@@ -275,7 +294,8 @@ addEventListener('keydown',e=>{
   if(e.repeat)return;
   if(k==='escape'){
     expedition.cancel();industry.closeTip();
-    if(industry.stationOpen())industry.showStation(null);
+    if(beasts.open())toggleBeastRoster(false);
+    else if(industry.stationOpen())industry.showStation(null);
     else if(industry.catalogOpen())toggleCatalog(false);
     else if(!locker.hidden)toggleStorage(false);
     else if(!panel.hidden)toggleBag(false);
@@ -284,6 +304,7 @@ addEventListener('keydown',e=>{
   } else if(k==='e')useNearby();
   else if(k==='n'){e.preventDefault();toggleChart();}
   else if(k==='b')toggleCatalog();
+  else if(k==='v')toggleBeastRoster();
   else if(k==='x'){toggleCatalog(false);choose(mode==='dismantle'?'hook':'dismantle');}
   else if(k==='z')industry.undoAction();
   else if(k==='m')toggleMute();
@@ -313,6 +334,7 @@ canvas.addEventListener('pointerdown',e=>{
     const hit=buildingAt(w,x,y);
     if(hit&&hit.id===nearestStorage(w)?.id){toggleStorage();return;}
     if(hit&&industryPanel(w,hit.id)){openIndustry(hit.id);return;}
+    if(hit&&['beast_den','feed_trough'].includes(hit.defId)&&industryDistance(w,hit)<=1.4){toggleBeastRoster(true);return;}
     if(startCharge(w,at))canvas.setPointerCapture(e.pointerId);
   } else if(mode==='dismantle'){
     finishAction(dismantle(w,x,y),'已拆除。可在 4 秒内撤销。','dismantle');
@@ -373,7 +395,9 @@ function frame(now:number):void {
       fire:h&&h.fuel>0?Math.min(1,Math.max(0,(local+8)/44)):0});
   }
   industry.update();chart.paint(false,now);
-  const here=expedition.update(now,chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||(mode!=='hook'&&expedition.area()==='ark'));
+  const overlay=chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||beasts.open();
+  const here=expedition.update(now,overlay||(mode!=='hook'&&expedition.area()==='ark'));
+  beasts.update(now,overlay);
   toolUi.update(here);
   const region=regions.get(w.activeIsland?.biomeId??w.sky.islands.find(n=>n.id===w.ark.anchoredIslandId)?.biomeId??'')??'碎云浅海';
   if(el('sector-name').textContent!==region)el('sector-name').textContent=region;
@@ -393,7 +417,7 @@ function frame(now:number):void {
   if(mood!==w.player.portraitMood){mood=w.player.portraitMood;portrait.src=portraits[mood]??portraits[0];}
   toast(caught?'正在拉回：'+catchName:g.charging?'抓钩蓄力 '+Math.round(g.charge*100)+'%':
     g.active?'抓钩已抛出…':now<messageUntil?message:'');
-  const interactionHint=here==='island'?'靠近资源按 E 采集 · I 制作和修理工具':here==='gangway'?'沿跳板继续走 · 无需切换场景':mode==='hook'?(nearbyStorage()?'按 E 或点击储物箱存取物品':nearestIndustry(w)?'按 E 或点击加工站操作':'按住左键蓄力，松开抛钩'):
+  const interactionHint=here==='island'?(beasts.target()?'云兽虚弱时按 E 投喂 · V 查看伙伴':'靠近资源按 E 采集 · I 制作和修理工具'):here==='gangway'?'沿跳板继续走 · 无需切换场景':mode==='hook'?(nearbyStorage()?'按 E 或点击储物箱存取物品':nearestIndustry(w)?'按 E 或点击加工站操作':'按住左键蓄力，松开抛钩'):
     mode==='wood_deck'?'移动鼠标贴合甲板直边，左键拼接':mode==='torch_post'?'先在背包手搓火把，再选空甲板放置':
     mode==='wind_wall'?'挡风墙放在空甲板，减缓周围热量散失':mode==='dismantle'?'点击选中拆除目标；可按 Z 撤销':
     `${buildDefinitions[mode].name} · 移到甲板预览后左键放置`;

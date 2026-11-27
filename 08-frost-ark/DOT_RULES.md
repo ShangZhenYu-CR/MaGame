@@ -12,7 +12,7 @@
   - `02-验收与测试报告`：`1eS2pOUBHwLnOlAuoSahxX5IYSnoO5AA5`
   - `03-里程碑试玩包`：`1Rl-zugEXgZ6HOpzUboBqn0VB7Eu2fkoX`
 - **绝对禁区**：
-  - 严禁向 `main` 分支推送或合并。
+  - 不向 `main` 推送或合并开发源码。2026-11-27 用户授权里程碑过门禁后，只把已验证的 `08-frost-ark/index.html` 与 `08-frost-ark/dist/` 同步到 `main`，实测同一 GitHub Pages 试玩入口后交付。
   - 严禁修改 `01-*` 至 `07-*`、仓库根目录 `index.html`、`assets/` 下的任何文件。
   - 马楠 4 表情头像仅以只读相对路径引用：`../assets/character/head-0.png ~ head-3.png`。
   - 所有源码与产物严格限定在 `08-frost-ark/` 内；构建后必须同步提交 `08-frost-ark/index.html` 与 `08-frost-ark/dist/`（确保 GitHub Pages 静态直开）。
@@ -45,7 +45,7 @@
 1. **小步勤推**：每完成 1 个子任务立刻 `git commit && git push origin game/08-frost-ark`，禁止把未推送改动留在 Dot 云盘过夜。
 2. **三道强制门禁**：每个 Milestone 完工前必须跑通 `npm run gate`（数据校验 + 类型检查 + 静态构建 + 无头生存闭环 + Playwright 实机截图且 console 0 报错）。
 3. **亲眼查图**：Playwright 截出的每张验收 PNG，Dot 必须自己打开检查，确认无黑屏、无文字重叠、暖橙与冰蓝对比清晰，再上传 Google Drive。
-4. **Google Drive 同步**：每个 Milestone 完工时：
+4. **交付主次**：GitHub 工作分支和 GitHub Pages 是主交付；Google Drive 做镜像备份。每个 Milestone 完工时：
    - 更新 `MILESTONES.md` 与 `docs/PROGRESS.md` 并同步更新到 `00-计划与日志`；
    - 在 `01-实机截图验收` 下建 `M0/`…`M6/` 目录上传全部验收截图；
    - 上传测试报告 JSON 到 `02-验收与测试报告`；

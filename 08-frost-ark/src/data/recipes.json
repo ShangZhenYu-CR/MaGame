@@ -135,5 +135,25 @@
     "seconds": 24,
     "output": { "itemId": "warm_berry", "count": 3 },
     "inputs": [{ "itemId": "warm_berry", "count": 1 }]
+  },
+  {
+    "id": "craft_beast_trap",
+    "station": "workbench",
+    "seconds": 4,
+    "output": { "itemId": "beast_trap", "count": 2 },
+    "inputs": [
+      { "itemId": "frost_iron_ingot", "count": 1 },
+      { "itemId": "rope", "count": 2 }
+    ]
+  },
+  {
+    "id": "craft_beast_feed",
+    "station": "workbench",
+    "seconds": 3,
+    "output": { "itemId": "beast_feed", "count": 4 },
+    "inputs": [
+      { "itemId": "raw_root", "count": 1 },
+      { "itemId": "driftwood", "count": 1 }
+    ]
   }
 ]

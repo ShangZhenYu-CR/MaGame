@@ -27,5 +27,7 @@
   { "id": "mining_pick", "name": "矿镐", "category": "tool", "stack": 1 },
   { "id": "frost_axe", "name": "霜铁手斧", "category": "tool", "stack": 1 },
   { "id": "frost_pick", "name": "霜铁矿镐", "category": "tool", "stack": 1 },
-  { "id": "paralysis_net", "name": "麻痹冰网", "category": "tool", "stack": 20 }
+  { "id": "paralysis_net", "name": "麻痹冰网", "category": "tool", "stack": 20 },
+  { "id": "beast_trap", "name": "霜铁兽夹", "category": "tool", "stack": 20 },
+  { "id": "beast_feed", "name": "暖粮饲料", "category": "food", "stack": 50 }
 ]

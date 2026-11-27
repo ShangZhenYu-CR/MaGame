@@ -1,6 +1,6 @@
 import type { BuildingInstance, ItemStack, WorldState } from './types';
 export interface IndustryJob {
-  recipeId:string; progress:number; duration:number; cold:number;
+  recipeId:string; progress:number; duration:number; cold:number; paid?:ItemStack[];
 }
 export interface IndustryStation {
   intake:ItemStack[]; output:ItemStack[]; job:IndustryJob|null; cycle:number;

@@ -1,5 +1,6 @@
 import { buildingAt, isDeck } from './ark';
 import { ensureNavigationState, getNavigation } from './m3-state';
+import { beastCompanions, crewCruiseMultiplier } from './beasts';
 import { nextRng } from './rng';
 import { TICK_RATE, type IslandNode, type Vec2, type WorldState } from './types';
 
@@ -118,13 +119,15 @@ export function stepNavigation(w:WorldState):void{
     if(!dock){w.sky.cruising=false;return;}
     w.sky.x=destination.skyX;w.sky.y=destination.skyY;w.sky.cruising=false;
     destination.discovered=true;
+    ensureNavigation(w);
     w.ark.anchoredIslandId=destination.id;
     nav.dock={nodeId:destination.id,...dock,deployed:false};
     return;
   }
-  const speed=CRUISE_SPEED*(w.weather==='whiteout'?.7:w.weather==='snow'?.85:1)/TICK_RATE;
+  const speed=CRUISE_SPEED*crewCruiseMultiplier(w)*(w.weather==='whiteout'?.7:w.weather==='snow'?.85:1)/TICK_RATE;
   w.sky.headingX=dx/gap;w.sky.headingY=dy/gap;
   w.sky.x+=w.sky.headingX*Math.min(gap,speed);
   w.sky.y+=w.sky.headingY*Math.min(gap,speed);
-  for(const n of w.sky.islands)if(distance(w,n)<=DISCOVERY_RADIUS)n.discovered=true;
+  const eyes=beastCompanions(w).some(b=>b.defId==='galehawk')?1.3:1;
+  for(const n of w.sky.islands)if(distance(w,n)<=DISCOVERY_RADIUS*eyes)n.discovered=true;
 }

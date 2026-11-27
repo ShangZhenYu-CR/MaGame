@@ -6,6 +6,7 @@ import { heatAt } from './heatField';
 import { dropOnDeck, isDeckDrop } from './latte';
 import { ensureIndustrySave, getIndustrySave, type IndustryStation } from './m2-state';
 import { getNavigation } from './m3-state';
+import { crewFurnaceFuel, crewIndustryMultiplier, crewSmeltBonus } from './beasts';
 import { TICK_RATE, type BuildingInstance, type ItemStack, type WorldState } from './types';
 
 const processable=new Set(['workbench','furnace','stove','greenhouse','catch_net','sorter_arm']);
@@ -49,13 +50,17 @@ function merge(contents:readonly ItemStack[],additions:readonly ItemStack[]):Ite
 }
 
 const isRecipeUnlocked=(w:WorldState,id:string)=>tech.nodes.some(n=>w.unlockedTech.includes(n.id)&&n.unlocksRecipes.includes(id));
+const recipeInputs=(w:WorldState,r:typeof recipes[number])=>r.station==='furnace'&&crewFurnaceFuel(w)
+  ?r.inputs.filter(s=>s.itemId!=='coal_chunk'):r.inputs;
+const recipeOutput=(w:WorldState,r:typeof recipes[number])=>r.id==='smelt_frost_iron'
+  ?{...r.output,count:r.output.count+crewSmeltBonus(w)}:r.output;
 function recipeIssue(w:WorldState,b:BuildingInstance,r:typeof recipes[number],s:IndustryStation|undefined):string|null{
   if(!near(w,b))return '请先走近设备';
   if(!isRecipeUnlocked(w,r.id))return '请先在木工台研究该配方';
   if(s?.job)return '设备正处理上一批';
   if(!efficiencyAt(w,b))return '设备结冻，先把这里暖起来';
-  if(!merge(s?.output??[],[r.output]))return '产出格已满，先取走物资';
-  if(!hasCost(w,r.inputs))return '材料不足';
+  if(!merge(s?.output??[],[recipeOutput(w,r)]))return '产出格已满，先取走物资';
+  if(!hasCost(w,recipeInputs(w,r)))return '材料不足';
   return null;
 }
 
@@ -72,7 +77,7 @@ export function industryPanel(w:WorldState,buildingId:string){
   const noNet=b.defId==='sorter_arm'&&!w.ark.buildings.some(net=>linkedNet(b,net));
   return {
     id:b.id,defId:b.defId,name:buildingDefs.get(b.defId)!.name,efficiency,job,
-    recipes:recipes.filter(r=>r.station===b.defId).map(r=>({...r,seconds:r.seconds??0,issue:recipeIssue(w,b,r,s)})),
+    recipes:recipes.filter(r=>r.station===b.defId).map(r=>({...r,inputs:recipeInputs(w,r),output:recipeOutput(w,r),seconds:r.seconds??0,issue:recipeIssue(w,b,r,s)})),
     output:s?.output??[],intake:s?.intake??[],
     status:!efficiency?'结冻停机':lockedNet?'请在网栏外侧留出一格开放云海':noNet?'附近没有捕捞网栏':
       b.defId==='catch_net'?'拦截漂流残骸，可手动取货':b.defId==='sorter_arm'?'自动收取三格内网栏物资':
@@ -85,8 +90,8 @@ export function startIndustry(w:WorldState,buildingId:string,recipeId:string):st
   if(!b||!r||r.station!==b.defId||!r.seconds)return '这里不能加工该配方';
   const issue=recipeIssue(w,b,r,getIndustrySave(w)?.stations[b.id]);
   if(issue)return issue;
-  if(!inventoryChange(w,r.inputs,[]))return '材料不足';
-  stationFor(w,b).job={recipeId,progress:0,duration:r.seconds*TICK_RATE,cold:0};
+  if(!inventoryChange(w,recipeInputs(w,r),[]))return '材料不足';
+  stationFor(w,b).job={recipeId,progress:0,duration:r.seconds*TICK_RATE,cold:0,paid:recipeInputs(w,r).map(s=>({...s}))};
   return null;
 }
 
@@ -131,7 +136,7 @@ export function stepIndustry(w:WorldState):void {
   if(state?.removal&&state.removal.expires<=w.tick)settleRemoval(w);
   for(const b of w.ark.buildings) {
     if(!processable.has(b.defId))continue;
-    const efficiency=efficiencyAt(w,b),s=getIndustrySave(w)?.stations[b.id];
+    const efficiency=efficiencyAt(w,b)*crewIndustryMultiplier(w,b),s=getIndustrySave(w)?.stations[b.id];
     if(s?.job){
       const job=s.job,recipe=rows.get(job.recipeId)!;
       if(!efficiency&&b.defId==='greenhouse'){
@@ -141,7 +146,7 @@ export function stepIndustry(w:WorldState):void {
         job.cold=0;
         job.progress=Math.min(job.duration,job.progress+efficiency);
         if(job.progress>=job.duration){
-          const output=merge(s.output,[recipe.output]);
+          const output=merge(s.output,[recipeOutput(w,recipe)]);
           if(output){s.output=output;s.job=null;}
         }
       }
@@ -246,7 +251,7 @@ function settleRemoval(w:WorldState):void{
   const state=getIndustrySave(w)!,r=state.removal!;
   const id=r.building?.defId??(r.deck===2?'iron_deck':'wood_deck');
   const refund=[...buildingDefs.get(id)!.cost,...(r.station?.intake??[]),...(r.station?.output??[])];
-  if(r.station?.job)refund.push(...rows.get(r.station.job.recipeId)!.inputs);
+  if(r.station?.job)refund.push(...(r.station.job.paid??rows.get(r.station.job.recipeId)!.inputs));
   state.removal=null;
   if(!inventoryChange(w,[],refund))dropOnDeck(w,refund);
 }

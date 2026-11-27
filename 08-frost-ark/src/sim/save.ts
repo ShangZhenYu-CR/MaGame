@@ -6,7 +6,8 @@ import { areaAt, dockedIsland, validIslandDeltas } from './island';
 import { ensureNavigation } from './sky-map';
 import { toolDefinition } from './tools';
 import biomes from '../data/biomes.json';
-import { ARK_SIZE, SAVE_VERSION, TICK_RATE, type BuildingInstance, type IslandNode, type WorldState } from './types';
+import { beastDefinitions, MAX_COMPANIONS } from './beasts';
+import { ARK_SIZE, SAVE_VERSION, TICK_RATE, type BuildingInstance, type IslandNode, type ItemStack, type WorldState } from './types';
 
 export function serializeWorld(world: WorldState): string {
   // The active map only persists its reference; topology is reconstructed
@@ -42,9 +43,55 @@ function validStation(value:unknown,defId:string):boolean {
     if(!Array.isArray(bin)||bin.length>8||!bin.every(stack)||new Set(bin.map(s=>s.itemId)).size!==bin.length)return false;
   const j=value.job;
   const recipe=record(j)&&typeof j.recipeId==='string'?recipeDefs.get(j.recipeId):undefined;
-  return j===null||(record(j)&&recipe?.station===defId&&!!recipe.seconds&&
-    num(j.progress)&&num(j.duration)&&j.progress>=0&&j.duration===recipe.seconds*TICK_RATE&&j.progress<=j.duration&&
-    num(j.cold)&&Number.isInteger(j.cold)&&j.cold>=0&&j.cold<30*TICK_RATE);
+  if(j===null)return true;
+  if(!record(j)||recipe?.station!==defId||!recipe.seconds||
+    !num(j.progress)||!num(j.duration)||j.progress<0||j.duration!==recipe.seconds*TICK_RATE||j.progress>j.duration||
+    !num(j.cold)||!Number.isInteger(j.cold)||j.cold<0||j.cold>=30*TICK_RATE)return false;
+  const paid=j.paid;
+  if(paid===undefined)return true;
+  const exact=(cost:ItemStack[])=>Array.isArray(paid)&&paid.length===cost.length&&paid.every((s,i)=>
+    stack(s)&&s.itemId===cost[i].itemId&&s.count===cost[i].count);
+  return exact(recipe.inputs)||(defId==='furnace'&&exact(recipe.inputs.filter(s=>s.itemId!=='coal_chunk')));
+}
+
+function isWildEntity(e:unknown):e is import('./types').WildEntity{
+  if(!record(e)||typeof e.id!=='string'||typeof e.defId!=='string'||
+    !['beast','raider','boss'].includes(String(e.kind))||typeof e.hostile!=='boolean'||
+    !num(e.x)||!num(e.y)||!num(e.hp)||!num(e.maxHp)||e.maxHp<=0||e.hp<0||e.hp>e.maxHp||
+    !num(e.stunnedTicks)||!Number.isSafeInteger(e.stunnedTicks)||e.stunnedTicks<0||
+    !num(e.tameProgress)||!Number.isSafeInteger(e.tameProgress)||e.tameProgress<0)return false;
+  const d=beastDefinitions.get(e.defId);
+  return e.kind==='beast'?!!d&&typeof e.homeIslandId==='string'&&e.maxHp===d.maxHp&&
+    e.tameProgress<d.tameFeedsRequired:e.homeIslandId===undefined||typeof e.homeIslandId==='string';
+}
+function isBeast(b:unknown):b is import('./types').BeastEntity{
+  if(!record(b)||typeof b.id!=='string'||typeof b.name!=='string'||typeof b.defId!=='string'||
+     !num(b.hp)||!num(b.maxHp)||b.maxHp<=0||b.hp<0||b.hp>b.maxHp||
+     !num(b.warmth)||b.warmth<0||b.warmth>100||!num(b.hunger)||b.hunger<0||b.hunger>100||
+     !num(b.workCooldown)||!Number.isSafeInteger(b.workCooldown)||b.workCooldown<0||
+     !eachNumber(b,['x','y'])||!(b.denBuildingId===null||typeof b.denBuildingId==='string')||
+     !['work','rest','companion'].includes(String(b.role)))return false;
+  return beastDefinitions.get(b.defId)?.maxHp===b.maxHp;
+}
+function validateFauna(p:Record<string,unknown>,ids:Set<string>):void{
+  const invalid=()=>new Error('云兽或饲料存档不符合方舟格式');
+  const {beastM4, beasts, wildEntities}=p;
+  if(!Array.isArray(beasts)||!Array.isArray(wildEntities)||beasts.length>18||!beasts.every(isBeast)||
+     !wildEntities.every(isWildEntity)||wildEntities.some(e=>e.kind==='beast'&&!ids.has(e.homeIslandId!))||
+     new Set([...wildEntities,...beasts].map(e=>e.id)).size!==wildEntities.length+beasts.length||
+     beasts.filter(b=>b.role==='companion').length>MAX_COMPANIONS)throw invalid();
+  if(beastM4===undefined){if(wildEntities.some(e=>e.kind==='beast')||beasts.length)throw invalid();return;}
+  if(!record(beastM4)||!record(beastM4.fauna)||!num(beastM4.feed)||!Number.isSafeInteger(beastM4.feed)||
+    beastM4.feed<0||beastM4.feed>50||!num(beastM4.lastStrike)||!Number.isSafeInteger(beastM4.lastStrike)||
+    !num(beastM4.offsetX)||!num(beastM4.offsetY)||!Number.isSafeInteger(beastM4.offsetX)||!Number.isSafeInteger(beastM4.offsetY)||
+    (beastM4.islandId!==null&&(typeof beastM4.islandId!=='string'||!ids.has(beastM4.islandId)))||
+    !Array.isArray(beastM4.pack)||beastM4.pack.length>12||!beastM4.pack.every(s=>stack(s)&&s.itemId!=='grapple_hook'&&!toolDefinition(s.itemId))||
+    new Set(beastM4.pack.map(s=>s.itemId)).size!==beastM4.pack.length)throw invalid();
+  for(const [id,population] of Object.entries(beastM4.fauna)){
+    if(!ids.has(id)||id===beastM4.islandId||!Array.isArray(population)||population.length>20||
+      !population.every(e=>isWildEntity(e)&&e.kind==='beast'&&e.homeIslandId===id&&e.x>=0&&e.x<64&&e.y>=0&&e.y<64)||
+      new Set(population.map(e=>e.id)).size!==population.length)throw invalid();
+  }
 }
 
 export function deserializeWorld(raw: string): WorldState {
@@ -107,6 +154,7 @@ export function deserializeWorld(raw: string): WorldState {
       !validIslandDeltas(v as unknown as IslandNode))throw invalidNavigation();
     ids.add(v.id);
   }
+  validateFauna(p,ids);
   const nav=p.navigationM3;
   if(nav!==undefined){
     if(!record(nav)||(nav.targetId!==null&&(typeof nav.targetId!=='string'||!ids.has(nav.targetId))))

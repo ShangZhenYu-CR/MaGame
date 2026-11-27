@@ -189,6 +189,18 @@
     ]
   },
   {
+    "id": "feed_trough",
+    "name": "自动饲料槽",
+    "category": "beast",
+    "size": [1, 1],
+    "buoyancyDelta": -1,
+    "maxHp": 90,
+    "cost": [
+      { "itemId": "driftwood", "count": 3 },
+      { "itemId": "rope", "count": 1 }
+    ]
+  },
+  {
     "id": "frost_turret",
     "name": "防霜箭塔",
     "category": "defense",

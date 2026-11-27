@@ -11,6 +11,7 @@ const descriptions:Partial<Record<BuildKind,string>>={
  heat_relay:'把主炉暖区向远端延伸。',workbench:'研究蓝图并制作工具。',furnace:'把冻铁废件熔成霜铁锭。',
  stove:'将原材料煮成暖食。',catch_net:'放在外缘，拦截从旁经过的漂流物。',sorter_arm:'放在捕捞网栏旁，将捕获物转存到分拣输出。',
  greenhouse:'在暖区种植霜薯等作物，需要 2×2 空甲板。',
+ beast_den:'建在暖区，供云兽工作、休眠与恢复（2×2）。',feed_trough:'添加云兽饲料，给家园里的伙伴补充饥饿。',
 };
 const name=(id:string)=>itemNames.get(id)??id;
 export const itemList=(stacks:readonly ItemStack[])=>stacks.map(x=>`${name(x.itemId)} ×${x.count}`).join(' · ');
@@ -49,7 +50,7 @@ export function createIndustryUi(cb:Callbacks){
   if(src)b.append(image(src));
   const label=document.createElement('span'),cap=document.createElement('small');label.textContent=def.name;
   cap.textContent=`${gw}×${gh} · ${lift}`;label.append(cap);b.append(label);
-  el(['workbench','furnace','stove','catch_net','sorter_arm','greenhouse'].includes(kind)?'catalog-industry':'catalog-structure').append(b);
+  el(['workbench','furnace','stove','catch_net','sorter_arm','greenhouse','beast_den','feed_trough'].includes(kind)?'catalog-industry':'catalog-structure').append(b);
   buttons.set(kind,b);
  }
  function showCatalog(show:boolean){

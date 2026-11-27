@@ -3,6 +3,7 @@ import items from '../data/items.json';
 import { getIndustrySave } from './m2-state';
 import { countItem, inventoryChange, isDeck } from './ark';
 import { expeditionTemperature } from './island';
+import { beastHeatEmitters } from './beasts';
 import { TICK_RATE, type BuildingInstance, type Vec2, type WorldState } from './types';
 
 export const DAY_TICKS=TICK_RATE*60*8;
@@ -46,10 +47,12 @@ export function upgradeHearth(w:WorldState):string|null {
 }
 export function heatAt(w:WorldState,x:number,y:number):number{
   const gx=Math.floor(x),gy=Math.floor(y);
-  return isDeck(w,gx,gy)?w.ark.heatGrid[gy*w.ark.size+gx]:(expeditionTemperature(w,x,y)??w.ambientTemp);
+  if(isDeck(w,gx,gy))return w.ark.heatGrid[gy*w.ark.size+gx];
+  const ambient=expeditionTemperature(w,x,y)??w.ambientTemp;
+  return ambient+beastHeatEmitters(w).reduce((sum,source)=>sum+source.power*Math.max(0,1-Math.hypot(x-source.x,y-source.y)/source.radius),0);
 }
 export function emitters(w:WorldState){
-  return w.ark.buildings.flatMap(b=>{
+  return [...w.ark.buildings.flatMap(b=>{
     const d=definitions.get(b.defId);
     if(!d||!d.heatOutput||!d.heatRadius||(b.defId==='hearth_core'&&b.fuel<=0))return [];
     if(b.defId==='furnace'||b.defId==='stove'){
@@ -58,7 +61,7 @@ export function emitters(w:WorldState){
     }
     const gain=b.defId==='hearth_core'&&b.level>=2?1.28:1;
     return [{...middle(b),radius:d.heatRadius*gain,power:d.heatOutput*gain,kind:b.defId}];
-  });
+  }),...beastHeatEmitters(w)];
 }
 
 export function advanceClimate(w:WorldState):void{

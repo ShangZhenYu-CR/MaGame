@@ -7,6 +7,7 @@ import {
 import { seedDrift, stepCloud } from './cloud';
 import { makeBuilding, refreshBuoyancy } from './ark';
 import { walkExpedition } from './island';
+import { stepBeasts } from './beasts';
 import { ensureNavigation, stepNavigation } from './sky-map';
 import { advanceClimate, initializeHeat, stepHeat } from './heatField';
 import { stepIndustry } from './industry';
@@ -130,6 +131,7 @@ export function stepWorld(world: WorldState, ticks = 1, direction: Vec2 = {x: 0,
     stepCloud(world);
     advanceClimate(world);
     stepHeat(world);
+    stepBeasts(world);
     stepIndustry(world);
     updateLatte(world);
   }

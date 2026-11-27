@@ -9,6 +9,8 @@ import { build, countItem, inventoryChange } from '../src/sim/ark';
 import { areaAt,dockedIsland,gangwayGeometry,islandNodes,islandNodeRemaining,nearestIslandNode } from '../src/sim/island';
 import { helmPoint, setDestination, toggleCruise } from '../src/sim/sky-map';
 import { deserializeWorld } from '../src/sim/save';
+import { runGrappleRange } from './grapple-range-e2e';
+import { runM4 } from './m4-e2e';
 
 const repoRoot = resolve(process.cwd(), '..');
 const outDir = resolve(process.cwd(), 'artifacts', 'e2e');
@@ -596,6 +598,9 @@ try {
     console.log('[e2e-visual:M3] OK: chart, actual helm cruise, docking, E gangway, WASD crossing, 64×64 terrain, pick durability, mining and sparse save');
   } finally { await m3.close(); }
 
+
+  await runGrappleRange(browser,baseUrl,outDir,errors);
+  await runM4(browser,baseUrl,outDir,errors);
 
   if (errors.length > 0) {
     throw new Error(errors.join('\n'));

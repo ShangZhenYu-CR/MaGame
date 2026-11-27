@@ -142,6 +142,7 @@ export interface WildEntity {
   stunnedTicks: number;
   tameProgress: number;
   hostile: boolean;
+  homeIslandId?: string; // fauna origin; raiders and global threats may omit it
 }
 
 export interface WorldState {

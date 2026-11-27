@@ -190,3 +190,35 @@ button[aria-disabled=true]{opacity:.62}
 .toolcraft-actions button{min-height:28px;padding:3px 6px;font-size:11px}
 #sky-map-toggle img{height:17px;width:17px;object-fit:contain;vertical-align:middle;margin-right:3px}
 .sky-marker[data-discovered=false]{opacity:.64;border-style:dashed}
+
+/* M4 · the stalker card is contextual; the roster keeps the deck visible at its left. */
+.beast-roster{width:min(340px,calc(100% - 24px));background:rgba(19,32,44,.97);scrollbar-color:#486176 #152436}
+.beast-roster [data-beast-id]{margin-top:8px;padding:9px;border:1px solid var(--edge);border-radius:4px;background:#1e3545}
+.beast-card-head{display:grid;grid-template-columns:1fr auto;align-items:center;font-size:13px;color:#e8d2a8}
+.beast-card-head span{font-size:10px;color:#9ac1c9}
+.beast-card-head img{width:39px;height:39px;object-fit:contain;grid-row:span 2;margin-right:4px}
+.beast-card-head:has(img){grid-template-columns:43px 1fr auto}
+.beast-vitals{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;color:#afc8d6;font-size:10px;margin:5px 0}
+.beast-skills{font-size:10px;color:#adbfcc;line-height:1.48}
+.beast-roles,.wild-actions{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap}
+.beast-roles button,.wild-actions button,#beast-feed-load{min-height:29px;padding:3px 6px;font-size:11px}
+.beast-roles button[aria-pressed=true]{border-color:#7fbfb1;background:#28484c;color:#c5e3d9}
+#beast-feed-controls{display:grid;grid-template-columns:1fr auto;align-items:center;gap:7px;padding:7px 0;border-bottom:1px solid var(--edge)}
+#beast-feed-details{white-space:normal}
+.beast-empty{margin:14px 0;color:#b6cbd8;font-size:12px;line-height:1.6}
+.wild-encounter{position:absolute;z-index:2;right:24px;top:166px;width:min(291px,calc(100% - 22px));padding:11px;border:1px solid #658296;background:rgba(20,37,50,.96);border-radius:5px}
+.wild-title{display:flex;justify-content:space-between;align-items:center;gap:4px;margin:3px 0 7px}
+.wild-title h2{font-size:17px}
+#wild-status{font-size:11px;color:#a5c3d2}
+.wild-encounter[data-weakened=true] #wild-status{color:var(--amber)}
+.wild-meters{display:grid;grid-template-columns:29px 1fr auto;gap:5px;align-items:center}
+#wild-hp{grid-column:span 2;width:100%;height:6px;accent-color:#b88978}
+#tame-progress{width:100%;height:6px;accent-color:#81bbac}
+.wild-actions img{width:19px;height:19px;object-fit:contain;margin-right:3px;vertical-align:middle}
+@media(max-width:1050px){.m2-tools{bottom:108px}.undo-strip{bottom:145px}.expedition-context{bottom:151px}}
+@media(max-width:620px){.wild-encounter{right:10px;top:176px}.m2-tools{bottom:119px;gap:3px}.m2-tools button{padding:4px 5px}.undo-strip{bottom:154px}.expedition-context{bottom:158px}}
+.beast-pack-row{display:grid;grid-template-columns:1fr auto;align-items:center;padding:4px 0;border-bottom:1px solid var(--edge);font-size:11px}
+.beast-pack-row button{font-size:10px}
+#beast-pack h3{font-size:12px;color:#abcbd9}
+.beast-vitals{display:block;white-space:normal;line-height:1.5}
+#wild-bait img{height:22px;width:22px;object-fit:contain;vertical-align:middle;margin-right:4px}

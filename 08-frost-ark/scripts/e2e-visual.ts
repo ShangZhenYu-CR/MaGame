@@ -1,3 +1,4 @@
+import { runFootprints } from './footprints-e2e';
 import { createServer } from 'node:http';
 import assert from 'node:assert/strict';
 import { pathToFileURL } from 'node:url';
@@ -607,6 +608,8 @@ try {
   await runM5(browser,baseUrl,outDir,errors);
 
   await runM6(browser,baseUrl,outDir,errors);
+
+  await runFootprints(browser,baseUrl,outDir,errors);
 
   if (errors.length > 0) {
     throw new Error(errors.join('\n'));

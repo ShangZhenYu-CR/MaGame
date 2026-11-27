@@ -1,3 +1,4 @@
+import { GROUND_FOOTPRINTS } from '../sim/ground-footprint';
 import { Lightmap } from './lightmap';
 import { ArtLibrary } from './art-library';
 import { clamp, cloudscape, ovalGlow, WeatherFinish } from './atmosphere';
@@ -239,7 +240,7 @@ export class ArkView {
       const working=getIndustrySave(w)?.stations[bld.id]?.job;
       const effect=bld.defId==='torch_post'?'torch':bld.defId==='heat_relay'?'relay':
         working?(bld.defId==='furnace'?'forge':bld.defId==='stove'?'stove':undefined):undefined;
-      actors.push({...visuals,x:gx+spanX*.5,y:gy+spanY*(visuals.ground??.80),fire:effect});
+      actors.push({...visuals,x:gx+spanX*.5,y:gy+spanY*(GROUND_FOOTPRINTS[bld.defId]?.anchorY??visuals.ground??.80),fire:effect});
     }
     const latte=w.latte;
     const catWalking=fire?Math.hypot(latte.x-fire.gx-2.4,latte.y-fire.gy-2.4)>.23:false;
@@ -434,7 +435,7 @@ export class ArkView {
     const visual=buildingVisuals[id];
     c.globalAlpha=ghost.ok?.57:.30;
     if(visual){
-      this.art.paint(c,visual.art,p.x+s*spanX*.5,p.y+s*spanY*(visual.ground??.80),s,visual);
+      this.art.paint(c,visual.art,p.x+s*spanX*.5,p.y+s*spanY*(GROUND_FOOTPRINTS[id]?.anchorY??visual.ground??.80),s,visual);
     }else if(id==='wood_deck'||id==='iron_deck'){
       this.art.paintTile(c,id==='iron_deck'?ironDeck:deckIds[hash(ghost.x,ghost.y)%4],p.x,p.y,s,s);
     }

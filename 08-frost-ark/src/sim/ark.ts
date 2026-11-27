@@ -1,3 +1,4 @@
+import { GROUND_FOOTPRINTS, PLAYER_FOOT_RADIUS } from './ground-footprint';
 import buildings from '../data/buildings.json';
 import recipes from '../data/recipes.json';
 import items from '../data/items.json';
@@ -31,6 +32,17 @@ export function buildingAt(w: WorldState, x: number, y: number): BuildingInstanc
   return w.ark.buildings.find(b => {
     const [sx, sy] = buildingDefs.get(b.defId)?.size ?? [1, 1];
     return x >= b.gx && y >= b.gy && x < b.gx + sx && y < b.gy + sy;
+  });
+}
+
+/** Rectangle overlap for the player's feet, independent of tile-based placement/UI. */
+export function hasBuildingContact(w: WorldState, px: number, py: number): boolean {
+  const r = PLAYER_FOOT_RADIUS;
+  return w.ark.buildings.some(b => {
+    const [sx, sy] = buildingDefs.get(b.defId)?.size ?? [1, 1];
+    const [left, top, right, bottom] = GROUND_FOOTPRINTS[b.defId]?.bounds ?? [0, 0, sx, sy];
+    return px + r > b.gx + left && px - r < b.gx + right &&
+           py + r > b.gy + top && py - r < b.gy + bottom;
   });
 }
 
@@ -163,10 +175,9 @@ export function walk(w: WorldState, direction: Vec2): void {
   const dx = direction.x / length;
   const dy = direction.y / length;
   p.facing = { x: dx, y: dy };
-  const clear = (px: number, py: number) => [-0.21,0.21].every(ox => [-0.21,0.21].every(oy => {
-    const x = Math.floor(px + ox), y = Math.floor(py + oy);
-    return isDeck(w, x, y) && !buildingAt(w, x, y);
-  }));
+  const r = PLAYER_FOOT_RADIUS;
+  const clear = (px: number, py: number) => !hasBuildingContact(w,px,py) &&
+    [-r,r].every(ox => [-r,r].every(oy => isDeck(w,Math.floor(px+ox),Math.floor(py+oy))));
   const speed = 0.095;
   if (clear(p.x + dx * speed, p.y)) { p.x += dx * speed; p.vx = dx * speed; }
   if (clear(p.x, p.y + dy * speed)) { p.y += dy * speed; p.vy = dy * speed; }

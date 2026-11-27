@@ -1,6 +1,7 @@
+import { PLAYER_FOOT_RADIUS } from './ground-footprint';
 import { highTierCache, highTierOre } from './m5-zones';
 import biomes from '../data/biomes.json';
-import { buildingAt, isDeck, walk } from './ark';
+import { hasBuildingContact, isDeck, walk } from './ark';
 import { getNavigation } from './m3-state';
 import { nextRng } from './rng';
 import { ISLAND_SIZE, type IslandNode, type IslandState, type ItemStack, type Vec2, type WorldState } from './types';
@@ -182,10 +183,9 @@ export function walkExpedition(w:WorldState,direction:Vec2):void{
   const dx=direction.x/len,dy=direction.y/len;
   p.facing={x:dx,y:dy};
   const speed=areaAt(w,p.x,p.y)==='island'?.087:.095;
-  const allowed=(x:number,y:number)=>[-.21,.21].every(ox=>[-.21,.21].every(oy=>{
-    const xx=x+ox,yy=y+oy,area=areaAt(w,xx,yy);
-    return area!=='void'&&(area!=='ark'||!buildingAt(w,Math.floor(xx),Math.floor(yy)));
-  }));
+  const r=PLAYER_FOOT_RADIUS;
+  const allowed=(x:number,y:number)=>!hasBuildingContact(w,x,y)&&
+    [-r,r].every(ox=>[-r,r].every(oy=>areaAt(w,x+ox,y+oy)!=='void'));
   if(allowed(p.x+dx*speed,p.y)){p.x+=dx*speed;p.vx=dx*speed;}
   if(allowed(p.x,p.y+dy*speed)){p.y+=dy*speed;p.vy=dy*speed;}
   const area=areaAt(w,p.x,p.y);

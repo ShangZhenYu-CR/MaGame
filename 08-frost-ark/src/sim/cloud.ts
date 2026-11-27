@@ -1,4 +1,5 @@
 import { countItem, inventoryChange, isDeck } from './ark';
+import { dropOnDeck, isDeckDrop } from './latte';
 import { nextRng } from './rng';
 import { TICK_RATE, type CloudDebris, type Vec2, type WorldState } from './types';
 
@@ -74,20 +75,20 @@ export function stepCloud(w: WorldState): void {
   const p = w.player, g = p.grapple;
   if (w.tick % (TICK_RATE * 3) === 0) w.sky.debris.push(debris(w,w.tick / (TICK_RATE * 3) - 1,false));
   for (const d of w.sky.debris) {
-    if (d.id === g.caughtDebrisId) continue;
+    if (d.id === g.caughtDebrisId || isDeckDrop(d)) continue;
     d.x += d.vx / TICK_RATE;
     d.y += d.vy / TICK_RATE;
     if (isDeck(w,Math.floor(d.x),Math.floor(d.y))) d.y += .07;
   }
-  w.sky.debris = w.sky.debris.filter(d => d.id === g.caughtDebrisId || d.x < w.ark.size / 2 + 17);
+  w.sky.debris = w.sky.debris.filter(d => d.id === g.caughtDebrisId || isDeckDrop(d) || d.x < w.ark.size / 2 + 17);
   if (g.charging) { g.charge = Math.min(1,g.charge + 1/(TICK_RATE*.8)); return; }
   if (!g.active) return;
   const held = w.sky.debris.find(d=>d.id === g.caughtDebrisId);
   if (held) {
     const dist = Math.hypot(p.x-held.x,p.y-held.y);
     if (dist <= .34) {
-      if (inventoryChange(w,[],held.loot)) w.sky.debris = w.sky.debris.filter(d=>d!==held);
-      else { held.x = p.x - 1.3; held.y = p.y + 1.15; }
+      if (!inventoryChange(w,[],held.loot)) dropOnDeck(w,held.loot);
+      w.sky.debris = w.sky.debris.filter(d=>d!==held);
       g.caughtDebrisId = null; g.active = false; g.charge = 0;
     } else {
       const k = Math.min(.205,dist)/dist;
@@ -100,7 +101,7 @@ export function stepCloud(w: WorldState): void {
   const b = hookTip(w);
   if (outbound) {
     const dx = b.x-a.x, dy = b.y-a.y;
-    const hits = w.sky.debris.flatMap(d => {
+    const hits = w.sky.debris.filter(d=>!isDeckDrop(d)).flatMap(d => {
       const k = Math.max(0,Math.min(1,((d.x-a.x)*dx+(d.y-a.y)*dy)/Math.max(.00001,dx*dx+dy*dy)));
       return Math.hypot(d.x-a.x-dx*k,d.y-a.y-dy*k) <= .45 ? [{d,k}] : [];
     }).sort((x,y)=>x.k-y.k);

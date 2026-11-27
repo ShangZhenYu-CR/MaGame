@@ -4,20 +4,26 @@ import { build, buildIssue, craftTorch, itemNames, type BuildKind } from './sim/
 import { aim, cancelCharge, fire, startCharge } from './sim/cloud';
 import { deserializeWorld, serializeWorld } from './sim/save';
 import { nearestStorage, storageContents, STORAGE_SLOTS, transferStorage } from './sim/storage-box';
+import { addFuel, heatAt, partOfDay, primaryHearth, upgradeHearth } from './sim/heatField';
+import { dropSupply, manuallyRecover } from './sim/latte';
 import { TICK_RATE, type WorldState } from './sim/types';
 import { createInitialWorld, stepWorld } from './sim/world';
 import { openArchive, savedWorld, storeWorld } from './ui/storage';
 
 function el<T extends HTMLElement = HTMLElement>(id: string): T { return document.getElementById(id)! as T; }
 const canvas=el<HTMLCanvasElement>('game-canvas'), view=new ArkView(canvas);
-el<HTMLImageElement>('manan-portrait').src='../assets/character/head-0.png';
+const portrait=el<HTMLImageElement>('manan-portrait');
+const portraits=[0,1,2,3].map(n=>`../assets/character/head-${n}.png`);
+portrait.src=portraits[0];
+let mood=0;
+const thermal=el('thermal-stats'), briefing=el('weather-status'), catStatus=el('latte-status');
 const stats=el('hud-stats'), hint=el('hint'), action=el('action'), save=el('save-label'), note=el('build-note');
 const meter=el('meter'), bar=el('charge-bar'), panel=el('inventory'), input=el<HTMLInputElement>('save-file');
 const keys=new Set<string>();
 const locker=el('storage-panel');
 let lockerSignature='';
 type Mode = 'hook' | BuildKind;
-const controls: Record<Mode,HTMLElement>={ hook:el('hook'),wood_deck:el('build-deck'),torch_post:el('build-torch') };
+const controls: Record<Mode,HTMLElement>={ hook:el('hook'),wood_deck:el('build-deck'),torch_post:el('build-torch'),wind_wall:el('build-wall') };
 let mode: Mode='hook', w: WorldState=createInitialWorld(), pointer:{x:number;y:number}|null=null;
 let db: IDBDatabase|null=null, active=false, saveQueue=Promise.resolve();
 let messageUntil=0, caught:string|null=null, catchName='', countAtCatch=0, catchLootId='';
@@ -100,10 +106,18 @@ function ghostAt(): Ghost|null {
   if(mode==='hook'||!pointer)return null;
   const at=view.world(pointer.x,pointer.y), x=Math.floor(at.x), y=Math.floor(at.y);
   const issue=buildIssue(w,mode,x,y);
-  note.hidden=false;note.textContent=issue??(mode==='wood_deck'?'吸附就绪 · 浮木板 ×2':'放置就绪 · 防风火把 ×1');
-  return {x,y,ok:!issue,torch:mode==='torch_post'};
+  note.hidden=false;note.textContent=issue??(mode==='wood_deck'?'吸附就绪 · 浮木板 ×2':mode==='torch_post'?'放置就绪 · 防风火把 ×1':'挡风墙 · 浮木板 ×3');
+  return {x,y,ok:!issue,torch:mode==='torch_post',wall:mode==='wind_wall'};
 }
 for(const [k,b] of Object.entries(controls)) b.addEventListener('click',()=>choose(k as Mode));
+function warmthAction(kind:'fuel'|'upgrade'|'drop'|'pickup'):void {
+  const reason=kind==='fuel'?addFuel(w):kind==='upgrade'?upgradeHearth(w):
+    kind==='drop'?(dropSupply(w)?null:'背包里没有浮木板。'):(manuallyRecover(w)?null:'附近没有可捡的掉落物。');
+  const result={fuel:'已给余烬主炉添柴。',upgrade:'主炉升至 Lv.2，拿铁会捡拾暖区的掉落物。',drop:'放下了浮木板 ×1，可按 F 拾回。',pickup:'已捡回地上的物品。'};
+  tell(reason??result[kind]);if(!reason)void saveNow();
+}
+el('fuel-hearth').onclick=()=>warmthAction('fuel');
+el('upgrade-hearth').onclick=()=>warmthAction('upgrade');
 el('bag').onclick=()=>toggleBag();
 el('close').onclick=()=>toggleBag(false);
 el('storage-close').onclick=()=>toggleStorage(false);
@@ -147,6 +161,11 @@ addEventListener('keydown',e=>{
   else if(k==='q')choose('hook');
   else if(k==='1')choose('wood_deck');
   else if(k==='2')choose('torch_post');
+  else if(k==='3')choose('wind_wall');
+  else if(k==='r')warmthAction('fuel');
+  else if(k==='u')warmthAction('upgrade');
+  else if(k==='g')warmthAction('drop');
+  else if(k==='f')warmthAction('pickup');
   else if(k==='i'){ e.preventDefault();toggleBag(); }
 });
 addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
@@ -167,7 +186,7 @@ canvas.addEventListener('pointerdown',e=>{
     const x=Math.floor(at.x),y=Math.floor(at.y), kind=mode;
     const issue=buildIssue(w,kind,x,y);
     if(!issue&&build(w,kind,x,y)){
-      tell(kind==='wood_deck'?'甲板已拼接，可以走上去。':'防风火把已点亮。');void saveNow();
+      tell(kind==='wood_deck'?'甲板已拼接，可以走上去。':kind==='torch_post'?'防风火把已点亮。':'挡风墙已放好，附近热量散得更慢。');void saveNow();
     } else tell(issue??'这里不能施工。');
   }
 });
@@ -188,7 +207,7 @@ function simulation():void {
       countAtCatch=w.player.inventory.reduce((n,s)=>n+(s?.itemId===catchLootId?s.count:0),0);
     }else if(caught){
       const total=w.player.inventory.reduce((n,s)=>n+(s?.itemId===catchLootId?s.count:0),0);
-      tell(total>countAtCatch?'已回收入包：'+catchName+' ×'+(total-countAtCatch):'背包没有空位，残骸已松开。');
+      tell(total>countAtCatch?'已回收入包：'+catchName+' ×'+(total-countAtCatch):'背包没有空位，残骸已放在甲板上。');
       void saveNow();
     }
     caught=g.caughtDebrisId;
@@ -205,11 +224,22 @@ function frame(now:number):void {
   const g=w.player.grapple;
   const nextStats=`DAY ${w.day}　${w.ambientTemp}°C　浮力 ${w.ark.buoyancyUsed}/${w.ark.buoyancyMax}`;
   if(stats.textContent!==nextStats)stats.textContent=nextStats;
+  const h=primaryHearth(w), local=Math.round(heatAt(w,w.player.x,w.player.y));
+  const body=`体温 ${Math.round(w.player.warmth)}　生命 ${Math.ceil(w.player.hp)}　脚下 ${local}°C`;
+  if(thermal.textContent!==body)thermal.textContent=body;
+  thermal.dataset.cold=String(w.player.warmth<=25);
+  const phase=w.weather==='whiteout'?'大寒潮':partOfDay(w.timeOfDay);
+  const report=`${phase} · 主炉 Lv.${h?.level??0} · 燃料 ${Math.ceil(h?.fuel??0)}`;
+  if(briefing.textContent!==report)briefing.textContent=report;
+  const cat=w.latte.mood==='alert'?'拿铁 · 炸毛警戒':w.latte.mood==='hungry_hearth'?'拿铁 · 提醒添柴':'拿铁 · 炉边打呼';
+  const catLine=cat+(w.latte.autoLootUnlocked?' · 暖区拾取':'');
+  if(catStatus.textContent!==catLine)catStatus.textContent=catLine;
+  if(mood!==w.player.portraitMood){mood=w.player.portraitMood;portrait.src=portraits[mood]??portraits[0];}
   if(caught)action.textContent='正在拉回：'+catchName;
   else if(g.charging)action.textContent='抓钩蓄力 '+Math.round(g.charge*100)+'%';
   else if(g.active)action.textContent='抓钩已抛出…';
   else if(w.tick>=messageUntil)action.textContent='余烬还在。先从云里捞点木头。';
-  hint.textContent=mode==='hook'?(nearbyStorage()?'按 E 或点击储物箱存取物品':'按住左键蓄力，松开抛钩'):mode==='wood_deck'?'移动鼠标贴合甲板直边，左键拼接':'先在背包手搓火把，再选空甲板放置';
+  hint.textContent=mode==='hook'?(nearbyStorage()?'按 E 或点击储物箱存取物品':'按住左键蓄力，松开抛钩'):mode==='wood_deck'?'移动鼠标贴合甲板直边，左键拼接':mode==='torch_post'?'先在背包手搓火把，再选空甲板放置':'挡风墙放在空甲板，减缓周围热量散失';
   meter.hidden=!g.charging;bar.style.width=(g.charge*100)+'%';
   note.hidden=mode==='hook'||!pointer;
   view.draw(w,ghostAt());

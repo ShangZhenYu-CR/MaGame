@@ -3,7 +3,7 @@ import type { Vec2, WorldState } from '../sim/types';
 import { PALETTE as P } from './palette';
 import { makeMananAtlas, MANAN_FRAME, type Direction } from './manan-atlas';
 
-export interface Ghost { x: number; y: number; ok: boolean; torch: boolean }
+export interface Ghost { x: number; y: number; ok: boolean; torch: boolean; wall?:boolean }
 export class ArkView {
   private ctx: CanvasRenderingContext2D;
   private scale = 40;

@@ -1,15 +1,14 @@
 import {
   ARK_SIZE,
   SAVE_VERSION,
-  TICK_RATE,
   type WorldState,
   type Vec2,
 } from './types';
 import { seedDrift, stepCloud } from './cloud';
 import { makeBuilding, walk } from './ark';
+import { advanceClimate, initializeHeat, stepHeat } from './heatField';
+import { updateLatte } from './latte';
 import { nextRng } from './rng';
-
-const DAY_TICKS = TICK_RATE * 60 * 8; // 8 minutes per in-game day
 
 export function createInitialWorld(seed = 202608): WorldState {
   const decks = new Array<number>(ARK_SIZE * ARK_SIZE).fill(0);
@@ -35,7 +34,7 @@ export function createInitialWorld(seed = 202608): WorldState {
     tick: 0,
     day: 1,
     timeOfDay: 0.15,
-    weather: 'snow',
+    weather: 'clear',
     ambientTemp: -4,
     player: {
       x: center + 0.5,
@@ -114,6 +113,7 @@ export function createInitialWorld(seed = 202608): WorldState {
     bossDefeated: false,
   };
   seedDrift(world);
+  initializeHeat(world);
   return world;
 }
 
@@ -122,20 +122,8 @@ export function stepWorld(world: WorldState, ticks = 1, direction: Vec2 = {x: 0,
     world.tick += 1;
     walk(world, direction);
     stepCloud(world);
-    world.timeOfDay = (world.timeOfDay + 1 / DAY_TICKS) % 1;
-    if (world.tick % DAY_TICKS === 0) {
-      world.day += 1;
-    }
-
-    const hearth = world.ark.buildings.find((b) => b.defId === 'hearth_core');
-    if (hearth && hearth.fuel > 0) {
-      hearth.fuel = Math.max(0, hearth.fuel - 0.015);
-    }
-
-    // Ambient temperature baseline curve (expanded in M1 heatField.ts)
-    const isNight = world.timeOfDay >= 0.68;
-    const isWhiteout = world.day % 5 === 0 && isNight;
-    world.weather = isWhiteout ? 'whiteout' : isNight ? 'snow' : 'clear';
-    world.ambientTemp = isWhiteout ? -55 : isNight ? -22 : -4;
+    advanceClimate(world);
+    stepHeat(world);
+    updateLatte(world);
   }
 }

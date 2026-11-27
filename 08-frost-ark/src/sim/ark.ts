@@ -3,12 +3,12 @@ import recipes from '../data/recipes.json';
 import items from '../data/items.json';
 import type { BuildingInstance, ItemStack, Vec2, WorldState } from './types';
 
-export type BuildKind = 'wood_deck' | 'torch_post';
+export type BuildKind = 'wood_deck' | 'torch_post' | 'wind_wall';
 export const itemNames = new Map(items.map(({ id, name }) => [id, name]));
 const limits = new Map(items.map(i => [i.id, i.stack]));
 const defs = new Map(buildings.map(d => [d.id, d]));
 const torch = recipes.find(r => r.id === 'craft_torch')!;
-export const buildCosts = { wood_deck: defs.get('wood_deck')!.cost, torch_post: defs.get('torch_post')!.cost };
+export const buildCosts = { wood_deck: defs.get('wood_deck')!.cost, torch_post: defs.get('torch_post')!.cost, wind_wall: defs.get('wind_wall')!.cost };
 export const torchInputs = torch.inputs;
 
 export function isDeck(w: WorldState, x: number, y: number): boolean {
@@ -82,7 +82,8 @@ export function buildIssue(w: WorldState, kind: BuildKind, x: number, y: number)
     if (![[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy]) => isDeck(w,x+dx,y+dy))) return '须吸附到甲板直边';
     if (w.ark.buoyancyUsed >= w.ark.buoyancyMax) return '浮力已满';
   } else {
-    if (!isDeck(w, x, y)) return '火把须放在甲板上';
+    if (!isDeck(w, x, y)) return kind==='wind_wall'?'挡风墙须放在甲板上':'火把须放在甲板上';
+    if (kind==='wind_wall'&&w.ark.buoyancyUsed>=w.ark.buoyancyMax) return '浮力已满';
     if (buildingAt(w, x, y) || (Math.floor(w.player.x) === x && Math.floor(w.player.y) === y)) return '这里被占用';
   }
   if (!hasCost(w, buildCosts[kind])) return '材料不足';
@@ -95,7 +96,8 @@ export function build(w: WorldState, kind: BuildKind, x: number, y: number): boo
     w.ark.decks[y * w.ark.size + x] = 1;
     w.ark.buoyancyUsed++;
   } else {
-    w.ark.buildings.push(makeBuilding(kind, x, y, `torch_${x}_${y}`));
+    w.ark.buildings.push(makeBuilding(kind, x, y, `${kind}_${x}_${y}`));
+    if(kind==='wind_wall')w.ark.buoyancyUsed++;
   }
   return true;
 }

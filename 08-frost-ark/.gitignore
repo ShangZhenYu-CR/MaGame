@@ -2,3 +2,7 @@ node_modules/
 artifacts/
 *.zip
 .DS_Store
+
+# Offline art pipeline work files
+__pycache__/
+art/raw/

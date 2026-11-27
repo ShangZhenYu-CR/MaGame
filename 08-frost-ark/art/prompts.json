@@ -1,0 +1,641 @@
+{
+  "specVersion": "2.0",
+  "generationTool": "OpenAI ImageGen",
+  "reference": "assets/character/design-sheet.jpg",
+  "prompts": {
+    "hearth": "2.5D top-down 3/4 view (40 degree camera angle), original high-detail hand-painted indie survival game sprite, crisp painterly cel brushwork, subtle dark slate-brown outline (#1b222c), tactile frost-weathered wood and cast-iron materials, soft top-left cool skylight, centered isolated full object with generous padding on a flat pure solid #FF00FF magenta background, NO ground cast shadow, NO text, NO frame, NO watermark. Match the game asset's straight horizontal footprint. One inventory prop sheet in a precise 2 columns by 1 row layout with both boxes of exactly equal width, wide landscape image. On LEFT a level 1 ember hearth, a squat rectangular stonework and iron industrial wood-burning stove with a wide recessed front firebox opening, iron bars only along the base, visible birch fuel and restrained glowing ember bed, short narrow dark iron chimney behind on right side with rim and clearly visible chimney mouth. On RIGHT an upgraded level 2 version of the SAME shape, scale, perspective and family, visibly thicker brass-and-iron rim with an extra metal strap and two brushed iron corner posts. Respect each cell and empty gap. Do not bake flames over the sprite or smoke above it; actual flames and smoke are composited later. Heavy masonry feel, strong firebox silhouette, weathered cool charcoal stone and dark grey/bronze, not steampunk fantasy, not cartoon geometry.",
+    "deck": "2.5D top-down 3/4 view (40 degree camera angle), original high-detail hand-painted indie survival game sprite, crisp painterly cel brushwork, subtle dark slate-brown outline (#1b222c), tactile frost-weathered wood and cast-iron materials, soft top-left cool skylight, centered isolated full object with generous padding on a flat pure solid #FF00FF magenta background, NO ground cast shadow, NO text, NO frame, NO watermark. Match the game asset's straight horizontal footprint. One landscape four asset sheet, exact 2×2 grid, each cell contains one carefully designed seamless FOOTPRINT compatible wood flooring variant, no numbering or separators. Four equal rectangular top surface tiles to map straight onto a grid: faded weathered narrow ship-plank flooring with subtle gashes and occasional peg joints; one comparatively smooth and one reinforced seam, consistent orientation. Facing horizontal plank lengths, four flat rectangular silhouettes with FRONT THICKNESS UNDER 5% total height, no perspective skew of silhouette, no gold or large decorated framing, no artificially dark edge seam. Identical subtle wood color value and muted brown family, real gray and tan worn timber hand-painted texture. Four tiles separated by very wide pure magenta gutters and margins. Each tile wholly contained inside its quadrant.",
+    "rim": "2.5D top-down 3/4 view (40 degree camera angle), original high-detail hand-painted indie survival game sprite, crisp painterly cel brushwork, subtle dark slate-brown outline (#1b222c), tactile frost-weathered wood and cast-iron materials, soft top-left cool skylight, centered isolated full object with generous padding on a flat pure solid #FF00FF magenta background, NO ground cast shadow, NO text, NO frame, NO watermark. Match the game asset's straight horizontal footprint. One 2×2 equal-cell isolated game prop sheet. TOP LEFT: low horizontal single-width weathered brown ship railing with two short frost-dark edge posts and two horizontal bars, no diagonal panel. TOP RIGHT: chunky L-shaped cast iron metal corner bracket with three tiny rivets, horizontal top plane and front lip, frost-dusted muted steel, optionally a small integral mooring nub, no board attached. BOTTOM LEFT: an irregular faceted hanging-gray floating rock cone undersection, the broad flat rocky roof should take 75% of the object's width, narrowing asymmetrically downward to a sizeable sharp chipped point, with tiny muted cyan cracks, front and left faces evident, NO WOOD. BOTTOM RIGHT: an isolated staggered cluster of five translucent pale glacial icicles hanging downward attached to a thin uneven ice crust, blue-grey and chalk-white, NO ROCK. All distinct in their own quadrant, no label or decorative frames, wide magenta gutters.",
+    "walltorch": "2.5D top-down 3/4 view (40 degree camera angle), original high-detail hand-painted indie survival game sprite, crisp painterly cel brushwork, subtle dark slate-brown outline (#1b222c), tactile frost-weathered wood and cast-iron materials, soft top-left cool skylight, centered isolated full object with generous padding on a flat pure solid #FF00FF magenta background, NO ground cast shadow, NO text, NO frame, NO watermark. Match the game asset's straight horizontal footprint. A two columns by one row wide landscape asset sheet, two completely separated objects in equal cells. LEFT simple game building piece: a low rectangular freestanding wooden ship windbreak, tightly vertical weathered planks, top rail, dark metal side brackets and supporting feet, frost on top (a solid windbreak not a fence). RIGHT simple freestanding narrow cast-iron oil torch on upright timber post with a small perforated hood and a rounded iron and stone foot, tapering up naturally, has orange glowing chamber but no outside drawn flame, so dynamic effects can be added. Muted realistic painterly materials, the two props clearly separate, centered entirely in their own respective cells with huge outer padding and magenta gutters.",
+    "cloud": "Ultra wide high-altitude fantasy sky cloud ocean as viewed looking down diagonally 40 degrees, seamless horizontally repeatable texture for an indie survival game's parallax. Whole frame artwork edge to edge; soft depth of layered ice-blue and cool slate-blue airy natural cloud billows, finely hand-painted atmospheric tonal modeling, broad thin wisps around big soft layered curls, consistent subtle upper left cool light, low saturation, shades from cold deep blues #152436 to gentle #7FA6C4; medium large see-through headroom in central clusters, crisp hand painted without geometric outlines, no pixelation, no visible horizon, no sun, no stars, no mountains, no rocks, no scene focal point, no neon, no purple, no magenta matte, no text. Wide 16:9 horizontal composition.",
+    "storage": "Generate one prototype game sprite to test the image pipeline for Frost Ark: a single small closed rectangular wooden storage chest with dark iron hardware and a muted brass latch, 2.5D top-down three-quarter view with 40 degree camera angle, align horizontal edges along screen axes, front visible below top, cool diffuse skylight from upper left, tactile weathered timber, subtle dark slate-brown contour, crisp hand-painted indie survival game art. Centered entire isolated object filling at most 62% of frame width and height, on an absolutely flat solid pure magenta (#FF00FF) background edge to edge. No floor or contact shadow, no reflections in background, no background grading, no text, no framing. Only one object.",
+    "manan": "2.5D top-down 3/4 view (40 degree camera angle) hand-painted indie survival game sprite, inspired by Core Keeper and Eastward, crisp painterly cel brushwork, subtle dark slate-brown outline (#1b222c), tactile frost-weathered wood and cast-iron materials, soft top-left cool skylight, centered isolated full object with generous padding on a flat pure solid #FF00FF magenta background, NO ground cast shadow, NO text, NO frame, NO watermark. Produce a square game sprite sheet with exactly four completely isolated sprites on an implicit equal-sized 2x2 grid, one small full-body sprite safely inside each quadrant and center aligned. NO grid lines. Asset for Frost Ark: Ma Nan, an East Asian young man with short close-cropped black buzz cut and very straight eyebrows. The attached design sheet is the required reference: match the exact haircut and face, dark charcoal lightweight hooded technical windbreaker (hood down, distinct zipper), very tiny gray A chest mark only on the anatomical left chest, black multipocket cargo pants, off-white sneakers with gray rubber panels. Do not reproduce any reference page background or labels. Slightly stylize to an adult about 5 heads high for 64px legibility; common chassis scale for all four, pose relaxed (arms not outstretched). His anatomical right hand HOLDS a compact windproof cast-iron storm lantern hanging at hip height with a visible warm amber-orange glass center, no magical halo bleeding outside the object. Orthographic camera elevated 40° above horizon for ALL FOUR, see top of head/shoulders. Precisely top-left SOUTH front facing camera, top-right NORTH back facing away with hood and lantern still visible on his right side, bottom-left EAST profile facing image-right, bottom-right WEST profile facing image-left. Keep lantern on correct anatomical hand at each angle, let it peek past the far hip where needed. Not 0-degree side view, not high-angle bird eye, not perspective-converged. Painterly tapered lines with smoky cold slate rim light, limited restrained palette charcoal and true warm orange lantern, shaped readable clothing folds, confident game-ready silhouette, no additional accessories. Ensure the background across corners, below and between sprites and all negative spaces is entirely exact RGB (255,0,255), no vignette, gradients, AO, reflected magenta light, shadow, sticker borders, or white halos. Render at 1024x1024 with bodies taking ~340px high centered per quadrant.",
+    "latte": "2.5D top-down 3/4 view (40 degree camera angle) hand-painted indie survival game sprite, inspired by Core Keeper and Eastward, crisp painterly cel brushwork, subtle dark slate-brown outline (#1b222c), tactile frost-weathered wood and cast-iron materials, soft top-left cool skylight, centered isolated full object with generous padding on a flat pure solid #FF00FF magenta background, NO ground cast shadow, NO text, NO frame, NO watermark. Square 1024x1024 contact sheet of one consistent fluffy juvenile cat rendered in FOUR distinct game-ready tiny orthographic 40deg poses, each isolated safely centered in its own 512x512 quadrant, no grid lines. This is Latte, an adorable round caramel-ginger and creamy ivory longhair kitten: light caramel shallow stripes on crown and a thick fluffy curled striped tail, white muzzle and chest bib, tiny peach inner TRIANGULAR ears, brown curious eyes; soft feline proportions not broad fox ears, no clothes. Top left SLEEP: tightly curled cinnamon roll, tuck paws under torso, eyes closed, tail curls snug against face, touches no pillow; top right ALERT: visibly standing up on four feet with arched back, puffed raised tail, ears upright and looking slightly screen-left, eyes open and curious; bottom left WALK: active natural feline stride diagonally toward screen-left, front-left paw stepping forward and expression relaxed, horizontally readable side/three-quarter view and tail up, eyes open; bottom right WALK 2: contrasting alternate feline stride with rear leg forward, same orientation and scale. Cohesive color and materials: caramel ochre highlights, deeper warm umber fur shadows, cream chest; subtle slate brown silhouette line and cool top-left rim, mature indie game hand-painted sprite quality, economical shape and silhouette for ~42 px presentation. Full silhouettes with no clipped whiskers/tail, ample buffer to quadrant edges. Exact flat electric magenta #FF00FF at all background pixels; absolutely no dropped shadows, line at ground contact, white fringe, vignette, gradients, text, decorative props, frames, or labels.",
+    "icons": "Game asset sprite sheet for Frost Ark, EXACT 4 columns x 2 rows regularly spaced on one flat solid pure electric magenta #FF00FF RGB(255,0,255) matte. Square canvas. Each sprite centered in its cell, all silhouettes have generous margins and never touch. No text, borders, guide lines, panels, shadows on background, white rim or gradient. Readable 32px game icons, handcrafted painterly 2.5D style with restrained realistic materials, game 3/4 overhead 40 degree, soft cool top-left skylight, soft deep slate-brown contour. Row 1 from left to right: steel grappling hook with short handle; square icy wooden deck plank module with two iron corner fixtures; lit short resin torch on wood pole orange amber flame; sturdy weathered dark wood windbreak wall panel with iron strap. Row 2 from left to right: charcoal canvas rucksack; two short frost-dusted splintered driftwood pieces; one chunky coil of twisted dark blue gray frozen iron scrap with scraped highlights; one loop of ochre tan knotted hemp rope. Keep icons bold, compact, evenly scaled, detailed without noise. Entire background exact block color #FF00FF including edges.",
+    "debris": "Square 2x2 atlas of EXACTLY three isolated game-world salvage sprites (bottom right must remain EMPTY uniform magenta): top left weathered floating wood box, slatted worn silver-gray brown crate with two narrow iron braces, splinter and light frost; top right knotted and twisted dark blue gray iron scrap, torn bent metal with ice crystals and a little sharp cold reflection; bottom left coiled golden brown hemp mooring rope with knot and visible twisted fibers and a few bright frosted breaks. Center in each of three cells with large margins and no overlap. Clean background is an uninterrupted flat pure #FF00FF (255,0,255) chroma key matte; no labels, frame, guides, shadow, colored ground, reflected pink, white halo, cloud or gradients. Original 2.5D hand-painted indie survival game props, fixed 40-degree 3/4 overhead shape, painted facets, gentle upper-left cool daylight, deep slate-brown softly edged outlines, clear consistent front sides, paint texture, readable silhouette at 64 pixels. All three objects completely visible. Strong distinct silhouettes."
+  },
+  "assets": [
+    {
+      "id": "manan-south",
+      "source": "manan-turnaround.png",
+      "size": [
+        128,
+        128
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        0,
+        0,
+        627,
+        627
+      ]
+    },
+    {
+      "id": "manan-north",
+      "source": "manan-turnaround.png",
+      "size": [
+        128,
+        128
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        627,
+        0,
+        1254,
+        627
+      ]
+    },
+    {
+      "id": "manan-east",
+      "source": "manan-turnaround.png",
+      "size": [
+        128,
+        128
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        0,
+        627,
+        627,
+        1254
+      ]
+    },
+    {
+      "id": "manan-west",
+      "source": "manan-turnaround.png",
+      "size": [
+        128,
+        128
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        627,
+        627,
+        1254,
+        1254
+      ]
+    },
+    {
+      "id": "latte-sleep",
+      "source": "latte-poses.png",
+      "size": [
+        128,
+        128
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        0,
+        0,
+        627,
+        627
+      ]
+    },
+    {
+      "id": "latte-alert",
+      "source": "latte-poses.png",
+      "size": [
+        128,
+        128
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        627,
+        0,
+        1254,
+        627
+      ]
+    },
+    {
+      "id": "latte-walk",
+      "source": "latte-poses.png",
+      "size": [
+        128,
+        128
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        0,
+        627,
+        627,
+        1254
+      ]
+    },
+    {
+      "id": "latte-walk-alt",
+      "source": "latte-poses.png",
+      "size": [
+        128,
+        128
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        627,
+        627,
+        1254,
+        1254
+      ]
+    },
+    {
+      "id": "hearth-1",
+      "source": "hearth.png",
+      "size": [
+        240,
+        240
+      ],
+      "tileW": 2,
+      "tileH": 2,
+      "key": "magenta",
+      "crop": [
+        0,
+        0,
+        887,
+        887
+      ]
+    },
+    {
+      "id": "hearth-2",
+      "source": "hearth.png",
+      "size": [
+        240,
+        240
+      ],
+      "tileW": 2,
+      "tileH": 2,
+      "key": "magenta",
+      "crop": [
+        887,
+        0,
+        1774,
+        887
+      ]
+    },
+    {
+      "id": "deck-1",
+      "source": "deck.png",
+      "size": [
+        128,
+        128
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "none",
+      "crop": [
+        40,
+        158,
+        730,
+        442
+      ],
+      "fit": "stretch",
+      "maxBytes": 52000
+    },
+    {
+      "id": "deck-2",
+      "source": "deck.png",
+      "size": [
+        128,
+        128
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "none",
+      "crop": [
+        805,
+        158,
+        1496,
+        442
+      ],
+      "fit": "stretch",
+      "maxBytes": 52000
+    },
+    {
+      "id": "deck-3",
+      "source": "deck.png",
+      "size": [
+        128,
+        128
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "none",
+      "crop": [
+        40,
+        623,
+        730,
+        910
+      ],
+      "fit": "stretch",
+      "maxBytes": 52000
+    },
+    {
+      "id": "deck-4",
+      "source": "deck.png",
+      "size": [
+        128,
+        128
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "none",
+      "crop": [
+        805,
+        623,
+        1496,
+        910
+      ],
+      "fit": "stretch",
+      "maxBytes": 52000
+    },
+    {
+      "id": "rail",
+      "source": "rim.png",
+      "size": [
+        128,
+        128
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        0,
+        0,
+        650,
+        615
+      ]
+    },
+    {
+      "id": "corner",
+      "source": "rim.png",
+      "size": [
+        128,
+        128
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        650,
+        0,
+        1278,
+        615
+      ]
+    },
+    {
+      "id": "rock",
+      "source": "rim.png",
+      "size": [
+        192,
+        192
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        0,
+        615,
+        640,
+        1230
+      ]
+    },
+    {
+      "id": "icicles",
+      "source": "rim.png",
+      "size": [
+        128,
+        128
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        640,
+        615,
+        1278,
+        1230
+      ]
+    },
+    {
+      "id": "storage",
+      "source": "storage.png",
+      "size": [
+        128,
+        128
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta"
+    },
+    {
+      "id": "wall",
+      "source": "walltorch.png",
+      "size": [
+        128,
+        128
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        0,
+        0,
+        887,
+        887
+      ]
+    },
+    {
+      "id": "torch",
+      "source": "walltorch.png",
+      "size": [
+        128,
+        128
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        887,
+        0,
+        1774,
+        887
+      ]
+    },
+    {
+      "id": "debris-wood",
+      "source": "debris.png",
+      "size": [
+        128,
+        128
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        0,
+        0,
+        627,
+        627
+      ]
+    },
+    {
+      "id": "debris-iron",
+      "source": "debris.png",
+      "size": [
+        128,
+        128
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        627,
+        0,
+        1254,
+        627
+      ]
+    },
+    {
+      "id": "debris-rope",
+      "source": "debris.png",
+      "size": [
+        128,
+        128
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        0,
+        627,
+        627,
+        1254
+      ]
+    },
+    {
+      "id": "icon-hook",
+      "source": "icons.png",
+      "size": [
+        64,
+        64
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        0,
+        185,
+        313,
+        580
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-deck",
+      "source": "icons.png",
+      "size": [
+        64,
+        64
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        313,
+        185,
+        626,
+        580
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-torch",
+      "source": "icons.png",
+      "size": [
+        64,
+        64
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        626,
+        185,
+        939,
+        580
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-wall",
+      "source": "icons.png",
+      "size": [
+        64,
+        64
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        939,
+        185,
+        1254,
+        580
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-bag",
+      "source": "icons.png",
+      "size": [
+        64,
+        64
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        0,
+        680,
+        313,
+        1050
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-driftwood",
+      "source": "icons.png",
+      "size": [
+        64,
+        64
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        313,
+        680,
+        626,
+        1050
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-iron",
+      "source": "icons.png",
+      "size": [
+        64,
+        64
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        626,
+        680,
+        939,
+        1050
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-rope",
+      "source": "icons.png",
+      "size": [
+        64,
+        64
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "magenta",
+      "crop": [
+        939,
+        680,
+        1254,
+        1050
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "clouds",
+      "source": "cloud.png",
+      "size": [
+        1024,
+        576
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "key": "none",
+      "format": "webp"
+    }
+  ]
+}

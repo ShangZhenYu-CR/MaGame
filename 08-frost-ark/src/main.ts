@@ -1,10 +1,10 @@
 import './ui/ark.css';
 import { ArkView, type Ghost } from './render/ark-view';
-import { build, buildIssue, craftTorch, itemNames, type BuildKind } from './sim/ark';
+import { build, buildIssue, countItem, craftTorch, itemNames, type BuildKind } from './sim/ark';
 import { aim, cancelCharge, fire, startCharge } from './sim/cloud';
 import { deserializeWorld, serializeWorld } from './sim/save';
 import { nearestStorage, storageContents, STORAGE_SLOTS, transferStorage } from './sim/storage-box';
-import { addFuel, heatAt, partOfDay, primaryHearth, upgradeHearth } from './sim/heatField';
+import { addFuel, FUEL_MAX, heatAt, partOfDay, primaryHearth, upgradeHearth } from './sim/heatField';
 import { dropSupply, isDeckDrop, manuallyRecover } from './sim/latte';
 import { TICK_RATE, type WorldState } from './sim/types';
 import { createInitialWorld, stepWorld } from './sim/world';
@@ -27,9 +27,50 @@ const controls: Record<Mode,HTMLElement>={ hook:el('hook'),wood_deck:el('build-d
 let mode: Mode='hook', w: WorldState=createInitialWorld(), pointer:{x:number;y:number}|null=null;
 let db: IDBDatabase|null=null, active=false, saveQueue=Promise.resolve();
 let messageUntil=0, caught:string|null=null, catchName='', countAtCatch=0, catchLootId='';
-let stackSignature='';
+let stackSignature='', toolbarSignature='', message='';
+const icons=import.meta.glob<string>('./assets/art/icon-*.png',{eager:true,query:'?inline',import:'default'});
+const iconPath=(id:string)=>icons['./assets/art/icon-'+id+'.png'];
+const itemIcons:Record<string,string>={grapple_hook:'hook',driftwood:'driftwood',frost_iron_scrap:'iron',rope:'rope',torch_item:'torch'};
+const toolbar=([
+  ['hook','hook'],['build-deck','deck'],['build-torch','torch'],['build-wall','wall'],['bag','bag'],
+] as const).map(([id,icon])=>{
+  const button=el(id), portrait=button.querySelector('img')!;
+  const path=iconPath(icon);
+  if(path)portrait.src=path;
+  return button.querySelector('output')!;
+});
+const vitals=([
+  ['warmth','warmth-value'],['life','life-value'],['fuel','fuel-value'],
+] as const).map(([id,value])=>[el<HTMLMeterElement>(id+'-meter'),el(value)] as const);
+const localTemperature=el('local-temp');
 
-function tell(text:string):void { action.textContent=text;messageUntil=w.tick+105; }
+function itemLabel(label:HTMLElement,itemId:string):void {
+  const path=iconPath(itemIcons[itemId]??'');
+  if(!path)return;
+  const icon=document.createElement('img');icon.alt='';icon.src=path;
+  label.classList.add('item-name');label.prepend(icon);
+}
+function setVital(i:number,n:number,max:number):void {
+  const [meter,output]=vitals[i];const display=String(Math.ceil(n));
+  if(meter.max!==max)meter.max=max;
+  if(meter.value!==n)meter.value=n;
+  if(output.textContent!==display)output.textContent=display;
+}
+function updateToolbar():void {
+  const signature=JSON.stringify(w.player.inventory);
+  if(signature===toolbarSignature)return;
+  toolbarSignature=signature;
+  const wood=countItem(w,'driftwood');
+  const count=[countItem(w,'grapple_hook'),Math.floor(wood/2),countItem(w,'torch_item'),Math.floor(wood/3),w.player.inventory.filter(Boolean).length+'/18'];
+  count.forEach((n,i)=>toolbar[i].textContent=String(n));
+}
+
+function toast(text:string):void {
+  if(text&&action.textContent!==text)action.textContent=text;
+  const shown=String(Boolean(text));
+  if(action.dataset.shown!==shown)action.dataset.shown=shown;
+}
+function tell(text:string):void { message=text;messageUntil=performance.now()+2520;toast(text); }
 function choose(next:Mode):void {
   cancelCharge(w);
   mode=next;
@@ -56,7 +97,7 @@ function fillLocker():void {
     const nodes=Array.from(entries,([itemId,count])=>{
       const li=document.createElement('li'),label=document.createElement('span'),button=document.createElement('button');
       const name=itemNames.get(itemId)??itemId;
-      label.textContent=name+' ×'+count;label.className='numbers';
+      label.textContent=name+' ×'+count;label.className='numbers';itemLabel(label,itemId);
       button.type='button';button.textContent=direction==='deposit'?'存入 1':'取出 1';
       button.setAttribute('aria-label',(direction==='deposit'?'存入 ':'取出 ')+name);
       button.onclick=()=>{
@@ -83,7 +124,7 @@ function fillBag():void {
   stackSignature=signature;
   const entries=w.player.inventory.filter(s=>s!==null).map(s=>{
     const li=document.createElement('li'), name=document.createElement('span'), count=document.createElement('strong');
-    name.textContent=itemNames.get(s.itemId) ?? s.itemId;count.textContent='×'+s.count;count.className='numbers';
+    name.textContent=itemNames.get(s.itemId) ?? s.itemId;count.textContent='×'+s.count;count.className='numbers';itemLabel(name,s.itemId);
     li.append(name,count);return li;
   });
   el('stacks').replaceChildren(...entries);
@@ -100,7 +141,7 @@ function saveNow():Promise<void> {
   return saveQueue;
 }
 function safeWorld(next:WorldState):void {
-  w=next;toggleStorage(false);lockerSignature='';cancelCharge(w);caught=null;keys.clear();messageUntil=0;stackSignature='';view.position(w);fillBag();
+  w=next;toggleStorage(false);lockerSignature='';cancelCharge(w);caught=null;keys.clear();messageUntil=0;message='';stackSignature='';view.position(w);fillBag();
 }
 function ghostAt(): Ghost|null {
   if(mode==='hook'||!pointer)return null;
@@ -227,8 +268,12 @@ function frame(now:number):void {
   const nextStats=`DAY ${w.day}　${w.ambientTemp}°C　浮力 ${w.ark.buoyancyUsed}/${w.ark.buoyancyMax}`;
   if(stats.textContent!==nextStats)stats.textContent=nextStats;
   const h=primaryHearth(w), local=Math.round(heatAt(w,w.player.x,w.player.y));
-  const body=`体温 ${Math.round(w.player.warmth)}　生命 ${Math.ceil(w.player.hp)}　脚下 ${local}°C`;
-  if(thermal.textContent!==body)thermal.textContent=body;
+  setVital(0,w.player.warmth,w.player.maxWarmth);
+  setVital(1,w.player.hp,w.player.maxHp);
+  setVital(2,h?.fuel??0,FUEL_MAX[Math.min(2,h?.level??0)]||120);
+  const reading=`脚下 ${local}°C`;
+  if(localTemperature.textContent!==reading)localTemperature.textContent=reading;
+  updateToolbar();
   thermal.dataset.cold=String(w.player.warmth<=25);
   const phase=w.weather==='whiteout'?'大寒潮':partOfDay(w.timeOfDay);
   const report=`${phase} · 主炉 Lv.${h?.level??0} · 燃料 ${Math.ceil(h?.fuel??0)}`;
@@ -237,10 +282,8 @@ function frame(now:number):void {
   const catLine=cat+(w.latte.autoLootUnlocked?' · 暖区拾取':'');
   if(catStatus.textContent!==catLine)catStatus.textContent=catLine;
   if(mood!==w.player.portraitMood){mood=w.player.portraitMood;portrait.src=portraits[mood]??portraits[0];}
-  if(caught)action.textContent='正在拉回：'+catchName;
-  else if(g.charging)action.textContent='抓钩蓄力 '+Math.round(g.charge*100)+'%';
-  else if(g.active)action.textContent='抓钩已抛出…';
-  else if(w.tick>=messageUntil)action.textContent='余烬还在。先从云里捞点木头。';
+  toast(caught?'正在拉回：'+catchName:g.charging?'抓钩蓄力 '+Math.round(g.charge*100)+'%':
+    g.active?'抓钩已抛出…':now<messageUntil?message:'');
   hint.textContent=mode==='hook'?(nearbyStorage()?'按 E 或点击储物箱存取物品':'按住左键蓄力，松开抛钩'):mode==='wood_deck'?'移动鼠标贴合甲板直边，左键拼接':mode==='torch_post'?'先在背包手搓火把，再选空甲板放置':'挡风墙放在空甲板，减缓周围热量散失';
   meter.hidden=!g.charging;bar.style.width=(g.charge*100)+'%';
   note.hidden=mode==='hook'||!pointer;

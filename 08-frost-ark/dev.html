@@ -13,21 +13,24 @@
   <header id="hud-card" class="hud-card">
     <img id="manan-portrait" alt="马楠">
     <div><div class="eyebrow">FROST ARK <span>／</span> 初航记录</div>
-      <h1>马楠：霜云方舟</h1><div id="hud-stats" class="numbers"></div><div id="thermal-stats" class="numbers"></div>
+      <h1>马楠：霜云方舟</h1><div id="hud-stats" class="numbers"></div>
+      <div id="thermal-stats" class="numbers">
+        <div class="survival-row"><label for="warmth-meter">体温</label><meter id="warmth-meter" min="0" max="100"></meter><output id="warmth-value"></output></div>
+        <div class="survival-row"><label for="life-meter">生命</label><meter id="life-meter" min="0" max="100"></meter><output id="life-value"></output></div>
+        <div class="survival-row"><label for="fuel-meter">燃料</label><meter id="fuel-meter" min="0" max="120"></meter><output id="fuel-value"></output></div>
+        <div class="underfoot" id="local-temp"></div>
+      </div>
     </div>
   </header>
   <aside class="sector"><div class="eyebrow">SKY SECTOR <span>01</span></div><strong>碎云浅海</strong><div id="weather-status" class="numbers"></div><div id="latte-status"></div><div class="hearth-tools"><button id="fuel-hearth" type="button"><kbd>R</kbd> 添柴</button><button id="upgrade-hearth" type="button" title="浮木板 ×4、冻铁废件 ×2"><kbd>U</kbd> 升炉</button></div></aside>
-  <section class="field-status">
-    <div id="action" role="status">余烬还在。先从云里捞点木头。</div>
-    <div id="hint">按住左键蓄力，松开抛钩</div>
-    <div class="meter" id="meter" hidden><div id="charge-bar"></div></div>
-  </section>
+  <div id="action" class="toast" role="status" data-shown="false"></div>
+  <div class="meter" id="meter" hidden><div id="charge-bar"></div></div>
   <nav class="toolbar" aria-label="方舟操作">
-    <button type="button" id="hook" aria-pressed="true"><kbd>Q</kbd> 抓钩</button>
-    <button type="button" id="build-deck" aria-pressed="false"><kbd>1</kbd> 甲板</button>
-    <button type="button" id="build-torch" aria-pressed="false"><kbd>2</kbd> 火把</button>
-    <button type="button" id="build-wall" aria-pressed="false"><kbd>3</kbd> 挡风</button>
-    <button type="button" id="bag" aria-expanded="false"><kbd>I</kbd> 背包</button>
+    <button type="button" id="hook" aria-pressed="true" aria-label="抓钩"><kbd>Q</kbd><img alt=""><span>抓钩</span><output aria-hidden="true"></output></button>
+    <button type="button" id="build-deck" aria-pressed="false" aria-label="甲板"><kbd>1</kbd><img alt=""><span>甲板</span><output aria-hidden="true"></output></button>
+    <button type="button" id="build-torch" aria-pressed="false" aria-label="火把"><kbd>2</kbd><img alt=""><span>火把</span><output aria-hidden="true"></output></button>
+    <button type="button" id="build-wall" aria-pressed="false" aria-label="挡风"><kbd>3</kbd><img alt=""><span>挡风</span><output aria-hidden="true"></output></button>
+    <button type="button" id="bag" aria-expanded="false" aria-label="背包"><kbd>I</kbd><img alt=""><span>背包</span><output aria-hidden="true"></output></button>
   </nav>
   <aside id="inventory" class="inventory" aria-label="背包" hidden>
     <div class="panel-head"><div><div class="eyebrow">FIELD PACK</div><h2>背包</h2></div><button id="close" type="button" aria-label="关闭背包">关闭</button></div>
@@ -42,7 +45,7 @@
   </aside>
   <div class="build-note" id="build-note" hidden></div>
   <div class="save-label" id="save-label" role="status">读取存档…</div>
-  <div class="key-note"><kbd>WASD</kbd> 移动 <span>／</span> <kbd>E</kbd> 储物箱 <span>／</span> <kbd>Esc</kbd> 返回</div>
+  <div class="key-note"><kbd>WASD</kbd> 移动 <span>／</span> <kbd>E</kbd> 储物箱 <span>／</span> <kbd>Esc</kbd> 返回 <span>／</span> 滚轮缩放<div id="hint">按住左键蓄力，松开抛钩</div></div>
 </main>
 <script type="module" src="/src/main.ts"></script>
 </body>

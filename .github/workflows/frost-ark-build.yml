@@ -35,7 +35,16 @@ jobs:
       - name: Package the double-clickable preview
         run: |
           cd ..
-          zip -qr 08-frost-ark/artifacts/frost-ark-playtest.zip             08-frost-ark/index.html 08-frost-ark/dist assets/character/head-0.png
+          zip -qr 08-frost-ark/artifacts/frost-ark-playtest.zip \
+            08-frost-ark/index.html 08-frost-ark/dist assets/character/head-{0,1,2,3}.png
+      - name: Verify the clean extraction and all portraits
+        run: |
+          unzip -qt artifacts/frost-ark-playtest.zip
+          source_dir="$PWD"
+          preview_dir="$(mktemp -d)"
+          unzip -q artifacts/frost-ark-playtest.zip -d "$preview_dir"
+          cd "$preview_dir/08-frost-ark"
+          FROST_E2E_FILE=index.html node --import "$source_dir/node_modules/tsx/dist/loader.mjs" "$source_dir/scripts/e2e-visual.ts"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: frost-ark-playtest

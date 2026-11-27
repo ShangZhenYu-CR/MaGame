@@ -5,7 +5,7 @@ import { aim, cancelCharge, fire, startCharge } from './sim/cloud';
 import { deserializeWorld, serializeWorld } from './sim/save';
 import { nearestStorage, storageContents, STORAGE_SLOTS, transferStorage } from './sim/storage-box';
 import { addFuel, heatAt, partOfDay, primaryHearth, upgradeHearth } from './sim/heatField';
-import { dropSupply, manuallyRecover } from './sim/latte';
+import { dropSupply, isDeckDrop, manuallyRecover } from './sim/latte';
 import { TICK_RATE, type WorldState } from './sim/types';
 import { createInitialWorld, stepWorld } from './sim/world';
 import { openArchive, savedWorld, storeWorld } from './ui/storage';
@@ -199,6 +199,7 @@ canvas.addEventListener('contextmenu',e=>e.preventDefault());
 
 function simulation():void {
   const g=w.player.grapple;
+  const pending=w.latte.autoLootUnlocked&&w.sky.debris.filter(isDeckDrop).length;
   stepWorld(w,1,{x:Number(keys.has('d'))-Number(keys.has('a')),y:Number(keys.has('s'))-Number(keys.has('w'))});
   if(caught!==g.caughtDebrisId){
     if(g.caughtDebrisId){
@@ -212,6 +213,7 @@ function simulation():void {
     }
     caught=g.caughtDebrisId;
   }
+  if(pending&&w.sky.debris.filter(isDeckDrop).length<pending){tell('拿铁捡回了暖区掉落物。');void saveNow();}
   if(!locker.hidden&&!nearbyStorage())toggleStorage(false);
   if(w.tick%90===0)void saveNow();
 }

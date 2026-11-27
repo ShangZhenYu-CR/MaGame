@@ -23,8 +23,17 @@ export function updateLatte(w:WorldState):void{
   const cat=w.latte, hearth=primaryHearth(w);
   cat.mood=!hearth||hearth.fuel<22?'hungry_hearth':w.weather!=='clear'?'alert':'cozy';
   cat.autoLootUnlocked=!!hearth&&hearth.level>=2;
-  if(w.tick%30!==0||!cat.autoLootUnlocked||!hearth||hearth.fuel<=0)return;
-  const d=w.sky.debris.find(v=>isDeckDrop(v)&&isDeck(w,Math.floor(v.x),Math.floor(v.y))&&
-    Math.hypot(v.x-hearth.gx-1,v.y-hearth.gy-1)<=6&&heatAt(w,v.x,v.y)>=15);
-  if(d&&inventoryChange(w,[],d.loot))w.sky.debris=w.sky.debris.filter(v=>v!==d);
+  if(!hearth)return;
+  const hx=hearth.gx+2.4, hy=hearth.gy+2.4;
+  const d=cat.autoLootUnlocked&&hearth.fuel>0
+    ?w.sky.debris.find(v=>isDeckDrop(v)&&isDeck(w,Math.floor(v.x),Math.floor(v.y))&&
+      Math.hypot(v.x-hearth.gx-1,v.y-hearth.gy-1)<=6&&heatAt(w,v.x,v.y)>=15)
+    :undefined;
+  const x=d?.x??hx,y=d?.y??hy, gap=Math.hypot(x-cat.x,y-cat.y);
+  if(gap>.19){
+    const k=Math.min(.08,gap)/gap;
+    cat.x+=(x-cat.x)*k;cat.y+=(y-cat.y)*k;
+  }else if(d&&w.tick%30===0&&inventoryChange(w,[],d.loot)){
+    w.sky.debris=w.sky.debris.filter(v=>v!==d);
+  }
 }

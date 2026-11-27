@@ -4,6 +4,8 @@ import { pathToFileURL } from 'node:url';
 import { existsSync, mkdirSync, readFileSync, statSync } from 'node:fs';
 import { extname, join, resolve } from 'node:path';
 import { chromium } from 'playwright';
+import { createInitialWorld, stepWorld } from '../src/sim/world';
+import { countItem } from '../src/sim/ark';
 
 const repoRoot = resolve(process.cwd(), '..');
 const outDir = resolve(process.cwd(), 'artifacts', 'e2e');
@@ -199,6 +201,86 @@ try {
     }
     console.log('[e2e-visual:local-launch] OK: both file:// entries show styled game, portrait, hearth and local save');
   }
+
+  // M1 scenarios enter through the real saved-game importer. No production debug controls.
+  const m1=await browser.newPage({viewport:{width:1280,height:720}});
+  try {
+    m1.on('pageerror',err=>errors.push(`M1 pageerror: ${err.message}`));
+    m1.on('console',msg=>{if(msg.type()==='error')errors.push(`M1 console.error: ${msg.text()}`);});
+    await m1.goto(baseUrl,{waitUntil:'networkidle'});
+    await m1.locator('#save-label[data-saved=true]').waitFor();
+    const mood=async(n:number)=>{
+      await m1.waitForFunction(value=>{
+        const img=document.getElementById('manan-portrait') as HTMLImageElement;
+        return img.src.endsWith(`head-${value}.png`) && img.complete && img.naturalWidth>0;
+      },n);
+    };
+    const importFixture=async(world:ReturnType<typeof createInitialWorld>)=>{
+      await m1.keyboard.press('i');
+      await m1.locator('#save-file').setInputFiles({name:'m1-fixture.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(world))});
+      await m1.getByText('已载入 JSON 存档。',{exact:true}).waitFor();
+      await m1.keyboard.press('Escape');
+    };
+    const fresh=createInitialWorld(202608);
+    await importFixture(fresh);
+    await mood(0);
+    await m1.locator('#weather-status').getByText(/^白昼/).waitFor();
+    await m1.locator('#latte-status').getByText(/炉边打呼/).waitFor();
+    await m1.screenshot({path:resolve(outDir,'M1-01-day.png')});
+    await m1.mouse.move(405,454);await m1.mouse.down();
+    await mood(2);
+    await m1.keyboard.press('Escape');await m1.mouse.up();
+
+    const night=createInitialWorld(202608);night.timeOfDay=.82;stepWorld(night,240);
+    await importFixture(night);
+    await m1.locator('#weather-status').getByText(/^暴雪夜/).waitFor();
+    await m1.locator('#latte-status').getByText(/炸毛警戒/).waitFor();
+    await m1.screenshot({path:resolve(outDir,'M1-02-snow-night.png')});
+
+    const cold=createInitialWorld(202608);cold.timeOfDay=.82;cold.player.x=27.3;cold.player.y=27.3;
+    stepWorld(cold,180);cold.player.warmth=15;
+    await importFixture(cold);
+    await mood(3);
+    await m1.locator('#thermal-stats[data-cold=true]').waitFor();
+    await m1.screenshot({path:resolve(outDir,'M1-03-cold-warning.png')});
+
+    const warm=createInitialWorld(202608);warm.player.x=24.5;warm.player.y=25.5;warm.player.warmth=55;
+    warm.player.inventory[3]={itemId:'frost_iron_scrap',count:2};
+    warm.player.inventory[1]={itemId:'driftwood',count:12};
+    warm.ark.buildings.find(b=>b.id==='hearth_main')!.fuel=79;
+    await importFixture(warm);
+    await mood(1);
+    await m1.keyboard.press('r');await m1.getByText('已给余烬主炉添柴。',{exact:true}).waitFor();
+    await m1.keyboard.press('u');await m1.locator('#weather-status').getByText(/主炉 Lv\.2/).waitFor();
+    await m1.locator('#latte-status').getByText(/暖区拾取/).waitFor();
+    await m1.keyboard.press('3');
+    await m1.mouse.move(642,499);
+    await m1.getByText('挡风墙 · 浮木板 ×3',{exact:true}).waitFor();
+    await m1.mouse.click(642,499);
+    await m1.getByText('挡风墙已放好，附近热量散得更慢。',{exact:true}).waitFor();
+    await m1.keyboard.press('g');
+    await m1.getByText('拿铁捡回了暖区掉落物。',{exact:true}).waitFor();
+    await m1.keyboard.press('Escape');
+    await m1.mouse.move(950,350);
+    await m1.waitForFunction(expected=>new Promise<boolean>(done=>{
+      const req=indexedDB.open('manan-frost-ark',1);
+      req.onerror=()=>done(false);
+      req.onsuccess=()=>{
+        const db=req.result;
+        const get=db.transaction('saves').objectStore('saves').get('world-M0');
+        get.onerror=()=>{db.close();done(false);};
+        get.onsuccess=()=>{
+          db.close();if(typeof get.result!=='string'){done(false);return;}
+          const w=JSON.parse(get.result);
+          done(w.latte.autoLootUnlocked&&w.ark.buildings.some((b:{defId:string})=>b.defId==='wind_wall')
+            &&!w.sky.debris.some((d:{id:string})=>d.id.startsWith('deckdrop_'))
+            &&w.player.inventory.reduce((n:number,s:{itemId:string;count:number}|null)=>n+(s?.itemId==='driftwood'?s.count:0),0)===expected);
+        };
+      };
+    }),countItem(warm,'driftwood')-1-4-3);
+    await m1.screenshot({path:resolve(outDir,'M1-04-wall-latte.png')});
+    console.log('[e2e-visual:M1] OK: day and blizzard, four decoded portraits, cold warning, wall, fuel and Latte pickup');
+  } finally { await m1.close(); }
 
   if (errors.length > 0) {
     throw new Error(errors.join('\n'));

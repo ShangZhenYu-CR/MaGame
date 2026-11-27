@@ -87,7 +87,9 @@ export class ArkView {
         this.tile(x+.07,y+.61,.15,.21,'#536772');this.tile(x+.78,y+.61,.15,.21,'#536772');
       }
     }
-    paintLatte(t,w.latte.x,w.latte.y,w.tick,w.latte.mood);
+    const fire=primaryHearth(w);
+    const catWalking=fire?Math.hypot(w.latte.x-fire.gx-2.4,w.latte.y-fire.gy-2.4)>.23:false;
+    paintLatte(t,w.latte.x,w.latte.y,w.tick,w.latte.mood,catWalking);
     if (ghost) {
       c.globalAlpha=.4;
       this.tile(ghost.x,ghost.y,1,1,ghost.ok?P.uiConfirmTeal:P.uiDanger);
@@ -131,7 +133,6 @@ export class ArkView {
     c.drawImage(this.actorAtlas,phase*MANAN_FRAME,dir*MANAN_FRAME,MANAN_FRAME,MANAN_FRAME,
       drawX,drawY,spriteSize,spriteSize);
     this.lightmap.paint(c,w,(x,y)=>this.pixel(x,y),s);
-    const fire=primaryHearth(w);
     screenWeather(c,w,fire&&fire.fuel>0?this.pixel(fire.gx+1,fire.gy+.7):null);
   }
 }

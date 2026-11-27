@@ -1,3 +1,4 @@
+import { voyageBiome } from './sim/expansion';
 import { couldMoorTrader } from './sim/sky-events';
 import { skyEventsUi } from './ui/sky-events-ui';
 import { activeCave,caveMelee } from './sim/cave';
@@ -710,7 +711,7 @@ function frame(now:number):void {
   skyEvents.frame(down||finale.arena(),context.kind==='trader');
   toolUi.update(here);
   finale.update(chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||finale.open());
-  const region=regions.get(w.activeIsland?.biomeId??w.sky.islands.find(n=>n.id===w.ark.anchoredIslandId)?.biomeId??'')??'碎云浅海';
+  const region=regions.get(voyageBiome(w))??'碎云浅海';
   if(el('sector-name').textContent!==region)el('sector-name').textContent=region;
   setVital(0,w.player.warmth,w.player.maxWarmth);
   setVital(1,w.player.hp,w.player.maxHp);

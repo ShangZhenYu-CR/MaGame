@@ -1,3 +1,4 @@
+import { paintWindZone } from './wind-zones';
 import { EVENT_ART,paintSkyEvent } from './sky-events-view';
 import { activeCave,caveEntrance,caveEntranceArt,caveGuard,CAVE_OFFSET,CAVE_SIZE } from '../sim/cave';
 import { CAVE_ART,paintCave } from './cave-view';
@@ -225,6 +226,7 @@ export class ArkView {
     cloudscape(c,this.art.image('clouds'),w,{
       x:this.origin.x+w.sky.x*3.5,y:this.origin.y+w.sky.y*1.9,
     });
+    paintWindZone(c,this.art,w);
     paintSkyEvent(c,this.art,w,project,s);
     // Free-floating scrap belongs to the lower air lane. Hull silhouettes can
     // occlude it; deck drops only enter the foreground after a grab/placement.

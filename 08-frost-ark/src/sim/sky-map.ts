@@ -1,3 +1,4 @@
+import { displayChartIslands,noteIslandVisit } from './expansion';
 import { eventWindDrag } from './sky-events';
 import { dockSide,docks } from './dock-direction';
 import { rigDrive,sailingRig } from './rigging';
@@ -70,7 +71,7 @@ export function navigationPanel(w:WorldState){
   const nav=getNavigation(w);
   const {x,y,headingX,headingY,cruising}=w.sky;
   return {x,y,headingX,headingY,cruising,targetId:nav?.targetId??null,anchoredIslandId:w.ark.anchoredIslandId,
-    islands:w.sky.islands.map(n=>({...n,distance:distance(w,n)}))};
+    islands:displayChartIslands(w).map(n=>({...n,distance:distance(w,n)}))};
 }
 
 export function toggleCruise(w:WorldState):string|null{
@@ -133,6 +134,7 @@ export function stepNavigation(w:WorldState):void{
     ensureNavigation(w);
     w.ark.anchoredIslandId=destination.id;
     nav.dock={nodeId:destination.id,...dock,deployed:false};
+    noteIslandVisit(w,destination.id);
     return;
   }
   w.sky.headingX=dx/gap;w.sky.headingY=dy/gap;

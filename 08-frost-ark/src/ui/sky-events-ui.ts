@@ -55,7 +55,7 @@ export function skyEventsUi(cb:{state:()=>WorldState;icon:(id:string)=>string|un
   set(heading,eventName(e.kind));
   const distance=skyEventDistance(w,e),left=Math.ceil((e.expires-w.tick)/TICK_RATE);
   let subtitle=eventDescription(e.kind);
-  if(e.kind==='merchant')subtitle=e.moored?'已系缆，按 E 重开交易。':w.sky.cruising?'礼让接近，舵轮处先停船。':'相距 '+distance.toFixed(1)+' 航格 · 停在近处可交易。';
+  if(e.kind==='merchant')subtitle=w.ark.anchoredIslandId?'当前已靠浮岛，解缆后才能会合游商。':e.moored?'已系缆，按 E 重开交易。':w.sky.cruising?'礼让接近，舵轮处先停船。':'相距 '+distance.toFixed(1)+' 航格 · 停在近处可交易。';
   if(e.kind==='thunder'&&distance<=2.55)subtitle=stormTell(w,e)==='warning'?'雷击预警：离开右舷！':stormTell(w,e)==='burst'?'雷暴已击中舷边。':subtitle;
   set(detail,subtitle+' · '+left+' 秒');
   moor.hidden=!primary;

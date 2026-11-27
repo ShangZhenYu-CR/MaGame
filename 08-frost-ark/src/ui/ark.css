@@ -386,3 +386,8 @@ button[aria-disabled=true]{opacity:.62}
 .sky-offer strong,.sky-offer small{display:block;line-height:1.35}
 .sky-offer small{color:#b2c7d2}
 #sky-trader-result{display:block;min-height:19px;color:#f0cc99}
+
+.sky-scan-button{color:#cce2e6;border-color:#54868a}
+.sky-scan-button:disabled{color:#98aab3}
+#sky-map .sky-island[data-generated="true"]{border-left-color:#557e7e}
+#sky-map .sky-marker[data-generated="true"]{border-style:dashed;border-color:#73a8a6}

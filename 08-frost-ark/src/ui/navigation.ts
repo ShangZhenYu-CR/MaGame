@@ -1,3 +1,5 @@
+import { proceduralIsland,scanExpeditions,scanIssue,scanWait } from '../sim/expansion';
+import { TICK_RATE } from '../sim/types';
 import { docks } from '../sim/dock-direction';
 import { cruiseSpeed } from '../sim/sky-map';
 import { DISCOVERY_RADIUS, DOCK_RADIUS, nearHelm, navigationPanel, setDestination, toggleCruise } from '../sim/sky-map';
@@ -23,6 +25,7 @@ export function navigationUi(hooks:ChartHooks){
  const dialog=get<HTMLDialogElement>('sky-map'),close=get<HTMLButtonElement>('sky-map-close'),toggle=get('sky-map-toggle');
  const list=get('sky-island-list'),marks=get('sky-markers'),status=get('sky-nav-status'),hint=get('sky-map-hint');
  const set=get<HTMLButtonElement>('sky-set-course'),cruise=get<HTMLButtonElement>('sky-cruise');
+ const find=get<HTMLButtonElement>('sky-new-scan');
  const line=document.getElementById('sky-line')!,scan=document.getElementById('sky-scan-ring')!,dock=document.getElementById('sky-dock-ring')!;
  let selected:string|null=null,notice='',noticeUntil=0,key='',last=0;
  const buttons=new Map<string,{list:HTMLButtonElement,mark:HTMLButtonElement,name:HTMLElement,dist:HTMLElement}>();
@@ -30,6 +33,7 @@ export function navigationUi(hooks:ChartHooks){
  function chartButton(marker:Marker,scene:boolean):HTMLButtonElement{
   const b=document.createElement('button');b.type='button';b.className=scene?'sky-marker':'sky-island';
   if(scene)b.dataset.chartIsland=marker.id;else b.dataset.islandId=marker.id;
+  b.dataset.generated=String(proceduralIsland(marker));
   b.onclick=()=>select(marker.id);
   const src=hooks.icon('island-tier-'+marker.tier);
   if(src){const img=document.createElement('img');img.src=src;img.alt='';b.append(img);}
@@ -71,6 +75,9 @@ export function navigationUi(hooks:ChartHooks){
   const connection=gangwayGeometry(w),bridge=connection?.deployed;
   cruise.disabled=!nearHelm(w)||(!nav.cruising&&!!bridge);
   cruise.dataset.cruising=String(nav.cruising);put(cruise,nav.cruising?'停止巡航':nav.anchoredIslandId?'解缆巡航':'开始巡航');
+  const waiting=scanWait(w),scanBlocked=scanIssue(w);
+  find.disabled=!!scanBlocked;find.title=scanBlocked??'在当前风区扫描两处新路线信号';
+  put(find,waiting?'雷达冷却 '+Math.ceil(waiting/TICK_RATE)+' 秒':'扫描新信号');
   put(hint,now<noticeUntil?notice:nearHelm(w)?bridge?'离港前请先到'+docks[connection!.side].label+'收起登岛跳板。':'设置目的地后按「开始巡航」，方舟抵达时会自动靠泊。':'航图可随时查看；走近甲板北面的舵轮才能改航向。');
   // The ship is always the chart centre. Zoom to cover the local navigation envelope.
   const extentX=Math.max(DISCOVERY_RADIUS*1.12,...nav.islands.map(v=>Math.abs(v.skyX-nav.x)));
@@ -101,6 +108,11 @@ export function navigationUi(hooks:ChartHooks){
   if(node)issueResult(setDestination(w,node.id),`已设航向：${islandTitle(node)}`);
  };
  cruise.onclick=()=>{const w=hooks.state(),was=w.sky.cruising;issueResult(toggleCruise(w),was?'已停止巡航。':'方舟已起航。');};
+ find.onclick=()=>{
+  const scan=scanExpeditions(hooks.state());
+  if(scan.found.length)selected=scan.found[0].id;
+  issueResult(scan.issue,scan.found.length?'发现 '+scan.found.length+' 处新远征信号。':'没有可用的新信号。');
+ };
  close.onclick=hooks.close;
  dialog.addEventListener('cancel',e=>{e.preventDefault();hooks.close();});
  return {

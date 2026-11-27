@@ -265,6 +265,7 @@ export function expeditionTemperature(w:WorldState,x:number,y:number):number|nul
 
 /** Validate deltas against the generated bodies, not a saved terrain copy. */
 export function validIslandDeltas(node:IslandNode):boolean{
+  if(!Object.keys(node.deltas).length)return true;
   const caps=new Map(generate(node,0,0).resources.map(r=>[r.key,r.count]));
   return Object.entries(node.deltas).every(([key,value])=>Number.isSafeInteger(value)&&value>0&&value<=(caps.get(key)??0));
 }

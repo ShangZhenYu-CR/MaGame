@@ -28,7 +28,7 @@ const gap=(a:Vec2,b:Vec2)=>Math.hypot(a.x-b.x,a.y-b.y);
 const coast=(w:WorldState)=>!caveActive(w)&&w.activeIsland?.nodeId===AURORA_ISLAND;
 export const whaleBattleActive=(w:WorldState)=>coast(w)&&get(w)?.mode==='battle';
 export const solarReady=(w:WorldState)=> (primaryHearth(w)?.level??0)>=4;
-export const canReachAurora=(w:WorldState,id:string)=>id!==AURORA_ISLAND||solarReady(w);
+export const canReachAurora=(w:WorldState,id:string)=>(id!==AURORA_ISLAND&&!id.startsWith('exp4_'))||solarReady(w);
 
 export function forgeSolarArk(w:WorldState):string|null{
   const hearth=primaryHearth(w);

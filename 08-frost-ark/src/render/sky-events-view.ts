@@ -17,6 +17,9 @@ export function paintAurora(c:CanvasRenderingContext2D,art:ArtLibrary,tick:numbe
 }
 export function paintSkyEvent(c:CanvasRenderingContext2D,art:ArtLibrary,w:WorldState,project:(x:number,y:number)=>Vec2,tile:number){
  const e=activeSkyEvent(w),W=c.canvas.width,H=c.canvas.height;if(!e||w.activeIsland)return;
+ // Ordinary island mooring and balloon mooring cannot coexist. The moving
+ // vessel stays in the air lane rather than visually intersecting that shore.
+ if(w.ark.anchoredIslandId&&e.kind==='merchant')return;
  const outside=skyEventDistance(w,e);
  if(e.kind==='warm'){if(outside<3.5)paintAurora(c,art,w.tick,.87);return;}
  if(e.kind==='thunder'){

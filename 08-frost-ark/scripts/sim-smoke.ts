@@ -1229,3 +1229,40 @@ const boarder=pirateArk.wildEntities.find(e=>e.id.startsWith('skyraid_'))!;
 stepWorld(pirateArk,1);assert.ok(pirateArk.wildEntities.includes(boarder),'pirates act outside normal cold wave');
 pirateArk.tick=vessel.expires;stepSkyEvents(pirateArk);assert.ok(!pirateArk.wildEntities.includes(boarder));
 console.log('[sim-smoke:P2-22] OK: seeded travel events, inventory-safe barter and persistence, limited salvage, warming, dangerous headwind and outside-wave raiders');
+
+import { displayChartIslands,noteIslandVisit,proceduralIsland,scanExpeditions,scanWait,voyageBiome } from '../src/sim/expansion';
+import { canReachAurora } from '../src/sim/finale';
+const survey=createInitialWorld(271128);Object.assign(survey.player,helmPoint(survey));stepWorld(survey,1);
+assert.equal(survey.sky.islands.length,8);
+const allSignals=new Set<string>();
+const found=scanExpeditions(survey);assert.equal(found.issue,null);assert.equal(found.found.length,2);
+const heldSignal=found.found[0].id;noteIslandVisit(survey,heldSignal);
+for(const p of found.found)allSignals.add(p.id);
+assert.ok(scanWait(survey)>0);
+assert.match(scanExpeditions(survey).issue!,/冷却/);
+for(let round=1;round<80;round++){
+ survey.tick+=scanWait(survey);
+ const res=scanExpeditions(survey);
+ assert.equal(res.issue,null);
+ assert.equal(res.found.length,2);
+ for(const node of res.found){
+  assert.ok(!allSignals.has(node.id));
+  assert.ok(proceduralIsland(node));allSignals.add(node.id);
+ }
+}
+assert.equal(allSignals.size,160,'continues generating after prior signals exceed live list cap');
+assert.equal(survey.sky.islands.filter(proceduralIsland).length,24);
+assert.equal(displayChartIslands(survey).filter(proceduralIsland).length,18);
+assert.ok(survey.sky.islands.some(n=>n.id===heldSignal));
+const restoredSurvey=deserializeWorld(serializeWorld(survey));
+assert.equal(restoredSurvey.sky.islands.filter(proceduralIsland).length,24);
+assert.ok(restoredSurvey.sky.islands.some(n=>n.id===heldSignal));
+for(const [tier,x,zone] of [[1,4,'cloud_shallows'],[2,16,'frostpine_isles'],[3,29,'sulfur_rift'],[4,46,'aurora_zenith']] as const){
+ const map=createInitialWorld(271128);Object.assign(map.player,helmPoint(map));map.sky.x=x;stepWorld(map,1);
+ assert.equal(voyageBiome(map),zone);
+ const a=scanExpeditions(map);
+ assert.equal(a.issue,null);
+ assert.ok(a.found.every(n=>n.tier===tier&&n.biomeId===zone));
+ if(tier===4)assert.ok(a.found.every(n=>!canReachAurora(map,n.id)));
+}
+console.log('[sim-smoke:P2-23] OK: four wind belts, repeated 160 unique signals with compact discovery list, save/visited retention and solar-ark gate');

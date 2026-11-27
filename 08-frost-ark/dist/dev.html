@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#0c1520">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23ea7a30' d='M7 1h3v5h3v6h-2v2H5v-2H3V7h4z'/%3E%3C/svg%3E">
   <title>马楠：霜云方舟</title>
-  <script type="module" crossorigin src="./assets/main-BfqRAU6N.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/main-veIzX758.css">
+  <script type="module" crossorigin src="./assets/main-BtXQfMyv.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/main-DGsL8V25.css">
 </head>
 <body>
 <main id="app" aria-label="马楠：霜云方舟">
@@ -36,9 +36,14 @@
     <section class="craft"><p>手制火把 <small>浮木板 ×2　旧缆绳 ×1</small></p><button type="button" id="craft-torch">制作 ×2</button></section>
     <footer><button id="export" type="button">导出 JSON</button><button id="import" type="button">导入 JSON</button><input type="file" id="save-file" accept=".json,application/json" hidden></footer>
   </aside>
+  <aside id="storage-panel" class="inventory storage" aria-label="储物箱" hidden>
+    <div class="panel-head"><div><div class="eyebrow">ARK LOCKER</div><h2>储物箱</h2></div><button id="storage-close" type="button" aria-label="关闭储物箱">关闭</button></div>
+    <h3>箱内 <span id="storage-count" class="numbers"></span></h3>
+    <ul id="storage-stacks"></ul><h3>背包</h3><ul id="storage-deposit"></ul>
+  </aside>
   <div class="build-note" id="build-note" hidden></div>
   <div class="save-label" id="save-label" role="status">读取存档…</div>
-  <div class="key-note"><kbd>WASD</kbd> 移动 <span>／</span> <kbd>Esc</kbd> 返回</div>
+  <div class="key-note"><kbd>WASD</kbd> 移动 <span>／</span> <kbd>E</kbd> 储物箱 <span>／</span> <kbd>Esc</kbd> 返回</div>
 </main>
 </body>
 </html>

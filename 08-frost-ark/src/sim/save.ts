@@ -1,5 +1,6 @@
 import items from '../data/items.json';
 import buildings from '../data/buildings.json';
+import { STORAGE_SLOTS } from './storage-box';
 import { ARK_SIZE, SAVE_VERSION, type WorldState } from './types';
 
 export function serializeWorld(world: WorldState): string {
@@ -36,5 +37,11 @@ export function deserializeWorld(raw: string): WorldState {
      !sky.debris.every(d=>record(d)&&typeof d.id==='string'&&eachNumber(d,['x','y','vx','vy'])&&Array.isArray(d.loot)&&d.loot.length>0&&d.loot.every(stack))||
      !record(latte)||!eachNumber(latte,['x','y'])||!Array.isArray(p.beasts)||!Array.isArray(p.wildEntities)||
      !Array.isArray(p.unlockedTech)||typeof p.bossDefeated!=='boolean')throw new Error('存档数据不完整或不符合方舟格式');
+  if(p.storageM0!==undefined){
+    if(!Array.isArray(p.storageM0)||p.storageM0.length>STORAGE_SLOTS||
+       !p.storageM0.every(stack)||p.storageM0.some(s=>s.itemId==='grapple_hook')||
+       new Set(p.storageM0.map(s=>s.itemId)).size!==p.storageM0.length)
+      throw new Error('储物箱数据不符合方舟格式');
+  }
   return p as unknown as WorldState;
 }

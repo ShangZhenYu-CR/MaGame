@@ -3,6 +3,7 @@ import { ArkView, type Ghost } from './render/ark-view';
 import { build, buildIssue, craftTorch, itemNames, type BuildKind } from './sim/ark';
 import { aim, cancelCharge, fire, startCharge } from './sim/cloud';
 import { deserializeWorld, serializeWorld } from './sim/save';
+import { nearestStorage, storageContents, STORAGE_SLOTS, transferStorage } from './sim/storage-box';
 import { TICK_RATE, type WorldState } from './sim/types';
 import { createInitialWorld, stepWorld } from './sim/world';
 import { openArchive, savedWorld, storeWorld } from './ui/storage';
@@ -13,6 +14,8 @@ el<HTMLImageElement>('manan-portrait').src='../assets/character/head-0.png';
 const stats=el('hud-stats'), hint=el('hint'), action=el('action'), save=el('save-label'), note=el('build-note');
 const meter=el('meter'), bar=el('charge-bar'), panel=el('inventory'), input=el<HTMLInputElement>('save-file');
 const keys=new Set<string>();
+const locker=el('storage-panel');
+let lockerSignature='';
 type Mode = 'hook' | BuildKind;
 const controls: Record<Mode,HTMLElement>={ hook:el('hook'),wood_deck:el('build-deck'),torch_post:el('build-torch') };
 let mode: Mode='hook', w: WorldState=createInitialWorld(), pointer:{x:number;y:number}|null=null;
@@ -27,8 +30,46 @@ function choose(next:Mode):void {
   for(const [k,b] of Object.entries(controls)) b.setAttribute('aria-pressed',String(k===mode));
 }
 function toggleBag(show=panel.hidden):void {
+  if(show)locker.hidden=true;
   panel.hidden=!show;el('bag').setAttribute('aria-expanded',String(show));
   if(show){ cancelCharge(w); fillBag(); }
+}
+function toggleStorage(show=locker.hidden):void {
+  if(show&&!nearbyStorage()){tell('走到甲板上的储物箱旁，再按 E。');return;}
+  if(show){toggleBag(false);cancelCharge(w);keys.clear();fillLocker();}
+  locker.hidden=!show;
+}
+function nearbyStorage():boolean { return !!nearestStorage(w); }
+function fillLocker():void {
+  const stash=storageContents(w);
+  const signature=JSON.stringify([stash,w.player.inventory]);
+  if(signature===lockerSignature)return;
+  lockerSignature=signature;
+  el('storage-count').textContent=stash.length+'/'+STORAGE_SLOTS;
+  const drawList=(target:string, entries:Iterable<[string,number]>, direction:'deposit'|'withdraw')=>{
+    const nodes=Array.from(entries,([itemId,count])=>{
+      const li=document.createElement('li'),label=document.createElement('span'),button=document.createElement('button');
+      const name=itemNames.get(itemId)??itemId;
+      label.textContent=name+' ×'+count;label.className='numbers';
+      button.type='button';button.textContent=direction==='deposit'?'存入 1':'取出 1';
+      button.setAttribute('aria-label',(direction==='deposit'?'存入 ':'取出 ')+name);
+      button.onclick=()=>{
+        const issue=transferStorage(w,itemId,direction);
+        tell(issue??(direction==='deposit'?'已存入：':'已取回：')+name+' ×1');
+        if(!issue){fillLocker();void saveNow();}
+      };
+      li.append(label,button);
+      return li;
+    });
+    if(nodes.length===0){
+      const empty=document.createElement('li');empty.textContent=direction==='withdraw'?'箱内空着':'没有可存物品';nodes.push(empty);
+    }
+    el(target).replaceChildren(...nodes);
+  };
+  const carried=new Map<string,number>();
+  for(const s of w.player.inventory)if(s&&s.itemId!=='grapple_hook')carried.set(s.itemId,(carried.get(s.itemId)??0)+s.count);
+  drawList('storage-stacks',stash.map(s=>[s.itemId,s.count]),'withdraw');
+  drawList('storage-deposit',carried,'deposit');
 }
 function fillBag():void {
   const signature=JSON.stringify(w.player.inventory);
@@ -53,7 +94,7 @@ function saveNow():Promise<void> {
   return saveQueue;
 }
 function safeWorld(next:WorldState):void {
-  w=next;cancelCharge(w);caught=null;keys.clear();messageUntil=0;stackSignature='';view.position(w);fillBag();
+  w=next;toggleStorage(false);lockerSignature='';cancelCharge(w);caught=null;keys.clear();messageUntil=0;stackSignature='';view.position(w);fillBag();
 }
 function ghostAt(): Ghost|null {
   if(mode==='hook'||!pointer)return null;
@@ -65,6 +106,7 @@ function ghostAt(): Ghost|null {
 for(const [k,b] of Object.entries(controls)) b.addEventListener('click',()=>choose(k as Mode));
 el('bag').onclick=()=>toggleBag();
 el('close').onclick=()=>toggleBag(false);
+el('storage-close').onclick=()=>toggleStorage(false);
 el('craft-torch').onclick=()=>{
   if(craftTorch(w)){tell('手制完成：防风火把 ×2');void saveNow();}
   else tell('材料不足，或背包没有空位。');
@@ -97,10 +139,12 @@ addEventListener('keydown',e=>{
   if('wasd'.split('').includes(k)){keys.add(k);e.preventDefault();return;}
   if(e.repeat)return;
   if(k==='escape'){
-    if(!panel.hidden)toggleBag(false);
+    if(!locker.hidden)toggleStorage(false);
+    else if(!panel.hidden)toggleBag(false);
     else if(mode!=='hook')choose('hook');
     else cancelCharge(w);
-  } else if(k==='q')choose('hook');
+  } else if(k==='e')toggleStorage();
+  else if(k==='q')choose('hook');
   else if(k==='1')choose('wood_deck');
   else if(k==='2')choose('torch_post');
   else if(k==='i'){ e.preventDefault();toggleBag(); }
@@ -116,6 +160,8 @@ canvas.addEventListener('pointerdown',e=>{
   pointer={x:e.clientX,y:e.clientY};
   const at=view.world(e.clientX,e.clientY);
   if(mode==='hook'){
+    const box=nearestStorage(w);
+    if(box&&Math.floor(at.x)===box.gx&&Math.floor(at.y)===box.gy){toggleStorage();return;}
     if(startCharge(w,at))canvas.setPointerCapture(e.pointerId);
   } else {
     const x=Math.floor(at.x),y=Math.floor(at.y), kind=mode;
@@ -147,6 +193,7 @@ function simulation():void {
     }
     caught=g.caughtDebrisId;
   }
+  if(!locker.hidden&&!nearbyStorage())toggleStorage(false);
   if(w.tick%90===0)void saveNow();
 }
 function frame(now:number):void {
@@ -162,11 +209,12 @@ function frame(now:number):void {
   else if(g.charging)action.textContent='抓钩蓄力 '+Math.round(g.charge*100)+'%';
   else if(g.active)action.textContent='抓钩已抛出…';
   else if(w.tick>=messageUntil)action.textContent='余烬还在。先从云里捞点木头。';
-  hint.textContent=mode==='hook'?'按住左键蓄力，松开抛钩':mode==='wood_deck'?'移动鼠标贴合甲板直边，左键拼接':'先在背包手搓火把，再选空甲板放置';
+  hint.textContent=mode==='hook'?(nearbyStorage()?'按 E 或点击储物箱存取物品':'按住左键蓄力，松开抛钩'):mode==='wood_deck'?'移动鼠标贴合甲板直边，左键拼接':'先在背包手搓火把，再选空甲板放置';
   meter.hidden=!g.charging;bar.style.width=(g.charge*100)+'%';
   note.hidden=mode==='hook'||!pointer;
   view.draw(w,ghostAt());
   if(!panel.hidden)fillBag();
+  if(!locker.hidden)fillLocker();
   requestAnimationFrame(frame);
 }
 let last=performance.now(),elapsed=0;

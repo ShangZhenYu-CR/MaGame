@@ -1,3 +1,4 @@
+import { renameBeast,traitList } from '../sim/beast-traits';
 import { isGrappleItem } from '../sim/grapple-tools';
 import {
  beastPanel, loadBeastFeed, nearestWildBeast, setBeastRole, strikeWildBeast, tameBeast, transferBeastPack, useRestraint,
@@ -28,8 +29,9 @@ export function beastUi(h:BeastUIHooks){
  const roster=el('beast-roster'),encounter=el('wild-encounter'),list=el('beast-list'),pack=el('beast-pack');
  const progress=el<HTMLProgressElement>('tame-progress'),hp=el<HTMLMeterElement>('wild-hp'),feedButton=el<HTMLButtonElement>('wild-feed');
  const load=el<HTMLButtonElement>('beast-feed-load');
+ const sector=document.querySelector<HTMLElement>('.sector');
  let targetId:string|null=null,last=0,packKey='',cardKey='';
- const cards=new Map<string,{role:HTMLElement,status:HTMLElement,vitals:HTMLElement,buttons:HTMLButtonElement[]}>();
+ const cards=new Map<string,{role:HTMLElement,status:HTMLElement,vitals:HTMLElement,label:HTMLElement,rate:HTMLElement,rename:HTMLDetailsElement,input:HTMLInputElement,buttons:HTMLButtonElement[]}>();
  const button=(label:string,fn:()=>void)=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.onclick=fn;return b;};
  const img=(src:string)=>{const i=document.createElement('img');i.src=src;i.alt='';return i;};
  function feedback(issue:string|null,msg:string,event?:'craft'|'hit'){h.msg(issue,msg,event);update(performance.now(),encounter.hidden,true);}
@@ -54,6 +56,8 @@ export function beastUi(h:BeastUIHooks){
   encounter.dataset.wildId=wild.id;encounter.dataset.species=wild.defId;encounter.dataset.weakened=String(wild.weakened);
   put(el('wild-species'),wild.name);put(el('wild-status'),wild.stunnedTicks>0?`压制中 ${Math.ceil(wild.stunnedTicks/30)}s`:wild.weakened?'虚弱，可投喂':'警戒');
   hp.max=wild.maxHp;hp.value=wild.hp;progress.max=wild.feedsRequired;progress.value=wild.tameProgress;
+  const profile=wild.profile;
+  put(el('wild-traits'),profile.temperament+' · '+profile.stars+' 星 · '+profile.traits.map(t=>traitList[t].name).join('、'));
   put(el('wild-tame-count'),`${wild.tameProgress}/${wild.feedsRequired}`);
   const bait=el('wild-bait'),quantity=countItem(w,wild.preferredBait),description=`偏好 ${name(wild.preferredBait)} · 背包 ${quantity}`;
   if(bait.dataset.label!==description){
@@ -77,12 +81,37 @@ export function beastUi(h:BeastUIHooks){
   const status=document.createElement('small'),vitals=document.createElement('div');vitals.className='beast-vitals numbers';
   const skills=document.createElement('p');skills.className='beast-skills';
   skills.textContent=`基地：${skillNames[beast.workSkill]??beast.workSkill}　随行：${skillNames[beast.companionSkill]??beast.companionSkill}`;
+  const profile=document.createElement('div');profile.className='beast-profile';
+  const subtype=document.createElement('small'),rate=document.createElement('small');
+  subtype.textContent='潜力 '+beast.profile.stars+'/5 星 · '+beast.profile.temperament;
+  rate.dataset.beastWorkRate='true';profile.append(subtype,rate);
+  const traits=document.createElement('ul');traits.className='beast-traits';traits.setAttribute('aria-label','个体词条');
+  for(const id of beast.profile.traits){
+    const tag=document.createElement('li');tag.dataset.trait=id;tag.textContent=traitList[id].name;tag.title=traitList[id].text;
+    if(beast.profile.rare===id)tag.dataset.rare='true';
+    traits.append(tag);
+  }
+  profile.append(traits);
+  const rename=document.createElement('details'),title=document.createElement('summary'),form=document.createElement('form');
+  rename.className='beast-rename';title.textContent='改名';
+  const edit=document.createElement('input');edit.type='text';edit.maxLength=32;edit.placeholder='输入昵称';edit.value=beast.name;
+  edit.setAttribute('aria-label','云兽昵称');
+  const submit=document.createElement('button');submit.type='submit';submit.textContent='保存名字';
+  form.append(edit,submit);
+  form.onsubmit=e=>{
+    e.preventDefault();
+    const issue=renameBeast(h.state(),beast.id,edit.value);
+    if(!issue){rename.open=false;title.focus();}
+    feedback(issue,'已保存云兽昵称。','craft');
+  };
+  rename.append(title,form);
   const row=document.createElement('div');row.className='beast-roles';
   const buttons=roles.map(([key,label])=>{
    const b=button(label,()=>feedback(setBeastRole(h.state(),beast.id,key),`${beast.name}：${label}`,'craft'));
    b.dataset.beastRole=key;return b;
   });
-  row.append(...buttons);card.append(head,status,vitals,skills,row);cards.set(beast.id,{role,status,vitals,buttons});return card;
+  row.append(...buttons);card.append(head,status,vitals,profile,skills,row,rename);
+  cards.set(beast.id,{role,status,vitals,label,rate,rename,input:edit,buttons});return card;
  }
  function updatePack(w:WorldState,data:Info){
   pack.hidden=!data.packAvailable;
@@ -101,6 +130,8 @@ export function beastUi(h:BeastUIHooks){
  }
  function updateRoster(w:WorldState,data:Info){
   if(roster.hidden)return;
+  const drop=Math.max(132,Math.ceil((sector?.getBoundingClientRect().bottom??120)+10))+'px';
+  if(roster.style.getPropertyValue('--beast-panel-top')!==drop)roster.style.setProperty('--beast-panel-top',drop);
   put(el('beast-summary'),`伙伴 ${data.beasts.length}　随行 ${data.companions}/${data.maxCompanions}　兽窝 ${data.denCount}`);
   const troughs=w.ark.buildings.filter(x=>x.defId==='feed_trough'),near=troughs.some(b=>Math.hypot(w.player.x-b.gx-.5,w.player.y-b.gy-.5)<=2);
   put(el('beast-feed-details'),troughs.length?`饲槽库存 ${data.feed} · 背包 ${countItem(w,'beast_feed')}${near?'':' · 靠近饲料槽加料'}`:'尚无饲料槽 · 在建造手册中制作');
@@ -116,6 +147,9 @@ export function beastUi(h:BeastUIHooks){
    const card=cards.get(x.id)!;
    put(card.role,roles.find(([id])=>id===x.role)?.[1]??'');
    put(card.status,x.status);
+   put(card.label,x.name);
+   put(card.rate,'工作 '+Math.round(x.workRate*100)+'%');
+   if(!card.rename.open&&card.input.value!==x.name)card.input.value=x.name;
    put(card.vitals,`体力 ${Math.ceil(x.hp)}/${x.maxHp}　体温 ${Math.round(x.warmth)}　饱腹 ${Math.round(x.hunger)}`);
    for(const b of card.buttons)b.setAttribute('aria-pressed',String(b.dataset.beastRole===x.role));
   }
@@ -137,5 +171,10 @@ export function beastUi(h:BeastUIHooks){
   if(open)update(performance.now(),true,true);
  }
  el('beast-roster-close').onclick=()=>{show(false);el('beast-roster-toggle').focus({preventScroll:true});};
- return { update,show,open:()=>!roster.hidden,tame:()=>perform('tame'),target:()=>targetId };
+ function closeRename(){
+   const detail=roster.querySelector<HTMLDetailsElement>('.beast-rename[open]');
+   if(!detail)return false;
+   detail.open=false;detail.querySelector('summary')?.focus({preventScroll:true});return true;
+ }
+ return { update,show,closeRename,open:()=>!roster.hidden,tame:()=>perform('tame'),target:()=>targetId };
 }

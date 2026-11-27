@@ -1,3 +1,4 @@
+import { traitStrike,traitWatchful } from './beast-traits';
 import { gangwayGeometry } from './island';
 import { rotateDockPoint } from './dock-direction';
 import { envelope,indoorsAt } from './rooms';
@@ -213,12 +214,13 @@ export function attackM5(w:WorldState):string|null {
   return null;
 }
 function stepCompanions(w:WorldState){
-  if(w.tick%36!==0)return;
+  if(w.tick%36!==0&&w.tick%30!==0)return;
   for(const b of w.beasts.filter(e=>e.role==='companion'&&e.hp>0)){
+    if(w.tick%(traitWatchful(w,b)?30:36)!==0)continue;
     const target=w.wildEntities.find(e=>isOwned(e)&&e.hp>0&&length(b,e)<=2.4&&
       (w.activeIsland?e.kind==='boss':e.kind==='raider'));
     if(!target)continue;
-    hurt(w,target,beastAttack.get(b.defId)??10,b.defId==='burrowback'||b.defId==='magmalisk',0,b.defId==='magmalisk'?'fire':undefined);
+    hurt(w,target,(beastAttack.get(b.defId)??10)*traitStrike(w,b),b.defId==='burrowback'||b.defId==='magmalisk',0,b.defId==='magmalisk'?'fire':undefined);
     flash(w,b,target,b.defId==='magmalisk'?'fire':'strike');
   }
 }

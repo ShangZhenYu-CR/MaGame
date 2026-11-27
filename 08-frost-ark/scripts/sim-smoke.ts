@@ -1266,3 +1266,24 @@ for(const [tier,x,zone] of [[1,4,'cloud_shallows'],[2,16,'frostpine_isles'],[3,2
  if(tier===4)assert.ok(a.found.every(n=>!canReachAurora(map,n.id)));
 }
 console.log('[sim-smoke:P2-23] OK: four wind belts, repeated 160 unique signals with compact discovery list, save/visited retention and solar-ark gate');
+
+import { beastProfile,renameBeast,traitList,traitWorkRate } from '../src/sim/beast-traits';
+import { traitsFixture } from './p2-traits-fixture';
+const {w:traitWorld,rapid,normal}=traitsFixture();
+const p1=beastProfile(traitWorld,rapid),p2=beastProfile(traitWorld,normal);
+assert.notDeepEqual(p1.traits,p2.traits);
+assert.equal(normal.defId,rapid.defId);
+assert.equal(Object.keys(traitList).length,12);
+assert.ok(p1.stars>=1&&p1.stars<=5&&p1.traits.length>=1&&p1.traits.length<=2);
+assert.ok(traitWorkRate(traitWorld,rapid)>=1.25&&traitWorkRate(traitWorld,normal)===1);
+stepWorld(traitWorld,1);
+assert.equal(countItem(traitWorld,'warm_fur'),2);
+assert.ok(rapid.workCooldown<normal.workCooldown);
+stepWorld(traitWorld,rapid.workCooldown);
+assert.equal(countItem(traitWorld,'warm_fur'),3,'an extra actual work cycle completes first');
+assert.equal(renameBeast(traitWorld,rapid.id,'松铃'),null);
+assert.match(renameBeast(traitWorld,rapid.id,'\n\n')!,/可见/);
+const restoredTrait=deserializeWorld(serializeWorld(traitWorld)),afterTrait=restoredTrait.beasts.find(v=>v.id===rapid.id)!;
+assert.equal(afterTrait.name,'松铃');
+assert.deepEqual(beastProfile(restoredTrait,afterTrait),p1);
+console.log('[sim-smoke:P2-24] OK: seeded individual trait/temperament/stars, actual shorter work cycles and valid persistent renaming');

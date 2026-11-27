@@ -1,3 +1,4 @@
+import { runP2Traits } from "./p2-traits-e2e";
 import { runP2Survey } from "./p2-survey-e2e";
 import { runP2SkyEvents } from "./p2-sky-event-e2e";
 import { runP2Caves } from './p2-cave-e2e';
@@ -663,6 +664,7 @@ try {
   await runP2Caves(browser,baseUrl,outDir,errors);
   await runP2SkyEvents(browser,baseUrl,outDir,errors);
   await runP2Survey(browser,baseUrl,outDir,errors);
+  await runP2Traits(browser,baseUrl,outDir,errors);
 
   if (errors.length > 0) {
     throw new Error(errors.join('\n'));

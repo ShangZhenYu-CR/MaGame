@@ -522,7 +522,7 @@ document.addEventListener('click',e=>{if(incapacitated(w)){e.preventDefault();e.
 addEventListener('keydown',e=>{
   const k=e.key.toLowerCase();
   if(e.ctrlKey||e.metaKey||e.altKey||e.target===input)return;
-  if(e.target instanceof HTMLSelectElement&&k!=='escape')return;
+  if((e.target instanceof HTMLSelectElement||e.target instanceof HTMLInputElement&&e.target.type==='text')&&k!=='escape')return;
   if(finale.blocking()||incapacitated(w))return;
   if(skyEvents.open()){
     if(!e.repeat&&k==='escape'){e.preventDefault();skyEvents.close();}
@@ -559,7 +559,7 @@ addEventListener('keydown',e=>{
   if(e.repeat)return;
   if(k==='escape'){
     expedition.cancel();industry.closeTip();
-    if(beasts.open())toggleBeastRoster(false);
+    if(beasts.open()){if(!beasts.closeRename())toggleBeastRoster(false);}
     else if(industry.stationOpen())industry.showStation(null);
     else if(industry.catalogOpen())toggleCatalog(false);
     else if(!locker.hidden)toggleStorage(false);

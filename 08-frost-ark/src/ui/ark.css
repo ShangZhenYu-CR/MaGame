@@ -391,3 +391,17 @@ button[aria-disabled=true]{opacity:.62}
 .sky-scan-button:disabled{color:#98aab3}
 #sky-map .sky-island[data-generated="true"]{border-left-color:#557e7e}
 #sky-map .sky-marker[data-generated="true"]{border-style:dashed;border-color:#73a8a6}
+
+.beast-profile{margin-top:.28rem;display:flex;gap:5px 8px;flex-wrap:wrap;font-size:11px;color:#cfdae0}
+.beast-profile small{font-size:inherit}
+.beast-traits{flex-basis:100%;display:flex;gap:.25rem;flex-wrap:wrap;margin:0;padding:0;list-style:none}
+.beast-traits li{padding:2px 5px;border:1px solid #62828f;border-radius:4px;color:#d0e3e9;background:#223e4c}
+.beast-traits li[data-rare="true"]{border-color:#ccae6a;color:#f0d09d}
+.beast-card-head strong{overflow-wrap:anywhere}
+.beast-rename{margin-top:6px;color:#bfcfd6;font-size:11px}
+.beast-rename summary{cursor:pointer}
+.beast-rename form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.3rem;margin-top:.22rem}
+.beast-rename input{width:100%;min-width:0;background:#162938;color:#e3edf1;border:1px solid #73919d;border-radius:.2rem;padding:.2rem .35rem}
+.wild-traits{display:block;color:#e2c997;font-size:10px;margin:.20rem 0}
+
+#beast-roster{top:var(--beast-panel-top,148px);max-height:calc(100vh - var(--beast-panel-top,148px) - 101px)}

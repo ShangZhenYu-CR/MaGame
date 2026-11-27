@@ -1584,6 +1584,182 @@
         121
       ],
       "bytes": 21865
+    },
+    "icon-beast-trap": {
+      "file": "icon-beast-trap.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        4,
+        46,
+        45
+      ],
+      "bytes": 5474
+    },
+    "icon-beast-den": {
+      "file": "icon-beast-den.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        4,
+        46,
+        44
+      ],
+      "bytes": 5036
+    },
+    "icon-feed-trough": {
+      "file": "icon-feed-trough.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        41,
+        46
+      ],
+      "bytes": 4411
+    },
+    "icon-beast-feed": {
+      "file": "icon-beast-feed.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        2,
+        45,
+        46
+      ],
+      "bytes": 5366
+    },
+    "beast-burrowback": {
+      "file": "beast-burrowback.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 0.99,
+      "tileH": 0.9,
+      "contentBox": [
+        2,
+        21,
+        126,
+        121
+      ],
+      "bytes": 27066
+    },
+    "beast-emberfox": {
+      "file": "beast-emberfox.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.03,
+      "tileH": 1.1,
+      "contentBox": [
+        4,
+        2,
+        124,
+        121
+      ],
+      "bytes": 27234
+    },
+    "beast-galehawk": {
+      "file": "beast-galehawk.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 63,
+      "anchorY": 102,
+      "tileW": 1.47,
+      "tileH": 1.32,
+      "contentBox": [
+        2,
+        35,
+        126,
+        119
+      ],
+      "bytes": 15999
+    },
+    "beast-frostyak": {
+      "file": "beast-frostyak.png",
+      "width": 160,
+      "height": 160,
+      "anchorX": 80,
+      "anchorY": 151,
+      "tileW": 1.46,
+      "tileH": 1.45,
+      "contentBox": [
+        2,
+        6,
+        158,
+        151
+      ],
+      "bytes": 46062
+    },
+    "beast-glacierstag": {
+      "file": "beast-glacierstag.png",
+      "width": 160,
+      "height": 160,
+      "anchorX": 80,
+      "anchorY": 151,
+      "tileW": 1.42,
+      "tileH": 1.62,
+      "contentBox": [
+        33,
+        2,
+        127,
+        151
+      ],
+      "bytes": 28128
+    },
+    "building-beast-den": {
+      "file": "building-beast-den.png",
+      "width": 160,
+      "height": 160,
+      "anchorX": 80,
+      "anchorY": 151,
+      "tileW": 1.34,
+      "tileH": 1.42,
+      "contentBox": [
+        2,
+        4,
+        158,
+        151
+      ],
+      "bytes": 54976
+    },
+    "building-feed-trough": {
+      "file": "building-feed-trough.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.06,
+      "tileH": 1.03,
+      "contentBox": [
+        2,
+        55,
+        126,
+        121
+      ],
+      "bytes": 19481
     }
   }
 }

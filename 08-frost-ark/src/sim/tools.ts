@@ -1,3 +1,4 @@
+import { claimIslandCacheSeed } from './m5';
 import recipes from '../data/recipes.json';
 import items from '../data/items.json';
 import { countItem, inventoryChange, itemNames } from './ark';
@@ -166,5 +167,7 @@ export function harvestIslandResource(
     w.player.inventory = before;
     return failed('这里已经没有可以采集的资源。');
   }
+  if (actual.kind === 'chest' && claimIslandCacheSeed(w, actual.key))
+    return succeeded(result.message + ' 找到一枚天穹火种。');
   return result;
 }

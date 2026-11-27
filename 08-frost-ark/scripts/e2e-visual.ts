@@ -11,6 +11,7 @@ import { helmPoint, setDestination, toggleCruise } from '../src/sim/sky-map';
 import { deserializeWorld } from '../src/sim/save';
 import { runGrappleRange } from './grapple-range-e2e';
 import { runM4 } from './m4-e2e';
+import { runM5 } from './m5-e2e';
 
 const repoRoot = resolve(process.cwd(), '..');
 const outDir = resolve(process.cwd(), 'artifacts', 'e2e');
@@ -601,6 +602,8 @@ try {
 
   await runGrappleRange(browser,baseUrl,outDir,errors);
   await runM4(browser,baseUrl,outDir,errors);
+
+  await runM5(browser,baseUrl,outDir,errors);
 
   if (errors.length > 0) {
     throw new Error(errors.join('\n'));

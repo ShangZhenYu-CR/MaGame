@@ -6,6 +6,8 @@ import { bindTooltips } from './tooltip';
 
 const el=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id)! as T;
 const descriptions:Partial<Record<BuildKind,string>>={
+ frost_turret:'远射自动防御塔，暖区供能时拦截敌袭。',
+ fire_oil_turret:'近距火油喷射，可连片驱散冰兽，严寒时须供暖。',
  wood_deck:'扩建可行走的甲板，须连接方舟边缘。',iron_deck:'更耐损的甲板，须连接方舟边缘。',torch_post:'近处小型热源。',
  wind_wall:'挡住一部分寒风，减缓热量流失。',warm_wall:'比木墙更能锁住热量。',buoyancy_core:'增加浮力上限 32 点。',
  heat_relay:'把主炉暖区向远端延伸。',workbench:'研究蓝图并制作工具。',furnace:'把冻铁废件熔成霜铁锭。',

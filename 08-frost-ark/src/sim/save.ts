@@ -1,3 +1,4 @@
+import { verifyM5 } from './m5';
 import items from '../data/items.json';
 import buildings from '../data/buildings.json';
 import recipes from '../data/recipes.json';
@@ -179,5 +180,6 @@ export function deserializeWorld(raw: string): WorldState {
       active.size!==island.size||active.offsetX!==island.offsetX||active.offsetY!==island.offsetY)throw invalidNavigation();
     world.activeIsland=island;
   }else if(area==='void'||active!==null)throw invalidNavigation();
+  if(!verifyM5(world))throw new Error('寒潮、首领或火种存档不符合方舟格式');
   return world;
 }

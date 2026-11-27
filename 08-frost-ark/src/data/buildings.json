@@ -211,5 +211,18 @@
       { "itemId": "frost_iron_ingot", "count": 3 },
       { "itemId": "driftwood", "count": 3 }
     ]
+  },
+  {
+    "id": "fire_oil_turret",
+    "name": "火油喷射塔",
+    "category": "defense",
+    "size": [1, 1],
+    "buoyancyDelta": -3,
+    "maxHp": 210,
+    "cost": [
+      { "itemId": "frost_iron_ingot", "count": 3 },
+      { "itemId": "sulfur_ore", "count": 2 },
+      { "itemId": "rope", "count": 2 }
+    ]
   }
 ]

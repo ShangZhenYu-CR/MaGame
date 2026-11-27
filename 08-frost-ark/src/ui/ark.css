@@ -222,3 +222,17 @@ button[aria-disabled=true]{opacity:.62}
 #beast-pack h3{font-size:12px;color:#abcbd9}
 .beast-vitals{display:block;white-space:normal;line-height:1.5}
 #wild-bait img{height:22px;width:22px;object-fit:contain;vertical-align:middle;margin-right:4px}
+
+/* M5 · weather and encounter overlays are quiet outside their active context. */
+.m5-seeds{position:absolute;top:217px;left:24px;padding:5px 8px;border:1px solid #527084;background:#203646;color:#c7d8d6;border-radius:3px;pointer-events:none}
+.raid-alert,.island-guardian{position:absolute;z-index:1;top:57px;left:50%;translate:-50% 0;width:min(330px,calc(100% - 24px));border:1px solid #557187;background:rgba(23,39,52,.96);color:#dce5e9;padding:7px 11px;border-radius:4px}
+.raid-alert strong,.island-guardian strong{font-size:14px;color:#f0d6a5}
+.raid-alert[data-phase=active]{border-color:#966a52}
+.raid-alert .eyebrow span{color:#a8bdcf}
+.island-guardian>div{display:flex;justify-content:space-between}
+.island-guardian meter{width:100%;height:7px;accent-color:#b78d72}
+.island-guardian[data-telegraph=true]{border-color:#edb36e}
+.island-guardian[data-telegraph=true] small{color:#f7d199}
+.m5-attack-prompt{position:absolute;right:24px;bottom:113px;z-index:1;display:grid;grid-template-columns:minmax(80px,1fr) auto;align-items:center;gap:7px;padding:6px 8px;border:1px solid #557187;background:#233d4e;border-radius:4px;font-size:12px}
+.m5-attack-prompt button{font-size:11px}
+@media(max-width:620px){.m5-seeds{left:10px;top:168px}.raid-alert,.island-guardian{top:197px}.m5-attack-prompt{right:10px;bottom:183px}}

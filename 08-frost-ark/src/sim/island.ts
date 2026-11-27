@@ -1,3 +1,4 @@
+import { highTierCache, highTierOre } from './m5-zones';
 import biomes from '../data/biomes.json';
 import { buildingAt, isDeck, walk } from './ark';
 import { getNavigation } from './m3-state';
@@ -74,13 +75,14 @@ function generate(node:IslandNode,offsetX:number,offsetY:number):GeneratedIsland
     const resourceKey=kind+'_'+at;
     // Seed fixes both resource positions and materials, independent of the player's route.
     const vein=ground(node.seed,x,y);
-    const material=x===16&&y===32?'frost_iron_scrap':
-      node.tier>=2&&vein>.5?'coal_chunk':node.tier===1&&vein>.82?'ice_shard':'frost_iron_scrap';
+    const featured=x===16&&y===32;
+    const material=highTierOre(node.tier,vein,featured)??(featured?'frost_iron_scrap':
+      node.tier>=2&&vein>.5?'coal_chunk':node.tier===1&&vein>.82?'ice_shard':'frost_iron_scrap');
     const itemId=kind==='tree'?'driftwood':kind==='ore'?material:'ice_shard';
     const count=kind==='chest'?1:kind==='tree'?3:2;
-    const loot=kind==='chest'?(node.tier===1?
+    const loot=kind==='chest'?(highTierCache(node.tier)??(node.tier===1?
       [{itemId:'ice_shard',count:4},{itemId:'rope',count:3},{itemId:'raw_root',count:2}]:
-      [{itemId:'coal_chunk',count:4},{itemId:'warm_berry',count:3},{itemId:'warm_fur',count:2}]):
+      [{itemId:'coal_chunk',count:4},{itemId:'warm_berry',count:3},{itemId:'warm_fur',count:2}])):
       [{itemId,count:1}];
     resources.push({id:node.id+'_'+resourceKey,key:resourceKey,kind,itemId,count,loot,x:offsetX+x+.5,y:offsetY+y+.5});
   };

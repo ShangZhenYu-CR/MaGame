@@ -9,6 +9,7 @@ import { dockedIsland, gangwayGeometry, islandNodes, islandNodeRemaining } from 
 import { helmPoint } from '../sim/sky-map';
 import { ISLAND_ART, islandActor, islandCameraExtent, paintGangway, paintIsland } from './island-view';
 import { BEAST_ART, BeastScene, paintBeastCues } from './beast-view';
+import { HOSTILE_ART, m5Actors, paintAttackTell, paintHostileBar, paintM5CombatEffects } from './combat-view';
 import { aimEnd, hookTip } from '../sim/cloud';
 import type { Vec2, WorldState } from '../sim/types';
 import { PALETTE as P } from './palette';
@@ -28,6 +29,8 @@ const buildingVisuals:Readonly<Record<string,BuildingVisual>>={
   sorter_arm:{art:'building-sorter',width:1.20,height:1.46,shadow:.47},
   greenhouse:{art:'building-greenhouse',width:2.26,height:2.17,shadow:.98,ground:.88},
   warm_wall:{art:'building-insulated-wall',width:1.18,height:1.25,shadow:.55},
+  frost_turret:{art:'building-frost-arrow-turret',width:1.29,height:1.52,shadow:.59},
+  fire_oil_turret:{art:'building-fire-oil-turret',width:1.33,height:1.53,shadow:.62},
   beast_den:{art:'building-beast-den',width:2.28,height:2.15,shadow:1.01,ground:.86},
   feed_trough:{art:'building-feed-trough',width:1.20,height:1.00,shadow:.54},
   buoyancy_core:{art:'building-buoyancy-core',width:1.20,height:1.38,shadow:.50},
@@ -36,7 +39,7 @@ const ironDeck='building-iron-deck';
 const required=[
   ...deckIds,'manan-south','manan-north','manan-west','manan-east','latte-sleep','latte-alert','latte-walk','latte-walk-alt',
   'hearth-1','hearth-2','rail','corner','rock','icicles',ironDeck,...Object.values(buildingVisuals).map(v=>v.art),
-  'debris-wood','debris-iron','debris-rope','clouds','rail-side','rock-side','frost-frame',...ISLAND_ART,...BEAST_ART,
+  'debris-wood','debris-iron','debris-rope','clouds','rail-side','rock-side','frost-frame',...ISLAND_ART,...BEAST_ART,...HOSTILE_ART,
 ] as const;
 interface Cell { x:number; y:number; hash:number; iron:boolean; temperature:number; left:boolean; right:boolean; front:boolean; back:boolean }
 interface Actor {
@@ -185,6 +188,9 @@ export class ArkView {
       return p.x> -s*3&&p.x<width+s*3&&p.y> -s*3&&p.y<height+s*4;
     });
     actors.push(...beasts);
+    const hostiles=m5Actors(w);
+    for(const hostile of hostiles)paintAttackTell(c,project(hostile.x,hostile.y),hostile,s,w.tick);
+    actors.push(...hostiles);
     const fire=primaryHearth(w);
     for(const bld of w.ark.buildings){
       const {gx,gy}=bld;
@@ -239,6 +245,8 @@ export class ArkView {
     this.lightmap.paint(c,w,project,s,{x:feet.x+lens.x,y:feet.y+lens.y-(player.float??0)});
     if(b && w.weather!=='clear')this.lowClouds(c,b,w.tick,true);
     this.weather.paint(c,w,this.art.image('frost-frame'));
+    paintM5CombatEffects(c,w,project,s);
+    for(const hostile of hostiles)paintHostileBar(c,project(hostile.x,hostile.y),hostile,s);
     for(const b of beasts)paintBeastCues(c,project(b.x,b.y),b,s,w.tick);
     // Aiming is a control cue, not world geometry. Keep it above night tint,
     // snow and frost so a reachable endpoint stays visible in all weather.

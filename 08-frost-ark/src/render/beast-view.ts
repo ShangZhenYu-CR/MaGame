@@ -9,6 +9,8 @@ const visuals:Record<string,BeastVisual>={
   galehawk:{art:'beast-galehawk',width:1.34,height:1.18,shadow:.39,lift:.22},
   frostyak:{art:'beast-frostyak',width:1.76,height:1.55,shadow:.70},
   glacierstag:{art:'beast-glacierstag',width:1.41,height:1.86,shadow:.54},
+  magmalisk:{art:'beast-magmalisk',width:1.89,height:1.38,shadow:.75},
+  tempest_wyvern:{art:'beast-tempest-wyvern',width:2.16,height:1.77,shadow:.79,lift:.23},
 };
 export const BEAST_ART=Object.values(visuals).map(v=>v.art);
 const definitions=new Map(beasts.map(d=>[d.id,d]));

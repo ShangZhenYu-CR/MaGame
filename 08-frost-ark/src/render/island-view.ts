@@ -5,6 +5,9 @@ import { ovalGlow } from './atmosphere';
 export const ISLAND_ART=[
   'island-t1-ground-1','island-t1-ground-2','island-t1-cliff',
   'island-t2-ground-1','island-t2-ground-2','island-t2-cliff',
+  'island-t3-ground-1','island-t3-ground-2','island-t3-cliff',
+  'island-t4-ground-1','island-t4-ground-2','island-t4-cliff',
+  'island-sulfur','island-sky-mithril','island-skyfire-ruin',
   'island-frost-pine','island-frost-shrub','island-frost-iron','island-coal','island-prismatic-ice',
   'island-ruin-closed','island-ruin-open','ark-gangway','ark-helm',
 ] as const;
@@ -19,6 +22,12 @@ interface Topography {
 }
 const hash=(x:number,y:number)=>((Math.imul(x+13,1664525)^Math.imul(y+33,1013904223))>>>0)/4294967296;
 const frostpine=(biomeId:string)=>biomeId==='frostpine_isles';
+const themes={
+  t1:{rim:'rgba(201,220,224,.35)',dark:'rgba(36,61,74,.32)',sky:'rgba(224,237,239,.16)',shade:'rgba(23,64,81,.17)'},
+  t2:{rim:'rgba(199,219,225,.38)',dark:'rgba(29,48,60,.32)',sky:'rgba(182,202,207,.16)',shade:'rgba(9,32,43,.20)'},
+  t3:{rim:'rgba(226,170,99,.38)',dark:'rgba(51,29,30,.38)',sky:'rgba(222,179,122,.19)',shade:'rgba(69,39,37,.24)'},
+  t4:{rim:'rgba(177,232,231,.43)',dark:'rgba(16,45,55,.39)',sky:'rgba(175,224,226,.19)',shade:'rgba(21,44,55,.22)'},
+} as const;
 const topologyCache=new WeakMap<number[],Topography>();
 const patterns=new WeakMap<HTMLImageElement,HTMLCanvasElement>();
 let terrainBlend:HTMLCanvasElement|undefined;
@@ -110,7 +119,8 @@ export function paintIsland(
   const end=project(offsetX+geo.maxX,offsetY+geo.maxY);
   if(start.x>W+tile||start.y>H+tile||end.x< -tile||end.y< -tile*4)return;
 
-  const t=frostpine(island.biomeId)?'t2':'t1';
+  const t=island.biomeId==='sulfur_rift'?'t3':island.biomeId==='aurora_zenith'?'t4':frostpine(island.biomeId)?'t2':'t1';
+  const theme=themes[t];
   // Dark under-hold diffuses into the clouds, below the distinct painted strata.
   const rx=(end.x-start.x)*.64,ry=Math.max(tile,(end.y-start.y)*.19);
   ovalGlow(c,(start.x+end.x)/2,end.y+tile*.86,rx,ry,'rgba(8,24,38,.54)','rgba(8,24,38,0)');
@@ -146,14 +156,14 @@ export function paintIsland(
   c.save();c.resetTransform();c.drawImage(blend,0,0);c.restore();
 
   c.lineCap='round';c.lineJoin='round';
-  c.strokeStyle=t==='t2'?'rgba(29,48,60,.32)':'rgba(36,61,74,.32)';
+  c.strokeStyle=theme.dark;
   c.lineWidth=.25;c.stroke(geo.coast);
-  c.strokeStyle=t==='t2'?'rgba(199,219,225,.38)':'rgba(201,220,224,.35)';
+  c.strokeStyle=theme.rim;
   c.lineWidth=.068;c.stroke(geo.coast);
   const wash=c.createLinearGradient(geo.minX,geo.minY,geo.maxX,geo.maxY);
-  wash.addColorStop(0,t==='t2'?'rgba(182,202,207,.16)':'rgba(224,237,239,.16)');
+  wash.addColorStop(0,theme.sky);
   wash.addColorStop(.36,'rgba(199,223,226,0)');
-  wash.addColorStop(1,t==='t2'?'rgba(9,32,43,.20)':'rgba(23,64,81,.17)');
+  wash.addColorStop(1,theme.shade);
   c.fillStyle=wash;c.fill(geo.land);
   c.restore();
 
@@ -170,6 +180,8 @@ export function islandActor(
 ):IslandActor|null{
   const base={x:node.x,y:node.y};
   const v=hash(Math.floor(node.x*100),Math.floor(node.y*100));
+  if(node.kind==='chest'&&biomeId==='aurora_zenith'&&remaining>0)
+    return {...base,art:'island-skyfire-ruin',width:1.60,height:1.48,shadow:.65};
   if(node.kind==='chest')
     return {...base,art:remaining>0?'island-ruin-closed':'island-ruin-open',width:1.52,height:1.43,shadow:.60};
   if(remaining<=0)return null;
@@ -179,7 +191,7 @@ export function islandActor(
     return {...base,art:'island-frost-pine',width:1.79,height:2.28,shadow:.55,scale:.90+v*.23,flip:v<.42};
   }
   if(node.kind==='ore'){
-    const art=node.itemId==='coal_chunk'?'island-coal':
+    const art=node.itemId==='sulfur_ore'?'island-sulfur':node.itemId==='sky_mithril'?'island-sky-mithril':node.itemId==='coal_chunk'?'island-coal':
       node.itemId==='ice_shard'?'island-prismatic-ice':'island-frost-iron';
     return {...base,art,width:1.45,height:1.27,shadow:.50,scale:.88+v*.24,flip:v<.45};
   }

@@ -64,3 +64,11 @@
 - 保留 M0–M2 断言。`npm run gate`、美术处理 3 个测试、两个 `file://` 入口启动以及验收 ZIP 干净解压后的主入口全流程通过。四张实机图包含航图、搭板、登岛采矿和 T2 地貌。
 - 【偏离报告】无功能降级。只更新 `game/08-frost-ark` 下的游戏目录，公开 Pages 未改。M3 待验收，暂不启动 M4。
 - [M3 实机图和审片](https://drive.google.com/drive/folders/1TflYR2toV2rMVukhcDUTYSN3H4KT-9jD) · [下载试玩 ZIP](https://drive.google.com/file/d/1AJdPp_Kz8IunNyFl8Ov5nFZRyHplowu-/view)。最终游戏源代码 `a784485`，静态试玩构建 `6d77b0c`。
+
+## 2026-11-27 · 抓钩修复与 M4 驯兽基地
+
+- 抓钩蓄力重新显示逐渐拉长的暖色轨迹和实际射程落点；最重寒潮与冰晶暗角下仍可辨认，松手或取消消失。
+- 两种束缚方式和压低体力均可进入驯服。五种云兽按栖地和诱饵区分；兽窝供暖、饲料槽补给。随行、工作、休息可切换，绒火狐暖圈和霜角牦牛行囊正常。
+- 11 张新精绘素材双背景逐件确认，运行 `npm run gate`，含过往全流程、HTTP 与双 `file://` 入口、寒潮蓄力线和 M4 实机。
+- 工作分支构建 `86189d5`；Pages 发布提交 `8d178b0`。
+- [M4 实机证据](https://drive.google.com/drive/folders/1Xpqwvi9jDbhn6T8ahrJh0zHTE7We3fqB)。

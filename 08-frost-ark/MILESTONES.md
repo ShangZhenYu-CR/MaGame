@@ -52,13 +52,15 @@
 - [x] 实现手斧/矿镐采伐采集与工具耐久/升级
 - [x] 跑通 `npm run gate`，截图上传 `M3/`（1. 云海航图 2. 方舟靠泊搭跳板 3. 登岛采矿探索）
 
-> M3 已交付，等待实机验收，再决定是否推进 M4。见 [M3 实机与 ZIP](https://drive.google.com/drive/folders/1TflYR2toV2rMVukhcDUTYSN3H4KT-9jD)。
+> M3 已交付并上线；用户授权 M4–M6 连续完成后统一验收。见 [M3 实机与 ZIP](https://drive.google.com/drive/folders/1TflYR2toV2rMVukhcDUTYSN3H4KT-9jD)。
 
 ## M4 · 方舟驯兽与活体基地
-- [ ] 实现麻痹网/兽夹、热食诱饵制作与野外驯服进度循环
-- [ ] 上线首批 5 种云兽（岩甲鼹、绒火狐、风爪鸥、霜角牦牛、雪林鹿）及按 `docs/ART_SPEC.md` 管线产出的精绘 2.5D 精灵与微动效
-- [ ] 实现暖区兽窝、自动饲料槽与「随行出战 / 基地打工 / 休整回温」一键切换（含绒火狐移动暖圈）
-- [ ] 跑通 `npm run gate`，截图上传 `M4/`（1. 浮岛驯兽瞬间 2. 方舟内兽群打工 3. 驯兽管理面板）
+- [x] 实现麻痹网/兽夹、热食诱饵制作与野外驯服进度循环
+- [x] 上线首批 5 种云兽（岩甲鼹、绒火狐、风爪鸥、霜角牦牛、雪林鹿）及按 `docs/ART_SPEC.md` 管线产出的精绘 2.5D 精灵与微动效
+- [x] 实现暖区兽窝、自动饲料槽与「随行出战 / 基地打工 / 休整回温」一键切换（含绒火狐移动暖圈）
+- [x] 跑通 `npm run gate`，截图上传 `M4/`（1. 浮岛驯兽瞬间 2. 方舟内兽群打工 3. 驯兽管理面板）
+
+> M4 已发 [GitHub Pages](https://shangzhenyu-cr.github.io/MaGame/08-frost-ark/)，[验收截图](https://drive.google.com/drive/folders/1Xpqwvi9jDbhn6T8ahrJh0zHTE7We3fqB)。
 
 ## M5 · 寒潮攻防与四大风区
 - [ ] 实现每 5 天「大寒潮（Whiteout）」事件、霜影猎手与破甲冰兽夜袭、防霜箭塔与火油喷射塔

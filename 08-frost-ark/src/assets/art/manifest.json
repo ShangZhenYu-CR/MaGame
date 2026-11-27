@@ -1760,6 +1760,342 @@
         121
       ],
       "bytes": 19481
+    },
+    "enemy-frost-stalker": {
+      "file": "enemy-frost-stalker.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.18,
+      "tileH": 1.18,
+      "contentBox": [
+        2,
+        13,
+        126,
+        121
+      ],
+      "bytes": 23556
+    },
+    "enemy-ice-breaker": {
+      "file": "enemy-ice-breaker.png",
+      "width": 160,
+      "height": 160,
+      "anchorX": 80,
+      "anchorY": 151,
+      "tileW": 1.55,
+      "tileH": 1.48,
+      "contentBox": [
+        2,
+        18,
+        158,
+        151
+      ],
+      "bytes": 43078
+    },
+    "boss-frost-mane": {
+      "file": "boss-frost-mane.png",
+      "width": 224,
+      "height": 224,
+      "anchorX": 112,
+      "anchorY": 212,
+      "tileW": 2.64,
+      "tileH": 2.42,
+      "contentBox": [
+        2,
+        8,
+        222,
+        212
+      ],
+      "bytes": 88734
+    },
+    "boss-rift-armor": {
+      "file": "boss-rift-armor.png",
+      "width": 224,
+      "height": 224,
+      "anchorX": 112,
+      "anchorY": 212,
+      "tileW": 2.64,
+      "tileH": 2.41,
+      "contentBox": [
+        2,
+        26,
+        222,
+        212
+      ],
+      "bytes": 82055
+    },
+    "building-frost-arrow-turret": {
+      "file": "building-frost-arrow-turret.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.2,
+      "tileH": 1.3,
+      "contentBox": [
+        14,
+        2,
+        115,
+        121
+      ],
+      "bytes": 25004
+    },
+    "building-fire-oil-turret": {
+      "file": "building-fire-oil-turret.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.2,
+      "tileH": 1.3,
+      "contentBox": [
+        14,
+        2,
+        113,
+        121
+      ],
+      "bytes": 23601
+    },
+    "beast-magmalisk": {
+      "file": "beast-magmalisk.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.28,
+      "tileH": 1.16,
+      "contentBox": [
+        2,
+        35,
+        126,
+        121
+      ],
+      "bytes": 25498
+    },
+    "beast-tempest-wyvern": {
+      "file": "beast-tempest-wyvern.png",
+      "width": 160,
+      "height": 160,
+      "anchorX": 80,
+      "anchorY": 151,
+      "tileW": 1.51,
+      "tileH": 1.57,
+      "contentBox": [
+        2,
+        10,
+        158,
+        151
+      ],
+      "bytes": 43266
+    },
+    "island-t3-ground-1": {
+      "file": "island-t3-ground-1.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 25460
+    },
+    "island-t3-ground-2": {
+      "file": "island-t3-ground-2.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 21183
+    },
+    "island-t4-ground-1": {
+      "file": "island-t4-ground-1.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 32668
+    },
+    "island-t4-ground-2": {
+      "file": "island-t4-ground-2.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 30280
+    },
+    "island-t3-cliff": {
+      "file": "island-t3-cliff.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 18,
+      "tileW": 1.25,
+      "tileH": 1.1,
+      "contentBox": [
+        2,
+        15,
+        126,
+        121
+      ],
+      "bytes": 19054
+    },
+    "island-t4-cliff": {
+      "file": "island-t4-cliff.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 18,
+      "tileW": 1.25,
+      "tileH": 1.1,
+      "contentBox": [
+        2,
+        15,
+        126,
+        125
+      ],
+      "bytes": 21764
+    },
+    "island-sulfur": {
+      "file": "island-sulfur.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        13,
+        126,
+        121
+      ],
+      "bytes": 26099
+    },
+    "island-sky-mithril": {
+      "file": "island-sky-mithril.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        11,
+        126,
+        121
+      ],
+      "bytes": 29466
+    },
+    "island-skyfire-ruin": {
+      "file": "island-skyfire-ruin.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.24,
+      "tileH": 1.2,
+      "contentBox": [
+        2,
+        66,
+        126,
+        121
+      ],
+      "bytes": 18252
+    },
+    "icon-frost-turret": {
+      "file": "icon-frost-turret.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        8,
+        2,
+        40,
+        46
+      ],
+      "bytes": 4216
+    },
+    "icon-fire-oil-turret": {
+      "file": "icon-fire-oil-turret.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        5,
+        2,
+        43,
+        46
+      ],
+      "bytes": 4943
+    },
+    "icon-island-tier-3": {
+      "file": "icon-island-tier-3.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        2,
+        46,
+        45
+      ],
+      "bytes": 4458
+    },
+    "icon-island-tier-4": {
+      "file": "icon-island-tier-4.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        2,
+        45,
+        46
+      ],
+      "bytes": 4745
     }
   }
 }

@@ -23,7 +23,7 @@
       "prerequisite": "tier2_automation",
       "researchCost": [{ "itemId": "frost_iron_ingot", "count": 1 }, { "itemId": "ice_shard", "count": 2 }],
       "name": "霜城防线与生态园",
-      "unlocksBuildings": ["iron_deck", "warm_wall", "greenhouse", "frost_turret"],
+      "unlocksBuildings": ["iron_deck", "warm_wall", "greenhouse", "frost_turret", "fire_oil_turret"],
       "unlocksRecipes": ["cook_warm_hay", "cook_berry_soup", "cook_magma_steak", "cook_mithril_roast", "grow_roots", "grow_berries"]
     }
   ]

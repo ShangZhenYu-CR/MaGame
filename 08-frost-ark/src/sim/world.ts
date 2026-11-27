@@ -1,3 +1,4 @@
+import { stepM5 } from './m5';
 import {
   ARK_SIZE,
   SAVE_VERSION,
@@ -134,5 +135,6 @@ export function stepWorld(world: WorldState, ticks = 1, direction: Vec2 = {x: 0,
     stepBeasts(world);
     stepIndustry(world);
     updateLatte(world);
+    stepM5(world);
   }
 }

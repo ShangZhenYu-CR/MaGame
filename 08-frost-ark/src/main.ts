@@ -19,6 +19,7 @@ import biomes from './data/biomes.json';
 import { nearestBeastFacility, nearestWildBeast } from './sim/beasts';
 import { nearestIslandNode } from './sim/island';
 import { beastUi } from './ui/beasts';
+import { combatM5Ui } from './ui/combat-m5';
 
 function el<T extends HTMLElement = HTMLElement>(id: string): T { return document.getElementById(id)! as T; }
 const canvas=el<HTMLCanvasElement>('game-canvas'), view=new ArkView(canvas);
@@ -63,6 +64,7 @@ const toolUi=expeditionToolsUi({state:()=>w,icon:iconPath,message:finishAction})
 const beastSprites=import.meta.glob<string>('./assets/art/beast-*.png',{eager:true,query:'?inline',import:'default'});
 const beastArt=(id:string)=>beastSprites['./assets/art/beast-'+id+'.png'];
 const beasts=beastUi({state:()=>w,msg:finishAction,icon:iconPath,art:beastArt});
+const m5Ui=combatM5Ui({state:()=>w,msg:finishAction});
 const skyToggle=el('sky-map-toggle');
 const helmIcon=iconPath('helm');
 if(helmIcon){const img=document.createElement('img');img.alt='';img.src=helmIcon;skyToggle.prepend(img);}
@@ -315,7 +317,7 @@ addEventListener('keydown',e=>{
   else if(k==='r')warmthAction('fuel');
   else if(k==='u')warmthAction('upgrade');
   else if(k==='g')warmthAction('drop');
-  else if(k==='f')warmthAction('pickup');
+  else if(k==='f'){if(!m5Ui.strike())warmthAction('pickup');}
   else if(k==='i'){ e.preventDefault();toggleBag(); }
 });
 addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
@@ -397,7 +399,7 @@ function frame(now:number):void {
   industry.update();chart.paint(false,now);
   const overlay=chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||beasts.open();
   const here=expedition.update(now,overlay||(mode!=='hook'&&expedition.area()==='ark'));
-  beasts.update(now,overlay);
+  beasts.update(now,overlay);m5Ui.update(now,overlay);
   toolUi.update(here);
   const region=regions.get(w.activeIsland?.biomeId??w.sky.islands.find(n=>n.id===w.ark.anchoredIslandId)?.biomeId??'')??'碎云浅海';
   if(el('sector-name').textContent!==region)el('sector-name').textContent=region;

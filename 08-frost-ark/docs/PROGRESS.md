@@ -107,3 +107,10 @@
 - **十天经济**：三种种子（202608、202609、271127）从标准自然初始状态出发，实际用模拟命令拾荒、做饭、制作和维修工具、冶炼、巡航、登岛采硫磺、升 Lv.3、布防和添柴；三轮都走完整 Day 1–10，没有倒地或材料死锁。自然模拟不同于键鼠通关；四阶外观分支由实机专项验证，终验继续遵守自然键鼠和全量实测要求。
 - **交付**：[16 张浏览器验收图与审片](https://drive.google.com/drive/folders/1N30Y89S82RNDNX2tD3gzO08VdvOQgK3r) · [S1 离线试玩包](https://drive.google.com/file/d/1pxyu6G3gTurtcAyueYeS5ImRTNoEvyt3/view) · [三个自然模拟结果](https://drive.google.com/file/d/1znA91SVYLpY8N9qkjV5yk6G74xYiYZYQ/view)。可玩代码版本 `51fbab53280e1e2a5775c316410a20a89d9a3ea3`。仅更新 `game/08-frost-ark`；`main` 保持不变。
 - **【偏离报告】**：Git CLI 无写入凭据，采用 GitHub 连接原子推送到同一分支并读回验证；回归发现的上述真实问题与测试站位均已复测。Phase 2 只完成 S1（5/42），不代表总验收；S2–S8 连续推进，P2-42 后另做完整七组终验并等合并批准。
+
+## 2026-11-28（北京时间） · Phase 2 / S2 装备与战斗验收通过
+
+- **P2-06 至 P2-11**：四套防寒服与两件饰品、五把动作与射程各异的武器、空格翻滚/体力/受击无敌、战斗采集反馈、两箭冻结接火油的 1.6 倍融化暴击、1–9 可拖动重绑及状态徽章。
+- **门禁**：`npm run gate` 完整通过；干净解压交付 ZIP 再用 `file://` 跑同套浏览器回归也通过，两条路径均无页面/控制台报错，原 M0–M6 和 P2-01 至 P2-11 都保留。存档 v9 可加载 v1–v8；正式 PNG 153 张，2,813,578 字节。
+- **交付**：[27 张实机图与审片](https://drive.google.com/drive/folders/1feAqdTeyB1x1u0peTJQlCpk3pnz4nXH1) · [离线试玩 ZIP](https://drive.google.com/file/d/1uoF9aFCu8wKXDWt4AGCmzYnKl9FsCvYu/view) · [S2 验收报告](https://drive.google.com/file/d/1wg150hLGw9QnVAwVFX9vT8vgIu8utukG/view) · [两套门禁日志](https://drive.google.com/file/d/1JxfIXWMVDBPX8LYQESTatSqo48bDAj17/view?usp=drivesdk)。实际可玩构建 `848c84c66886b38a72f9b55756f30c4b96fa510d`，仅更新开发分支。
+- **【偏离报告】**：第一轮回归暴露了打开背包时鼠标点火把不能选建造，已修并保留原断言复测。部分战斗是实机准备档，不能代替 P2-42 后的自然档与全量终验；极光岛地表重复感留给 S4 对应地貌单。继续 S3，不碰 `main`。

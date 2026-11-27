@@ -65,6 +65,8 @@
   - 快捷栏扩展为 1–9 格，支持拖拽或快捷键自由编排工具/武器/食物/建筑；左上角下方新增紧凑状态 Buff 徽章栏（暖胃、抗寒、复苏护盾、舒适加成）；优化鼠标悬停锁定与近战自动微转向。
   - **验收**：快捷栏 1–9 切换顺畅，食物可直接按对应数字键食用，Esc 逐层退栈无冲突。
 
+> S2 验收归档（11/42）：[截图与审片](https://drive.google.com/drive/folders/1feAqdTeyB1x1u0peTJQlCpk3pnz4nXH1) · [离线试玩 ZIP](https://drive.google.com/file/d/1uoF9aFCu8wKXDWt4AGCmzYnKl9FsCvYu/view) · [门禁与偏离报告](https://drive.google.com/file/d/1wg150hLGw9QnVAwVFX9vT8vgIu8utukG/view)。
+
 ---
 
 ## Sprint S3 · 深度方舟建造、室内热学与全自动物流（6 单）

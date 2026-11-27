@@ -42,3 +42,10 @@ python scripts/process-art.py --config art/prompts.json --source-dir /tmp/frost-
 - `fit` 默认对有幕布输入紧裁后等比放入规范画布（`contain`），无幕布背景使用等比铺满（`cover`）。需要铺满固定 UV 区域时可以明确选择 `stretch`；此时脚底位置需用 `targetAnchor` 明确指定。
 - 地面精灵默认把紧裁后的底边中心对齐画布宽度 50%、高度 94.5% 处。透视地基、炉体或垂挂结构可用 `anchor` 覆盖主体的脚底位置，并用 `targetAnchor` 调整到输出画布的位置，轴向 `0 = 左/上`、`1 = 右/下`。`tileW`、`tileH` 是渲染时整个画布的世界格尺寸，可以是小数；清单中的 `anchorX`、`anchorY` 和 `contentBox` 均为输出像素。
 - 先尝试保留原颜色的轻量 PNG 或无损 WebP，超出预算才逐级压缩。上限：常规精灵每张 90,000 字节、背景 180,000 字节、整批 4,500,000 字节。测试用的几何图仅生成在临时目录，从不成为素材。旧版废弃文件应显式移除，不能继续打入试玩包。
+
+## 只处理一批新增素材
+
+增量制作时，把 `process-art.py` 的 `--output-dir` 和 `--review` 指向临时目录。
+打开双背景审片图验过后，用
+`python scripts/merge-art.py /tmp/batch-prompts.json /tmp/processed-art` 合并。
+合并器保留既有资产，拒绝重复 ID、文件、字节不符及超过总预算的批次。

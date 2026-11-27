@@ -12,7 +12,9 @@
     "manan": "2.5D top-down 3/4 view (40 degree camera angle) hand-painted indie survival game sprite, inspired by Core Keeper and Eastward, crisp painterly cel brushwork, subtle dark slate-brown outline (#1b222c), tactile frost-weathered wood and cast-iron materials, soft top-left cool skylight, centered isolated full object with generous padding on a flat pure solid #FF00FF magenta background, NO ground cast shadow, NO text, NO frame, NO watermark. Produce a square game sprite sheet with exactly four completely isolated sprites on an implicit equal-sized 2x2 grid, one small full-body sprite safely inside each quadrant and center aligned. NO grid lines. Asset for Frost Ark: Ma Nan, an East Asian young man with short close-cropped black buzz cut and very straight eyebrows. The attached design sheet is the required reference: match the exact haircut and face, dark charcoal lightweight hooded technical windbreaker (hood down, distinct zipper), very tiny gray A chest mark only on the anatomical left chest, black multipocket cargo pants, off-white sneakers with gray rubber panels. Do not reproduce any reference page background or labels. Slightly stylize to an adult about 5 heads high for 64px legibility; common chassis scale for all four, pose relaxed (arms not outstretched). His anatomical right hand HOLDS a compact windproof cast-iron storm lantern hanging at hip height with a visible warm amber-orange glass center, no magical halo bleeding outside the object. Orthographic camera elevated 40° above horizon for ALL FOUR, see top of head/shoulders. Precisely top-left SOUTH front facing camera, top-right NORTH back facing away with hood and lantern still visible on his right side, bottom-left EAST profile facing image-right, bottom-right WEST profile facing image-left. Keep lantern on correct anatomical hand at each angle, let it peek past the far hip where needed. Not 0-degree side view, not high-angle bird eye, not perspective-converged. Painterly tapered lines with smoky cold slate rim light, limited restrained palette charcoal and true warm orange lantern, shaped readable clothing folds, confident game-ready silhouette, no additional accessories. Ensure the background across corners, below and between sprites and all negative spaces is entirely exact RGB (255,0,255), no vignette, gradients, AO, reflected magenta light, shadow, sticker borders, or white halos. Render at 1024x1024 with bodies taking ~340px high centered per quadrant.",
     "latte": "2.5D top-down 3/4 view (40 degree camera angle) hand-painted indie survival game sprite, inspired by Core Keeper and Eastward, crisp painterly cel brushwork, subtle dark slate-brown outline (#1b222c), tactile frost-weathered wood and cast-iron materials, soft top-left cool skylight, centered isolated full object with generous padding on a flat pure solid #FF00FF magenta background, NO ground cast shadow, NO text, NO frame, NO watermark. Square 1024x1024 contact sheet of one consistent fluffy juvenile cat rendered in FOUR distinct game-ready tiny orthographic 40deg poses, each isolated safely centered in its own 512x512 quadrant, no grid lines. This is Latte, an adorable round caramel-ginger and creamy ivory longhair kitten: light caramel shallow stripes on crown and a thick fluffy curled striped tail, white muzzle and chest bib, tiny peach inner TRIANGULAR ears, brown curious eyes; soft feline proportions not broad fox ears, no clothes. Top left SLEEP: tightly curled cinnamon roll, tuck paws under torso, eyes closed, tail curls snug against face, touches no pillow; top right ALERT: visibly standing up on four feet with arched back, puffed raised tail, ears upright and looking slightly screen-left, eyes open and curious; bottom left WALK: active natural feline stride diagonally toward screen-left, front-left paw stepping forward and expression relaxed, horizontally readable side/three-quarter view and tail up, eyes open; bottom right WALK 2: contrasting alternate feline stride with rear leg forward, same orientation and scale. Cohesive color and materials: caramel ochre highlights, deeper warm umber fur shadows, cream chest; subtle slate brown silhouette line and cool top-left rim, mature indie game hand-painted sprite quality, economical shape and silhouette for ~42 px presentation. Full silhouettes with no clipped whiskers/tail, ample buffer to quadrant edges. Exact flat electric magenta #FF00FF at all background pixels; absolutely no dropped shadows, line at ground contact, white fringe, vignette, gradients, text, decorative props, frames, or labels.",
     "icons": "Game asset sprite sheet for Frost Ark, EXACT 4 columns x 2 rows regularly spaced on one flat solid pure electric magenta #FF00FF RGB(255,0,255) matte. Square canvas. Each sprite centered in its cell, all silhouettes have generous margins and never touch. No text, borders, guide lines, panels, shadows on background, white rim or gradient. Readable 32px game icons, handcrafted painterly 2.5D style with restrained realistic materials, game 3/4 overhead 40 degree, soft cool top-left skylight, soft deep slate-brown contour. Row 1 from left to right: steel grappling hook with short handle; square icy wooden deck plank module with two iron corner fixtures; lit short resin torch on wood pole orange amber flame; sturdy weathered dark wood windbreak wall panel with iron strap. Row 2 from left to right: charcoal canvas rucksack; two short frost-dusted splintered driftwood pieces; one chunky coil of twisted dark blue gray frozen iron scrap with scraped highlights; one loop of ochre tan knotted hemp rope. Keep icons bold, compact, evenly scaled, detailed without noise. Entire background exact block color #FF00FF including edges.",
-    "debris": "Square 2x2 atlas of EXACTLY three isolated game-world salvage sprites (bottom right must remain EMPTY uniform magenta): top left weathered floating wood box, slatted worn silver-gray brown crate with two narrow iron braces, splinter and light frost; top right knotted and twisted dark blue gray iron scrap, torn bent metal with ice crystals and a little sharp cold reflection; bottom left coiled golden brown hemp mooring rope with knot and visible twisted fibers and a few bright frosted breaks. Center in each of three cells with large margins and no overlap. Clean background is an uninterrupted flat pure #FF00FF (255,0,255) chroma key matte; no labels, frame, guides, shadow, colored ground, reflected pink, white halo, cloud or gradients. Original 2.5D hand-painted indie survival game props, fixed 40-degree 3/4 overhead shape, painted facets, gentle upper-left cool daylight, deep slate-brown softly edged outlines, clear consistent front sides, paint texture, readable silhouette at 64 pixels. All three objects completely visible. Strong distinct silhouettes."
+    "debris": "Square 2x2 atlas of EXACTLY three isolated game-world salvage sprites (bottom right must remain EMPTY uniform magenta): top left weathered floating wood box, slatted worn silver-gray brown crate with two narrow iron braces, splinter and light frost; top right knotted and twisted dark blue gray iron scrap, torn bent metal with ice crystals and a little sharp cold reflection; bottom left coiled golden brown hemp mooring rope with knot and visible twisted fibers and a few bright frosted breaks. Center in each of three cells with large margins and no overlap. Clean background is an uninterrupted flat pure #FF00FF (255,0,255) chroma key matte; no labels, frame, guides, shadow, colored ground, reflected pink, white halo, cloud or gradients. Original 2.5D hand-painted indie survival game props, fixed 40-degree 3/4 overhead shape, painted facets, gentle upper-left cool daylight, deep slate-brown softly edged outlines, clear consistent front sides, paint texture, readable silhouette at 64 pixels. All three objects completely visible. Strong distinct silhouettes.",
+    "m2VerticalEdges": "Two separately isolated narrow vertical video game sprites side by side on solid pure #FF00FF, 2.5D HAND PAINTED 40 DEGREE top down look, cool upper left skylight and frost, subtle slate-brown outline. The direction of each entire piece aligns with the VERTICAL Y AXIS OF THE PICTURE: connecting rail segment runs away from viewer from bottom center towards top center; the near post stands in front of the far post and partially overlaps it. NOT left-to-right, NO horizontal side elevation, near post lower on the canvas and far post higher on canvas, screen X almost same. Left half: wooden nautical rail, two upright posts, lengthwise connecting short straight rails, visible thick top and carved wooden rim, small snow crust on rails, plain rustic. Right half: narrow dark wooden and slate-blue stone hull side edging, a narrow width strip of wood planks covered with small flat thin broken stone fragments, like a vertical runway, bottom end much nearer than top end, prominent wood sides on left and right, no pillar, no hanging stone or icicles. Brown pine wood, blue grey stone, no shine or bright neon, hard object edges without shadows on magenta, big separation, no text. Sprite sheet for orthogonal board game. Do not show anything horizontal, keep both strips vertical on screen. Render both objects in full without cropping.",
+    "m2FrostVignette": "TRANSPARENT CANVAS, real alpha. An irregular ultra-soft light ice blue frost effect for the perimeter of a cold survival videogame screen; wide landscape 16:9. Center 75% completely empty and fully transparent; nothing across central view or horizon, no opaque checker pattern. Artistic hand-painted organic feathery frost crystal veins entering from lower two corners and a bit in top corners, scattered edge patches, very thin framing at midpoints and mix of short and long branches at asymmetrical positions. Frost color ONLY icy blue-grey, slate, pale white. Absolutely no violet, pink, purple, magenta, gray opaque background, lines, geometric hexagons, layout boxes, text, or snowflake icon shapes. Let frost opacity taper into a feathered fully transparent interior. Do not put a solid rim line, make natural fractal ice organic crystalline structure."
   },
   "assets": [
     {
@@ -636,6 +638,66 @@
       "tileH": 1,
       "key": "none",
       "format": "webp"
+    },
+    {
+      "id": "rail-side",
+      "source": "vertical-edges.png",
+      "crop": [
+        110,
+        45,
+        420,
+        1495
+      ],
+      "size": [
+        40,
+        160
+      ],
+      "key": "magenta",
+      "fit": "stretch",
+      "targetAnchor": [
+        0.5,
+        0.9
+      ],
+      "tileW": 0.28,
+      "tileH": 1.12
+    },
+    {
+      "id": "rock-side",
+      "source": "vertical-edges.png",
+      "crop": [
+        530,
+        65,
+        930,
+        1498
+      ],
+      "size": [
+        40,
+        160
+      ],
+      "key": "magenta",
+      "fit": "stretch",
+      "targetAnchor": [
+        0.5,
+        0.52
+      ],
+      "tileW": 0.31,
+      "tileH": 1.12
+    },
+    {
+      "id": "frost-frame",
+      "source": "frost-frame.png",
+      "size": [
+        640,
+        360
+      ],
+      "key": "none",
+      "format": "webp",
+      "fit": "stretch",
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "maxBytes": 90000
     }
   ]
 }

@@ -528,6 +528,54 @@
         576
       ],
       "bytes": 61914
+    },
+    "rail-side": {
+      "file": "rail-side.png",
+      "width": 40,
+      "height": 160,
+      "anchorX": 20,
+      "anchorY": 144,
+      "tileW": 0.28,
+      "tileH": 1.12,
+      "contentBox": [
+        4,
+        1,
+        37,
+        158
+      ],
+      "bytes": 12179
+    },
+    "rock-side": {
+      "file": "rock-side.png",
+      "width": 40,
+      "height": 160,
+      "anchorX": 20,
+      "anchorY": 83,
+      "tileW": 0.31,
+      "tileH": 1.12,
+      "contentBox": [
+        1,
+        2,
+        37,
+        158
+      ],
+      "bytes": 11751
+    },
+    "frost-frame": {
+      "file": "frost-frame.webp",
+      "width": 640,
+      "height": 360,
+      "anchorX": 320,
+      "anchorY": 180,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        640,
+        360
+      ],
+      "bytes": 78822
     }
   }
 }

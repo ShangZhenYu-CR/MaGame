@@ -1,3 +1,4 @@
+import { contourHull, HULL_NORTH, HULL_EAST, HULL_SOUTH, HULL_WEST, type HullProfile } from '../sim/hull';
 import { GROUND_FOOTPRINTS } from '../sim/ground-footprint';
 import { Lightmap } from './lightmap';
 import { ArtLibrary } from './art-library';
@@ -49,6 +50,10 @@ interface Actor {
   x:number;y:number;art:string;shadow:number;
   width?:number;height?:number;rotation?:number;scale?:number;flip?:boolean;float?:number;fire?:'hearth'|'torch'|'forge'|'stove'|'relay';hearthLevel?:number;
 }
+function dataHull(canvas:HTMLCanvasElement,hull:HullProfile):void{
+  canvas.dataset.hullCones=String(hull.cones.reduce((n,x)=>n+x,0));
+  canvas.dataset.hullInnerCorners=String(hull.corners.filter(x=>x.inside).length);
+}
 const tau=Math.PI*2;
 const hash=(x:number,y:number)=>(Math.imul(x+101,1597334677)^Math.imul(y+291,3812015801))>>>0;
 
@@ -61,6 +66,8 @@ export class ArkView {
   private lightmap=new Lightmap();
   private beastScene=new BeastScene();
   private weather=new WeatherFinish();
+  private hull:HullProfile|null=null;
+  private hullSignature='';
   private loaded=false;
   private loadError='';
   readonly ready:Promise<void> = this.art.ready;
@@ -138,12 +145,20 @@ export class ArkView {
     const project=this.screen.bind(this);
     const {width,height}=c.canvas;
     const deck=(x:number,y:number)=>x>=0&&y>=0&&x<w.ark.size&&y<w.ark.size&&!!w.ark.decks[y*w.ark.size+x];
+    const signature=w.ark.decks.join('');
+    if(!this.hull||signature!==this.hullSignature){
+      this.hullSignature=signature;
+      this.hull=contourHull(w.ark);
+      dataHull(this.canvas,this.hull);
+    }
+    const hull=this.hull;
     const cells:Cell[]=[];
     const a=this.worldBounds();
     for(let y=a.top;y<=a.bottom;y++) for(let x=a.left;x<=a.right;x++){
       if(!deck(x,y))continue;
-      cells.push({x,y,hash:hash(x,y),iron:w.ark.decks[y*w.ark.size+x]===2,temperature:w.ark.heatGrid[y*w.ark.size+x]??w.ambientTemp,
-        left:!deck(x-1,y),right:!deck(x+1,y),front:!deck(x,y+1),back:!deck(x,y-1)});
+      const i=y*w.ark.size+x,mask=hull.edges[i];
+      cells.push({x,y,hash:hash(x,y),iron:w.ark.decks[i]===2,temperature:w.ark.heatGrid[i]??w.ambientTemp,
+        left:!!(mask&HULL_WEST),right:!!(mask&HULL_EAST),front:!!(mask&HULL_SOUTH),back:!!(mask&HULL_NORTH)});
     }
 
     // L0: Parallax cloud ocean and high-altitude haze.
@@ -185,9 +200,9 @@ export class ArkView {
       c.restore();
     }
     if(island)paintIsland(c,this.art,island,project,s,w.tick);
-    const b=this.deckStructure(c,cells,w);
+    const b=this.deckStructure(c,cells,w,hull);
     if(gangway?.deployed)paintGangway(c,this.art,gangway,project,s);
-    const actors:Actor[]=[...this.edgeActors(cells,w,ghost,gangway),...deckDrops];
+    const actors:Actor[]=[...this.edgeActors(cells,w,ghost,gangway,hull),...deckDrops];
     if(island){
       for(const node of islandNodes(w)){
         const p=project(node.x,node.y);
@@ -303,11 +318,10 @@ export class ArkView {
       top:Math.max(0,Math.floor(-this.origin.y/s)-5),bottom:Math.ceil((height-this.origin.y)/s)+2};
   }
 
-  private deckStructure(c:CanvasRenderingContext2D,cells:Cell[],w:WorldState):HullBounds|null{
+  private deckStructure(c:CanvasRenderingContext2D,cells:Cell[],w:WorldState,hull:HullProfile):HullBounds|null{
     if(!cells.length)return null;
     const s=this.scale;
-    const minX=Math.min(...cells.map(t=>t.x)),minY=Math.min(...cells.map(t=>t.y));
-    const maxX=Math.max(...cells.map(t=>t.x))+1,maxY=Math.max(...cells.map(t=>t.y))+1;
+    const {minX,minY,maxX,maxY}=hull;
     const p=this.screen((minX+maxX)/2,maxY);
     const b:HullBounds={x:p.x,y:p.y,w:(maxX-minX)*s,d:(maxY-minY)*s};
     ovalGlow(c,p.x+s*.17,p.y+s*.79,b.w*.66,b.d*.26,'rgba(12,31,46,.48)');
@@ -327,6 +341,10 @@ export class ArkView {
     // Long cones and icicles only belong to the ground-facing front contour.
     for(const t of cells.filter(t=>t.front)){
       const p=this.screen(t.x+.5,t.y+1);
+      if(!hull.cones[t.y*w.ark.size+t.x]){
+        this.art.paint(c,'rock',p.x,p.y+s*.23,s,{width:1.10,height:.32,flip:!!(t.hash%2)});
+        continue;
+      }
       const height=1.42+((t.hash>>>5)%5)*.17;
       this.art.paint(c,'rock',p.x,p.y+s*height*.73,s,{width:1.46,height,flip:!!(t.hash%2)});
       this.art.paint(c,'icicles',p.x+s*(t.hash%2===0?-.24:.27),p.y+s*(.53+((t.hash>>>6)%4)*.13),s,
@@ -406,7 +424,7 @@ export class ArkView {
     c.fill();c.restore();
   }
 
-  private edgeActors(cells:Cell[],w:WorldState,ghost:Ghost|null,gangway:ReturnType<typeof gangwayGeometry>):Actor[]{
+  private edgeActors(cells:Cell[],w:WorldState,ghost:Ghost|null,gangway:ReturnType<typeof gangwayGeometry>,hull:HullProfile):Actor[]{
     const trims:Actor[]=[];
     const put=(x:number,y:number,art:string,width:number,height:number,flip=false)=>
       trims.push({x,y,art,width,height,shadow:art==='corner'?.17:.26,flip});
@@ -414,20 +432,32 @@ export class ArkView {
     const hasGhost=(x:number,y:number)=>!!ghost&&ghost.x===x&&ghost.y===y&&ghost.ok&&
       (!ghost.defId||ghost.defId==='wood_deck')&&!ghost.torch&&!ghost.wall;
     const hasNet=(x:number,y:number)=>w.ark.buildings.some(b=>b.defId==='catch_net'&&b.gx===x&&b.gy===y);
+    const isLaunchPort=(x:number,y:number,side:string)=>
+      (side==='north'&&x===center&&y===center-3)||(side==='south'&&x===center&&y===center+3)||
+      (side==='west'&&x===center-3&&y===center-1)||(side==='east'&&x===center+3&&y===center-1);
     for(const t of cells){
       const {x,y}=t;
-      const bridgeExit=!!gangway?.deployed&&Math.abs((x+1)-gangway.x)<1.1&&y<gangway.y+gangway.height&&y+1>gangway.y;
-      // A main gap on each side of the launch deck; expanded cells follow the outer contour.
-      if(t.back&&!hasNet(x,y)&&!hasGhost(x,y-1)&&x!==center)put(x+.5,y+.10,'rail',1.18,.54);
-      if(t.front&&!hasNet(x,y)&&!hasGhost(x,y+1)&&x!==center)put(x+.5,y+.97,'rail',1.14,.55);
-      if(t.left&&!hasNet(x,y)&&!hasGhost(x-1,y)&&y!==center-1)put(x+.08,y+1.02,'rail-side',.405,1.11);
-      if(t.right&&!bridgeExit&&!hasNet(x,y)&&!hasGhost(x+1,y)&&y!==center-1)put(x+.92,y+1.02,'rail-side',.405,1.11,true);
-      if(t.back&&t.left)put(x+.10,y+.12,'corner',.43,.58,true);
-      if(t.back&&t.right)put(x+.88,y+.12,'corner',.43,.58);
-      if(t.front&&t.left)put(x+.10,y+.99,'corner',.43,.58,true);
-      if(t.front&&t.right)put(x+.88,y+.99,'corner',.43,.58);
-      if(t.front&&x===center){put(x+.16,y+1,'corner',.34,.46);put(x+.87,y+1,'corner',.34,.46,true);}
-      if(t.back&&x===center){put(x+.16,y+.1,'corner',.34,.46);put(x+.87,y+.1,'corner',.34,.46,true);}
+      if(hasNet(x,y))continue;
+      const bridgeExit=!!gangway?.deployed&&x+1===gangway.x&&y<gangway.y+gangway.height&&y+1>gangway.y;
+      const bowGap=isLaunchPort(x,y,'north'),sternGap=isLaunchPort(x,y,'south');
+      if(t.back&&!hasGhost(x,y-1)){
+        if(!bowGap)put(x+.5,y+.10,'rail',1.18,.54);
+        else{put(x+.16,y+.1,'corner',.34,.46);put(x+.87,y+.1,'corner',.34,.46,true);}
+      }
+      if(t.front&&!hasGhost(x,y+1)){
+        if(!sternGap)put(x+.5,y+.97,'rail',1.14,.55);
+        else{put(x+.16,y+1,'corner',.34,.46);put(x+.87,y+1,'corner',.34,.46,true);}
+      }
+      if(t.left&&!hasGhost(x-1,y)&&!isLaunchPort(x,y,'west'))put(x+.08,y+1.02,'rail-side',.405,1.11);
+      if(t.right&&!bridgeExit&&!hasGhost(x+1,y)&&!isLaunchPort(x,y,'east'))put(x+.92,y+1.02,'rail-side',.405,1.11,true);
+    }
+    const visible=this.worldBounds();
+    for(const corner of hull.corners){
+      const {x,y,dx,dy,inside}=corner;
+      if(x<visible.left||x>visible.right+1||y<visible.top||y>visible.bottom+1)continue;
+      if(gangway?.deployed&&x===gangway.x&&y>gangway.y&&y<gangway.y+gangway.height)continue;
+      if(hasGhost(x+(dx>0?-1:0),y+(dy>0?-1:0)))continue;
+      put(x+dx*(inside?.06:.11),y+(dy>0?.11:-.015),'corner',inside?.34:.43,inside?.47:.58,dx>0);
     }
     return trims;
   }

@@ -587,3 +587,33 @@ assert.equal(closeHeavy.sky.debris.length,1,'plain hook cannot snag a heavy crat
 const v3Hook=JSON.parse(serializeWorld(createInitialWorld()));v3Hook.saveVersion=3;
 assert.equal(deserializeWorld(JSON.stringify(v3Hook)).saveVersion,SAVE_VERSION);
 console.log('[sim-smoke:P2-03] OK: basic recovery, reinforced recipe, 35% longer aim, faster charging, heavy cargo gate and archive migration');
+
+import { contourHull, HULL_EAST, HULL_NORTH, HULL_SOUTH, HULL_WEST } from '../src/sim/hull';
+
+// P2-04: outer fittings come from the entire deck footprint, not the visible
+// camera crop. Side tips and inner notches never receive splashy icicles.
+const hullMap=createInitialWorld().ark;
+const idx=(x:number,y:number)=>y*hullMap.size+x;
+const originalHull=contourHull(hullMap);
+assert.equal(originalHull.cones.reduce((n,x)=>n+x,0),7);
+const lend=(tiles:number[][])=>{for(const [x,y] of tiles)hullMap.decks[idx(x,y)]=1;return contourHull(hullMap);};
+const sideStep=lend([[20,24]]);
+assert.equal(sideStep.edges[idx(20,24)],HULL_NORTH|HULL_SOUTH|HULL_WEST);
+assert.equal(sideStep.edges[idx(21,24)]&HULL_WEST,0);
+assert.equal(sideStep.cones[idx(20,24)],0);
+assert.equal(sideStep.corners.filter(a=>a.inside).length,2);
+assert.equal(sideStep.cones.reduce((n,x)=>n+x,0),7);
+const arms=lend([[19,24],[28,24],[29,24],[24,20],[24,28],[24,29],[25,28],[23,29]]);
+assert.equal(arms.edges[idx(29,24)],HULL_EAST|HULL_NORTH|HULL_SOUTH);
+assert.equal(arms.cones[idx(29,24)],0);
+assert.equal(arms.cones[idx(24,29)],1,'a supported southern extension gets the full floating edge');
+assert.equal(arms.cones[idx(25,28)],1);
+assert.equal(arms.cones[idx(23,27)],0,'a mouth with deck below is not the southern profile');
+assert.equal(arms.cones[idx(23,29)],0,'the unsupported tip beside a deep arm remains thin');
+assert.ok(arms.corners.filter(x=>x.inside).length>=7);
+hullMap.decks[idx(22,22)]=0;
+const hole=contourHull(hullMap);
+assert.equal(hole.edges[idx(22,21)]&HULL_SOUTH,HULL_SOUTH);
+assert.equal(hole.cones[idx(22,21)],0);
+assert.ok(hole.corners.filter(x=>x.inside&&x.x>=22&&x.x<=23&&x.y>=22&&x.y<=23).length===4);
+console.log('[sim-smoke:P2-04] OK: exposed edge masks, side tips, stepped south profile, concave corners and holes');

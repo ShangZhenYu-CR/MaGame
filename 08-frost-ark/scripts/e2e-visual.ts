@@ -1,3 +1,4 @@
+import { runP2Hull } from './p2-hull-e2e';
 import { runP2Hook } from './p2-hook-e2e';
 import { runP2Food } from './p2-food-e2e';
 import { runP2Rescue } from './p2-rescue-e2e';
@@ -618,6 +619,7 @@ try {
   await runP2Rescue(browser,baseUrl,outDir,errors);
   await runP2Food(browser,baseUrl,outDir,errors);
   await runP2Hook(browser,baseUrl,outDir,errors);
+  await runP2Hull(browser,baseUrl,outDir,errors);
 
   if (errors.length > 0) {
     throw new Error(errors.join('\n'));

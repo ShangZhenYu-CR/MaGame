@@ -223,13 +223,16 @@ export class ArkView {
       this.art.paint(c,actor.art,p.x,p.y-(actor.float??0),s,actor);
       if(actor.fire)this.paintFire(c,actor,p,w.tick);
     }
-    if(g.active||g.charging)this.paintHook(c,w,held);
+    if(g.active)this.paintHook(c,w,held);
     // L4 and L5: Night/fire composite, then screen particles and hypothermia.
     const lens=this.art.offset(player.art,dir==='south'?.135:dir==='north'?.865:dir==='east'?.46:.54,.73,s*1.43,s*1.43);
     const feet=project(pl.x,pl.y);
     this.lightmap.paint(c,w,project,s,{x:feet.x+lens.x,y:feet.y+lens.y-(player.float??0)});
     if(b && w.weather!=='clear')this.lowClouds(c,b,w.tick,true);
     this.weather.paint(c,w,this.art.image('frost-frame'));
+    // Aiming is a control cue, not world geometry. Keep it above night tint,
+    // snow and frost so a reachable endpoint stays visible in all weather.
+    if(g.charging)this.paintGrapplePreview(c,w);
     if(this.canvas.dataset.artReady!=='true')this.canvas.dataset.artReady='true';
   }
 
@@ -392,18 +395,40 @@ export class ArkView {
     c.restore();
   }
 
+  private paintGrapplePreview(c:CanvasRenderingContext2D,w:WorldState):void{
+    const p=w.player,g=p.grapple,s=this.scale;
+    const origin=this.screen(p.x,p.y);
+    const tip=aimEnd(w,{x:g.targetX,y:g.targetY});
+    const q=this.screen(tip.x,tip.y);
+    const dx=q.x-origin.x,dy=q.y-origin.y,len=Math.hypot(dx,dy);
+    const direction=len>.01?dx/len:0;
+    const x=origin.x+direction*s*.28,y=origin.y-s*.40;
+    c.save();
+    c.lineCap='round';
+    c.beginPath();c.moveTo(x,y);c.lineTo(q.x,q.y);
+    c.strokeStyle='rgba(9,24,36,.92)';c.lineWidth=5;c.stroke();
+    c.setLineDash([8,5]);c.strokeStyle='#ffe8b3';c.lineWidth=2.6;c.stroke();
+    c.setLineDash([]);
+    const r=7+g.charge*3;
+    c.beginPath();c.arc(q.x,q.y,r,0,tau);
+    c.strokeStyle='rgba(9,24,36,.92)';c.lineWidth=4.4;c.stroke();
+    c.strokeStyle='#ffe8b3';c.lineWidth=2;c.stroke();
+    c.beginPath();c.arc(q.x,q.y,2.1,0,tau);c.fillStyle='#fff3d1';c.fill();
+    c.restore();
+  }
+
   private paintHook(c:CanvasRenderingContext2D,w:WorldState,held:Vec2|undefined):void{
-    const g=w.player.grapple,s=this.scale;
+    const s=this.scale;
     const p=this.screen(w.player.x,w.player.y);
-    const worldTip=g.charging?aimEnd(w,{x:g.targetX,y:g.targetY}):hookTip(w);
+    const worldTip=hookTip(w);
     const q=this.screen(worldTip.x,worldTip.y);
     if(held)q.y-=s*.19;
     c.save();
     const x=p.x+Math.sign(q.x-p.x)*s*.29,y=p.y-s*.40;
-    c.beginPath();c.moveTo(x,y);c.quadraticCurveTo((x+q.x)/2,(y+q.y)/2+(g.charging?0:6),q.x,q.y);
-    c.strokeStyle='rgba(20,35,43,.74)';c.lineWidth=g.charging?2.5:4;c.stroke();
-    c.strokeStyle=g.charging?P.hearthCore:P.uiAccentWarm;
-    c.lineWidth=g.charging?1.35:2;c.setLineDash(g.charging?[5,6]:[]);c.stroke();c.setLineDash([]);
+    c.beginPath();c.moveTo(x,y);c.quadraticCurveTo((x+q.x)/2,(y+q.y)/2+6,q.x,q.y);
+    c.strokeStyle='rgba(20,35,43,.74)';c.lineWidth=4;c.stroke();
+    c.strokeStyle=P.uiAccentWarm;
+    c.lineWidth=2;c.stroke();
     c.beginPath();c.moveTo(q.x-4,q.y-3);c.lineTo(q.x,q.y+3);c.lineTo(q.x+6,q.y-4);
     c.strokeStyle=P.hearthCore;c.stroke();
     if(held){c.beginPath();c.ellipse(q.x,q.y,s*.35,s*.25,0,0,tau);c.strokeStyle='rgba(255,208,138,.58)';c.stroke();}

@@ -650,3 +650,42 @@ switchover.player.inventory[5]={itemId:'ice_shard',count:2};
 assert.equal(repairTool(switchover,'mining_pick').ok,true,'shortage-safe starter pick sharpening');
 assert.equal(countItem(switchover,'ice_shard'),0);
 console.log('[sim-smoke:P2-05] OK: separate Lv.3, coal efficiency in whiteout, greater reach, +24 flotation and resource migration');
+
+import { craftGear, equipGear, equipment, equipmentCost, gearModifiers } from '../src/sim/equipment';
+
+// P2-06: exercise all six real recipes, ownership and each independent slot.
+const tailor=createInitialWorld();
+const materials=new Map<string,number>();
+for(const d of equipment)for(const m of equipmentCost(d.id))materials.set(m.itemId,(materials.get(m.itemId)??0)+m.count);
+let materialSlot=3;
+for(const [itemId,count] of materials)tailor.player.inventory[materialSlot++]={itemId,count};
+for(const d of equipment){
+  assert.match(equipGear(tailor,d.id)!,/没有/);
+  assert.equal(craftGear(tailor,d.id),null);
+  assert.equal(countItem(tailor,d.id),1);
+  assert.equal(equipGear(tailor,d.id),null);
+  assert.equal(tailor.player.gear[d.slot],d.id);
+}
+assert.equal(tailor.player.gear.outer,'aurora_mithril_cloak');
+assert.equal(tailor.player.gear.guard,'frost_scale_armor');
+assert.equal(tailor.player.gear.charm,'magnetic_salvage_buckle');
+assert.equal(gearModifiers(tailor).hookRadius,.17);
+assert.deepEqual(deserializeWorld(serializeWorld(tailor)).player.gear,tailor.player.gear);
+assert.equal(equipGear(tailor,'pocket_hand_warmer'),null);
+assert.equal(gearModifiers(tailor).personalHeat,6);
+assert.equal(equipGear(tailor,'pocket_hand_warmer'),null,'equipping the same piece takes it off');
+assert.equal(gearModifiers(tailor).personalHeat,0);
+const weatherTry=createInitialWorld(),jacketTry=createInitialWorld();
+for(const g of [weatherTry,jacketTry]){
+  g.timeOfDay=.80;g.player.x=27.5;g.player.y=27.5;g.ark.buildings[0].fuel=0;
+}
+jacketTry.player.inventory[4]={itemId:'warm_wind_coat',count:1};
+equipGear(jacketTry,'warm_wind_coat');
+stepWorld(weatherTry,125);stepWorld(jacketTry,125);
+assert.equal(jacketTry.ambientTemp,-22);
+assert.ok(jacketTry.player.warmth-weatherTry.player.warmth>7,'a warm coat buys time under the same -22°C conditions');
+for(const g of [weatherTry,jacketTry])damagePlayer(g,20);
+assert.ok(jacketTry.player.hp-weatherTry.player.hp>1,'guard modifier is applied to damage, not only on the card');
+const v5Gear=JSON.parse(serializeWorld(createInitialWorld()));v5Gear.saveVersion=5;delete v5Gear.player.gear;
+assert.deepEqual(deserializeWorld(JSON.stringify(v5Gear)).player.gear,{outer:null,guard:null,charm:null});
+console.log('[sim-smoke:P2-06] OK: all six recipes/equips, three exclusive slots, physical reduction, cold and v5 archive');

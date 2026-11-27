@@ -1,4 +1,5 @@
 import { damagePlayer, healPlayer } from './rescue';
+import { gearModifiers } from './equipment';
 import { mealRemaining } from './food';
 import data from '../data/buildings.json';
 import items from '../data/items.json';
@@ -132,11 +133,11 @@ export function initializeHeat(w:WorldState):void{
 export function stepHeat(w:WorldState):void{
   if(Math.floor(w.tick*HEAT_HZ/TICK_RATE)===Math.floor((w.tick-1)*HEAT_HZ/TICK_RATE))return;
   solveHeat(w);
-  const p=w.player, t=heatAt(w,p.x,p.y), before=p.warmth;
+  const p=w.player, gear=gearModifiers(w), t=heatAt(w,p.x,p.y)+gear.personalHeat, before=p.warmth;
   const trend=t>=15?Math.min(11,4+(t-15)*.28):t<0?Math.max(-18,-1.8+t*.34):0;
-  const protectedTrend=trend<0&&mealRemaining(w)?trend*.52:trend;
+  const protectedTrend=trend<0?trend*(1-gear.cold)*(mealRemaining(w)?.52:1):trend;
   p.warmth=clamp(p.warmth+protectedTrend/HEAT_HZ,0,p.maxWarmth);
-  if(p.warmth===0)damagePlayer(w,(t< -20?6:3)/HEAT_HZ);
+  if(p.warmth===0)damagePlayer(w,(t< -20?6:3)/HEAT_HZ,'cold');
   else if(t>=15&&p.warmth>50)healPlayer(w,.3/HEAT_HZ);
   const h=primaryHearth(w);
   p.portraitMood=p.warmth<=25||(h?h.fuel<12:false)?3:

@@ -1,3 +1,4 @@
+import { equippedItem } from './equipment';
 import { isGrappleItem } from './grapple-tools';
 import { countItem, inventoryChange } from './ark';
 import items from '../data/items.json';
@@ -19,6 +20,7 @@ export function storageContents(w: WorldState): readonly ItemStack[] {
 
 export function transferStorage(w: WorldState, itemId:string, direction:'deposit'|'withdraw'): string | null {
   if(!nearestStorage(w))return '走近储物箱后再操作。';
+  if(direction==='deposit'&&equippedItem(w,itemId))return '请先卸下装备。';
   if(isGrappleItem(itemId))return '抓钩留在身上，用来回收残骸。';
   const current=storageContents(w);
   const idx=current.findIndex(s=>s.itemId===itemId);

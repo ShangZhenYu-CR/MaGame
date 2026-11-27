@@ -2240,6 +2240,102 @@
         212
       ],
       "bytes": 83196
+    },
+    "icon-warm-wind-coat": {
+      "file": "icon-warm-wind-coat.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        58,
+        60
+      ],
+      "bytes": 7348
+    },
+    "icon-frost-scale-armor": {
+      "file": "icon-frost-scale-armor.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        10,
+        2,
+        54,
+        60
+      ],
+      "bytes": 7218
+    },
+    "icon-magma-insulated-coat": {
+      "file": "icon-magma-insulated-coat.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        7,
+        2,
+        57,
+        60
+      ],
+      "bytes": 6943
+    },
+    "icon-aurora-mithril-cloak": {
+      "file": "icon-aurora-mithril-cloak.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        59,
+        60
+      ],
+      "bytes": 7647
+    },
+    "icon-pocket-hand-warmer": {
+      "file": "icon-pocket-hand-warmer.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        19,
+        62,
+        60
+      ],
+      "bytes": 6120
+    },
+    "icon-magnetic-salvage-buckle": {
+      "file": "icon-magnetic-salvage-buckle.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        11,
+        62,
+        60
+      ],
+      "bytes": 6240
     }
   }
 }

@@ -165,5 +165,11 @@
       { "itemId": "raw_root", "count": 1 },
       { "itemId": "driftwood", "count": 1 }
     ]
-  }
+  },
+  {"id": "craft_warm_wind_coat", "station": "hand", "output": {"itemId": "warm_wind_coat", "count": 1}, "inputs": [{"itemId": "warm_fur", "count": 3}, {"itemId": "rope", "count": 2}]},
+  {"id": "craft_frost_scale_armor", "station": "hand", "output": {"itemId": "frost_scale_armor", "count": 1}, "inputs": [{"itemId": "frost_iron_ingot", "count": 3}, {"itemId": "warm_fur", "count": 2}, {"itemId": "rope", "count": 2}]},
+  {"id": "craft_magma_insulated_coat", "station": "hand", "output": {"itemId": "magma_insulated_coat", "count": 1}, "inputs": [{"itemId": "warm_fur", "count": 4}, {"itemId": "sulfur_ore", "count": 2}, {"itemId": "frost_iron_ingot", "count": 2}]},
+  {"id": "craft_aurora_mithril_cloak", "station": "hand", "output": {"itemId": "aurora_mithril_cloak", "count": 1}, "inputs": [{"itemId": "sky_mithril", "count": 3}, {"itemId": "warm_fur", "count": 4}, {"itemId": "frost_iron_ingot", "count": 1}]},
+  {"id": "craft_pocket_hand_warmer", "station": "hand", "output": {"itemId": "pocket_hand_warmer", "count": 1}, "inputs": [{"itemId": "frost_iron_scrap", "count": 2}, {"itemId": "coal_chunk", "count": 2}]},
+  {"id": "craft_magnetic_salvage_buckle", "station": "hand", "output": {"itemId": "magnetic_salvage_buckle", "count": 1}, "inputs": [{"itemId": "frost_iron_ingot", "count": 2}, {"itemId": "rope", "count": 1}]}
 ]

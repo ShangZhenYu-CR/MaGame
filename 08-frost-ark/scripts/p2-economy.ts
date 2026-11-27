@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { build,countItem } from '../src/sim/ark';
 import { fire,startCharge,aim } from '../src/sim/cloud';
 import { eatMeal,quickMeal } from '../src/sim/food';
+import { craftGear,equipGear } from '../src/sim/equipment';
 import { addFuel,hearthNear,primaryHearth,upgradeHearth } from '../src/sim/heatField';
 import { areaAt,gangwayGeometry,islandNodes,islandNodeRemaining,toggleGangway } from '../src/sim/island';
 import { collectIndustry,industryPanel,startIndustry,unlockTech } from '../src/sim/industry';
@@ -86,7 +87,10 @@ export function playEconomy(seed=202608){
  warm();assert.equal(upgradeHearth(w),null);
  catchOne('raw_root',8);job(stove,'cook_baked_root',{x:22.60,y:25.72});
  assert.equal(count('baked_root'),2);
- assert.ok(w.day<=3,'stove, tools and hot food must be attainable within the first three days');
+ catchOne('warm_fur',3);catchOne('rope',2);
+ assert.equal(craftGear(w,'warm_wind_coat'),null);
+ assert.equal(equipGear(w,'warm_wind_coat'),null);
+ assert.ok(w.day<=3,'stove, tools, hot food and the first warm coat must be attainable within the first three days');
  for(let i=0;i<6;i++)job(furnace,'smelt_frost_iron',{x:25.60,y:24.12});
 
  // Sail naturally to the first guaranteed geothermal vein. No coordinates,

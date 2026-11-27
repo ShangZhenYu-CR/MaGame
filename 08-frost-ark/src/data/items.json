@@ -30,5 +30,11 @@
   { "id": "frost_pick", "name": "霜铁矿镐", "category": "tool", "stack": 1 },
   { "id": "paralysis_net", "name": "麻痹冰网", "category": "tool", "stack": 20 },
   { "id": "beast_trap", "name": "霜铁兽夹", "category": "tool", "stack": 20 },
-  { "id": "beast_feed", "name": "暖粮饲料", "category": "food", "stack": 50 }
+  { "id": "beast_feed", "name": "暖粮饲料", "category": "food", "stack": 50 },
+  {"id": "warm_wind_coat", "name": "暖绒防风衣", "category": "equipment", "stack": 1},
+  {"id": "frost_scale_armor", "name": "霜铁鳞甲衣", "category": "equipment", "stack": 1},
+  {"id": "magma_insulated_coat", "name": "熔核隔热大衣", "category": "equipment", "stack": 1},
+  {"id": "aurora_mithril_cloak", "name": "极光秘银披风", "category": "equipment", "stack": 1},
+  {"id": "pocket_hand_warmer", "name": "便携暖手炉", "category": "equipment", "stack": 1},
+  {"id": "magnetic_salvage_buckle", "name": "磁力拾荒扣", "category": "equipment", "stack": 1}
 ]

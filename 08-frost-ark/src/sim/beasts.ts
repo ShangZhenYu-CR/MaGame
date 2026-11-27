@@ -1,3 +1,4 @@
+import { equippedItem } from './equipment';
 import { isGrappleItem } from './grapple-tools';
 import { damagePlayer, healPlayer } from './rescue';
 import beastData from '../data/beasts.json';
@@ -241,6 +242,7 @@ export function beastPackContents(w:WorldState):readonly ItemStack[]{return getF
 const packAvailable=(w:WorldState)=>beastCompanions(w).some(b=>b.defId==='frostyak'&&distance(w.player,b)<=2.5);
 export function transferBeastPack(w:WorldState,itemId:string,direction:'deposit'|'withdraw'):string|null{
   if(!packAvailable(w))return '随行霜角牦牛不在身边';
+  if(direction==='deposit'&&equippedItem(w,itemId))return '请先卸下装备。';
   if(toolDefinition(itemId)||isGrappleItem(itemId))return '耐久工具和抓钩请留在身上';
   const state=ensureFauna(w),s=state.pack.find(v=>v.itemId===itemId);
   if(direction==='deposit'){

@@ -1,3 +1,4 @@
+import { gearModifiers } from './equipment';
 import { fitsOnDeck, hasBuildingContact, inventoryChange } from './ark';
 import { TICK_RATE, type Vec2, type WorldState } from './types';
 
@@ -6,10 +7,12 @@ export const RESCUE_SHIELD_TICKS = 10 * TICK_RATE;
 export const incapacitated = (w: WorldState): boolean => w.player.hp <= 0 || w.player.rescue.startedAt !== null;
 export const rescueShield = (w: WorldState): number => Math.max(0,w.player.rescue.shieldUntil - w.tick);
 
-export function damagePlayer(w: WorldState, amount: number): boolean {
+export function damagePlayer(w: WorldState, amount: number, kind:'physical'|'cold'|'hunger'='physical'): boolean {
   if (incapacitated(w) || rescueShield(w) || amount <= 0) return false;
   const p=w.player;
-  p.hp=Math.max(0,p.hp-amount);
+  const gear=gearModifiers(w);
+  const reduction=kind==='physical'?gear.guard:kind==='cold'?gear.cold*.5:0;
+  p.hp=Math.max(0,p.hp-amount*(1-reduction));
   if (p.hp===0) begin(w);
   return true;
 }

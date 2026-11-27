@@ -1,9 +1,10 @@
-export const SAVE_VERSION = 5;
+export const SAVE_VERSION = 6;
 export const TICK_RATE = 30;
 export const ARK_SIZE = 48;
 export const ISLAND_SIZE = 64;
 export const TILE_PX = 32;
 
+export type GearSlot='outer'|'guard'|'charm';
 export type WeatherKind = 'clear' | 'snow' | 'whiteout';
 export type BeastRole = 'companion' | 'work' | 'rest';
 export type PortraitMood = 0 | 1 | 2 | 3; // head-0..head-3
@@ -33,6 +34,7 @@ export interface PlayerState {
   maxHunger: number;
   portraitMood: PortraitMood;
   selectedSlot: number;
+  gear: Record<GearSlot,string|null>;
   rescue: { startedAt: number | null; shieldUntil: number };
   diet: { warmUntil: number; last: import('./food').MealId | null; quick: import('./food').MealId | null };
   inventory: (ItemStack | null)[];

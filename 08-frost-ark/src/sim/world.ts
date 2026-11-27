@@ -58,6 +58,7 @@ export function createInitialWorld(seed = 202608): WorldState {
       maxHunger: 100,
       portraitMood: 0,
       selectedSlot: 0,
+      gear: {outer:null,guard:null,charm:null},
       rescue: {startedAt:null, shieldUntil:0},
       diet: {warmUntil:0,last:null,quick:null},
       inventory: [

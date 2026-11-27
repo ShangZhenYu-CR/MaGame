@@ -24,6 +24,7 @@ import biomes from './data/biomes.json';
 import { nearestBeastFacility, nearestWildBeast } from './sim/beasts';
 import { nearestIslandNode } from './sim/island';
 import { beastUi } from './ui/beasts';
+import { equipmentUi } from './ui/equipment';
 import { combatM5Ui } from './ui/combat-m5';
 
 function el<T extends HTMLElement = HTMLElement>(id: string): T { return document.getElementById(id)! as T; }
@@ -71,6 +72,7 @@ const finale=finaleUi({state:()=>w,say:finishAction,sound:x=>audio.play(x),icon:
 const beastSprites=import.meta.glob<string>('./assets/art/beast-*.png',{eager:true,query:'?inline',import:'default'});
 const beastArt=(id:string)=>beastSprites['./assets/art/beast-'+id+'.png'];
 const beasts=beastUi({state:()=>w,msg:finishAction,icon:iconPath,art:beastArt});
+const gearUi=equipmentUi({state:()=>w,art:iconPath,message:finishAction,change:()=>fillBag()});
 const m5Ui=combatM5Ui({state:()=>w,msg:finishAction});
 const skyToggle=el('sky-map-toggle');
 const helmIcon=iconPath('helm');
@@ -234,7 +236,7 @@ function fillLocker():void {
   drawList('storage-deposit',carried,'deposit');
 }
 function fillBag():void {
-  const signature=JSON.stringify([w.player.inventory,w.player.diet.quick]);
+  const signature=JSON.stringify([w.player.inventory,w.player.diet.quick,w.player.gear]);
   if(signature===stackSignature)return;
   stackSignature=signature;
   const entries=w.player.inventory.filter(s=>s!==null).map(s=>{
@@ -258,6 +260,7 @@ function fillBag():void {
   const hook=equippedGrapple(w);
   el<HTMLButtonElement>('craft-grapple').disabled=!!hook;
   el<HTMLButtonElement>('craft-frost-grapple').disabled=hook!== 'grapple_hook';
+  gearUi.update();
 }
 const foodShortcut=el<HTMLButtonElement>('quick-meal'),buff=el('meal-buff');
 let shownMeal:MealId|null=null, shownMealCount=-1, shownBuff:MealId|null=null;

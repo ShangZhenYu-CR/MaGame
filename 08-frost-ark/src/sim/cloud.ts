@@ -1,3 +1,4 @@
+import { gearModifiers } from './equipment';
 import { incapacitated } from './rescue';
 import { inventoryChange, isDeck } from './ark';
 import { equippedGrapple, hasFrostGrapple } from './grapple-tools';
@@ -115,10 +116,11 @@ export function stepCloud(w: WorldState): void {
   g.charge = outbound ? Math.min(1,g.charge+travel) : g.charge+(reinforced?.17:.12);
   const b = hookTip(w);
   if (outbound) {
+    const pickupRadius=.45+gearModifiers(w).hookRadius;
     const dx = b.x-a.x, dy = b.y-a.y;
     const hits = w.sky.debris.filter(d=>!isDeckDrop(d)&&(reinforced||!d.heavy)).flatMap(d => {
       const k = Math.max(0,Math.min(1,((d.x-a.x)*dx+(d.y-a.y)*dy)/Math.max(.00001,dx*dx+dy*dy)));
-      return Math.hypot(d.x-a.x-dx*k,d.y-a.y-dy*k) <= .45 ? [{d,k}] : [];
+      return Math.hypot(d.x-a.x-dx*k,d.y-a.y-dy*k) <= pickupRadius ? [{d,k}] : [];
     }).sort((x,y)=>x.k-y.k);
     if (hits[0]) g.caughtDebrisId = hits[0].d.id;
   }

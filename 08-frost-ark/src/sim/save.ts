@@ -2,6 +2,7 @@ import { verifyM5 } from './m5';
 import { RESCUE_SHIELD_TICKS } from './rescue';
 import { isMeal, MAX_MEAL_TICKS } from './food';
 import { isGrappleItem } from './grapple-tools';
+import { equipmentById,gearSlots } from './equipment';
 import items from '../data/items.json';
 import buildings from '../data/buildings.json';
 import recipes from '../data/recipes.json';
@@ -101,7 +102,7 @@ function validateFauna(p:Record<string,unknown>,ids:Set<string>):void{
 
 export function deserializeWorld(raw: string): WorldState {
   const p:unknown=JSON.parse(raw);
-  if(!record(p)||![1,2,3,4,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
+  if(!record(p)||![1,2,3,4,5,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
     throw new Error('存档版本不受支持');
   if(p.saveVersion===1){
     if(record(p.player))p.player.rescue={startedAt:null,shieldUntil:0};
@@ -117,6 +118,7 @@ export function deserializeWorld(raw: string): WorldState {
         island.deltas.tree_1997=4;
     }
   }
+  if(p.saveVersion<6&&record(p.player))p.player.gear={outer:null,guard:null,charm:null};
   p.saveVersion=SAVE_VERSION;
   const {ark, player, sky, latte}=p;
   if(!eachNumber(p,['seed','rngState','tick','day','timeOfDay','ambientTemp','skyheartCores'])||
@@ -200,6 +202,11 @@ export function deserializeWorld(raw: string): WorldState {
     !(player.diet.last===null||isMeal(player.diet.last))||!(player.diet.quick===null||isMeal(player.diet.quick))||
     !num(player.hunger)||!num(player.maxHunger)||player.maxHunger<=0||player.hunger<0||player.hunger>player.maxHunger)
     throw new Error('食物或饱食度存档不符合方舟格式');
+  const gear=player.gear,inventory=player.inventory;
+  if(!record(gear)||Object.keys(gear).length!==gearSlots.length||gearSlots.some(slot=>{
+    const id=gear[slot];
+    return id!==null&&(typeof id!=='string'||equipmentById.get(id)?.slot!==slot||!inventory.some(s=>s?.itemId===id));
+  }))throw new Error('装备存档不符合方舟格式');
   const world=p as unknown as WorldState;
   if(!validFinale(world)||
     (world.ark.anchoredIslandId&&!canReachAurora(world,world.ark.anchoredIslandId))||

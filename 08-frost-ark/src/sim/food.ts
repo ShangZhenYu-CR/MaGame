@@ -42,5 +42,5 @@ export function stepHunger(w:WorldState):void{
     whaleBattleActive(w);
   const cost=.042+(t<0?.05+Math.min(40,-t)*.0018:0)+(threatened?.085:0);
   p.hunger=Math.max(0,p.hunger-cost);
-  if(p.hunger===0)damagePlayer(w,1.2);
+  if(p.hunger===0)damagePlayer(w,1.2,'hunger');
 }

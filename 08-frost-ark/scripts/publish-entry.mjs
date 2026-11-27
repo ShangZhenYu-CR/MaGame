@@ -1,18 +1,33 @@
-import { copyFileSync, readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const root = process.cwd();
-const builtDevHtml = resolve(root, 'dist', 'dev.html');
-const distIndexHtml = resolve(root, 'dist', 'index.html');
-const rootIndexHtml = resolve(root, 'index.html');
+const dist = resolve(root, 'dist');
+const builtHtml = resolve(dist, 'dev.html');
+let html = readFileSync(builtHtml, 'utf8');
 
-// 1. Provide dist/index.html for standalone zip previews
-copyFileSync(builtDevHtml, distIndexHtml);
+// Use bundled, classic JS rather than network-loaded modules so opening file://
+// starts the same build as HTTP. Keep dist/assets/ as the usual build output.
+let scriptCount = 0, styleCount = 0;
+html = html.replace(/<script\b[^>]*\bsrc="\.\/(assets\/[^"]+\.js)"[^>]*><\/script>/g, (_tag, asset) => {
+  scriptCount++;
+  const js = readFileSync(resolve(dist, asset), 'utf8');
+  return '<script>' + js.replace(/<\/script/gi, '<\\/script') + '</script>';
+});
+html = html.replace(/<link\b[^>]*\brel="stylesheet"[^>]*\bhref="\.\/(assets\/[^"]+\.css)"[^>]*>/g, (_tag, asset) => {
+  styleCount++;
+  const css = readFileSync(resolve(dist, asset), 'utf8');
+  if (/<\/style/i.test(css)) throw new Error('Build CSS cannot be safely inlined');
+  return '<style>' + css + '</style>';
+});
+if (scriptCount !== 1 || styleCount !== 1) throw new Error('Expected one bundled JS and one CSS entry');
+const runtime = html.match(/<script>[\s\S]*?<\/script>/)?.[0];
+if (!runtime) throw new Error('Bundled runtime missing');
+html = html.replace(runtime, '').replace('</body>', () => runtime + '\n</body>');
+writeFileSync(resolve(root, 'index.html'), html);
 
-// 2. Sync root 08-frost-ark/index.html for MaGame & GitHub Pages entry
-const html = readFileSync(builtDevHtml, 'utf8')
-  .replaceAll('"./assets/', '"./dist/assets/')
-  .replaceAll("'./assets/", "'./dist/assets/");
-
-writeFileSync(rootIndexHtml, html, 'utf8');
-console.log('[publish-entry] Synced index.html and dist/index.html');
+// A dist entry has the same page-relative portrait path as the project entry.
+const nested = html.replace('<head>', '<head>\n  <base href="../">');
+writeFileSync(resolve(dist, 'index.html'), nested);
+writeFileSync(builtHtml, nested);
+console.log('[publish-entry] Synced file:// and HTTP entries in root and dist');

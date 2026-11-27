@@ -1,5 +1,6 @@
 import { createServer } from 'node:http';
 import assert from 'node:assert/strict';
+import { pathToFileURL } from 'node:url';
 import { existsSync, mkdirSync, readFileSync, statSync } from 'node:fs';
 import { extname, join, resolve } from 'node:path';
 import { chromium } from 'playwright';
@@ -42,7 +43,10 @@ const server = createServer((req, res) => {
 await new Promise<void>((r) => server.listen(0, '127.0.0.1', r));
 const addr = server.address();
 const port = typeof addr === 'object' && addr ? addr.port : 0;
-const baseUrl = `http://127.0.0.1:${port}/08-frost-ark/index.html`;
+const localEntry = process.env.FROST_E2E_FILE;
+const baseUrl = localEntry
+  ? pathToFileURL(resolve(repoRoot, '08-frost-ark', localEntry)).href
+  : `http://127.0.0.1:${port}/08-frost-ark/index.html`;
 
 const errors: string[] = [];
 const browser = await chromium.launch();
@@ -173,6 +177,28 @@ try {
   await page.keyboard.press('e');
   await page.locator('#storage-stacks').getByText('旧缆绳 ×1',{exact:true}).waitFor();
   console.log('[e2e-visual:M0-refinement] OK: walk to locker, deposit/withdraw, local reload and JSON round-trip');
+
+  // Both extracted static launchers must render when opened directly, without custom browser flags.
+  if (!localEntry) {
+    for (const entry of ['index.html','dist/index.html']) {
+      const direct=await browser.newPage({viewport:{width:1280,height:720}});
+      try {
+        direct.on('pageerror', e=>errors.push(`file:// ${entry}: ${e.message}`));
+        direct.on('console', m=>{if(m.type()==='error')errors.push(`file:// ${entry}: ${m.text()}`);});
+        await direct.goto(pathToFileURL(resolve(repoRoot,'08-frost-ark',entry)).href);
+        await direct.locator('#save-label[data-saved=true]').waitFor({timeout:5000});
+        assert.ok(await direct.locator('#manan-portrait').evaluate(img=>img instanceof HTMLImageElement&&img.naturalWidth>0));
+        assert.equal(await direct.locator('html').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(12, 21, 32)');
+        assert.ok(await direct.locator('#game-canvas').evaluate(el=>{
+          const cv=el as HTMLCanvasElement;
+          const px=cv.getContext('2d')!.getImageData(cv.width/2-20,cv.height/2-20,32,32).data;
+          for(let i=0;i<px.length;i+=4)if(px[i]>100&&px[i+1]>30&&px[i+1]<px[i])return true;
+          return false;
+        }),'Direct-open hearth must be painted');
+      } finally { await direct.close(); }
+    }
+    console.log('[e2e-visual:local-launch] OK: both file:// entries show styled game, portrait, hearth and local save');
+  }
 
   if (errors.length > 0) {
     throw new Error(errors.join('\n'));

@@ -3,7 +3,7 @@ import { mealRemaining } from './food';
 import data from '../data/buildings.json';
 import items from '../data/items.json';
 import { getIndustrySave } from './m2-state';
-import { countItem, inventoryChange, isDeck } from './ark';
+import { countItem, inventoryChange, isDeck, refreshBuoyancy } from './ark';
 import { expeditionTemperature, gangwayGeometry } from './island';
 import { beastHeatEmitters } from './beasts';
 import { TICK_RATE, type BuildingInstance, type Vec2, type WorldState } from './types';
@@ -39,12 +39,21 @@ export function addFuel(w:WorldState):string|null {
   return '背包里没有燃料。';
 }
 export const HEARTH_UPGRADE=[{itemId:'driftwood',count:4},{itemId:'frost_iron_scrap',count:2}];
+export const PRESSURE_HEARTH_UPGRADE=[{itemId:'frost_iron_ingot',count:2},{itemId:'sulfur_ore',count:2}];
+export const HEARTH_NAMES=['','余烬主炉','暖芯主炉','硫磺高压炉','太阳方舟'] as const;
+
 export function upgradeHearth(w:WorldState):string|null {
   const h=primaryHearth(w);
   if(!h||!hearthNear(w))return '靠近主炉才能升级。';
   if(h.level>=4)return '主炉已升级为太阳方舟。';
-  if(h.level>=2)return '主炉已经升到二级。';
-  if(!inventoryChange(w,HEARTH_UPGRADE,[]))return '升级需要浮木板 ×4、冻铁废件 ×2。';
+  if(h.level===3)return '硫磺高压炉已就绪，收齐火种后可点燃太阳方舟。';
+  if(h.level===2){
+    if(!inventoryChange(w,PRESSURE_HEARTH_UPGRADE,[]))return '升 Lv.3 需要霜铁锭 ×2、地热硫磺 ×2。';
+    h.level=3;h.maxHp=530;h.hp=Math.min(h.maxHp,h.hp+130);
+    refreshBuoyancy(w);
+    return null;
+  }
+  if(!inventoryChange(w,HEARTH_UPGRADE,[]))return '升 Lv.2 需要浮木板 ×4、冻铁废件 ×2。';
   h.level=2;w.latte.autoLootUnlocked=true;
   return null;
 }
@@ -64,7 +73,7 @@ export function emitters(w:WorldState){
       const job=getIndustrySave(w)?.stations[b.id]?.job;
       if(!job||job.progress>=job.duration||b.frozen)return [];
     }
-    const gain=b.defId==='hearth_core'?(b.level>=4?1.82:b.level>=2?1.28:1):1;
+    const gain=b.defId==='hearth_core'?(b.level>=4?1.82:b.level===3?1.55:b.level===2?1.28:1):1;
     return [{...middle(b),radius:d.heatRadius*gain,power:d.heatOutput*gain,kind:b.defId}];
   }),...beastHeatEmitters(w)];
 }
@@ -79,7 +88,7 @@ export function advanceClimate(w:WorldState):void{
   const t=w.timeOfDay;
   w.ambientTemp=whiteout?-55:part==='暴雪夜'?-22:part==='黄昏'?Math.round(-4-18*(t-.59)/.15):-4;
   const hearth=primaryHearth(w);
-  if(hearth&&hearth.fuel>0)hearth.fuel=Math.max(0,hearth.fuel-(whiteout?.05:part==='暴雪夜'?.026:.015));
+  if(hearth&&hearth.fuel>0)hearth.fuel=Math.max(0,hearth.fuel-(whiteout?(hearth.level>=3?.034:.05):part==='暴雪夜'?.023:.013));
 }
 
 export function solveHeat(w:WorldState):void{

@@ -98,7 +98,7 @@
     "seconds": 5,
     "output": { "itemId": "warm_hay_ball", "count": 2 },
     "inputs": [
-      { "itemId": "frost_grass", "count": 3 },
+      { "itemId": "frost_grass", "count": 2 },
       { "itemId": "warm_berry", "count": 1 }
     ]
   },
@@ -108,7 +108,7 @@
     "seconds": 5,
     "output": { "itemId": "warm_berry_soup", "count": 1 },
     "inputs": [
-      { "itemId": "warm_berry", "count": 3 },
+      { "itemId": "warm_berry", "count": 2 },
       { "itemId": "ice_shard", "count": 1 }
     ]
   },

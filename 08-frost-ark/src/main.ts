@@ -7,7 +7,7 @@ import { aim, cancelCharge, fire, grappleRange, startCharge } from './sim/cloud'
 import { craftGrapple, equippedGrapple, FROST_GRAPPLE, grappleRecipes, isGrappleItem } from './sim/grapple-tools';
 import { deserializeWorld, serializeWorld } from './sim/save';
 import { nearestStorage, storageContents, STORAGE_SLOTS, transferStorage } from './sim/storage-box';
-import { addFuel, FUEL_MAX, heatAt, partOfDay, primaryHearth, upgradeHearth } from './sim/heatField';
+import { addFuel, FUEL_MAX, HEARTH_NAMES, HEARTH_UPGRADE, PRESSURE_HEARTH_UPGRADE, heatAt, partOfDay, primaryHearth, upgradeHearth } from './sim/heatField';
 import { dropSupply, isDeckDrop, manuallyRecover } from './sim/latte';
 import { TICK_RATE, type WorldState } from './sim/types';
 import { incapacitated, RESCUE_TICKS, rescueShield } from './sim/rescue';
@@ -324,7 +324,7 @@ for(const [k,b] of Object.entries(controls))b?.addEventListener('click',()=>{
 function warmthAction(kind:'fuel'|'upgrade'|'drop'|'pickup'):void {
   const reason=kind==='fuel'?addFuel(w):kind==='upgrade'?upgradeHearth(w):
     kind==='drop'?(dropSupply(w)?null:'背包里没有浮木板。'):(manuallyRecover(w)?null:'附近没有可捡的掉落物。');
-  const result={fuel:'已给余烬主炉添柴。',upgrade:'主炉升至 Lv.2，拿铁会捡拾暖区的掉落物。',drop:'放下了浮木板 ×1，可按 F 拾回。',pickup:'已捡回地上的物品。'};
+  const result={fuel:'已给余烬主炉添柴。',upgrade:primaryHearth(w)?.level===3?'硫磺高压炉升阶完成：暖圈扩大，浮力 +24。':'主炉升至 Lv.2，拿铁会捡拾暖区的掉落物。',drop:'放下了浮木板 ×1，可按 F 拾回。',pickup:'已捡回地上的物品。'};
   tell(reason??result[kind]);if(!reason)void saveNow();
 }
 el('fuel-hearth').onclick=()=>warmthAction('fuel');
@@ -532,7 +532,10 @@ function frame(now:number):void {
   updateToolbar();
   thermal.dataset.cold=String(w.player.warmth<=25);
   const phase=w.weather==='whiteout'?'大寒潮':partOfDay(w.timeOfDay);
-  const report=`${phase} · 主炉 Lv.${h?.level??0} · 燃料 ${Math.ceil(h?.fuel??0)}`;
+  const level=h?.level??0, upgrade=el<HTMLButtonElement>('upgrade-hearth');
+  const upgradeTitle=level<2?itemList(HEARTH_UPGRADE):level===2?itemList(PRESSURE_HEARTH_UPGRADE):HEARTH_NAMES[level]??'';
+  if(upgrade.title!==upgradeTitle)upgrade.title=upgradeTitle;
+  const report=`${phase} · 主炉 Lv.${level}${level===3?' 硫磺高压炉':''} · 燃料 ${Math.ceil(h?.fuel??0)}`;
   if(briefing.textContent!==report)briefing.textContent=report;
   const cat=w.latte.mood==='alert'?'拿铁 · 炸毛警戒':w.latte.mood==='hungry_hearth'?'拿铁 · 提醒添柴':'拿铁 · 炉边打呼';
   const catLine=cat+(w.latte.autoLootUnlocked?' · 暖区拾取':'');

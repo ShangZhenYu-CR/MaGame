@@ -81,6 +81,14 @@ export function materialSummary(items: readonly ItemStack[]): string {
   return items.map(({itemId, count}) => `${itemNames.get(itemId) ?? itemId} ×${count}`).join('、');
 }
 
+export function availableRepairCost(w:WorldState,kind:ToolKind,tier:1|2):ItemStack[]{
+  const normal=toolRepairCost(kind,tier);
+  // This gives a stranded starter pick an alternate sharpening material
+  // without letting the stronger tools bypass their metal upkeep.
+  return kind==='mining_pick'&&tier===1&&!countItem(w,'frost_iron_scrap')&&countItem(w,'ice_shard')>=2?
+    [{itemId:'ice_shard',count:2}]:normal;
+}
+
 function missingCost(w: WorldState, cost: ItemStack[]): string | null {
   const missing = cost.map(({itemId, count}) => ({itemId, count: count - countItem(w, itemId)}))
     .filter(({count}) => count > 0);
@@ -116,7 +124,7 @@ export function repairTool(w: WorldState, kind: ToolKind): ToolResult {
   const current = toolStatus(w, kind);
   if (!current) return failed(`请先制作${toolDefinition(kind)!.name}。`);
   if (current.durability === current.maxDurability) return failed(`${current.name}耐久已满。`);
-  const cost = toolRepairCost(kind, current.tier);
+  const cost = availableRepairCost(w,kind,current.tier);
   const missing = missingCost(w, cost);
   if (missing) return failed(missing);
   if (!inventoryChange(w, cost, [])) return failed('修理失败，材料未消耗。');

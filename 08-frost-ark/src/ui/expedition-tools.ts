@@ -1,5 +1,5 @@
 import {
- craftTool,repairTool,upgradeTool,materialSummary,toolCraftCost,toolUpgradeCost,toolRepairCost,toolStatus,type ToolKind,
+ craftTool,repairTool,upgradeTool,materialSummary,toolCraftCost,toolUpgradeCost,availableRepairCost,toolStatus,type ToolKind,
 } from '../sim/tools';
 import type { WorldState,ItemStack } from '../sim/types';
 import { countItem } from '../sim/ark';
@@ -44,7 +44,7 @@ export function expeditionToolsUi(hooks:ToolHooks){
    };
    if(!status)row.append(act('craft','制作'+name,toolCraftCost(kind)));
    else {
-    row.append(act('repair','修理'+name,toolRepairCost(kind,status.tier),status.durability>=status.maxDurability));
+    row.append(act('repair','修理'+name,availableRepairCost(w,kind,status.tier),status.durability>=status.maxDurability));
     if(status.tier===1)row.append(act('upgrade','升级'+name,toolUpgradeCost(kind)));
    }
    section.append(label,info,row);return section;

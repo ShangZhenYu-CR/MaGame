@@ -3,7 +3,7 @@ import { damagePlayer, healPlayer } from './rescue';
 import beastData from '../data/beasts.json';
 import biomes from '../data/biomes.json';
 import { buildingDefs, inventoryChange, itemNames, itemStackLimits, refreshBuoyancy } from './ark';
-import { heatAt, primaryHearth } from './heatField';
+import { FUEL_MAX, heatAt, primaryHearth } from './heatField';
 import { areaAt, consumeIslandNode, dockedIsland, harvestIssue, islandNodes, islandNodeRemaining } from './island';
 import { ensureFauna, getFauna } from './m4-state';
 import { nextRng } from './rng';
@@ -209,7 +209,7 @@ function moveWorker(w:WorldState,b:BeastEntity):void{
 function work(w:WorldState,b:BeastEntity):void{
   if(b.defId==='emberfox'){
     const h=primaryHearth(w);
-    const cap=h&&h.level>=2?180:120;
+    const cap=h?FUEL_MAX[h.level]??120:120;
     if(h&&h.fuel<cap/2&&inventoryChange(w,[{itemId:'driftwood',count:1}],[]))
       h.fuel=Math.min(cap,h.fuel+18*1.25);
   }else if(b.defId==='galehawk'){

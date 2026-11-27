@@ -22,6 +22,8 @@ for(const key of ['frostpine_gate','sulfur_reach','sulfur_furnace','permafrost_r
   else n.bossDefeated=true;
   assert.ok(claimSunSeed(w,key));
 }
+assert.match(forgeSolarArk(w)??'',/Lv.3/,'four cores cannot skip the pressure hearth');
+primaryHearth(w)!.level=3;
 assert.equal(forgeSolarArk(w),null);
 assert.equal(forgeSolarArk(w),'太阳方舟已经升起。');
 assert.equal(primaryHearth(w)!.level,4);

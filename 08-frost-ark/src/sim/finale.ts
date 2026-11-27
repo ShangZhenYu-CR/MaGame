@@ -32,6 +32,7 @@ export function forgeSolarArk(w:WorldState):string|null{
   if(solarReady(w))return '太阳方舟已经升起。';
   if(hearth.level<2)return '先把余烬主炉升到 Lv.2。';
   if(w.skyheartCores<SOLAR_CORE_COST)return '收齐 4 枚天穹火种才能点燃太阳方舟。';
+  if(hearth.level<3)return '先把主炉升到 Lv.3 硫磺高压炉。';
   hearth.level=4;hearth.maxHp=Math.max(hearth.maxHp,680);hearth.hp=hearth.maxHp;hearth.fuel=SOLAR_HEARTH_FUEL;
   if(!w.unlockedTech.includes('solar_ark'))w.unlockedTech.push('solar_ark');
   ensure(w);refreshBuoyancy(w);

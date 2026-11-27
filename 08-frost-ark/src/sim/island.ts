@@ -81,9 +81,10 @@ function generate(node:IslandNode,offsetX:number,offsetY:number):GeneratedIsland
     const material=highTierOre(node.tier,vein,featured)??(featured?'frost_iron_scrap':
       node.tier>=2&&vein>.5?'coal_chunk':node.tier===1&&vein>.82?'ice_shard':'frost_iron_scrap');
     const itemId=kind==='tree'?'driftwood':kind==='ore'?material:'ice_shard';
-    const count=kind==='chest'?1:kind==='tree'?3:2;
+    const count=kind==='chest'?1:kind==='tree'?((node.tier===1&&x===13&&y===31)?4:3):2;
+    const starterCache=(node.id==='shallows_lantern'||node.id==='shallows_ice')&&x===20&&y===32;
     const loot=kind==='chest'?(highTierCache(node.tier)??(node.tier===1?
-      [{itemId:'ice_shard',count:4},{itemId:'rope',count:3},{itemId:'raw_root',count:2}]:
+      [{itemId:starterCache?'frost_iron_scrap':'ice_shard',count:starterCache?2:4},{itemId:'rope',count:3},{itemId:'raw_root',count:starterCache?3:2}]:
       [{itemId:'coal_chunk',count:4},{itemId:'warm_berry',count:3},{itemId:'warm_fur',count:2}])):
       [{itemId,count:1}];
     resources.push({id:node.id+'_'+resourceKey,key:resourceKey,kind,itemId,count,loot,x:offsetX+x+.5,y:offsetY+y+.5});

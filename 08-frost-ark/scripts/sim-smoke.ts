@@ -617,3 +617,36 @@ assert.equal(hole.edges[idx(22,21)]&HULL_SOUTH,HULL_SOUTH);
 assert.equal(hole.cones[idx(22,21)],0);
 assert.ok(hole.corners.filter(x=>x.inside&&x.x>=22&&x.x<=23&&x.y>=22&&x.y<=23).length===4);
 console.log('[sim-smoke:P2-04] OK: exposed edge masks, side tips, stepped south profile, concave corners and holes');
+
+import { advanceClimate, emitters } from '../src/sim/heatField';
+import { repairTool } from '../src/sim/tools';
+
+// P2-05: two separate powered hearth upgrades, +24 flotation, stronger
+// warmth emission and reduced fuel demand during the exact same whiteout.
+const pressure=createInitialWorld();
+Object.assign(pressure.player,{x:24.5,y:25.35});
+pressure.player.inventory[3]={itemId:'frost_iron_scrap',count:2};
+pressure.player.inventory[4]={itemId:'frost_iron_ingot',count:2};
+pressure.player.inventory[5]={itemId:'sulfur_ore',count:2};
+assert.equal(upgradeHearth(pressure),null);
+assert.equal(primaryHearth(pressure)?.level,2);
+const beforePressure=deserializeWorld(serializeWorld(pressure));
+const warmRadius=emitters(beforePressure).find(q=>q.kind==='hearth_core')!.radius;
+const priorCapacity=pressure.ark.buoyancyMax;
+assert.equal(upgradeHearth(pressure),null);
+assert.equal(primaryHearth(pressure)?.level,3);
+assert.equal(pressure.ark.buoyancyMax,priorCapacity+24);
+assert.equal(countItem(pressure,'frost_iron_ingot'),0);
+assert.equal(countItem(pressure,'sulfur_ore'),0);
+assert.ok(emitters(pressure).find(q=>q.kind==='hearth_core')!.radius>warmRadius);
+for(const model of [pressure,beforePressure]){model.day=5;model.timeOfDay=.80;advanceClimate(model);assert.equal(model.weather,'whiteout');}
+assert.ok(primaryHearth(pressure)!.fuel>primaryHearth(beforePressure)!.fuel);
+const lastVersion=JSON.parse(serializeWorld(createInitialWorld()));
+lastVersion.saveVersion=4;lastVersion.sky.islands[0].deltas.tree_1997=3;
+const switchover=deserializeWorld(JSON.stringify(lastVersion));
+assert.equal(switchover.sky.islands[0].deltas.tree_1997,4,'old fully-collected grove stays empty');
+switchover.player.inventory[4]={itemId:'mining_pick',count:1,durability:0};
+switchover.player.inventory[5]={itemId:'ice_shard',count:2};
+assert.equal(repairTool(switchover,'mining_pick').ok,true,'shortage-safe starter pick sharpening');
+assert.equal(countItem(switchover,'ice_shard'),0);
+console.log('[sim-smoke:P2-05] OK: separate Lv.3, coal efficiency in whiteout, greater reach, +24 flotation and resource migration');

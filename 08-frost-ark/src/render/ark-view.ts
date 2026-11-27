@@ -42,7 +42,7 @@ const buildingVisuals:Readonly<Record<string,BuildingVisual>>={
 const ironDeck='building-iron-deck';
 const required=[
   ...deckIds,'boss-frost-whale-1','boss-frost-whale-2','boss-frost-whale-3','solar-hearth','aurora-crystal','manan-south','manan-north','manan-west','manan-east','latte-sleep','latte-alert','latte-walk','latte-walk-alt',
-  'hearth-1','hearth-2','rail','corner','rock','icicles',ironDeck,...Object.values(buildingVisuals).map(v=>v.art),
+  'hearth-1','hearth-2','hearth-3','rail','corner','rock','icicles',ironDeck,...Object.values(buildingVisuals).map(v=>v.art),
   'debris-wood','debris-iron','debris-rope','debris-heavy','clouds','rail-side','rock-side','frost-frame',...ISLAND_ART,...BEAST_ART,...HOSTILE_ART,
 ] as const;
 interface Cell { x:number; y:number; hash:number; iron:boolean; temperature:number; left:boolean; right:boolean; front:boolean; back:boolean }
@@ -246,9 +246,11 @@ export class ArkView {
     for(const hostile of hostiles)paintAttackTell(c,project(hostile.x,hostile.y),hostile,s,w.tick);
     actors.push(...hostiles);
     const fire=primaryHearth(w);
+    const fireArt=fire?.level===4?'solar-hearth':fire?.level===3?'hearth-3':fire?.level===2?'hearth-2':'hearth-1';
+    if(this.canvas.dataset.hearthArt!==fireArt)this.canvas.dataset.hearthArt=fireArt;
     for(const bld of w.ark.buildings){
       const {gx,gy}=bld;
-      if(bld.defId==='hearth_core')actors.push({x:gx+1,y:gy+GROUND_FOOTPRINTS.hearth_core!.anchorY,art:bld.level>=4?'solar-hearth':bld.level>=2?'hearth-2':'hearth-1',
+      if(bld.defId==='hearth_core')actors.push({x:gx+1,y:gy+GROUND_FOOTPRINTS.hearth_core!.anchorY,art:fireArt,
         width:2.65,height:2.43,shadow:1.15,fire:bld.fuel>0?'hearth':undefined,hearthLevel:bld.level});
       const visuals=buildingVisuals[bld.defId];
       if(!visuals)continue;
@@ -528,7 +530,7 @@ export class ArkView {
 
   private paintFire(c:CanvasRenderingContext2D,actor:Actor,p:Vec2,tick:number):void {
     const hearth=actor.fire==='hearth',s=this.scale;
-    const sourceV=hearth?.79:actor.fire==='forge'?.74:actor.fire==='relay'?.53:actor.fire==='stove'?.69:.17;
+    const sourceV=hearth?(actor.hearthLevel===3?.84:.79):actor.fire==='forge'?.74:actor.fire==='relay'?.53:actor.fire==='stove'?.69:.17;
     const anchor=this.art.offset(actor.art,hearth?.48:actor.fire==='stove'?.58:.50,sourceV,s*actor.width!,s*actor.height!);
     const x=p.x+anchor.x,y=p.y+anchor.y;
     const r=s*(hearth?.30:actor.fire==='stove'?.09:.14),up=r*(1.12+Math.sin(tick*.29)*.16+Math.sin(tick*.73)*.07);
@@ -550,8 +552,8 @@ export class ArkView {
     c.restore();
     this.paintSparks(c,x,y,r,tick,hearth?17:8,hearth?3.36:3.0);
     if(hearth){
-      const leveled=actor.hearthLevel===2;
-      const chimney=this.art.offset(actor.art,leveled?.79:.80,.035,s*actor.width!,s*actor.height!);
+      const leveled=actor.hearthLevel===2,pressurized=actor.hearthLevel===3;
+      const chimney=this.art.offset(actor.art,pressurized?.87:leveled?.79:.80,pressurized?.095:.035,s*actor.width!,s*actor.height!);
       const chimneyX=p.x+chimney.x,chimneyY=p.y+chimney.y;
       this.paintSparks(c,chimneyX,chimneyY,r*.73,tick+37,7,2.8);
       for(let i=0;i<6;i++){

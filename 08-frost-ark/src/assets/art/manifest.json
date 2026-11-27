@@ -2224,6 +2224,22 @@
         121
       ],
       "bytes": 31117
+    },
+    "hearth-3": {
+      "file": "hearth-3.png",
+      "width": 224,
+      "height": 224,
+      "anchorX": 112,
+      "anchorY": 212,
+      "tileW": 2.65,
+      "tileH": 2.43,
+      "contentBox": [
+        2,
+        24,
+        222,
+        212
+      ],
+      "bytes": 83196
     }
   }
 }

@@ -38,7 +38,7 @@ export async function runM6(browser:Browser,baseUrl:string,outDir:string,errors:
     await p.getByText('极光天穹 · 点燃太阳方舟后开放',{exact:true}).waitFor();
     await p.keyboard.press('Escape');
 
-    primaryHearth(w)!.level=2;
+    primaryHearth(w)!.level=3;
     Object.assign(w.player,{x:24.5,y:25.9});
     for(let y=20;y<=27;y++)for(let x=20;x<=28;x++)w.ark.decks[y*w.ark.size+x]=1;
     const placements=[

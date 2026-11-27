@@ -18,7 +18,7 @@ async function load(p:Page,w:WorldState){
  await p.getByText('已载入 JSON 存档。',{exact:true}).waitFor();
  await p.keyboard.press('Escape');
 }
-async function exportWorld(p:Page){
+export async function exportWorld(p:Page){
  const raw=await p.evaluate(async()=>{
    const create=URL.createObjectURL,click=HTMLAnchorElement.prototype.click;
    let data:Promise<string>|null=null;

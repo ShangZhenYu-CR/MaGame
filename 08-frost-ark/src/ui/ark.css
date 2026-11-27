@@ -263,3 +263,7 @@ button[aria-disabled=true]{opacity:.62}
 #grapple-craft p{margin:.45rem 0}
 #grapple-craft button{white-space:nowrap}
 #expedition-interact kbd[hidden],#wild-feed kbd[hidden]{display:none}
+@media(min-width:821px){
+ .raid-alert,.island-guardian{top:70px}
+ #raid-alert:not([hidden])~#island-guardian{top:148px}
+}

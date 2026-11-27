@@ -101,13 +101,21 @@ function validateFauna(p:Record<string,unknown>,ids:Set<string>):void{
 
 export function deserializeWorld(raw: string): WorldState {
   const p:unknown=JSON.parse(raw);
-  if(!record(p)||![1,2,3,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
+  if(!record(p)||![1,2,3,4,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
     throw new Error('存档版本不受支持');
   if(p.saveVersion===1){
     if(record(p.player))p.player.rescue={startedAt:null,shieldUntil:0};
   }
   if(p.saveVersion===1||p.saveVersion===2){
     if(record(p.player))p.player.diet={warmUntil:0,last:null,quick:null};
+  }
+  if(p.saveVersion<5&&record(p.sky)&&Array.isArray(p.sky.islands)){
+    for(const island of p.sky.islands){
+      // The starting grove's first tree yields four instead of three.
+      // Do not regenerate already collected wood in an old visited island.
+      if(record(island)&&island.tier===1&&record(island.deltas)&&island.deltas.tree_1997===3)
+        island.deltas.tree_1997=4;
+    }
   }
   p.saveVersion=SAVE_VERSION;
   const {ark, player, sky, latte}=p;

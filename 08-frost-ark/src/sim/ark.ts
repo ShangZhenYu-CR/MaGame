@@ -111,7 +111,7 @@ export function refreshBuoyancy(w: WorldState): void {
   }
   for (const building of w.ark.buildings) {
     const n=buildingDefs.get(building.defId)?.buoyancyDelta ?? 0;
-    if (n>0) capacity+=n+(building.defId==='hearth_core'&&building.level>=4?40:0); else used-=n;
+    if (n>0) capacity+=n+(building.defId==='hearth_core'?(building.level>=4?40:building.level===3?24:0):0); else used-=n;
   }
   w.ark.buoyancyUsed=used;
   w.ark.buoyancyMax=Math.floor(capacity*(1+crewBuoyancyBonus(w)));

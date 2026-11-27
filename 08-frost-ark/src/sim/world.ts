@@ -3,7 +3,9 @@ import {
   SAVE_VERSION,
   TICK_RATE,
   type WorldState,
+  type Vec2,
 } from './types';
+import { makeBuilding, walk } from './ark';
 import { nextRng } from './rng';
 
 const DAY_TICKS = TICK_RATE * 60 * 8; // 8 minutes per in-game day
@@ -86,8 +88,9 @@ export function createInitialWorld(seed = 202608): WorldState {
           level: 1,
           frozen: false,
         },
+        makeBuilding('storage_box', center + 2, center + 1, 'storage_main'),
       ],
-      buoyancyUsed: 49,
+      buoyancyUsed: 50,
       buoyancyMax: 64,
       anchoredIslandId: null,
     },
@@ -111,9 +114,10 @@ export function createInitialWorld(seed = 202608): WorldState {
   };
 }
 
-export function stepWorld(world: WorldState, ticks = 1): void {
+export function stepWorld(world: WorldState, ticks = 1, direction: Vec2 = {x: 0, y: 0}): void {
   for (let i = 0; i < ticks; i++) {
     world.tick += 1;
+    walk(world, direction);
     world.timeOfDay = (world.timeOfDay + 1 / DAY_TICKS) % 1;
     if (world.tick % DAY_TICKS === 0) {
       world.day += 1;

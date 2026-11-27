@@ -37,3 +37,11 @@
 - 同机位、同原生 1280×720 计算及同游戏缩放对比开局白昼和夜间；M0 夜间基线没有独立夜间美术，仍用相同夜间时段的 M0 画面，不后期造雪。[M1 验收图](https://drive.google.com/drive/folders/1Qwbi4tatTt1NeoD4XY7iigwhLU-aUXIl) · [试玩 ZIP](https://drive.google.com/file/d/1zK_fdQnU7cTU__9MRVoJjlGwC1X7GWpB/view)。
 - 本地及 [GitHub Actions](https://github.com/ShangZhenYu-CR/MaGame/actions/runs/45959659072) 门禁通过，保留既有测试。独立解压 ZIP 经 `file://` 走完试玩，四张头像均真实解码。当前代码验收 `fd6d263`。
 - 【偏离报告】无功能删减。为保证 M1 的表情都能在离线包使用，发布包和 CI 的独立解压门禁加入其余三张共享头像的只读原件；源码仍在专用分支，Pages 只更新已授权游戏目录。M2 等待用户确认。
+
+## 2026-11-27 · M1.5 精绘资产与视觉验收
+
+- M1 功能已由用户确认；本轮只改美术、表现与界面。代码提交 `a0762114d307a578b65fd2a4b93665e75ffe620e`，仅更新专用分支 `game/08-frost-ark`；`main` 和线上版保持 M1，M2 暂停。
+- 实测认证 ImageGen 可用，精绘入库 33 件（含四向马楠、拿铁三状态、两级主炉、舰体构件、残骸、云海与图标），合计 685,852 B；生图原图不入 Git。统一输出画布与锚点，洋红去背/净边/压缩均有测试。首轮图标版面在审片发现过小，已重新校准锚点并重新审过，未把有问题的版本接入。
+- 调整为 64 px/格（1280×720 时），滚轮 44–80 px/格；实装护栏、包角、锥形浮石与冰凌、热力霜、接触影与 Y 排序、冷暖光与风雪、失温霜花、顶部短 Toast、角标图标和三条生存条。
+- `npm run gate` 通过；既有 M0/M1 功能断言没有删减。HTTP 与独立解压后两种 `file://` 入口全流程通过，四张共享头像原件随 ZIP 提供。新增素材全部解码且图标有可见内容；游戏执行时无生图／Python／网络依赖。Vite 对内联资源给出体积提示，压缩试玩 ZIP 为 4,053,458 B。
+- [5 张验收图](https://drive.google.com/drive/folders/1Y9GcHtY3QGDTbozvFRQU6CpN65Oo0vZ_) · [同场景对比](https://drive.google.com/file/d/1X_R-MZqFZjSvT74mH9uowDDzgJss096m/view)（两侧原始分辨率均为 1280×720，标注默认镜头差异） · [试玩 ZIP](https://drive.google.com/file/d/14rR9zINYfPzMfPJn-9BpqKYg3u_XPqEI/view) · [GitHub 构建记录](https://github.com/ShangZhenYu-CR/MaGame/actions/runs/45965196847)。

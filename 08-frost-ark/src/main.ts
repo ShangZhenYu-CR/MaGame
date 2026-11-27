@@ -10,6 +10,7 @@ import { addFuel, FUEL_MAX, heatAt, partOfDay, primaryHearth, upgradeHearth } fr
 import { dropSupply, isDeckDrop, manuallyRecover } from './sim/latte';
 import { TICK_RATE, type WorldState } from './sim/types';
 import { incapacitated, RESCUE_TICKS, rescueShield } from './sim/rescue';
+import { eatMeal, isMeal, mealRemaining, quickMeal, type MealId } from './sim/food';
 import { createInitialWorld, stepWorld } from './sim/world';
 import { openArchive, savedWorld, storeWorld } from './ui/storage';
 import { createIndustryUi, itemList } from './ui/industry';
@@ -54,7 +55,7 @@ const toolbar=([
   return button.querySelector('output')!;
 });
 const vitals=([
-  ['warmth','warmth-value'],['life','life-value'],['fuel','fuel-value'],
+  ['warmth','warmth-value'],['life','life-value'],['fuel','fuel-value'],['hunger','hunger-value'],
 ] as const).map(([id,value])=>[el<HTMLMeterElement>(id+'-meter'),el(value)] as const);
 const localTemperature=el('local-temp');
 const industry=createIndustryUi({
@@ -207,15 +208,55 @@ function fillLocker():void {
   drawList('storage-deposit',carried,'deposit');
 }
 function fillBag():void {
-  const signature=JSON.stringify(w.player.inventory);
+  const signature=JSON.stringify([w.player.inventory,w.player.diet.quick]);
   if(signature===stackSignature)return;
   stackSignature=signature;
   const entries=w.player.inventory.filter(s=>s!==null).map(s=>{
     const li=document.createElement('li'), name=document.createElement('span'), count=document.createElement('strong');
     name.textContent=itemNames.get(s.itemId) ?? s.itemId;count.textContent='×'+s.count;count.className='numbers';itemLabel(name,s.itemId);
-    li.append(name,count);return li;
+    li.append(name,count);
+    if(isMeal(s.itemId)){
+      const id=s.itemId,actions=document.createElement('div'),eat=document.createElement('button'),pin=document.createElement('button');
+      actions.className='meal-actions';eat.type=pin.type='button';
+      eat.textContent='食用';eat.dataset.eatMeal=id;eat.setAttribute('aria-label','食用'+itemNames.get(id));
+      eat.onclick=()=>consumeMeal(id);
+      pin.textContent=w.player.diet.quick===id?'H 已设':'设为 H';
+      pin.setAttribute('aria-pressed',String(w.player.diet.quick===id));
+      pin.setAttribute('aria-label','设为快捷食物：'+itemNames.get(id));
+      pin.onclick=()=>{w.player.diet.quick=id;fillBag();void saveNow();};
+      actions.append(eat,pin);li.append(actions);
+    }
+    return li;
   });
   el('stacks').replaceChildren(...entries);
+}
+const foodShortcut=el<HTMLButtonElement>('quick-meal'),buff=el('meal-buff');
+let shownMeal:MealId|null=null, shownMealCount=-1, shownBuff:MealId|null=null;
+function consumeMeal(id=quickMeal(w)):void{
+  if(!id){tell('背包里没有可食用的熟食。');return;}
+  const issue=eatMeal(w,id);
+  finishAction(issue,'吃下了'+itemNames.get(id)+'，回饱、回温、回血。','craft');
+  if(!panel.hidden)fillBag();
+}
+foodShortcut.onclick=()=>consumeMeal();
+function updateFoodHud():void{
+  const id=quickMeal(w),amount=id?countItem(w,id):0;
+  if(id!==shownMeal||amount!==shownMealCount){
+    shownMeal=id;shownMealCount=amount;foodShortcut.hidden=!id;
+    if(id){
+      foodShortcut.querySelector('img')!.src=iconPath(id.replaceAll('_','-'))!;
+      foodShortcut.querySelector('span')!.textContent=itemNames.get(id)!;
+      foodShortcut.querySelector('output')!.textContent='×'+amount;
+      foodShortcut.setAttribute('aria-label','快捷食用'+itemNames.get(id));
+    }
+  }
+  const seconds=Math.ceil(mealRemaining(w)/TICK_RATE),last=w.player.diet.last;
+  buff.hidden=!seconds;
+  if(seconds&&last){
+    if(last!==shownBuff){shownBuff=last;buff.querySelector('img')!.src=iconPath(last.replaceAll('_','-'))!;}
+    const output=buff.querySelector('output')!,value=seconds+' 秒';
+    if(output.textContent!==value)output.textContent=value;
+  }
 }
 function saveNow():Promise<void> {
   if(!db || !active) return Promise.resolve();
@@ -332,6 +373,7 @@ addEventListener('keydown',e=>{
   else if(k==='r')warmthAction('fuel');
   else if(k==='u')warmthAction('upgrade');
   else if(k==='g')warmthAction('drop');
+  else if(k==='h'){e.preventDefault();consumeMeal();}
   else if(k==='f'){if(!m5Ui.strike())warmthAction('pickup');}
   else if(k==='i'){ e.preventDefault();toggleBag(); }
 });
@@ -443,6 +485,7 @@ function frame(now:number):void {
   setVital(0,w.player.warmth,w.player.maxWarmth);
   setVital(1,w.player.hp,w.player.maxHp);
   setVital(2,h?.fuel??0,FUEL_MAX[Math.min(4,h?.level??0)]||120);
+  setVital(3,w.player.hunger,w.player.maxHunger);updateFoodHud();
   const reading=`脚下 ${local}°C`;
   if(localTemperature.textContent!==reading)localTemperature.textContent=reading;
   updateToolbar();

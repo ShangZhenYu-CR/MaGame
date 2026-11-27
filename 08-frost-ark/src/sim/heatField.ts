@@ -1,4 +1,5 @@
 import { damagePlayer, healPlayer } from './rescue';
+import { mealRemaining } from './food';
 import data from '../data/buildings.json';
 import items from '../data/items.json';
 import { getIndustrySave } from './m2-state';
@@ -124,7 +125,8 @@ export function stepHeat(w:WorldState):void{
   solveHeat(w);
   const p=w.player, t=heatAt(w,p.x,p.y), before=p.warmth;
   const trend=t>=15?Math.min(11,4+(t-15)*.28):t<0?Math.max(-18,-1.8+t*.34):0;
-  p.warmth=clamp(p.warmth+trend/HEAT_HZ,0,p.maxWarmth);
+  const protectedTrend=trend<0&&mealRemaining(w)?trend*.52:trend;
+  p.warmth=clamp(p.warmth+protectedTrend/HEAT_HZ,0,p.maxWarmth);
   if(p.warmth===0)damagePlayer(w,(t< -20?6:3)/HEAT_HZ);
   else if(t>=15&&p.warmth>50)healPlayer(w,.3/HEAT_HZ);
   const h=primaryHearth(w);

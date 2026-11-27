@@ -57,6 +57,7 @@ export function stepRescue(w: WorldState): void {
   w.activeIsland=null;
   const hearth=w.ark.buildings.find(b=>b.defId==='hearth_core');
   if(hearth&&hearth.fuel===0)hearth.fuel=14;
+  p.hunger=Math.max(p.hunger,p.maxHunger*.08);
   p.hp=Math.max(1,p.maxHp*.35);p.warmth=Math.max(p.warmth,p.maxWarmth*.60);
   p.rescue.startedAt=null;p.rescue.shieldUntil=w.tick+RESCUE_SHIELD_TICKS;
 }

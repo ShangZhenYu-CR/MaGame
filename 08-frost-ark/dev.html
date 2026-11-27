@@ -20,7 +20,10 @@
         <div class="survival-row"><label for="fuel-meter">燃料</label><meter id="fuel-meter" min="0" max="120"></meter><output id="fuel-value"></output></div>
         <div class="underfoot" id="local-temp"></div>
       </div>
+      <div class="survival-row nutrition-row numbers"><label for="hunger-meter">饱食</label><meter id="hunger-meter" min="0" max="100"></meter><output id="hunger-value"></output></div>
+      <div id="meal-buff" hidden><img alt=""><span>暖胃抗寒</span><output class="numbers"></output></div>
       <div class="survival-row lift-row numbers"><label for="buoyancy-gauge">浮力</label><meter id="buoyancy-gauge" min="0" max="64"></meter><output id="buoyancy-spare"></output></div>
+      <section class="m5-seeds numbers" id="m5-seed-count" aria-label="天穹火种进度"></section>
     </div>
   </header>
   <aside class="sector"><div class="eyebrow">SKY SECTOR <span>01</span></div><strong id="sector-name">碎云浅海</strong><div id="weather-status" class="numbers"></div><div id="latte-status"></div><div class="hearth-tools"><button id="fuel-hearth" type="button"><kbd>R</kbd> 添柴</button><button id="upgrade-hearth" type="button" title="浮木板 ×4、冻铁废件 ×2"><kbd>U</kbd> 升炉</button></div></aside>
@@ -36,6 +39,7 @@
     <button type="button" id="build-wall" aria-pressed="false" aria-label="挡风"><kbd>3</kbd><img alt=""><span>挡风</span><output aria-hidden="true"></output></button>
     <button type="button" id="bag" aria-expanded="false" aria-label="背包"><kbd>I</kbd><img alt=""><span>背包</span><output aria-hidden="true"></output></button>
   </nav>
+  <button type="button" id="quick-meal" hidden><kbd>H</kbd><img alt=""><span></span><output class="numbers"></output></button>
   <aside id="inventory" class="inventory" aria-label="背包" hidden>
     <div class="panel-head"><div><div class="eyebrow">FIELD PACK</div><h2>背包</h2></div><button id="close" type="button" aria-label="关闭背包">关闭</button></div>
     <ul id="stacks"></ul>
@@ -74,7 +78,6 @@
     <div id="beast-list"></div>
     <section id="beast-pack" hidden aria-labelledby="beast-pack-title"><h3 id="beast-pack-title">牦牛随行仓</h3><div id="beast-pack-contents"></div></section>
   </aside>
-  <section class="m5-seeds numbers" id="m5-seed-count" aria-label="天穹火种进度"></section>
   <section id="raid-alert" class="raid-alert" aria-label="寒潮警报" hidden>
     <div class="eyebrow">TEMPERATURE WATCH <span>／</span> 方舟警戒</div><strong id="raid-title"></strong><small id="raid-detail"></small>
   </section>

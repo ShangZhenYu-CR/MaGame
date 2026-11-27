@@ -16,6 +16,7 @@ import { updateLatte } from './latte';
 import { nextRng } from './rng';
 import { stepFinale } from './finale';
 import { stepRescue } from './rescue';
+import { stepHunger } from './food';
 
 export function createInitialWorld(seed = 202608): WorldState {
   const decks = new Array<number>(ARK_SIZE * ARK_SIZE).fill(0);
@@ -58,6 +59,7 @@ export function createInitialWorld(seed = 202608): WorldState {
       portraitMood: 0,
       selectedSlot: 0,
       rescue: {startedAt:null, shieldUntil:0},
+      diet: {warmUntil:0,last:null,quick:null},
       inventory: [
         { itemId: 'grapple_hook', count: 1 },
         { itemId: 'driftwood', count: 8 },
@@ -135,6 +137,7 @@ export function stepWorld(world: WorldState, ticks = 1, direction: Vec2 = {x: 0,
     stepCloud(world);
     advanceClimate(world);
     stepHeat(world);
+    stepHunger(world);
     stepBeasts(world);
     stepIndustry(world);
     updateLatte(world);

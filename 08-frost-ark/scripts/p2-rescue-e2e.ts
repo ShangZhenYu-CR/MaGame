@@ -8,21 +8,26 @@ import { helmPoint,setDestination,toggleCruise } from '../src/sim/sky-map';
 import { areaAt,gangwayGeometry,toggleGangway } from '../src/sim/island';
 import { serializeWorld } from '../src/sim/save';
 
+export function shoreForSurvival(){
+  const w=createInitialWorld(),helm=helmPoint(w);
+  Object.assign(w.player,helm);
+  assert.equal(setDestination(w,'shallows_lantern'),null);
+  assert.equal(toggleCruise(w),null);
+  stepWorld(w,600);
+  const g=gangwayGeometry(w)!;
+  Object.assign(w.player,{x:g.x-.5,y:g.y+.5});
+  assert.equal(toggleGangway(w),null);
+  for(let n=0;n<100&&!w.activeIsland;n++)stepWorld(w,1,{x:1,y:0});
+  assert.equal(areaAt(w,w.player.x,w.player.y),'island');
+  return w;
+}
+
 export async function runP2Rescue(browser:Browser,url:string,dir:string,errors:string[]):Promise<void>{
  const p=await browser.newPage({viewport:{width:1280,height:720}});
  p.on('pageerror',e=>errors.push('rescue page: '+e.message));
  p.on('console',m=>{if(m.type()==='error')errors.push('rescue console: '+m.text());});
  try{
-   const w=createInitialWorld(),helm=helmPoint(w);
-   Object.assign(w.player,helm);
-   assert.equal(setDestination(w,'shallows_lantern'),null);
-   assert.equal(toggleCruise(w),null);
-   stepWorld(w,600);
-   const g=gangwayGeometry(w)!;
-   Object.assign(w.player,{x:g.x-.5,y:g.y+.5});
-   assert.equal(toggleGangway(w),null);
-   for(let n=0;n<100&&!w.activeIsland;n++)stepWorld(w,1,{x:1,y:0});
-   assert.equal(areaAt(w,w.player.x,w.player.y),'island');
+   const w=shoreForSurvival();
    // Shorten setup, not the damage path. The browser's real climate must
    // drive the player to zero; do not import an already unconscious player.
    Object.assign(w.player,{warmth:1,hp:2});

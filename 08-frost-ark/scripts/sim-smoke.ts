@@ -500,3 +500,46 @@ migratedP2.player.hp=0;migratedP2.ark.buildings[0].fuel=0;
 stepWorld(migratedP2,RESCUE_TICKS+1);
 assert.ok(migratedP2.player.hp>0&&migratedP2.ark.buildings[0].fuel===14,'old zero-HP save recovers even with an empty stove');
 console.log('[sim-smoke:P2-01] OK: natural cold unconsciousness, input lock, archive migration, rescue penalty and 10s shield');
+
+import { cookedMeals, eatMeal, mealRemaining, quickMeal, stepHunger, type MealId } from '../src/sim/food';
+
+// P2-02: every cooked dish is food as well as bait; use must consume exactly
+// one item and apply immediate recovery on the same authoritative state.
+for(const id of Object.keys(cookedMeals) as MealId[]){
+  const diner=createInitialWorld();
+  Object.assign(diner.player,{hunger:31,warmth:39,hp:37});
+  diner.player.inventory[3]={itemId:id,count:2};
+  assert.equal(eatMeal(diner,id),null);
+  assert.equal(countItem(diner,id),1);
+  assert.ok(diner.player.hunger>31&&diner.player.warmth>39&&diner.player.hp>37);
+  assert.equal(diner.player.diet.last,id);
+  assert.equal(mealRemaining(diner),cookedMeals[id].seconds*30);
+}
+const feast=deserializeWorld(onLand), coldControl=deserializeWorld(onLand);
+for(const trip of [feast,coldControl])Object.assign(trip.player,{hunger:42,warmth:43,hp:40});
+feast.player.inventory[4]={itemId:'warm_berry_soup',count:1};
+feast.player.diet.quick='warm_berry_soup';
+assert.equal(quickMeal(feast),'warm_berry_soup');
+assert.equal(eatMeal(feast,'warm_berry_soup'),null);
+assert.equal(countItem(feast,'warm_berry_soup'),0);
+assert.match(eatMeal(feast,'warm_berry_soup')!,/没有/);
+const protectedStart=feast.player.warmth,unprotectedStart=coldControl.player.warmth;
+stepWorld(feast,90);stepWorld(coldControl,90);
+assert.ok(protectedStart-feast.player.warmth<(unprotectedStart-coldControl.player.warmth)*.6);
+assert.deepEqual(deserializeWorld(serializeWorld(feast)).player.diet,feast.player.diet);
+const sated=createInitialWorld(), hungry=createInitialWorld();
+hungry.player.hunger=0;
+stepWorld(sated,10,{x:1,y:0});stepWorld(hungry,10,{x:1,y:0});
+assert.ok(sated.player.x-hungry.player.x>.2,'starvation slows movement');
+stepWorld(hungry,20);
+assert.ok(hungry.player.hp<100,'starvation damages the player');
+const safeMeal=createInitialWorld(), coldMeal=deserializeWorld(onLand), battleMeal=deserializeWorld(onLand);
+for(const z of [safeMeal,coldMeal,battleMeal]){z.tick=30;z.player.hunger=100;}
+battleMeal.wildEntities.push({id:'test-battle',defId:'frost_wolf',kind:'raider',x:battleMeal.player.x,y:battleMeal.player.y,
+  hp:30,maxHp:30,stunnedTicks:0,tameProgress:0,hostile:true});
+for(const z of [safeMeal,coldMeal,battleMeal])stepHunger(z);
+assert.ok(safeMeal.player.hunger>coldMeal.player.hunger&&coldMeal.player.hunger>battleMeal.player.hunger);
+const beforeFood=JSON.parse(serializeWorld(createInitialWorld()));
+beforeFood.saveVersion=2;delete beforeFood.player.diet;
+assert.deepEqual(deserializeWorld(JSON.stringify(beforeFood)).player.diet,{warmUntil:0,last:null,quick:null});
+console.log('[sim-smoke:P2-02] OK: seven edible meals, no free food, real warmth resistance, hunger drain and v2 migration');

@@ -177,6 +177,7 @@ export function fitsOnDeck(w:WorldState,x:number,y:number):boolean {
 /** Sweep each axis and use the free part of a blocked step, rather than losing
  * the last full frame of travel in short gaps and at inside corners. */
 export function walkOnGround(w:WorldState,direction:Vec2,speed:number,supported:(x:number,y:number)=>boolean):void {
+  if(w.player.hunger<=0)speed*=.65;
   const p=w.player, length=Math.hypot(direction.x,direction.y);
   p.vx=p.vy=0;
   if(!length||!Number.isFinite(length))return;

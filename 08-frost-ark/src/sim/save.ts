@@ -1,5 +1,6 @@
 import { verifyM5 } from './m5';
 import { RESCUE_SHIELD_TICKS } from './rescue';
+import { isMeal, MAX_MEAL_TICKS } from './food';
 import items from '../data/items.json';
 import buildings from '../data/buildings.json';
 import recipes from '../data/recipes.json';
@@ -99,10 +100,13 @@ function validateFauna(p:Record<string,unknown>,ids:Set<string>):void{
 
 export function deserializeWorld(raw: string): WorldState {
   const p:unknown=JSON.parse(raw);
-  if(!record(p)||![1,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
+  if(!record(p)||![1,2,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
     throw new Error('存档版本不受支持');
   if(p.saveVersion===1){
     if(record(p.player))p.player.rescue={startedAt:null,shieldUntil:0};
+  }
+  if(p.saveVersion===1||p.saveVersion===2){
+    if(record(p.player))p.player.diet={warmUntil:0,last:null,quick:null};
     p.saveVersion=SAVE_VERSION;
   }
   const {ark, player, sky, latte}=p;
@@ -182,6 +186,11 @@ export function deserializeWorld(raw: string): WorldState {
     !num(player.rescue.shieldUntil)||!Number.isSafeInteger(player.rescue.shieldUntil)||
     player.rescue.shieldUntil<0||player.rescue.shieldUntil>p.tick+RESCUE_SHIELD_TICKS)
     throw new Error('救援存档不符合方舟格式');
+  if(!record(player.diet)||!num(player.diet.warmUntil)||!Number.isSafeInteger(player.diet.warmUntil)||
+    player.diet.warmUntil<0||player.diet.warmUntil>p.tick+MAX_MEAL_TICKS||
+    !(player.diet.last===null||isMeal(player.diet.last))||!(player.diet.quick===null||isMeal(player.diet.quick))||
+    !num(player.hunger)||!num(player.maxHunger)||player.maxHunger<=0||player.hunger<0||player.hunger>player.maxHunger)
+    throw new Error('食物或饱食度存档不符合方舟格式');
   const world=p as unknown as WorldState;
   if(!validFinale(world)||
     (world.ark.anchoredIslandId&&!canReachAurora(world,world.ark.anchoredIslandId))||

@@ -1,3 +1,4 @@
+import { landmarkFootClear } from './landmarks';
 import { dockSide,docks,downDock,rotateDockPoint,type DockSide } from './dock-direction';
 import { incapacitated } from './rescue';
 import { feetSupported, PLAYER_FOOT_RADIUS } from './ground-footprint';
@@ -235,7 +236,7 @@ export function walkExpedition(w:WorldState,direction:Vec2,pace=1):void{
     return;
   }
   const speed=areaAt(w,p.x,p.y)==='island'?.087:.095;
-  walkOnGround(w,direction,speed*pace,(x,y)=>feetSupported(x,y,(px,py)=>areaAt(w,px,py)!=='void'));
+  walkOnGround(w,direction,speed*pace,(x,y)=>feetSupported(x,y,(px,py)=>areaAt(w,px,py)!=='void')&&landmarkFootClear(w,p,{x,y},PLAYER_FOOT_RADIUS));
   const area=areaAt(w,p.x,p.y);
   if(area!=='ark'&&(p.grapple.charging||p.grapple.active)){
     p.grapple.charging=p.grapple.active=false;p.grapple.caughtDebrisId=null;p.grapple.charge=0;

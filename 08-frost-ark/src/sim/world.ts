@@ -1,3 +1,4 @@
+import { stepLandmarks } from './landmarks';
 import { stepM5 } from './m5';
 import {
   ARK_SIZE,
@@ -146,6 +147,7 @@ export function stepWorld(world: WorldState, ticks = 1, direction: Vec2 = {x: 0,
     stepCloud(world);
     advanceClimate(world);
     stepHeat(world);
+    stepLandmarks(world);
     stepHunger(world);
     stepBeasts(world);
     stepIndustry(world);

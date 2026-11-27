@@ -3472,6 +3472,102 @@
         57
       ],
       "bytes": 4543
+    },
+    "landmark-camp": {
+      "file": "landmark-camp.png",
+      "width": 176,
+      "height": 176,
+      "anchorX": 88,
+      "anchorY": 150,
+      "tileW": 2.32,
+      "tileH": 2,
+      "contentBox": [
+        2,
+        35,
+        174,
+        170
+      ],
+      "bytes": 10547
+    },
+    "landmark-spring": {
+      "file": "landmark-spring.png",
+      "width": 176,
+      "height": 176,
+      "anchorX": 88,
+      "anchorY": 102,
+      "tileW": 2.85,
+      "tileH": 1.65,
+      "contentBox": [
+        2,
+        46,
+        174,
+        142
+      ],
+      "bytes": 9934
+    },
+    "landmark-obelisk": {
+      "file": "landmark-obelisk.png",
+      "width": 128,
+      "height": 160,
+      "anchorX": 64,
+      "anchorY": 138,
+      "tileW": 1.34,
+      "tileH": 2.15,
+      "contentBox": [
+        11,
+        15,
+        117,
+        158
+      ],
+      "bytes": 23393
+    },
+    "landmark-vent": {
+      "file": "landmark-vent.png",
+      "width": 128,
+      "height": 160,
+      "anchorX": 64,
+      "anchorY": 112,
+      "tileW": 1.75,
+      "tileH": 1.08,
+      "contentBox": [
+        2,
+        62,
+        126,
+        133
+      ],
+      "bytes": 17722
+    },
+    "landmark-wreck": {
+      "file": "landmark-wreck.png",
+      "width": 176,
+      "height": 176,
+      "anchorX": 88,
+      "anchorY": 151,
+      "tileW": 2.92,
+      "tileH": 1.96,
+      "contentBox": [
+        2,
+        51,
+        174,
+        167
+      ],
+      "bytes": 9892
+    },
+    "landmark-obelisk-lit": {
+      "file": "landmark-obelisk-lit.png",
+      "width": 128,
+      "height": 160,
+      "anchorX": 64,
+      "anchorY": 138,
+      "tileW": 1.34,
+      "tileH": 2.15,
+      "contentBox": [
+        12,
+        15,
+        117,
+        158
+      ],
+      "bytes": 23400
     }
   }
 }

@@ -8,8 +8,8 @@ import { forgeSolarArk } from '../src/sim/finale';
 import { claimSunSeed } from '../src/sim/m5';
 import { createInitialWorld } from '../src/sim/world';
 export const terrainZones=['shallows_lantern','frostpine_cove','sulfur_reach','aurora_vault'] as const;
-export function coastFixture(id:typeof terrainZones[number]){
-  const w=createInitialWorld(202608);expandM5Chart(w);
+export function coastFixture(id:typeof terrainZones[number],seed=202608){
+  const w=createInitialWorld(seed);expandM5Chart(w);
   if(id==='aurora_vault'){
     for(const key of ['frostpine_gate','sulfur_reach','sulfur_furnace','permafrost_ruins'] as const){
       const n=w.sky.islands.find(v=>v.id===key)!;

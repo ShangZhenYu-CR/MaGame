@@ -1,3 +1,4 @@
+import { fieldLandmarks } from './landmarks';
 import { downDock } from './dock-direction';
 import { roomComfort } from './home';
 import { pipeHeat } from './utilities';
@@ -69,7 +70,7 @@ export function heatAt(w:WorldState,x:number,y:number):number{
   const hearth=primaryHearth(w),bridge=w.ark.anchoredIslandId==='aurora_vault'&&hearth&&hearth.level>=4&&hearth.fuel>0?gangwayGeometry(w):null;
   const shore=bridge?.deployed?downDock(bridge.landing,bridge.side,2.5):null;
   const solar=shore?Math.max(0,1-Math.hypot(x-shore.x,y-shore.y)/14)*60:0;
-  return ambient+solar+beastHeatEmitters(w).reduce((sum,source)=>sum+source.power*Math.max(0,1-Math.hypot(x-source.x,y-source.y)/source.radius),0);
+  return ambient+solar+fieldLandmarks(w,x,y,ambient+solar)+beastHeatEmitters(w).reduce((sum,source)=>sum+source.power*Math.max(0,1-Math.hypot(x-source.x,y-source.y)/source.radius),0);
 }
 export function emitters(w:WorldState){
   return [...w.ark.buildings.flatMap(b=>{

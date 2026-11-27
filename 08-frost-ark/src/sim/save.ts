@@ -1,3 +1,4 @@
+import { validLandmarkArchive } from './landmarks';
 import { verifyM5 } from './m5';
 import { docks,type DockSide } from './dock-direction';
 import { isDoor } from './rooms';
@@ -113,7 +114,7 @@ function validateFauna(p:Record<string,unknown>,ids:Set<string>):void{
 
 export function deserializeWorld(raw: string): WorldState {
   const p:unknown=JSON.parse(raw);
-  if(!record(p)||![1,2,3,4,5,6,7,8,9,10,11,12,13,14,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
+  if(!record(p)||![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
     throw new Error('存档版本不受支持');
   if(p.saveVersion===1){
     if(record(p.player))p.player.rescue={startedAt:null,shieldUntil:0};
@@ -249,6 +250,7 @@ export function deserializeWorld(raw: string): WorldState {
       active.size!==island.size||active.offsetX!==island.offsetX||active.offsetY!==island.offsetY)throw invalidNavigation();
     world.activeIsland=island;
   }else if(area==='void'||active!==null)throw invalidNavigation();
+  if(!validLandmarkArchive(world))throw new Error('浮岛地标存档不符合方舟格式');
   if(!validHotbar(world))throw new Error('快捷栏存档不符合方舟格式');
   if(!validElements(world))throw new Error('元素状态存档不符合方舟格式');
   if(!verifyM5(world))throw new Error('寒潮、首领或火种存档不符合方舟格式');

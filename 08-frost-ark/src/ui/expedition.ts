@@ -1,3 +1,4 @@
+import { actionLandmark, landmarkPrompt, nearLandmark, type Landmark } from '../sim/landmarks';
 import { docks } from '../sim/dock-direction';
 import { areaAt, gangwayGeometry, islandNodeRemaining, islandNodes, nearestIslandNode, nearGangway, toggleGangway,
  type IslandResource } from '../sim/island';
@@ -8,7 +9,7 @@ import type { Vec2, WorldState } from '../sim/types';
 
 const byId=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id)! as T;
 const set=(node:HTMLElement,s:string)=>{if(node.textContent!==s)node.textContent=s;};
-type ContextAction='helm'|'deploy'|'stow'|'gather'|'open-cache'|'return'|'board'|'dock'|'none';
+type ContextAction='helm'|'deploy'|'stow'|'gather'|'open-cache'|'landmark'|'return'|'board'|'dock'|'none';
 const duration=350;
 export type ExpeditionArea=ReturnType<typeof areaAt>;
 interface Hooks{
@@ -41,9 +42,21 @@ export function expeditionUi(hooks:Hooks){
   }
   const now=performance.now();gathering={node:target,finish:now+duration,world:w};progress.hidden=false;progress.value=0;
  }
+ function chosenMark():Landmark|undefined{
+  const w=hooks.state(),mark=nearLandmark(w),node=nearestIslandNode(w,1.8);
+  if(!mark)return;
+  if(!node||Math.hypot(mark.x-w.player.x,mark.y-w.player.y)<Math.hypot(node.x-w.player.x,node.y-w.player.y))
+    return mark;
+ }
+ function useLandmark(mark:Landmark){const result=actionLandmark(hooks.state(),mark);hooks.message(result.issue,result.message,'place');}
  function keyAction(){
   const w=hooks.state(),here=area();
-  if(here==='island')return nearestIslandNode(w,1.8)?'harvest':null;
+  if(here==='island'){
+   const mark=chosenMark();
+   if(mark&&landmarkPrompt(w,mark).label)return 'landmark';
+   if(mark)return null;
+   return nearestIslandNode(w,1.8)?'harvest':null;
+  }
   if(here!=='ark')return null;
   if(w.ark.anchoredIslandId&&nearGangway(w))return 'gangway';
   if(nearHelm(w))return 'helm';
@@ -51,6 +64,7 @@ export function expeditionUi(hooks:Hooks){
  }
  function use():boolean{
   const action=keyAction();
+  if(action==='landmark'){const mark=chosenMark();if(!mark)return false;useLandmark(mark);return true;}
   if(action==='harvest'){harvest();return true;}
   if(action==='gangway'){gangway();return true;}
   if(action==='helm'){cruise();return true;}
@@ -60,6 +74,8 @@ export function expeditionUi(hooks:Hooks){
  function pointer(at:Vec2):boolean{
   const w=hooks.state(),a=area();
   if(a==='island'){
+   const mark=chosenMark();
+   if(mark&&Math.hypot(at.x-mark.x,at.y-mark.y)<1.25&&landmarkPrompt(w,mark).label){useLandmark(mark);return true;}
    const picked=islandNodes(w).filter(n=>Math.hypot(at.x-n.x,at.y-n.y)<.8&&islandNodeRemaining(w,n)>0)
       .sort((p,q)=>Math.hypot(at.x-p.x,at.y-p.y)-Math.hypot(at.x-q.x,at.y-q.y))[0];
    if(picked&&Math.hypot(w.player.x-picked.x,w.player.y-picked.y)<=1.8)harvest(picked);
@@ -84,8 +100,12 @@ export function expeditionUi(hooks:Hooks){
    }else progress.value=1-(gathering.finish-now)/duration;
   }
   let action:ContextAction='none',title='',detail='',label='';
+  const mark=here==='island'?chosenMark():undefined;
   if(here==='island'){
-   if(!node){action='return';title='浮岛探索';detail='靠近树林、矿脉和遗迹箱可采集；沿来时的跳板回船。';}
+   if(mark){
+    action='landmark';
+    ({title,detail,label}=landmarkPrompt(w,mark));
+   }else if(!node){action='return';title='浮岛探索';detail='靠近树林、矿脉和遗迹箱可采集；沿来时的跳板回船。';}
    else {
     const kind=node.kind==='tree'?'wood_axe':node.kind==='ore'?'mining_pick':undefined;
     const tool=kind&&toolStatus(w,kind),name=kind==='wood_axe'?'手斧':'矿镐';
@@ -110,7 +130,7 @@ export function expeditionUi(hooks:Hooks){
    action='dock';title='已靠泊';detail='走到'+(box?docks[box.side].label:'舷侧')+'登岛口搭跳板。';
   }
   if(current!==action){current=action;root.dataset.action=action;view.dataset.context=action;}
-  root.dataset.area=here;root.dataset.anchored=String(!!w.ark.anchoredIslandId);root.dataset.resourceKind=node?.kind??'';
+  root.dataset.area=here;root.dataset.anchored=String(!!w.ark.anchoredIslandId);root.dataset.resourceKind=mark?'':node?.kind??'';root.dataset.landmark=mark?.kind??'';
   root.hidden=hide||action==='none';interact.hidden=!label;interact.disabled=!!gathering;
   interact.querySelector('kbd')!.hidden=!primary;
   if(title)set(byId('expedition-title'),title);

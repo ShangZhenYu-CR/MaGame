@@ -1,3 +1,4 @@
+import { islandLandmarks,landmarkLit } from '../sim/landmarks';
 import { emitters, partOfDay } from '../sim/heatField';
 import type { Vec2, WorldState } from '../sim/types';
 
@@ -30,6 +31,12 @@ export class Lightmap {
       return {x:p.x/4,y:(p.y-tile*(e.kind==='hearth_core'?-.32:.47))/4,
         groundY:p.y/4,radius:tile*e.radius*(e.kind==='hearth_core'?.57:.55)/4,small:false};
     });
+    if(world.activeIsland)for(const mark of islandLandmarks(world)){
+      if(mark.kind!=='spring'&&!landmarkLit(world,mark))continue;
+      const p=project(mark.x,mark.y),radius=tile*(mark.kind==='spring'?.62:1.23);
+      if(p.x+radius<0||p.x-radius>width||p.y+radius<0||p.y-radius>height)continue;
+      sources.push({x:p.x/4,y:(p.y-tile*.29)/4,groundY:p.y/4,radius:radius/4,small:mark.kind==='spring'});
+    }
     const p=project(world.player.x,world.player.y);
     sources.push({x:(lantern?.x??p.x+tile*.20)/4,y:(lantern?.y??p.y-tile*.43)/4,
       groundY:p.y/4,radius:tile*1.16/4,small:true});

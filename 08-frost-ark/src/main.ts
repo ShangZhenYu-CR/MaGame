@@ -134,12 +134,11 @@ function primaryInteraction():PrimaryInteraction{
   if(industry.stationOpen())return {kind:'close-station'};
   if(!locker.hidden)return {kind:'close-storage'};
   if(chart.open()||finale.arena())return {kind:'none'};
-  const here=expedition.area();
+  const here=expedition.area(),travel=expedition.keyAction();
   if(here==='island'){
     const wild=nearestWildBeast(w);
-    if(wild&&(wild.stunnedTicks>0||wild.hp<=wild.maxHp*.35||!nearestIslandNode(w,1.8)))return {kind:'feed'};
+    if(wild&&(wild.stunnedTicks>0||wild.hp<=wild.maxHp*.35||(travel!=='landmark'&&!nearestIslandNode(w,1.8))))return {kind:'feed'};
   }
-  const travel=expedition.keyAction();
   if(travel&&travel!=='helm')return {kind:'expedition'};
   if(here!=='ark')return {kind:'none'};
   const door=nearestManualDoor(w),box=nearestStorage(w),station=nearestIndustry(w),animal=nearestBeastFacility(w);

@@ -1,3 +1,4 @@
+import { runP2Landmarks } from './p2-landmark-e2e';
 import { runP2Coasts } from './p2-coast-e2e';
 import { runP2Dock } from './p2-dock-e2e';
 import { runP2Home } from './p2-home-e2e';
@@ -648,6 +649,7 @@ try {
   await runP2Home(browser,baseUrl,outDir,errors);
   await runP2Dock(browser,baseUrl,outDir,errors);
   await runP2Coasts(browser,baseUrl,outDir,errors);
+  await runP2Landmarks(browser,baseUrl,outDir,errors);
 
   if (errors.length > 0) {
     throw new Error(errors.join('\n'));

@@ -1,3 +1,4 @@
+import { LANDMARK_ART,landmarkScene } from './landmark-view';
 import { docks,downDock } from '../sim/dock-direction';
 import { catPerch } from '../sim/home';
 import { heatedPipes,overlayKind } from '../sim/utilities';
@@ -68,7 +69,7 @@ const ironDeck='building-iron-deck';
 const required=[
   ...deckIds,'boss-frost-whale-1','boss-frost-whale-2','boss-frost-whale-3','solar-hearth','aurora-crystal','manan-south','manan-north','manan-west','manan-east','latte-sleep','latte-alert','latte-walk','latte-walk-alt',
   'hearth-1','hearth-2','hearth-3','rail','corner','rock','icicles',ironDeck,...Object.values(buildingVisuals).map(v=>v.art),
-  'debris-wood','debris-iron','debris-rope','debris-heavy','clouds','rail-side','rock-side','frost-frame','floor-insulated','icon-driftwood','icon-coal-chunk','icon-iron','icon-raw-root','icon-cloud-fish','icon-raw-meat','icon-beast-feed','building-wind-door-open','building-airlock-open',...ISLAND_ART,...BEAST_ART,...HOSTILE_ART,...ELEMENT_ART,
+  'debris-wood','debris-iron','debris-rope','debris-heavy','clouds','rail-side','rock-side','frost-frame','floor-insulated','icon-driftwood','icon-coal-chunk','icon-iron','icon-raw-root','icon-cloud-fish','icon-raw-meat','icon-beast-feed','building-wind-door-open','building-airlock-open',...ISLAND_ART,...LANDMARK_ART,...BEAST_ART,...HOSTILE_ART,...ELEMENT_ART,
 ] as const;
 interface Cell { x:number; y:number; hash:number; iron:boolean; insulated:boolean; temperature:number; left:boolean; right:boolean; front:boolean; back:boolean }
 interface Actor {
@@ -263,6 +264,7 @@ export class ArkView {
     if(gangway?.deployed)paintGangway(c,this.art,gangway,project,s);
     const actors:Actor[]=[...this.edgeActors(cells,w,ghost,gangway,hull),...deckDrops];
     if(island){
+      actors.push(...landmarkScene(c,this.art,w,project,s));
       for(const node of islandNodes(w)){
         const p=project(node.x,node.y);
         if(p.x< -s*2||p.x>width+s*2||p.y< -s*2||p.y>height+s*3)continue;

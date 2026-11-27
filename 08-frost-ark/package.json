@@ -1,0 +1,23 @@
+{
+  "name": "magame-08-frost-ark",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --open /dev.html",
+    "typecheck": "tsc --noEmit",
+    "check:data": "tsx scripts/check-data.ts",
+    "test:sim": "tsx scripts/sim-smoke.ts",
+    "test:e2e": "tsx scripts/e2e-visual.ts",
+    "build": "vite build && node scripts/publish-entry.mjs",
+    "gate:headless": "npm run check:data && npm run typecheck && npm run build && npm run test:sim",
+    "gate": "npm run gate:headless && npm run test:e2e"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "playwright": "^1.52.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.0"
+  }
+}

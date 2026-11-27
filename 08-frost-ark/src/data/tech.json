@@ -1,0 +1,26 @@
+{
+  "winCondition": {
+    "requiredSkyheartCores": 4,
+    "finalBossId": "permafrost_leviathan"
+  },
+  "nodes": [
+    {
+      "id": "tier1_basics",
+      "name": "初燃余烬",
+      "unlocksBuildings": ["wood_deck", "wind_wall", "torch_post", "workbench", "storage_box", "stove"],
+      "unlocksRecipes": ["craft_torch", "craft_grapple", "cook_baked_root", "cook_warm_jerky", "cook_cured_fish"]
+    },
+    {
+      "id": "tier2_automation",
+      "name": "拾荒与供暖拓展",
+      "unlocksBuildings": ["furnace", "heat_relay", "buoyancy_core", "catch_net", "beast_den"],
+      "unlocksRecipes": ["smelt_frost_iron", "craft_paralysis_net"]
+    },
+    {
+      "id": "tier3_fortress",
+      "name": "霜城防线与生态园",
+      "unlocksBuildings": ["iron_deck", "warm_wall", "greenhouse", "frost_turret"],
+      "unlocksRecipes": ["cook_warm_hay", "cook_berry_soup", "cook_magma_steak", "cook_mithril_roast"]
+    }
+  ]
+}

@@ -1,0 +1,191 @@
+[
+  {
+    "id": "hearth_core",
+    "name": "余烬主炉",
+    "category": "heat",
+    "size": [2, 2],
+    "buoyancyDelta": 64,
+    "heatOutput": 52,
+    "heatRadius": 6,
+    "maxHp": 400,
+    "cost": []
+  },
+  {
+    "id": "wood_deck",
+    "name": "浮木甲板",
+    "category": "structure",
+    "size": [1, 1],
+    "buoyancyDelta": -1,
+    "maxHp": 80,
+    "cost": [{ "itemId": "driftwood", "count": 2 }]
+  },
+  {
+    "id": "iron_deck",
+    "name": "加固铁甲板",
+    "category": "structure",
+    "size": [1, 1],
+    "buoyancyDelta": -2,
+    "maxHp": 220,
+    "cost": [
+      { "itemId": "driftwood", "count": 2 },
+      { "itemId": "frost_iron_ingot", "count": 1 }
+    ]
+  },
+  {
+    "id": "buoyancy_core",
+    "name": "浮力核心",
+    "category": "structure",
+    "size": [1, 1],
+    "buoyancyDelta": 32,
+    "maxHp": 160,
+    "cost": [
+      { "itemId": "frost_iron_ingot", "count": 3 },
+      { "itemId": "ice_shard", "count": 4 }
+    ]
+  },
+  {
+    "id": "wind_wall",
+    "name": "木质挡风墙",
+    "category": "structure",
+    "size": [1, 1],
+    "buoyancyDelta": -1,
+    "insulation": 0.5,
+    "maxHp": 120,
+    "cost": [{ "itemId": "driftwood", "count": 3 }]
+  },
+  {
+    "id": "warm_wall",
+    "name": "暖绒保温墙",
+    "category": "structure",
+    "size": [1, 1],
+    "buoyancyDelta": -1,
+    "insulation": 0.65,
+    "maxHp": 200,
+    "cost": [
+      { "itemId": "driftwood", "count": 2 },
+      { "itemId": "warm_fur", "count": 2 }
+    ]
+  },
+  {
+    "id": "torch_post",
+    "name": "防风火把柱",
+    "category": "heat",
+    "size": [1, 1],
+    "buoyancyDelta": 0,
+    "heatOutput": 18,
+    "heatRadius": 3,
+    "maxHp": 50,
+    "cost": [{ "itemId": "torch_item", "count": 1 }]
+  },
+  {
+    "id": "heat_relay",
+    "name": "热力中继塔",
+    "category": "heat",
+    "size": [1, 1],
+    "buoyancyDelta": -2,
+    "heatOutput": 36,
+    "heatRadius": 5,
+    "maxHp": 140,
+    "cost": [
+      { "itemId": "frost_iron_ingot", "count": 2 },
+      { "itemId": "coal_chunk", "count": 2 }
+    ]
+  },
+  {
+    "id": "workbench",
+    "name": "木工台",
+    "category": "production",
+    "size": [1, 1],
+    "buoyancyDelta": -1,
+    "maxHp": 100,
+    "cost": [
+      { "itemId": "driftwood", "count": 4 },
+      { "itemId": "rope", "count": 2 }
+    ]
+  },
+  {
+    "id": "furnace",
+    "name": "霜铁熔炉",
+    "category": "production",
+    "size": [1, 1],
+    "buoyancyDelta": -2,
+    "heatOutput": 20,
+    "heatRadius": 3,
+    "maxHp": 160,
+    "cost": [
+      { "itemId": "frost_iron_scrap", "count": 4 },
+      { "itemId": "coal_chunk", "count": 2 }
+    ]
+  },
+  {
+    "id": "stove",
+    "name": "暖炉灶台",
+    "category": "production",
+    "size": [1, 1],
+    "buoyancyDelta": -1,
+    "heatOutput": 14,
+    "heatRadius": 2,
+    "maxHp": 100,
+    "cost": [
+      { "itemId": "driftwood", "count": 3 },
+      { "itemId": "frost_iron_scrap", "count": 2 }
+    ]
+  },
+  {
+    "id": "storage_box",
+    "name": "防潮储物箱",
+    "category": "production",
+    "size": [1, 1],
+    "buoyancyDelta": -1,
+    "maxHp": 90,
+    "cost": [{ "itemId": "driftwood", "count": 4 }]
+  },
+  {
+    "id": "catch_net",
+    "name": "捕捞网栏",
+    "category": "production",
+    "size": [1, 1],
+    "buoyancyDelta": -1,
+    "maxHp": 70,
+    "cost": [
+      { "itemId": "driftwood", "count": 2 },
+      { "itemId": "rope", "count": 3 }
+    ]
+  },
+  {
+    "id": "greenhouse",
+    "name": "玻璃温室",
+    "category": "production",
+    "size": [2, 2],
+    "buoyancyDelta": -4,
+    "maxHp": 120,
+    "cost": [
+      { "itemId": "driftwood", "count": 4 },
+      { "itemId": "ice_shard", "count": 6 }
+    ]
+  },
+  {
+    "id": "beast_den",
+    "name": "保暖兽窝",
+    "category": "beast",
+    "size": [2, 2],
+    "buoyancyDelta": -3,
+    "maxHp": 140,
+    "cost": [
+      { "itemId": "driftwood", "count": 5 },
+      { "itemId": "rope", "count": 2 }
+    ]
+  },
+  {
+    "id": "frost_turret",
+    "name": "防霜箭塔",
+    "category": "defense",
+    "size": [1, 1],
+    "buoyancyDelta": -2,
+    "maxHp": 180,
+    "cost": [
+      { "itemId": "frost_iron_ingot", "count": 3 },
+      { "itemId": "driftwood", "count": 3 }
+    ]
+  }
+]

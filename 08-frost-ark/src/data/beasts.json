@@ -1,0 +1,86 @@
+[
+  {
+    "id": "burrowback",
+    "name": "岩甲鼹",
+    "biomeTier": 1,
+    "preferredBait": "baked_root",
+    "tameFeedsRequired": 2,
+    "maxHp": 90,
+    "attack": 14,
+    "workSkill": "mine_crush",
+    "companionSkill": "auto_mine",
+    "heatAuraRadius": 0
+  },
+  {
+    "id": "emberfox",
+    "name": "绒火狐",
+    "biomeTier": 1,
+    "preferredBait": "warm_jerky",
+    "tameFeedsRequired": 2,
+    "maxHp": 75,
+    "attack": 12,
+    "workSkill": "stoke_hearth",
+    "companionSkill": "mobile_warmth",
+    "heatAuraRadius": 3
+  },
+  {
+    "id": "galehawk",
+    "name": "风爪鸥",
+    "biomeTier": 1,
+    "preferredBait": "cured_cloud_fish",
+    "tameFeedsRequired": 2,
+    "maxHp": 65,
+    "attack": 15,
+    "workSkill": "fetch_debris",
+    "companionSkill": "scout_dive",
+    "heatAuraRadius": 0
+  },
+  {
+    "id": "frostyak",
+    "name": "霜角牦牛",
+    "biomeTier": 2,
+    "preferredBait": "warm_hay_ball",
+    "tameFeedsRequired": 3,
+    "maxHp": 170,
+    "attack": 22,
+    "workSkill": "produce_fur_repair",
+    "companionSkill": "pack_charge",
+    "heatAuraRadius": 0
+  },
+  {
+    "id": "glacierstag",
+    "name": "雪林鹿",
+    "biomeTier": 2,
+    "preferredBait": "warm_berry_soup",
+    "tameFeedsRequired": 3,
+    "maxHp": 115,
+    "attack": 14,
+    "workSkill": "boost_greenhouse",
+    "companionSkill": "warm_heal_aura",
+    "heatAuraRadius": 2
+  },
+  {
+    "id": "magmalisk",
+    "name": "熔核蜥",
+    "biomeTier": 3,
+    "preferredBait": "magma_steak",
+    "tameFeedsRequired": 3,
+    "maxHp": 190,
+    "attack": 32,
+    "workSkill": "power_furnace_deice",
+    "companionSkill": "flame_cone",
+    "heatAuraRadius": 4
+  },
+  {
+    "id": "tempest_wyvern",
+    "name": "风暴翼龙",
+    "biomeTier": 4,
+    "preferredBait": "mithril_roast",
+    "tameFeedsRequired": 4,
+    "maxHp": 260,
+    "attack": 44,
+    "workSkill": "boost_buoyancy_speed",
+    "companionSkill": "gale_blade",
+    "heatAuraRadius": 0
+  }
+]

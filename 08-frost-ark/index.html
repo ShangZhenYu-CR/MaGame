@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>08 · 马楠：霜云方舟</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #0c1520;
+        color: #e6eef5;
+        font-family: system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      }
+      #app {
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        image-rendering: pixelated;
+      }
+      .hud-card {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        border-radius: 12px;
+        background: rgba(24, 32, 43, 0.9);
+        border: 1px solid rgba(210, 230, 245, 0.14);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
+      }
+      .hud-card img {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        object-fit: cover;
+        background: #212c3a;
+      }
+      .hud-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #ffd08a;
+      }
+      .hud-meta {
+        margin-top: 3px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-variant-numeric: tabular-nums;
+        font-size: 12px;
+        color: #93a6b8;
+      }
+    </style>
+    <script type="module" crossorigin src="./dist/assets/main-Bs9A-8Pi.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="game-canvas"></canvas>
+      <div class="hud-card" id="hud-card">
+        <img id="manan-portrait" alt="马楠" />
+        <div>
+          <div class="hud-title">马楠 · 霜云方舟（Bootstrap）</div>
+          <div class="hud-meta" id="hud-stats">DAY 1 | -4°C | 浮力 49/64</div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

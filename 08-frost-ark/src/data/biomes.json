@@ -1,0 +1,38 @@
+[
+  {
+    "id": "cloud_shallows",
+    "name": "碎云浅海",
+    "tier": 1,
+    "baseTempOffset": 0,
+    "resources": ["driftwood", "frost_iron_scrap", "ice_shard", "raw_root", "raw_meat", "cloud_fish"],
+    "wildBeasts": ["burrowback", "emberfox", "galehawk"],
+    "bossId": null
+  },
+  {
+    "id": "frostpine_isles",
+    "name": "霜松群岛",
+    "tier": 2,
+    "baseTempOffset": -8,
+    "resources": ["driftwood", "frost_iron_scrap", "coal_chunk", "warm_berry", "frost_grass", "warm_fur"],
+    "wildBeasts": ["frostyak", "glacierstag", "galehawk"],
+    "bossId": "frostmane_lord"
+  },
+  {
+    "id": "sulfur_rift",
+    "name": "硫磺裂谷岛",
+    "tier": 3,
+    "baseTempOffset": -12,
+    "resources": ["coal_chunk", "sulfur_ore", "frost_iron_scrap", "raw_meat", "skyheart_core"],
+    "wildBeasts": ["magmalisk", "burrowback"],
+    "bossId": "rift_carapace"
+  },
+  {
+    "id": "aurora_zenith",
+    "name": "永冻遗迹与极光天穹",
+    "tier": 4,
+    "baseTempOffset": -20,
+    "resources": ["sky_mithril", "ice_shard", "coal_chunk", "skyheart_core"],
+    "wildBeasts": ["tempest_wyvern", "frostyak"],
+    "bossId": "permafrost_leviathan"
+  }
+]

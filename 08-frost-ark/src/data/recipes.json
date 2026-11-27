@@ -1,0 +1,92 @@
+[
+  {
+    "id": "craft_torch",
+    "station": "hand",
+    "output": { "itemId": "torch_item", "count": 2 },
+    "inputs": [
+      { "itemId": "driftwood", "count": 2 },
+      { "itemId": "rope", "count": 1 }
+    ]
+  },
+  {
+    "id": "craft_grapple",
+    "station": "hand",
+    "output": { "itemId": "grapple_hook", "count": 1 },
+    "inputs": [
+      { "itemId": "frost_iron_scrap", "count": 2 },
+      { "itemId": "rope", "count": 2 }
+    ]
+  },
+  {
+    "id": "smelt_frost_iron",
+    "station": "furnace",
+    "output": { "itemId": "frost_iron_ingot", "count": 1 },
+    "inputs": [
+      { "itemId": "frost_iron_scrap", "count": 2 },
+      { "itemId": "coal_chunk", "count": 1 }
+    ]
+  },
+  {
+    "id": "craft_paralysis_net",
+    "station": "workbench",
+    "output": { "itemId": "paralysis_net", "count": 2 },
+    "inputs": [
+      { "itemId": "rope", "count": 3 },
+      { "itemId": "ice_shard", "count": 2 }
+    ]
+  },
+  {
+    "id": "cook_baked_root",
+    "station": "stove",
+    "output": { "itemId": "baked_root", "count": 2 },
+    "inputs": [{ "itemId": "raw_root", "count": 2 }]
+  },
+  {
+    "id": "cook_warm_jerky",
+    "station": "stove",
+    "output": { "itemId": "warm_jerky", "count": 2 },
+    "inputs": [{ "itemId": "raw_meat", "count": 2 }]
+  },
+  {
+    "id": "cook_cured_fish",
+    "station": "stove",
+    "output": { "itemId": "cured_cloud_fish", "count": 2 },
+    "inputs": [{ "itemId": "cloud_fish", "count": 2 }]
+  },
+  {
+    "id": "cook_warm_hay",
+    "station": "stove",
+    "output": { "itemId": "warm_hay_ball", "count": 2 },
+    "inputs": [
+      { "itemId": "frost_grass", "count": 3 },
+      { "itemId": "warm_berry", "count": 1 }
+    ]
+  },
+  {
+    "id": "cook_berry_soup",
+    "station": "stove",
+    "output": { "itemId": "warm_berry_soup", "count": 1 },
+    "inputs": [
+      { "itemId": "warm_berry", "count": 3 },
+      { "itemId": "ice_shard", "count": 1 }
+    ]
+  },
+  {
+    "id": "cook_magma_steak",
+    "station": "stove",
+    "output": { "itemId": "magma_steak", "count": 1 },
+    "inputs": [
+      { "itemId": "raw_meat", "count": 2 },
+      { "itemId": "sulfur_ore", "count": 1 }
+    ]
+  },
+  {
+    "id": "cook_mithril_roast",
+    "station": "stove",
+    "output": { "itemId": "mithril_roast", "count": 1 },
+    "inputs": [
+      { "itemId": "raw_meat", "count": 2 },
+      { "itemId": "sky_mithril", "count": 1 }
+    ]
+  }
+]

@@ -1216,6 +1216,134 @@
         46
       ],
       "bytes": 4404
+    },
+    "icon-hand-axe": {
+      "file": "icon-hand-axe.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        5,
+        2,
+        43,
+        46
+      ],
+      "bytes": 3183
+    },
+    "icon-hand-axe-upgraded": {
+      "file": "icon-hand-axe-upgraded.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        4,
+        2,
+        43,
+        46
+      ],
+      "bytes": 3283
+    },
+    "icon-mining-pick": {
+      "file": "icon-mining-pick.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        5,
+        2,
+        43,
+        46
+      ],
+      "bytes": 2918
+    },
+    "icon-mining-pick-upgraded": {
+      "file": "icon-mining-pick-upgraded.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        3,
+        2,
+        45,
+        46
+      ],
+      "bytes": 3329
+    },
+    "icon-island-tier-1": {
+      "file": "icon-island-tier-1.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        9,
+        46,
+        39
+      ],
+      "bytes": 3409
+    },
+    "icon-island-tier-2": {
+      "file": "icon-island-tier-2.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        7,
+        46,
+        41
+      ],
+      "bytes": 3608
+    },
+    "icon-helm": {
+      "file": "icon-helm.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        3,
+        46,
+        45
+      ],
+      "bytes": 4705
+    },
+    "icon-gangway": {
+      "file": "icon-gangway.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        4,
+        2,
+        45,
+        46
+      ],
+      "bytes": 3864
     }
   }
 }

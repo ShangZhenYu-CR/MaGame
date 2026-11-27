@@ -21,7 +21,10 @@
     "m2-icon-food": "Frost Ark inventory illustration sprites. EXACT 3-column by 2-row rectangular grid, equally centered singles, generous pure magenta gutters at every cell. Solid pure magenta #FF00FF flat backdrop, no shadow cast on background, no ground, no text, no outlines around cells, no decoration. Readable 32px game icon art with clear chunky silhouettes, dark slate-brown tapered edge, hand-painted textured indie survival rendering, 40-degree three-quarter top-down, soft upper-left blue skylight, muted colors, small pops of warm orange as appropriate. All six sprites full and completely isolated, exact order like reading a book. TOP: (1) one raw oval lavender-gray potato-like root and tiny root hairs, (2) dark red uncooked cloud beast flank steak with cream fat edge, (3) one slate blue silver fish with elegant fork tail. BOTTOM: (4) round cluster of ruby warm berries with two green leaves, (5) a sheaf of pale straw dry frost grass blades, (6) one warm baked russet root cut open so visibly warm golden cooked inside, faint browned crust.",
     "m2-icon-products": "Frost Ark inventory illustration sprites. EXACT 3-column by 2-row rectangular grid, equally centered singles, generous pure magenta gutters at every cell. Solid pure magenta #FF00FF flat backdrop, no shadow cast on background, no ground, no text, no outlines around cells, no decoration. Readable 32px game icon art with clear chunky silhouettes, dark slate-brown tapered edge, hand-painted textured indie survival rendering, 40-degree three-quarter top-down, soft upper-left blue skylight, muted colors, small pops of warm orange as appropriate. All six sprites full and completely isolated, exact order like reading a book. TOP: (1) two dry long brown grilled jerky strips marked with golden grill lines, (2) three salt-cured blue and cream fish fillets on a dark board, (3) round ball of compressed yellow dry hay strands tied by twine. BOTTOM: (4) glazed utilitarian steel-blue bowl filled with ruby berry soup and visible whole berries, (5) dark grilled orange magma steak with hot amber glowing stripes, (6) bronze roasted meat with small icy-blue metallic accents on tiny cream camping plate.",
     "m2-icon-tech": "Frost Ark inventory illustration sprites. EXACT 3-column by 2-row rectangular grid, equally centered singles, generous pure magenta gutters at every cell. Solid pure magenta #FF00FF flat backdrop, no shadow cast on background, no ground, no text, no outlines around cells, no decoration. Readable 32px game icon art with clear chunky silhouettes, dark slate-brown tapered edge, hand-painted textured indie survival rendering, 40-degree three-quarter top-down, soft upper-left blue skylight, muted colors, small pops of warm orange as appropriate. All six sprites full and completely isolated, exact order like reading a book. TOP: (1) wooden workbench with tools and vise, (2) upright stone and cast iron smelting furnace with front orange glow, (3) squat iron cooking stove with a pot. BOTTOM: (4) thin copper and cast iron heat relay tower with warm radiator coil and low foot, (5) wooden framed angled maritime catching net with rope grid, (6) dark iron two-joint sorting arm with a claw and flat bolted base.",
-    "m2-icon-tech-b": "Frost Ark inventory illustration sprites. EXACT 3-column by 2-row rectangular grid, equally centered singles, generous pure magenta gutters at every cell. Solid pure magenta #FF00FF flat backdrop, no shadow cast on background, no ground, no text, no outlines around cells, no decoration. Readable 32px game icon art with clear chunky silhouettes, dark slate-brown tapered edge, hand-painted textured indie survival rendering, 40-degree three-quarter top-down, soft upper-left blue skylight, muted colors, small pops of warm orange as appropriate. All six sprites full and completely isolated, exact order like reading a book. TOP: (1) small glass greenhouse with peaked glass roof weathered brass frame and green seedlings, (2) framed dark brown warm insulated wall with fluffy tan batting partly visible and leather strips, (3) small mechanical horizontal buoyancy core with visible suspended blue-white crystal in a dark bronze cradle. BOTTOM: (4) stack of iron deck panel squares with rivets, (5) small bundled blue-tinted ice rope paralysis net with icy cyan knot, NOT a mounted dock net, (6) rare quest skyheart fire seed like small glowing amber ember in a dark smoky floating stone shell, NOT an egg."
+    "m2-icon-tech-b": "Frost Ark inventory illustration sprites. EXACT 3-column by 2-row rectangular grid, equally centered singles, generous pure magenta gutters at every cell. Solid pure magenta #FF00FF flat backdrop, no shadow cast on background, no ground, no text, no outlines around cells, no decoration. Readable 32px game icon art with clear chunky silhouettes, dark slate-brown tapered edge, hand-painted textured indie survival rendering, 40-degree three-quarter top-down, soft upper-left blue skylight, muted colors, small pops of warm orange as appropriate. All six sprites full and completely isolated, exact order like reading a book. TOP: (1) small glass greenhouse with peaked glass roof weathered brass frame and green seedlings, (2) framed dark brown warm insulated wall with fluffy tan batting partly visible and leather strips, (3) small mechanical horizontal buoyancy core with visible suspended blue-white crystal in a dark bronze cradle. BOTTOM: (4) stack of iron deck panel squares with rivets, (5) small bundled blue-tinted ice rope paralysis net with icy cyan knot, NOT a mounted dock net, (6) rare quest skyheart fire seed like small glowing amber ember in a dark smoky floating stone shell, NOT an egg.",
+    "m3-icons-tools": "Frost Ark high-altitude winter survival game, original hand-painted indie survival UI item sprite atlas for 48×48 transparent PNGs displayed at 32 pixels. Edge-to-edge flat SOLID PURE RGB(255,0,255) electric MAGENTA backdrop #FF00FF including holes. Exactly one fully visible centered sprite per cell, wide unbroken magenta gutters. No labels, grids, cast/contact shadow, panel, white sticker edge, or hue reflection from magenta. Dark slate-brown softened contour, cool top-left skylight, restrained brown and steel-blue painted facets, chunky memorable silhouette, 40-degree elevated 3/4 orthographic. Precise 2 by 2 arrangement, square canvas. TOP LEFT one basic one-handed wood-cutting hatchet with broad matte hammered dull iron blade, flared cutting edge, rough dark warm timber haft, linen cord wrap. TOP RIGHT upgraded frost iron hatchet: same compact hatchet proportions, bright cold-blue trimmed steel broad head with a twin gold rivet brace and fitted handle. BOTTOM LEFT one simple angled iron mining pick with two arcing sharp clean spikes, chipped textured steel head, worn brown handle and simple leather grip, no axe-shaped blade. BOTTOM RIGHT upgraded bright blue-gray forged frost iron mining pickaxe with reinforced pointed horns, gold rivets on dark forged socket and improved warm grip, noticeably premium. All four tools angle diagonally upward to the right, readable silhouettes at 32px, no disconnected sparks or glow.",
+    "m3-icons-islands": "Frost Ark high-altitude winter survival game, original hand-painted indie survival UI item sprite atlas for 48×48 transparent PNGs displayed at 32 pixels. Edge-to-edge flat SOLID PURE RGB(255,0,255) electric MAGENTA backdrop #FF00FF including holes. Exactly one fully visible centered sprite per cell, wide unbroken magenta gutters. No labels, grids, cast/contact shadow, panel, white sticker edge, or hue reflection from magenta. Dark slate-brown softened contour, cool top-left skylight, restrained brown and steel-blue painted facets, chunky memorable silhouette, 40-degree elevated 3/4 orthographic. Precise two-column sprite atlas, wide landscape canvas. LEFT TIER 1: horizontal eclectically shaped floating snowy mountain fragment with pine silhouettes and muted gray-green moss ridges, broad light gray snowy tops and rugged dark charcoal hanging rock apex. RIGHT TIER 2: more dramatic rugged blue-black mineral islet with two clustered large frosty blue crystal spikes and a mute blue glacial ridge, gem glints subdued, broad fractured hanging base. NOT map pins and no decorative round frame. The visible lower sides abruptly end in individually sharp rock contours, no drifting pebbles. Consistent horizontal footprint, similar readable volume, differing shapes/colors and silhouettes. No atmospheric halo or clouds; islands are completely separate against perfectly flat magenta.",
+    "m3-icons-helm": "Frost Ark two original hand painted indie game inventory UI sprites, landscape 2 columns side by side, each isolated on flat pure electric #FF00FF magenta chroma matte with wide gutters. No text, panel, background shadow, rim, fog, decor or gradient. Left: bold compact weathered mahogany ship’s helm steering wheel with six readable spokes and small cast iron hub, 40 degree 3/4 top down, no floor mount. Right: small gray wooden plank gangway bridge for boarding a flying raft, two slim copper metal supports, rope rail only one edge, three-quarter overhead 40 degree, laid diagonally for 32px readable compact silhouette. Soft upper-left icy natural daylight, charcoal edge, slightly frost-weathered materials, matching high-altitude survival assets from Frost Ark. Each unique shape occupies no more than 75 percent of its own column width and completely fits inside its own cell."
   },
   "assets": [
     {
@@ -1568,6 +1571,190 @@
         512,
         1536,
         1024
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-hand-axe",
+      "source": "m3-icons-tools.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-hand-axe-upgraded",
+      "source": "m3-icons-tools.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        627,
+        0,
+        1254,
+        627
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-mining-pick",
+      "source": "m3-icons-tools.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        0,
+        627,
+        627,
+        1254
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-mining-pick-upgraded",
+      "source": "m3-icons-tools.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        627,
+        627,
+        1254,
+        1254
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-island-tier-1",
+      "source": "m3-icons-islands.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        0,
+        0,
+        887,
+        887
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-island-tier-2",
+      "source": "m3-icons-islands.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        887,
+        0,
+        1774,
+        887
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-helm",
+      "source": "m3-icons-helm.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        0,
+        0,
+        887,
+        887
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-gangway",
+      "source": "m3-icons-helm.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        887,
+        0,
+        1774,
+        887
       ],
       "anchor": [
         0.5,

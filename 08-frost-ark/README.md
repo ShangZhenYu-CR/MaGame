@@ -2,7 +2,7 @@
 
 2D 俯视生存建造沙盒（MaGame 独立云端分支）：融合**云海拾荒移动基地**、**方舟生态驯兽分工**与**暖橙火光 vs 冰蓝暴雪**热力生存。
 
-- **当前阶段**：M0 已交付，等待截图验收；M1 未开始
+- **当前阶段**：M1 · 冷暖热力场、拿铁和开局美术升级；M2 等待确认
 - **GitHub 分支**：[`game/08-frost-ark`](https://github.com/ShangZhenYu-CR/MaGame/tree/game/08-frost-ark)
 - **项目目录**：[`08-frost-ark/`](https://github.com/ShangZhenYu-CR/MaGame/tree/game/08-frost-ark/08-frost-ark)
 - **Google Drive 总目录**：[`MaGame-Dot/08-frost-ark`](https://drive.google.com/drive/folders/16oAjTkGj8PJpr86Cg5QJbPjgwLXsb6cV)
@@ -26,6 +26,12 @@
 - **Esc** 先关背包，再退回抓钩。进度存到当前浏览器，也可在背包导出或导入 JSON。
 - **ZIP 试玩**：把整个 ZIP 解压，再双击 `08-frost-ark/index.html`。不用启动服务器，也不用装 Python。请保留解压后的目录结构，左上角头像从同级共享资产目录读取。旧的 HTTP 存档和双击打开的本地存档不一定共用；可用背包中的 JSON 导入导出迁移。
 - [GitHub 在线构建和产物](https://github.com/ShangZhenYu-CR/MaGame/actions/runs/45956832321)：Actions 只在专用分支构建；从 Artifacts 下载安装包，和现有 GitHub Pages 发布互不影响。
+
+## M1 · 过一夜
+
+- 到了暴雪夜，甲板边角会失温，主炉边能回温；体温耗尽会开始掉生命。
+- **3** 放挡风墙，**R** 在主炉附近添柴。**U** 用 4 块浮木板和 2 件冻铁废件升级主炉，拿铁会拾回暖区里的掉落物。可用 **G** 放下一块浮木观察，**F** 手动拾回。
+- [直接在线玩](https://shangzhenyu-cr.github.io/MaGame/08-frost-ark/) · [M1 实机及同机位美术对比](https://drive.google.com/drive/folders/1Qwbi4tatTt1NeoD4XY7iigwhLU-aUXIl)。
 
 ## 开发与验收命令
 

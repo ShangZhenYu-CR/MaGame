@@ -48,6 +48,10 @@ export async function runDeckMovement(browser:Browser,url:string,out:string,erro
     assert.ok((await walk('d',p=>p.x>27.55)).player.x>27.55,'turn away from the chest without a dead corner');
     assert.ok((await walk('s',p=>p.y>26.26)).player.y>26.26,'get around the side of the chest');
     await page.screenshot({path:join(out,'deck-movement-03-chest-bypass.png')});
+    // The bypass can finish farther south when a held key spans extra frames.
+    // Walk back into the actual 1.7-tile interaction range before pressing E.
+    const reachable=await walk('w',p=>p.y<26.45,135,14);
+    assert.ok(Math.hypot(reachable.player.x-26.5,reachable.player.y-25.5)<=1.7,'return to chest interaction range after bypass');
     await page.keyboard.press('e');
     await page.locator('#storage-panel').waitFor();
     await page.keyboard.press('Escape');

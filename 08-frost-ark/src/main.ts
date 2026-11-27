@@ -100,7 +100,7 @@ function primaryInteraction():PrimaryInteraction{
   if(beasts.open())return {kind:'close-beasts'};
   if(industry.stationOpen())return {kind:'close-station'};
   if(!locker.hidden)return {kind:'close-storage'};
-  if(!panel.hidden||industry.catalogOpen()||chart.open()||finale.arena())return {kind:'none'};
+  if(chart.open()||finale.arena())return {kind:'none'};
   const here=expedition.area();
   if(here==='island'){
     const wild=nearestWildBeast(w);

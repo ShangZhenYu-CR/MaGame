@@ -13,13 +13,19 @@ function debris(w: WorldState, index: number, first: boolean): CloudDebris {
   w.rngState = random.state;
   const jitter = (random.value - .5) * .38;
   const id = lootIds[index % lootIds.length];
+  // Secondary salvage retains the three float silhouettes from M0.
+  const extras = first ? [null,'coal_chunk','ice_shard'] :
+    ['coal_chunk','ice_shard','raw_root','warm_fur','raw_meat','cloud_fish',
+      'coal_chunk','ice_shard','warm_berry','frost_grass','warm_fur','coal_chunk'];
+  const extra=extras[index%extras.length];
+
   return {
     id: `drift_${w.tick}_${index}`,
     x: c - (first ? [5.9, 7.2, 8.9][index] : 15),
     y: c + (first ? [2.5, -3.45, 4.05][index] : [-5.5, 5.3, 2.9, -2.7, -7.0, 7.1][index % 6]) + jitter,
     vx: .45 + w.sky.windX * .27 + jitter * .18,
     vy: w.sky.windY * .24,
-    loot: [{ itemId:id, count: id === 'driftwood' ? 3 : 2 }],
+    loot: [{ itemId:id, count: id === 'driftwood' ? 3 : 2 },...(extra?[{itemId:extra,count:2}]:[])],
   };
 }
 

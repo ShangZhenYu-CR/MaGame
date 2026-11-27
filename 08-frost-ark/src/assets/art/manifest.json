@@ -576,6 +576,646 @@
         360
       ],
       "bytes": 78822
+    },
+    "building-workbench": {
+      "file": "building-workbench.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.12,
+      "tileH": 1.12,
+      "contentBox": [
+        2,
+        38,
+        126,
+        121
+      ],
+      "bytes": 23065
+    },
+    "building-smelter": {
+      "file": "building-smelter.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.18,
+      "tileH": 1.18,
+      "contentBox": [
+        18,
+        2,
+        110,
+        121
+      ],
+      "bytes": 25295
+    },
+    "building-stove": {
+      "file": "building-stove.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.12,
+      "tileH": 1.12,
+      "contentBox": [
+        4,
+        2,
+        124,
+        121
+      ],
+      "bytes": 29827
+    },
+    "building-heat-relay": {
+      "file": "building-heat-relay.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.45,
+      "tileH": 1.45,
+      "contentBox": [
+        32,
+        2,
+        96,
+        121
+      ],
+      "bytes": 19415
+    },
+    "building-net": {
+      "file": "building-net.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.12,
+      "tileH": 1.12,
+      "contentBox": [
+        2,
+        51,
+        126,
+        121
+      ],
+      "bytes": 21860
+    },
+    "building-sorter": {
+      "file": "building-sorter.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 90,
+      "anchorY": 120,
+      "tileW": 1.5,
+      "tileH": 1.5,
+      "contentBox": [
+        23,
+        2,
+        116,
+        120
+      ],
+      "bytes": 20541
+    },
+    "building-greenhouse": {
+      "file": "building-greenhouse.png",
+      "width": 224,
+      "height": 224,
+      "anchorX": 112,
+      "anchorY": 212,
+      "tileW": 2.03,
+      "tileH": 2.03,
+      "contentBox": [
+        16,
+        2,
+        208,
+        212
+      ],
+      "bytes": 22531
+    },
+    "building-insulated-wall": {
+      "file": "building-insulated-wall.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.12,
+      "tileH": 1.12,
+      "contentBox": [
+        2,
+        48,
+        126,
+        121
+      ],
+      "bytes": 24442
+    },
+    "building-buoyancy-core": {
+      "file": "building-buoyancy-core.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.2,
+      "tileH": 1.38,
+      "contentBox": [
+        2,
+        5,
+        126,
+        121
+      ],
+      "bytes": 31431
+    },
+    "building-iron-deck": {
+      "file": "building-iron-deck.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 64,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "bytes": 32730
+    },
+    "icon-frost-iron-ingot": {
+      "file": "icon-frost-iron-ingot.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        4,
+        46,
+        43
+      ],
+      "bytes": 4370
+    },
+    "icon-ice-shard": {
+      "file": "icon-ice-shard.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        4,
+        2,
+        44,
+        46
+      ],
+      "bytes": 4473
+    },
+    "icon-coal-chunk": {
+      "file": "icon-coal-chunk.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        4,
+        46,
+        43
+      ],
+      "bytes": 4478
+    },
+    "icon-warm-fur": {
+      "file": "icon-warm-fur.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        4,
+        46,
+        45
+      ],
+      "bytes": 5046
+    },
+    "icon-sulfur-ore": {
+      "file": "icon-sulfur-ore.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        4,
+        46,
+        45
+      ],
+      "bytes": 4809
+    },
+    "icon-sky-mithril": {
+      "file": "icon-sky-mithril.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        4,
+        46,
+        45
+      ],
+      "bytes": 4875
+    },
+    "icon-raw-root": {
+      "file": "icon-raw-root.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        6,
+        46,
+        42
+      ],
+      "bytes": 4333
+    },
+    "icon-raw-meat": {
+      "file": "icon-raw-meat.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        7,
+        46,
+        41
+      ],
+      "bytes": 4135
+    },
+    "icon-cloud-fish": {
+      "file": "icon-cloud-fish.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        9,
+        46,
+        39
+      ],
+      "bytes": 2968
+    },
+    "icon-warm-berry": {
+      "file": "icon-warm-berry.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        4,
+        46,
+        45
+      ],
+      "bytes": 5327
+    },
+    "icon-frost-grass": {
+      "file": "icon-frost-grass.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        4,
+        46,
+        45
+      ],
+      "bytes": 4459
+    },
+    "icon-baked-root": {
+      "file": "icon-baked-root.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        6,
+        46,
+        43
+      ],
+      "bytes": 4267
+    },
+    "icon-warm-jerky": {
+      "file": "icon-warm-jerky.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        6,
+        46,
+        42
+      ],
+      "bytes": 4080
+    },
+    "icon-cured-cloud-fish": {
+      "file": "icon-cured-cloud-fish.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        6,
+        46,
+        41
+      ],
+      "bytes": 4168
+    },
+    "icon-warm-hay-ball": {
+      "file": "icon-warm-hay-ball.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        3,
+        46,
+        45
+      ],
+      "bytes": 5386
+    },
+    "icon-warm-berry-soup": {
+      "file": "icon-warm-berry-soup.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        5,
+        46,
+        43
+      ],
+      "bytes": 4846
+    },
+    "icon-magma-steak": {
+      "file": "icon-magma-steak.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        7,
+        46,
+        41
+      ],
+      "bytes": 4139
+    },
+    "icon-mithril-roast": {
+      "file": "icon-mithril-roast.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        7,
+        46,
+        41
+      ],
+      "bytes": 4395
+    },
+    "icon-workbench": {
+      "file": "icon-workbench.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        2,
+        46,
+        45
+      ],
+      "bytes": 5005
+    },
+    "icon-furnace": {
+      "file": "icon-furnace.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        41,
+        46
+      ],
+      "bytes": 4197
+    },
+    "icon-stove": {
+      "file": "icon-stove.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        8,
+        2,
+        40,
+        46
+      ],
+      "bytes": 3729
+    },
+    "icon-heat-relay": {
+      "file": "icon-heat-relay.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        12,
+        2,
+        35,
+        46
+      ],
+      "bytes": 2832
+    },
+    "icon-catch-net": {
+      "file": "icon-catch-net.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        2,
+        45,
+        46
+      ],
+      "bytes": 5603
+    },
+    "icon-sorter-arm": {
+      "file": "icon-sorter-arm.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        4,
+        2,
+        45,
+        46
+      ],
+      "bytes": 4381
+    },
+    "icon-greenhouse": {
+      "file": "icon-greenhouse.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        4,
+        2,
+        44,
+        46
+      ],
+      "bytes": 4965
+    },
+    "icon-warm-wall": {
+      "file": "icon-warm-wall.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        8,
+        2,
+        40,
+        46
+      ],
+      "bytes": 3927
+    },
+    "icon-buoyancy-core": {
+      "file": "icon-buoyancy-core.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        10,
+        46,
+        38
+      ],
+      "bytes": 3952
+    },
+    "icon-iron-deck": {
+      "file": "icon-iron-deck.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        4,
+        46,
+        44
+      ],
+      "bytes": 4545
+    },
+    "icon-paralysis-net": {
+      "file": "icon-paralysis-net.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        5,
+        46,
+        43
+      ],
+      "bytes": 4790
+    },
+    "icon-skyheart-core": {
+      "file": "icon-skyheart-core.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        8,
+        2,
+        41,
+        46
+      ],
+      "bytes": 4404
     }
   }
 }

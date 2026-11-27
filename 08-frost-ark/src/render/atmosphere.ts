@@ -103,7 +103,7 @@ export function ovalGlow(c:CanvasRenderingContext2D,x:number,y:number,rx:number,
   c.fillStyle=g;c.beginPath();c.arc(0,0,rx,0,tau);c.fill();c.restore();
 }
 
-const snow=Array.from({length:180},(_,i)=>({u:seeded(i*5+1000),v:seeded(i*5+2000),s:seeded(i*5+3000)}));
+const snow=Array.from({length:360},(_,i)=>({u:seeded(i*5+1000),v:seeded(i*5+2000),s:seeded(i*5+3000)}));
 function paintSnow(c:CanvasRenderingContext2D,w:WorldState):void{
   const {width:W,height:H}=c.canvas,t=w.tick;
   const depth=w.weather==='whiteout'?1.65:1;
@@ -111,37 +111,25 @@ function paintSnow(c:CanvasRenderingContext2D,w:WorldState):void{
   const margin=55, dx=.788,dy=.616;
   c.save();
   for(const layer of [0,1,2]){
-    const n=Math.min(snow.length,Math.round([138,67,19][layer]*depth));
+    const n=Math.min(snow.length,Math.round([244,116,27][layer]*depth));
     const velocity=[.47,2.04,4.50][layer]*depth*drift;
     for(let i=0;i<n;i++){
       const p=snow[(i+layer*31)%snow.length], phase=t*velocity*(.70+p.s*.77);
       const x=wrap(p.u*(W+2*margin)+phase*dx,W+2*margin)-margin;
       const y=wrap(p.v*(H+2*margin)+phase*dy,H+2*margin)-margin;
       if(layer===0){
-        c.globalAlpha=.12+p.s*.22;c.fillStyle=P.snowHighlight;
+        c.globalAlpha=.19+p.s*.33;c.fillStyle=P.snowHighlight;
         c.beginPath();c.arc(x,y,.48+p.s*.85,0,tau);c.fill();
       }else if(layer===1){
-        const length=5+p.s*12*depth;
-        c.strokeStyle=P.snowHighlight;c.globalAlpha=.08+p.s*.25;
-        c.lineWidth=.55+p.s*.6;c.lineCap='round';
+        const length=7+p.s*15*depth;
+        c.strokeStyle=P.snowHighlight;c.globalAlpha=.13+p.s*.33;
+        c.lineWidth=.55+p.s*.8;c.lineCap='round';
         c.beginPath();c.moveTo(x,y);c.lineTo(x-dx*length,y-dy*length);c.stroke();
       }else{
         const r=8+p.s*17;
-        c.globalAlpha=.12+p.s*.21;
+        c.globalAlpha=.16+p.s*.24;
         c.save();c.translate(x,y);c.rotate(.663);ovalGlow(c,0,0,r,r*.41,'rgba(186,215,231,.46)','rgba(186,215,231,0)');c.restore();
       }
-    }
-  }
-  c.restore();
-}
-
-function crystal(c:CanvasRenderingContext2D,x:number,y:number,r:number,rotation:number):void{
-  c.save(); c.translate(x,y);c.rotate(rotation);
-  for(let i=0;i<6;i++){
-    c.rotate(tau/6);
-    c.moveTo(0,0);c.lineTo(r,0);
-    for(const b of [.57,.80]){
-      c.moveTo(r*b-r*.20,-r*.14);c.lineTo(r*b,0);c.lineTo(r*b-r*.20,r*.14);
     }
   }
   c.restore();
@@ -152,7 +140,7 @@ export class WeatherFinish {
   private frozen=0;
   private lastTick=-1;
 
-  paint(c:CanvasRenderingContext2D,w:WorldState):void{
+  paint(c:CanvasRenderingContext2D,w:WorldState,frostFrame:HTMLImageElement):void{
     if(w.weather!=='clear')paintSnow(c,w);
     const {width:W,height:H}=c.canvas;
     const cold=clamp((45-w.player.warmth)/45);
@@ -179,16 +167,11 @@ export class WeatherFinish {
     }
     c.restore();
     if(cold>.006){
-      c.save();c.lineWidth=1;c.lineCap='round';
-      for(let i=0;i<56;i++){
-        const horizontal=i%4<2, side=i%2, depth=seeded(i+880)*62;
-        const along=seeded(i+332)*1.08-.04;
-        const x=horizontal?W*along:side?W-depth:depth;
-        const y=horizontal?side?H-depth:depth:H*along;
-        c.strokeStyle=i%3?'#c2dfed':'#f0f4ef';
-        c.globalAlpha=intensity*(.12+seeded(i+714)*.40)*clamp(1.1-depth/86);
-        c.beginPath();crystal(c,x,y,7+seeded(i+52)*29*intensity,seeded(i+711)*tau);c.stroke();
-      }
+      c.save();
+      c.globalAlpha=clamp(intensity*.88);
+      // The transparent painted frame fades toward the center, so the frame
+      // can scale with the viewport without UI-sized repeated snowflake stamps.
+      c.drawImage(frostFrame,0,0,W,H);
       c.restore();
     }
   }

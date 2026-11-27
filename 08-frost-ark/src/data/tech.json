@@ -12,15 +12,19 @@
     },
     {
       "id": "tier2_automation",
+      "prerequisite": "tier1_basics",
+      "researchCost": [],
       "name": "拾荒与供暖拓展",
-      "unlocksBuildings": ["furnace", "heat_relay", "buoyancy_core", "catch_net", "beast_den"],
+      "unlocksBuildings": ["furnace", "heat_relay", "buoyancy_core", "catch_net", "sorter_arm", "beast_den"],
       "unlocksRecipes": ["smelt_frost_iron", "craft_paralysis_net"]
     },
     {
       "id": "tier3_fortress",
+      "prerequisite": "tier2_automation",
+      "researchCost": [{ "itemId": "frost_iron_ingot", "count": 1 }, { "itemId": "ice_shard", "count": 2 }],
       "name": "霜城防线与生态园",
       "unlocksBuildings": ["iron_deck", "warm_wall", "greenhouse", "frost_turret"],
-      "unlocksRecipes": ["cook_warm_hay", "cook_berry_soup", "cook_magma_steak", "cook_mithril_roast"]
+      "unlocksRecipes": ["cook_warm_hay", "cook_berry_soup", "cook_magma_steak", "cook_mithril_roast", "grow_roots", "grow_berries"]
     }
   ]
 }

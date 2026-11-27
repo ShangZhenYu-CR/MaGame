@@ -153,6 +153,18 @@
     ]
   },
   {
+    "id": "sorter_arm",
+    "name": "分拣臂",
+    "category": "production",
+    "size": [1, 1],
+    "buoyancyDelta": -2,
+    "maxHp": 105,
+    "cost": [
+      { "itemId": "frost_iron_ingot", "count": 2 },
+      { "itemId": "rope", "count": 2 }
+    ]
+  },
+  {
     "id": "greenhouse",
     "name": "玻璃温室",
     "category": "production",

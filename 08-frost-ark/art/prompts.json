@@ -14,7 +14,14 @@
     "icons": "Game asset sprite sheet for Frost Ark, EXACT 4 columns x 2 rows regularly spaced on one flat solid pure electric magenta #FF00FF RGB(255,0,255) matte. Square canvas. Each sprite centered in its cell, all silhouettes have generous margins and never touch. No text, borders, guide lines, panels, shadows on background, white rim or gradient. Readable 32px game icons, handcrafted painterly 2.5D style with restrained realistic materials, game 3/4 overhead 40 degree, soft cool top-left skylight, soft deep slate-brown contour. Row 1 from left to right: steel grappling hook with short handle; square icy wooden deck plank module with two iron corner fixtures; lit short resin torch on wood pole orange amber flame; sturdy weathered dark wood windbreak wall panel with iron strap. Row 2 from left to right: charcoal canvas rucksack; two short frost-dusted splintered driftwood pieces; one chunky coil of twisted dark blue gray frozen iron scrap with scraped highlights; one loop of ochre tan knotted hemp rope. Keep icons bold, compact, evenly scaled, detailed without noise. Entire background exact block color #FF00FF including edges.",
     "debris": "Square 2x2 atlas of EXACTLY three isolated game-world salvage sprites (bottom right must remain EMPTY uniform magenta): top left weathered floating wood box, slatted worn silver-gray brown crate with two narrow iron braces, splinter and light frost; top right knotted and twisted dark blue gray iron scrap, torn bent metal with ice crystals and a little sharp cold reflection; bottom left coiled golden brown hemp mooring rope with knot and visible twisted fibers and a few bright frosted breaks. Center in each of three cells with large margins and no overlap. Clean background is an uninterrupted flat pure #FF00FF (255,0,255) chroma key matte; no labels, frame, guides, shadow, colored ground, reflected pink, white halo, cloud or gradients. Original 2.5D hand-painted indie survival game props, fixed 40-degree 3/4 overhead shape, painted facets, gentle upper-left cool daylight, deep slate-brown softly edged outlines, clear consistent front sides, paint texture, readable silhouette at 64 pixels. All three objects completely visible. Strong distinct silhouettes.",
     "m2VerticalEdges": "Two separately isolated narrow vertical video game sprites side by side on solid pure #FF00FF, 2.5D HAND PAINTED 40 DEGREE top down look, cool upper left skylight and frost, subtle slate-brown outline. The direction of each entire piece aligns with the VERTICAL Y AXIS OF THE PICTURE: connecting rail segment runs away from viewer from bottom center towards top center; the near post stands in front of the far post and partially overlaps it. NOT left-to-right, NO horizontal side elevation, near post lower on the canvas and far post higher on canvas, screen X almost same. Left half: wooden nautical rail, two upright posts, lengthwise connecting short straight rails, visible thick top and carved wooden rim, small snow crust on rails, plain rustic. Right half: narrow dark wooden and slate-blue stone hull side edging, a narrow width strip of wood planks covered with small flat thin broken stone fragments, like a vertical runway, bottom end much nearer than top end, prominent wood sides on left and right, no pillar, no hanging stone or icicles. Brown pine wood, blue grey stone, no shine or bright neon, hard object edges without shadows on magenta, big separation, no text. Sprite sheet for orthogonal board game. Do not show anything horizontal, keep both strips vertical on screen. Render both objects in full without cropping.",
-    "m2FrostVignette": "TRANSPARENT CANVAS, real alpha. An irregular ultra-soft light ice blue frost effect for the perimeter of a cold survival videogame screen; wide landscape 16:9. Center 75% completely empty and fully transparent; nothing across central view or horizon, no opaque checker pattern. Artistic hand-painted organic feathery frost crystal veins entering from lower two corners and a bit in top corners, scattered edge patches, very thin framing at midpoints and mix of short and long branches at asymmetrical positions. Frost color ONLY icy blue-grey, slate, pale white. Absolutely no violet, pink, purple, magenta, gray opaque background, lines, geometric hexagons, layout boxes, text, or snowflake icon shapes. Let frost opacity taper into a feathered fully transparent interior. Do not put a solid rim line, make natural fractal ice organic crystalline structure."
+    "m2FrostVignette": "TRANSPARENT CANVAS, real alpha. An irregular ultra-soft light ice blue frost effect for the perimeter of a cold survival videogame screen; wide landscape 16:9. Center 75% completely empty and fully transparent; nothing across central view or horizon, no opaque checker pattern. Artistic hand-painted organic feathery frost crystal veins entering from lower two corners and a bit in top corners, scattered edge patches, very thin framing at midpoints and mix of short and long branches at asymmetrical positions. Frost color ONLY icy blue-grey, slate, pale white. Absolutely no violet, pink, purple, magenta, gray opaque background, lines, geometric hexagons, layout boxes, text, or snowflake icon shapes. Let frost opacity taper into a feathered fully transparent interior. Do not put a solid rim line, make natural fractal ice organic crystalline structure.",
+    "m2Workshop": "Original Frost Ark indie survival game 2.5D top-down THREE QUARTER overhead 40 degree elevated orthographic front-on camera, visible horizontal frontal width and TOP face with compressed depth rising vertically, NO diamond isometric footprint, NO left/right yaw. Match attached reference sprites for gnarled frost-weathered muted timber, dark grey cast iron, brushed warm antique accents, crisp hand-painted illustrative strokes and thin deep slate-brown outlines, not low-poly or plastic. Soft upper-left cool daylight, gently darker lower right. Square sprite contact sheet exact 2x2 regular grid. Completely isolated separate object centered within each full quadrant using up to 78 percent of its width/height. Generous padding on flat solid pure #FF00FF RGB(255,0,255) magenta including through any holes. NO cast/contact ground shadow, flagstone/plank FLOOR, vignette, text, frames, grid lines, watermark, glow bleeding outside object boundary, emitted particles or pink reflected spill. Workshop and heat. TOP LEFT: shipboard workbench, sturdy broad warmly weathered pine working surface aligned horizontally, short legs, a clearly visible compact old iron vise on left on tabletop, wooden mallet on right and a few little hooked tools arranged on a low back rack; keep shape wide and low and top readable, no tall billboard, no floating separated tools. TOP RIGHT: blast SMELTER, compact tall rounded stone and black iron crucible furnace with a tapered tall main body, industrial cast iron stoke door with brass latch, small vivid amber vent, frosted chunky brown-stone segmented body, a concentrated crucible mouth inset near top, NOT a rectangular masonry hearth shape, no drawn smoke/flames. BOTTOM LEFT: compact domestic COOK STOVE; a low rectangular cast-iron range with TWO obvious top burner plates and a small rustic copper kettle standing on only one plate, visible ash-drawer and oven door beneath with muted amber slit, four short feet, no chimney, no emitted steam. BOTTOM RIGHT: HEAT RELAY TOWER, tall dockside cylindrical antenna/heat radiator device, distinctive armored vertical ochre-orange copper radiator tubes on iron cage, frosted hexagonal base and tip, central amber capacitor glow bounded by glass, a stout fan assembly mostly visible in top view, no weapon shape, no arms/rays/aurora. Different silhouettes, coherent pragmatic retro analogue equipment on a floating cold nautical platform.",
+    "m2Salvage": "Original Frost Ark indie survival game 2.5D top-down THREE QUARTER overhead 40 degree elevated orthographic front-on camera, visible horizontal frontal width and TOP face with compressed depth rising vertically, NO diamond isometric footprint, NO left/right yaw. Match attached reference sprites for gnarled frost-weathered muted timber, dark grey cast iron, brushed warm antique accents, crisp hand-painted illustrative strokes and thin deep slate-brown outlines, not low-poly or plastic. Soft upper-left cool daylight, gently darker lower right. Square sprite contact sheet exact 2x2 regular grid. Completely isolated separate object centered within each full quadrant using up to 78 percent of its width/height. Generous padding on flat solid pure #FF00FF RGB(255,0,255) magenta including through any holes. NO cast/contact ground shadow, flagstone/plank FLOOR, vignette, text, frames, grid lines, watermark, glow bleeding outside object boundary, emitted particles or pink reflected spill. Ship salvage and agriculture. TOP LEFT: automated FISHING NET BARRIER, a wide horizontal rail-like two post timber and iron frame, visible crisscross weathered ochre rope mesh sagging low between posts, taut upper rope, low iron feet, little nailed winding drum on right post, mesh holes all exact magenta. Keep net thick enough to read at 56px. BOTTOM LEFT: tiny GLASS GREENHOUSE, building-scale 2x2 squared rectangular footprint, a richly authored framed old-fashioned cold-climate wooden greenhouse with tall ivory blue-gray frosted glass roof, gable with visible top planes, frosted roof line, chunky weathered dark timber and black iron panel frames, small front door, pale de-saturated green seedlings visible inside; glass is intentionally blue-grey and unbroken, not magenta / transparent. TOP RIGHT: auto SORTER ARM, a clearly mechanical orange-brown iron and copper articulated TWO joint crane arm rising UP out of small square frosted stone pedestal, short navy piston, one wide recognisable steel two-finger pincer at end holding a tiny small plank, functional articulated engineering not a weapon or stove, three-quarter front at 40deg overhead. BOTTOM RIGHT: high INSULATED WALL segment, horizontal low ship storm barrier, strongly distinguishable from bare vertical plank wooden wall (reference). Rounded heavy cream-oat insulated felt/wool panels with stitched seams and spots of frost inside sturdy dark timber frame with iron bands, bulging upholstered weatherproof canvas pads and a thick top rail, broaden shape with visible short foundation feet. Four assets; no accessories around them.",
+    "m2-icon-materials": "Frost Ark inventory illustration sprites. EXACT 3-column by 2-row rectangular grid, equally centered singles, generous pure magenta gutters at every cell. Solid pure magenta #FF00FF flat backdrop, no shadow cast on background, no ground, no text, no outlines around cells, no decoration. Readable 32px game icon art with clear chunky silhouettes, dark slate-brown tapered edge, hand-painted textured indie survival rendering, 40-degree three-quarter top-down, soft upper-left blue skylight, muted colors, small pops of warm orange as appropriate. All six sprites full and completely isolated, exact order like reading a book. TOP: (1) two tidy cast blue-steel frost iron ingots with beveled shape and subtle frost, (2) three jagged icy cyan crystal shards, (3) dark chunky coal nugget split into 3 pieces. BOTTOM: (4) a cream tawny tuft of soft warm animal fur, distinct curled fibers and no skin, (5) mustard sulfur mineral with rock base, (6) a bright pale icy sky-blue mithril ore nugget with six facets and thin silver veins.",
+    "m2-icon-food": "Frost Ark inventory illustration sprites. EXACT 3-column by 2-row rectangular grid, equally centered singles, generous pure magenta gutters at every cell. Solid pure magenta #FF00FF flat backdrop, no shadow cast on background, no ground, no text, no outlines around cells, no decoration. Readable 32px game icon art with clear chunky silhouettes, dark slate-brown tapered edge, hand-painted textured indie survival rendering, 40-degree three-quarter top-down, soft upper-left blue skylight, muted colors, small pops of warm orange as appropriate. All six sprites full and completely isolated, exact order like reading a book. TOP: (1) one raw oval lavender-gray potato-like root and tiny root hairs, (2) dark red uncooked cloud beast flank steak with cream fat edge, (3) one slate blue silver fish with elegant fork tail. BOTTOM: (4) round cluster of ruby warm berries with two green leaves, (5) a sheaf of pale straw dry frost grass blades, (6) one warm baked russet root cut open so visibly warm golden cooked inside, faint browned crust.",
+    "m2-icon-products": "Frost Ark inventory illustration sprites. EXACT 3-column by 2-row rectangular grid, equally centered singles, generous pure magenta gutters at every cell. Solid pure magenta #FF00FF flat backdrop, no shadow cast on background, no ground, no text, no outlines around cells, no decoration. Readable 32px game icon art with clear chunky silhouettes, dark slate-brown tapered edge, hand-painted textured indie survival rendering, 40-degree three-quarter top-down, soft upper-left blue skylight, muted colors, small pops of warm orange as appropriate. All six sprites full and completely isolated, exact order like reading a book. TOP: (1) two dry long brown grilled jerky strips marked with golden grill lines, (2) three salt-cured blue and cream fish fillets on a dark board, (3) round ball of compressed yellow dry hay strands tied by twine. BOTTOM: (4) glazed utilitarian steel-blue bowl filled with ruby berry soup and visible whole berries, (5) dark grilled orange magma steak with hot amber glowing stripes, (6) bronze roasted meat with small icy-blue metallic accents on tiny cream camping plate.",
+    "m2-icon-tech": "Frost Ark inventory illustration sprites. EXACT 3-column by 2-row rectangular grid, equally centered singles, generous pure magenta gutters at every cell. Solid pure magenta #FF00FF flat backdrop, no shadow cast on background, no ground, no text, no outlines around cells, no decoration. Readable 32px game icon art with clear chunky silhouettes, dark slate-brown tapered edge, hand-painted textured indie survival rendering, 40-degree three-quarter top-down, soft upper-left blue skylight, muted colors, small pops of warm orange as appropriate. All six sprites full and completely isolated, exact order like reading a book. TOP: (1) wooden workbench with tools and vise, (2) upright stone and cast iron smelting furnace with front orange glow, (3) squat iron cooking stove with a pot. BOTTOM: (4) thin copper and cast iron heat relay tower with warm radiator coil and low foot, (5) wooden framed angled maritime catching net with rope grid, (6) dark iron two-joint sorting arm with a claw and flat bolted base.",
+    "m2-icon-tech-b": "Frost Ark inventory illustration sprites. EXACT 3-column by 2-row rectangular grid, equally centered singles, generous pure magenta gutters at every cell. Solid pure magenta #FF00FF flat backdrop, no shadow cast on background, no ground, no text, no outlines around cells, no decoration. Readable 32px game icon art with clear chunky silhouettes, dark slate-brown tapered edge, hand-painted textured indie survival rendering, 40-degree three-quarter top-down, soft upper-left blue skylight, muted colors, small pops of warm orange as appropriate. All six sprites full and completely isolated, exact order like reading a book. TOP: (1) small glass greenhouse with peaked glass roof weathered brass frame and green seedlings, (2) framed dark brown warm insulated wall with fluffy tan batting partly visible and leather strips, (3) small mechanical horizontal buoyancy core with visible suspended blue-white crystal in a dark bronze cradle. BOTTOM: (4) stack of iron deck panel squares with rivets, (5) small bundled blue-tinted ice rope paralysis net with icy cyan knot, NOT a mounted dock net, (6) rare quest skyheart fire seed like small glowing amber ember in a dark smoky floating stone shell, NOT an egg."
   },
   "assets": [
     {
@@ -698,6 +705,886 @@
         0.5
       ],
       "maxBytes": 90000
+    },
+    {
+      "id": "building-workbench",
+      "source": "m2-workshop.png",
+      "crop": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "magenta",
+      "tileW": 1.12,
+      "tileH": 1.12
+    },
+    {
+      "id": "building-smelter",
+      "source": "m2-workshop.png",
+      "crop": [
+        627,
+        0,
+        1254,
+        627
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "magenta",
+      "tileW": 1.18,
+      "tileH": 1.18
+    },
+    {
+      "id": "building-stove",
+      "source": "m2-workshop.png",
+      "crop": [
+        0,
+        627,
+        627,
+        1254
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "magenta",
+      "tileW": 1.12,
+      "tileH": 1.12
+    },
+    {
+      "id": "building-heat-relay",
+      "source": "m2-workshop.png",
+      "crop": [
+        627,
+        627,
+        1254,
+        1254
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "magenta",
+      "tileW": 1.45,
+      "tileH": 1.45
+    },
+    {
+      "id": "building-net",
+      "source": "m2-salvage.png",
+      "crop": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "magenta",
+      "tileW": 1.12,
+      "tileH": 1.12,
+      "keyClear": 64,
+      "keyOpaque": 150
+    },
+    {
+      "id": "building-sorter",
+      "source": "m2-salvage.png",
+      "crop": [
+        627,
+        0,
+        1254,
+        627
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "magenta",
+      "tileW": 1.5,
+      "tileH": 1.5,
+      "anchor": [
+        0.721,
+        1
+      ],
+      "targetAnchor": [
+        0.7,
+        0.94
+      ]
+    },
+    {
+      "id": "building-greenhouse",
+      "source": "m2-salvage.png",
+      "crop": [
+        0,
+        627,
+        627,
+        1254
+      ],
+      "size": [
+        224,
+        224
+      ],
+      "key": "magenta",
+      "tileW": 2.03,
+      "tileH": 2.03
+    },
+    {
+      "id": "building-insulated-wall",
+      "source": "m2-salvage.png",
+      "crop": [
+        627,
+        627,
+        1254,
+        1254
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "magenta",
+      "tileW": 1.12,
+      "tileH": 1.12
+    },
+    {
+      "id": "building-buoyancy-core",
+      "source": "m2-buoyancy.png",
+      "crop": [
+        0,
+        0,
+        887,
+        887
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "magenta",
+      "tileW": 1.2,
+      "tileH": 1.38
+    },
+    {
+      "id": "building-iron-deck",
+      "source": "m2-buoyancy.png",
+      "crop": [
+        1059,
+        184,
+        1602,
+        703
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "none",
+      "fit": "stretch",
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 52000
+    },
+    {
+      "id": "icon-frost-iron-ingot",
+      "source": "m2-icon-materials.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-ice-shard",
+      "source": "m2-icon-materials.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-coal-chunk",
+      "source": "m2-icon-materials.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-warm-fur",
+      "source": "m2-icon-materials.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-sulfur-ore",
+      "source": "m2-icon-materials.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-sky-mithril",
+      "source": "m2-icon-materials.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        1024,
+        512,
+        1536,
+        1024
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-raw-root",
+      "source": "m2-icon-food.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-raw-meat",
+      "source": "m2-icon-food.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-cloud-fish",
+      "source": "m2-icon-food.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-warm-berry",
+      "source": "m2-icon-food.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-frost-grass",
+      "source": "m2-icon-food.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-baked-root",
+      "source": "m2-icon-food.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        1024,
+        512,
+        1536,
+        1024
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-warm-jerky",
+      "source": "m2-icon-products.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-cured-cloud-fish",
+      "source": "m2-icon-products.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-warm-hay-ball",
+      "source": "m2-icon-products.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-warm-berry-soup",
+      "source": "m2-icon-products.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-magma-steak",
+      "source": "m2-icon-products.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-mithril-roast",
+      "source": "m2-icon-products.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        1024,
+        512,
+        1536,
+        1024
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-workbench",
+      "source": "m2-icon-tech.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-furnace",
+      "source": "m2-icon-tech.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-stove",
+      "source": "m2-icon-tech.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-heat-relay",
+      "source": "m2-icon-tech.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-catch-net",
+      "source": "m2-icon-tech.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-sorter-arm",
+      "source": "m2-icon-tech.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        1024,
+        512,
+        1536,
+        1024
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-greenhouse",
+      "source": "m2-icon-tech-b.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-warm-wall",
+      "source": "m2-icon-tech-b.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-buoyancy-core",
+      "source": "m2-icon-tech-b.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-iron-deck",
+      "source": "m2-icon-tech-b.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-paralysis-net",
+      "source": "m2-icon-tech-b.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "icon-skyheart-core",
+      "source": "m2-icon-tech-b.png",
+      "size": [
+        48,
+        48
+      ],
+      "key": "magenta",
+      "crop": [
+        1024,
+        512,
+        1536,
+        1024
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ]
     }
+  ],
+  "batchReferences": [
+    [
+      "src/assets/art/hearth-2.png",
+      "src/assets/art/storage.png",
+      "src/assets/art/wall.png",
+      "src/assets/art/deck-1.png"
+    ]
   ]
 }

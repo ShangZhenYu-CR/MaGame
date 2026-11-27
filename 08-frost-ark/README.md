@@ -2,7 +2,7 @@
 
 2D 俯视生存建造沙盒（MaGame 独立云端分支）：融合**云海拾荒移动基地**、**方舟生态驯兽分工**与**暖橙火光 vs 冰蓝暴雪**热力生存。
 
-- **当前阶段**：M1 · 冷暖热力场、拿铁和开局美术升级；M2 等待确认
+- **当前阶段**：M2 · 建造科技树与自动化拾荒（专用分支与试玩 ZIP）；公开 Pages 仍为 M1
 - **GitHub 分支**：[`game/08-frost-ark`](https://github.com/ShangZhenYu-CR/MaGame/tree/game/08-frost-ark)
 - **项目目录**：[`08-frost-ark/`](https://github.com/ShangZhenYu-CR/MaGame/tree/game/08-frost-ark/08-frost-ark)
 - **Google Drive 总目录**：[`MaGame-Dot/08-frost-ark`](https://drive.google.com/drive/folders/16oAjTkGj8PJpr86Cg5QJbPjgwLXsb6cV)
@@ -32,6 +32,15 @@
 - 到了暴雪夜，甲板边角会失温，主炉边能回温；体温耗尽会开始掉生命。
 - **3** 放挡风墙，**R** 在主炉附近添柴。**U** 用 4 块浮木板和 2 件冻铁废件升级主炉，拿铁会拾回暖区里的掉落物。可用 **G** 放下一块浮木观察，**F** 手动拾回。
 - [直接在线玩](https://shangzhenyu-cr.github.io/MaGame/08-frost-ark/) · [M1 实机及同机位美术对比](https://drive.google.com/drive/folders/1Qwbi4tatTt1NeoD4XY7iigwhLU-aUXIl)。
+
+## M2 · 把方舟建成工坊
+
+- **B** 打开建造手册。先建木工台，走近按 **E** 研究；把鼠标移到甲板格，吸附虚影会显示占位。浮力不足时不能继续加重。
+- 把捕捞网栏放在靠云海的外缘，分拣臂放在三格内，走近按 **E** 收取自动打捞的材料。熔炉、灶台和温室也用 **E** 打开加工界面。
+- 热力中继塔会延伸暖区；设备太冷会减速或停机。基础炼铁需要的煤可从漂流残骸中得到。
+- **X** 切换拆除，点选格子后 **Z** 在 4 秒内撤销，期间可继续走动。**M** 静音；**Esc** 先关当前工艺窗口，再退出建造或拆除。
+
+[M2 实机验收与试玩目录](https://drive.google.com/drive/folders/1LuNdwPYSwB_tJYCJqgd6r6CT9FT4bfYp)。
 
 ## 开发与验收命令
 

@@ -5,7 +5,7 @@ import { existsSync, mkdirSync, readFileSync, statSync } from 'node:fs';
 import { extname, join, resolve } from 'node:path';
 import { chromium, type Page } from 'playwright';
 import { createInitialWorld, stepWorld } from '../src/sim/world';
-import { countItem } from '../src/sim/ark';
+import { build, countItem, inventoryChange } from '../src/sim/ark';
 
 const repoRoot = resolve(process.cwd(), '..');
 const outDir = resolve(process.cwd(), 'artifacts', 'e2e');
@@ -343,6 +343,130 @@ try {
     console.log('[e2e-visual:M1.5] OK: default and wheel zoom, generated offline HUD icons, 3 survival meters, transient toast and 3 hero screenshots');
     console.log('[e2e-visual:M1] OK: day and blizzard, four decoded portraits, cold warning, wall, fuel and Latte pickup');
   } finally { await m1.close(); }
+
+  // M2: exercise the same public game entry through actual input and imported fixtures.
+  const m2 = await browser.newPage({viewport:{width:1280,height:720}});
+  try {
+    m2.on('pageerror',e=>errors.push('M2 pageerror: '+e.message));
+    m2.on('console',m=>{if(m.type()==='error') errors.push('M2 console.error: '+m.text());});
+    await m2.goto(baseUrl,{waitUntil:'networkidle'});
+    await assertArtHud(m2);
+    const shot=(name:string)=>m2.screenshot({path:resolve(outDir,'M2-'+name+'.png')});
+    const point=(x:number,y:number,click=false)=>pointerAt(m2,x*42-389,y*42-662,click);
+    const supply=()=>{
+      const w=createInitialWorld(202608);
+      const goods={driftwood:29,rope:20,frost_iron_scrap:24,coal_chunk:14,ice_shard:14,
+        frost_iron_ingot:16,warm_fur:6,raw_root:4};
+      assert.ok(inventoryChange(w,[],Object.entries(goods).map(([itemId,count])=>({itemId,count}))));
+      return w;
+    };
+    async function loadM2(w:ReturnType<typeof createInitialWorld>,file:string) {
+      if(await m2.locator('#inventory').isHidden()) await m2.keyboard.press('i');
+      await m2.locator('#save-file').setInputFiles({name:file+'.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(w))});
+      await m2.getByText('已载入 JSON 存档。',{exact:true}).waitFor();
+      await m2.keyboard.press('Escape');
+      await m2.locator('#inventory').waitFor({state:'hidden'});
+      await m2.keyboard.press('q');
+    }
+    const toastGone=()=>m2.locator('#action').waitFor({state:'hidden',timeout:5000});
+    const original=supply();
+    await loadM2(original,'m2-build');
+    const gauge=m2.locator('#buoyancy-gauge');
+    const countFloat=()=>gauge.evaluate(v=>(v as HTMLMeterElement).value);
+    assert.equal(await countFloat(),original.ark.buoyancyUsed);
+    await m2.keyboard.press('b');
+    const catalog=m2.locator('#build-catalog');
+    const bench=catalog.locator('[data-build-kind=workbench]');
+    await bench.hover();await m2.locator('#ui-tip').getByText(/研究蓝图/).waitFor();
+    assert.equal(await catalog.locator('[data-build-kind] img').count(),13);
+    await m2.mouse.move(1000,350);await m2.locator('#ui-tip').waitFor({state:'hidden'});
+    await shot('09-blueprints');await bench.click();
+    await catalog.waitFor({state:'hidden'});
+    await point(25.5,26.5);
+    await m2.locator('#build-note[data-valid=true]').getByText(/木工台/).waitFor();
+    await shot('01-construction-ghost');
+    await point(25.5,26.5,true);
+    await m2.getByText('木工台已放好。',{exact:true}).waitFor();
+    assert.equal(await countFloat(),original.ark.buoyancyUsed+1);
+    await m2.keyboard.press('b');
+    await catalog.locator('[data-tech-id=tier2_automation]').click();
+    await m2.getByText('已研究：拾荒与供暖拓展',{exact:true}).waitFor();
+    await m2.keyboard.press('Escape');await catalog.waitFor({state:'hidden'});
+    assert.equal(await m2.locator('#game-canvas').getAttribute('data-mode'),'workbench');
+    await m2.keyboard.press('Escape');
+    assert.equal(await m2.locator('#game-canvas').getAttribute('data-mode'),'hook');
+    await m2.keyboard.press('x');await point(25.5,26.5,true);
+    const undo=m2.locator('#dismantle-undo');
+    await undo.waitFor();
+    const undoSeconds=await m2.locator('#undo-progress').evaluate(v=>(v as HTMLProgressElement).value);
+    assert.ok(undoSeconds>3&&undoSeconds<=4);
+    assert.equal(await countFloat(),original.ark.buoyancyUsed);
+    await m2.keyboard.press('z');await undo.waitFor({state:'hidden'});
+    assert.equal(await countFloat(),original.ark.buoyancyUsed+1);
+    await point(25.5,26.5,true);
+    await undo.waitFor();await shot('04-dismantle-undo');
+    await m2.keyboard.press('m');
+    assert.equal(await m2.locator('#audio-toggle').getAttribute('aria-pressed'),'true');
+    await m2.reload({waitUntil:'networkidle'});await assertArtHud(m2);
+    assert.equal(await m2.locator('#audio-toggle').getAttribute('aria-pressed'),'true');
+
+    const warmed=supply();warmed.timeOfDay=.82;warmed.unlockedTech.push('tier2_automation');
+    warmed.player.x=21.4;warmed.player.y=27.4;
+    const local=async()=>Number((await m2.locator('#local-temp').textContent())?.match(/-?\d+(?=°C)/)?.[0]);
+    const cool=structuredClone(warmed);stepWorld(cool,420);
+    await loadM2(cool,'m2-relay-before');
+    const before=await local();assert.ok(Number.isFinite(before));
+    assert.ok(build(warmed,'heat_relay',21,26));stepWorld(warmed,420);
+    await loadM2(warmed,'m2-relay-after');
+    const after=await local();
+    assert.ok(after>=before+3,'relay same-position comparison: '+before+'°C → '+after+'°C');
+    await toastGone();await shot('02-relay-warmth');
+
+    const auto=supply();auto.unlockedTech.push('tier2_automation');
+    auto.player.x=24.3;auto.player.y=26.4;
+    assert.ok(build(auto,'furnace',22,26));assert.ok(build(auto,'catch_net',25,27));
+    assert.ok(build(auto,'sorter_arm',25,26));
+    auto.sky.debris.unshift({id:'m2-net-test',x:25.5,y:28.15,vx:0,vy:0,loot:[{itemId:'rope',count:2}]});
+    stepWorld(auto,120);await loadM2(auto,'m2-industry');
+    await point(25.5,26.5,true);await m2.locator('#industry-panel[data-def-id=sorter_arm]').waitFor();
+    await m2.locator('#industry-output').getByText('旧缆绳',{exact:true}).waitFor();await shot('03-net-sorter');
+    await m2.locator('#industry-collect').click();
+    await m2.locator('#industry-output').getByText('暂无产出',{exact:true}).waitFor();
+    await m2.keyboard.press('Escape');await m2.locator('#industry-panel').waitFor({state:'hidden'});
+
+    const factory=supply();factory.player.x=24.4;factory.player.y=26.4;
+    factory.unlockedTech.push('tier2_automation');
+    assert.ok(build(factory,'furnace',23,26));assert.ok(build(factory,'catch_net',25,27));
+    assert.ok(build(factory,'sorter_arm',25,26));
+    stepWorld(factory,140);await loadM2(factory,'m2-smelter');
+    await point(23.5,26.5,true);await m2.locator('#industry-panel[data-def-id=furnace]').waitFor();
+    await m2.locator('[data-recipe-id=smelt_frost_iron]').click();
+    await m2.locator('#industry-job').waitFor();await shot('05-smelter-crafting');
+    await m2.locator('#industry-output').getByText('霜铁锭',{exact:true}).waitFor({timeout:20000});
+    await m2.locator('#industry-collect').click();
+    await m2.locator('#industry-output').getByText('暂无产出').waitFor();
+    await m2.keyboard.press('Escape');
+
+    const polish=createInitialWorld(202608);
+    polish.sky.debris.forEach((d,i)=>{d.x=[20.3,27.5,23.3][i%3];d.y=[24,27.9,28.25][i%3];d.vx=0;d.vy=0;});
+    await loadM2(polish,'m2-polish-day');await toastGone();await shot('06-polish-day');
+    const storm=createInitialWorld(202608);storm.timeOfDay=.82;stepWorld(storm,240);
+    await loadM2(storm,'m2-polish-storm');await m2.locator('#weather-status').getByText(/^暴雪夜/).waitFor();
+    await toastGone();await shot('07-polish-blizzard');
+    const cold=createInitialWorld(202608);cold.timeOfDay=.82;cold.player.x=27.3;cold.player.y=27.05;
+    stepWorld(cold,180);cold.player.warmth=14;
+    await loadM2(cold,'m2-polish-cold');await m2.locator('#thermal-stats[data-cold=true]').waitFor();
+    await toastGone();await shot('08-polish-frost-vignette');
+    const showcased=supply();showcased.unlockedTech.push('tier2_automation','tier3_fortress');
+    for (const [kind,gx,gy] of [
+      ['buoyancy_core',23,26], ['workbench',22,22], ['furnace',24,22], ['greenhouse',25,21],
+      ['stove',23,25], ['catch_net',21,26], ['sorter_arm',22,26], ['heat_relay',26,26],
+      ['warm_wall',23,27], ['iron_deck',25,27],
+    ] as const) assert.ok(build(showcased,kind,gx,gy),'showcase build failed: '+kind);
+    await loadM2(showcased,'m2-all-buildings');await toastGone();await shot('10-all-buildings');
+    console.log('[e2e-visual:M2] OK: build grid, buoyancy, tech, 4s undo, sequential Escape, tooltip, Web Audio mute, relay heat, net→sorter and timed furnace');
+  } finally { await m2.close(); }
+
 
   if (errors.length > 0) {
     throw new Error(errors.join('\n'));

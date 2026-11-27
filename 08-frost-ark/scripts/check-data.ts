@@ -6,15 +6,21 @@ interface ItemDef {
   gatherable?: boolean;
 }
 
+type Cost = { itemId: string; count: number };
+
 interface RecipeDef {
   id: string;
-  output: { itemId: string; count: number };
-  inputs: { itemId: string; count: number }[];
+  station: string;
+  seconds?: number;
+  output: Cost;
+  inputs: Cost[];
 }
 
 interface BuildingDef {
   id: string;
-  cost: { itemId: string; count: number }[];
+  cost: Cost[];
+  size: [number,number];
+  buoyancyDelta: number;
 }
 
 interface BeastDef {
@@ -29,7 +35,7 @@ interface BiomeDef {
 }
 
 interface TechData {
-  nodes: { id: string; unlocksBuildings: string[]; unlocksRecipes: string[] }[];
+  nodes: { id: string; unlocksBuildings: string[]; unlocksRecipes: string[]; prerequisite?: string; researchCost?: Cost[] }[];
 }
 
 const dataDir = resolve(process.cwd(), 'src', 'data');
@@ -122,6 +128,34 @@ while (changed) {
 for (const r of recipes) {
   if (!reachable.has(r.output.itemId)) {
     errors.push(`Recipe ${r.id} output "${r.output.itemId}" is unreachable (deadlock)`);
+  }
+}
+
+// M2: station/timing, footprint/mass and research prerequisites.
+const techIds = new Set(tech.nodes.map(n=>n.id));
+if(techIds.size!==tech.nodes.length)errors.push('Duplicate technology id in tech.json');
+const positiveWhole=(n:number)=>Number.isSafeInteger(n)&&n>0;
+for(const r of recipes){
+  if(r.station!=='hand'&&(!buildingIds.has(r.station)||!positiveWhole(r.seconds??0)))
+    errors.push(`Recipe ${r.id} lacks a valid production station and duration`);
+}
+for(const b of buildings){
+  if(b.size?.length!==2||!b.size.every(positiveWhole)||!Number.isSafeInteger(b.buoyancyDelta))
+    errors.push(`Building ${b.id} lacks a valid footprint or buoyancy delta`);
+  for(const cost of b.cost)if(!positiveWhole(cost.count))
+    errors.push(`Building ${b.id} has an invalid material quantity`);
+}
+const reachableTech=new Set<string>();
+while(reachableTech.size<tech.nodes.length){
+  const previous=reachableTech.size;
+  for(const n of tech.nodes)if(!n.prerequisite||reachableTech.has(n.prerequisite))reachableTech.add(n.id);
+  if(previous===reachableTech.size)break;
+}
+for(const t of tech.nodes){
+  if(!reachableTech.has(t.id))errors.push(`Tech node ${t.id} has a missing or circular prerequisite`);
+  for(const cost of t.researchCost??[]){
+    if(!reachable.has(cost.itemId)||!positiveWhole(cost.count))
+      errors.push(`Tech node ${t.id} has invalid or unreachable cost ${cost.itemId}`);
   }
 }
 

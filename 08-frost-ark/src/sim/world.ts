@@ -5,8 +5,9 @@ import {
   type Vec2,
 } from './types';
 import { seedDrift, stepCloud } from './cloud';
-import { makeBuilding, walk } from './ark';
+import { makeBuilding, refreshBuoyancy, walk } from './ark';
 import { advanceClimate, initializeHeat, stepHeat } from './heatField';
+import { stepIndustry } from './industry';
 import { updateLatte } from './latte';
 import { nextRng } from './rng';
 
@@ -90,8 +91,8 @@ export function createInitialWorld(seed = 202608): WorldState {
         },
         makeBuilding('storage_box', center + 2, center + 1, 'storage_main'),
       ],
-      buoyancyUsed: 50,
-      buoyancyMax: 64,
+      buoyancyUsed: 0,
+      buoyancyMax: 0,
       anchoredIslandId: null,
     },
     sky: {
@@ -112,6 +113,7 @@ export function createInitialWorld(seed = 202608): WorldState {
     skyheartCores: 0,
     bossDefeated: false,
   };
+  refreshBuoyancy(world);
   seedDrift(world);
   initializeHeat(world);
   return world;
@@ -124,6 +126,7 @@ export function stepWorld(world: WorldState, ticks = 1, direction: Vec2 = {x: 0,
     stepCloud(world);
     advanceClimate(world);
     stepHeat(world);
+    stepIndustry(world);
     updateLatte(world);
   }
 }

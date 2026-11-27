@@ -20,6 +20,7 @@
         <div class="survival-row"><label for="fuel-meter">燃料</label><meter id="fuel-meter" min="0" max="120"></meter><output id="fuel-value"></output></div>
         <div class="underfoot" id="local-temp"></div>
       </div>
+      <div class="survival-row lift-row numbers"><label for="buoyancy-gauge">浮力</label><meter id="buoyancy-gauge" min="0" max="64"></meter><output id="buoyancy-spare"></output></div>
     </div>
   </header>
   <aside class="sector"><div class="eyebrow">SKY SECTOR <span>01</span></div><strong>碎云浅海</strong><div id="weather-status" class="numbers"></div><div id="latte-status"></div><div class="hearth-tools"><button id="fuel-hearth" type="button"><kbd>R</kbd> 添柴</button><button id="upgrade-hearth" type="button" title="浮木板 ×4、冻铁废件 ×2"><kbd>U</kbd> 升炉</button></div></aside>
@@ -43,9 +44,35 @@
     <h3>箱内 <span id="storage-count" class="numbers"></span></h3>
     <ul id="storage-stacks"></ul><h3>背包</h3><ul id="storage-deposit"></ul>
   </aside>
+  <aside id="build-catalog" class="inventory build-catalog" aria-label="方舟建造手册" hidden>
+    <div class="panel-head"><div><div class="eyebrow">ARK BLUEPRINTS</div><h2>建造手册</h2></div><button id="catalog-close" type="button" aria-label="关闭建造手册">关闭</button></div>
+    <p class="panel-intro" id="catalog-budget"></p>
+    <section aria-labelledby="build-structure-title"><h3 id="build-structure-title">方舟与保暖</h3><div id="catalog-structure" class="catalog-grid"></div></section>
+    <section aria-labelledby="build-industry-title"><h3 id="build-industry-title">加工与拾荒</h3><div id="catalog-industry" class="catalog-grid"></div></section>
+    <section aria-labelledby="build-tech-title"><h3 id="build-tech-title">研究蓝图</h3><div id="catalog-tech"></div></section>
+  </aside>
+  <aside id="industry-panel" class="inventory industry-panel" aria-labelledby="industry-title" hidden>
+    <div class="panel-head"><div><div class="eyebrow">ARK INDUSTRY</div><h2 id="industry-title">加工站</h2></div><button id="industry-close" type="button" aria-label="关闭加工面板">关闭</button></div>
+    <p id="industry-status" class="panel-intro"></p>
+    <button id="bench-research" type="button" hidden>查阅研究蓝图</button>
+    <div id="industry-job" class="industry-job" hidden><label for="industry-progress" id="industry-job-label"></label><progress id="industry-progress" max="1" value="0"></progress></div>
+    <section id="industry-recipes-section" aria-labelledby="industry-recipes-title" hidden><h3 id="industry-recipes-title">配方</h3><div id="industry-recipes"></div></section>
+    <section id="industry-intake-section" aria-labelledby="industry-intake-title" hidden><h3 id="industry-intake-title">待分拣</h3><ul id="industry-intake"></ul></section>
+    <section aria-labelledby="industry-output-title"><h3 id="industry-output-title">产出</h3><ul id="industry-output"></ul><button type="button" id="industry-collect">收取产出</button></section>
+  </aside>
+  <div class="m2-tools" aria-label="建造操作">
+    <button type="button" id="build-catalog-toggle" aria-expanded="false" aria-controls="build-catalog" data-tip="选择蓝图，查看材料和浮力预算"><kbd>B</kbd> 建造手册</button>
+    <button type="button" id="dismantle-mode" aria-pressed="false" data-tip="点击一处建筑或可拆甲板；拆除后可在 4 秒内撤销"><kbd>X</kbd> 拆除</button>
+    <button type="button" id="audio-toggle" aria-pressed="false" data-tip="开关炉火、风雪和施工音效"><kbd>M</kbd> 音效开</button>
+  </div>
+  <div class="undo-strip" id="dismantle-undo" hidden>
+    <span id="dismantle-name" role="status"></span><button id="undo-dismantle" type="button"><kbd>Z</kbd> 撤销 <output id="undo-seconds" class="numbers"></output></button>
+    <progress max="4" value="4" id="undo-progress" aria-label="剩余撤销时间"></progress>
+  </div>
+  <div id="ui-tip" class="ui-tip" role="tooltip" hidden></div>
   <div class="build-note" id="build-note" hidden></div>
   <div class="save-label" id="save-label" role="status">读取存档…</div>
-  <div class="key-note"><kbd>WASD</kbd> 移动 <span>／</span> <kbd>E</kbd> 储物箱 <span>／</span> <kbd>Esc</kbd> 返回 <span>／</span> 滚轮缩放<div id="hint">按住左键蓄力，松开抛钩</div></div>
+  <div class="key-note"><kbd>WASD</kbd> 移动 <span>／</span> <kbd>E</kbd> 互动 <span>／</span> <kbd>Esc</kbd> 返回 <span>／</span> 滚轮缩放<div id="hint">按住左键蓄力，松开抛钩</div></div>
 </main>
 <script type="module" src="/src/main.ts"></script>
 </body>

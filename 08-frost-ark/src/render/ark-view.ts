@@ -3,21 +3,39 @@ import { ArtLibrary } from './art-library';
 import { clamp, cloudscape, ovalGlow, WeatherFinish } from './atmosphere';
 import { primaryHearth } from '../sim/heatField';
 import { isDeckDrop } from '../sim/latte';
+import { buildingDefs } from '../sim/ark';
+import { getIndustrySave } from '../sim/m2-state';
 import { aimEnd, hookTip } from '../sim/cloud';
 import type { Vec2, WorldState } from '../sim/types';
 import { PALETTE as P } from './palette';
 
-export interface Ghost { x:number; y:number; ok:boolean; torch:boolean; wall?:boolean }
+export interface Ghost { x:number; y:number; ok:boolean; defId?:string; torch?:boolean; wall?:boolean }
 const deckIds=['deck-1','deck-2','deck-3','deck-4'];
+interface BuildingVisual { art:string; width:number; height:number; shadow:number; ground?:number }
+const buildingVisuals:Readonly<Record<string,BuildingVisual>>={
+  storage_box:{art:'storage',width:1.26,height:1.23,shadow:.51},
+  wind_wall:{art:'wall',width:1.18,height:1.24,shadow:.57},
+  torch_post:{art:'torch',width:.82,height:1.31,shadow:.26},
+  workbench:{art:'building-workbench',width:1.20,height:1.14,shadow:.54},
+  furnace:{art:'building-smelter',width:1.25,height:1.42,shadow:.51},
+  stove:{art:'building-stove',width:1.20,height:1.33,shadow:.50},
+  heat_relay:{art:'building-heat-relay',width:1.22,height:1.5,shadow:.45},
+  catch_net:{art:'building-net',width:1.23,height:1.20,shadow:.45,ground:.92},
+  sorter_arm:{art:'building-sorter',width:1.20,height:1.46,shadow:.47},
+  greenhouse:{art:'building-greenhouse',width:2.26,height:2.17,shadow:.98,ground:.88},
+  warm_wall:{art:'building-insulated-wall',width:1.18,height:1.25,shadow:.55},
+  buoyancy_core:{art:'building-buoyancy-core',width:1.20,height:1.38,shadow:.50},
+};
+const ironDeck='building-iron-deck';
 const required=[
   ...deckIds,'manan-south','manan-north','manan-west','manan-east','latte-sleep','latte-alert','latte-walk','latte-walk-alt',
-  'hearth-1','hearth-2','rail','corner','rock','icicles','storage','wall','torch',
-  'debris-wood','debris-iron','debris-rope','clouds',
+  'hearth-1','hearth-2','rail','corner','rock','icicles',ironDeck,...Object.values(buildingVisuals).map(v=>v.art),
+  'debris-wood','debris-iron','debris-rope','clouds','rail-side','rock-side','frost-frame',
 ] as const;
-interface Cell { x:number; y:number; hash:number; temperature:number; left:boolean; right:boolean; front:boolean; back:boolean }
+interface Cell { x:number; y:number; hash:number; iron:boolean; temperature:number; left:boolean; right:boolean; front:boolean; back:boolean }
 interface Actor {
   x:number;y:number;art:string;shadow:number;
-  width?:number;height?:number;rotation?:number;scale?:number;flip?:boolean;float?:number;fire?:'hearth'|'torch';hearthLevel?:number;
+  width?:number;height?:number;rotation?:number;scale?:number;flip?:boolean;float?:number;fire?:'hearth'|'torch'|'forge'|'stove'|'relay';hearthLevel?:number;
 }
 const tau=Math.PI*2;
 const hash=(x:number,y:number)=>(Math.imul(x+101,1597334677)^Math.imul(y+291,3812015801))>>>0;
@@ -96,45 +114,55 @@ export class ArkView {
     const a=this.worldBounds();
     for(let y=a.top;y<=a.bottom;y++) for(let x=a.left;x<=a.right;x++){
       if(!deck(x,y))continue;
-      cells.push({x,y,hash:hash(x,y),temperature:w.ark.heatGrid[y*w.ark.size+x]??w.ambientTemp,
+      cells.push({x,y,hash:hash(x,y),iron:w.ark.decks[y*w.ark.size+x]===2,temperature:w.ark.heatGrid[y*w.ark.size+x]??w.ambientTemp,
         left:!deck(x-1,y),right:!deck(x+1,y),front:!deck(x,y+1),back:!deck(x,y-1)});
     }
 
     // L0: Parallax cloud ocean and high-altitude haze.
     cloudscape(c,this.art.image('clouds'),w,this.origin);
-    // L1: Projected hull, deck, and generated structural fittings.
-    const b=this.deckStructure(c,cells,w);
-    const actors:Actor[]=[...this.edgeActors(cells,w,ghost)];
-    const fire=primaryHearth(w);
-    for(const bld of w.ark.buildings){
-      const {gx,gy}=bld;
-      if(bld.defId==='hearth_core')actors.push({x:gx+1,y:gy+1.76,art:bld.level>=2?'hearth-2':'hearth-1',
-        width:2.65,height:2.43,shadow:1.15,fire:bld.fuel>0?'hearth':undefined,hearthLevel:bld.level});
-      if(bld.defId==='storage_box')actors.push({x:gx+.5,y:gy+.80,art:'storage',width:1.26,height:1.23,shadow:.51});
-      if(bld.defId==='wind_wall')actors.push({x:gx+.5,y:gy+.79,art:'wall',width:1.18,height:1.24,shadow:.57});
-      if(bld.defId==='torch_post')actors.push({x:gx+.5,y:gy+.80,art:'torch',width:.82,height:1.31,shadow:.26,fire:'torch'});
-    }
-    const pl=w.player,latte=w.latte;
-    const catWalking=fire?Math.hypot(latte.x-fire.gx-2.4,latte.y-fire.gy-2.4)>.23:false;
-    actors.push({x:latte.x,y:latte.y,art:catWalking?(Math.floor(w.tick/7)%2?'latte-walk':'latte-walk-alt'):latte.mood==='cozy'?'latte-sleep':'latte-alert',
-      width:.94,height:.94,shadow:.32,scale:1+(.5+.5*Math.sin(w.tick*.12))*.03,rotation:catWalking?Math.sin(w.tick*.45)*.026:0});
-    const dir=Math.abs(pl.facing.x)>Math.abs(pl.facing.y)?(pl.facing.x<0?'west':'east'):(pl.facing.y<0?'north':'south');
-    const walking=!!(pl.vx||pl.vy);
-    const player:Actor={x:pl.x,y:pl.y,art:`manan-${dir}`,width:1.43,height:1.43,shadow:.34,scale:walking?1:1+(.5+.5*Math.sin(w.tick*.115))*.03,
-      rotation:walking?Math.sin(w.tick*.42)*Math.PI/72:0,float:walking?Math.abs(Math.sin(w.tick*.31))*s*.04:0};
-    actors.push(player);
-
-    const g=pl.grapple;
+    // Free-floating scrap belongs to the lower air lane. Hull silhouettes can
+    // occlude it; deck drops only enter the foreground after a grab/placement.
+    const pl=w.player,g=pl.grapple;
     const held=w.sky.debris.find(d=>d.id===g.caughtDebrisId);
+    const deckDrops:Actor[]=[];
     for(const d of w.sky.debris){
       if(d.x<0||!d.loot.length)continue;
       const pos=project(d.x,d.y);
       if(pos.x< -s||pos.x>width+s||pos.y< -s||pos.y>height+s)continue;
       const drop=isDeckDrop(d),id=d.loot[0].itemId;
-      actors.push({x:d.x,y:d.y+(drop?.14:.22),art:id==='frost_iron_scrap'?'debris-iron':id==='rope'?'debris-rope':'debris-wood',
-        shadow:drop?.24:0,width:drop?.60:1.04,height:drop?.60:1.04,
-        float:drop?0:s*(.04+.075*Math.sin(w.tick*.10+d.x)),rotation:drop?0:.048*Math.sin(w.tick*.052+d.y)});
+      const art=id==='frost_iron_scrap'?'debris-iron':id==='rope'?'debris-rope':'debris-wood';
+      if(drop){deckDrops.push({x:d.x,y:d.y+.14,art,shadow:.24,width:.60,height:.60}); continue;}
+      const fy=pos.y+s*(.17-.075*Math.sin(w.tick*.10+d.x));
+      c.save();c.globalAlpha=.92;
+      this.art.paint(c,art,pos.x,fy,s,{width:.78,height:.78,rotation:.048*Math.sin(w.tick*.052+d.y)});
+      c.restore();
+      ovalGlow(c,pos.x+s*.07,fy-s*.12,s*.55,s*.13,'rgba(159,192,211,.19)','rgba(159,192,211,0)');
     }
+    // L1: Projected hull, deck, and generated structural fittings.
+    const b=this.deckStructure(c,cells,w);
+    const actors:Actor[]=[...this.edgeActors(cells,w,ghost),...deckDrops];
+    const fire=primaryHearth(w);
+    for(const bld of w.ark.buildings){
+      const {gx,gy}=bld;
+      if(bld.defId==='hearth_core')actors.push({x:gx+1,y:gy+1.76,art:bld.level>=2?'hearth-2':'hearth-1',
+        width:2.65,height:2.43,shadow:1.15,fire:bld.fuel>0?'hearth':undefined,hearthLevel:bld.level});
+      const visuals=buildingVisuals[bld.defId];
+      if(!visuals)continue;
+      const [spanX,spanY]=buildingDefs.get(bld.defId)?.size??[1,1];
+      const working=getIndustrySave(w)?.stations[bld.id]?.job;
+      const effect=bld.defId==='torch_post'?'torch':bld.defId==='heat_relay'?'relay':
+        working?(bld.defId==='furnace'?'forge':bld.defId==='stove'?'stove':undefined):undefined;
+      actors.push({...visuals,x:gx+spanX*.5,y:gy+spanY*(visuals.ground??.80),fire:effect});
+    }
+    const latte=w.latte;
+    const catWalking=fire?Math.hypot(latte.x-fire.gx-2.4,latte.y-fire.gy-2.4)>.23:false;
+    actors.push({x:latte.x,y:latte.y,art:catWalking?(Math.floor(w.tick/7)%2?'latte-walk':'latte-walk-alt'):latte.mood==='cozy'?'latte-sleep':'latte-alert',
+      width:.94*.65,height:.94*.65,shadow:.32*.65,scale:1+(.5+.5*Math.sin(w.tick*.12))*.03,rotation:catWalking?Math.sin(w.tick*.45)*.026:0});
+    const dir=Math.abs(pl.facing.x)>Math.abs(pl.facing.y)?(pl.facing.x<0?'west':'east'):(pl.facing.y<0?'north':'south');
+    const walking=!!(pl.vx||pl.vy);
+    const player:Actor={x:pl.x,y:pl.y,art:`manan-${dir}`,width:1.43,height:1.43,shadow:.34,scale:walking?1:1+(.5+.5*Math.sin(w.tick*.115))*.03,
+      rotation:walking?Math.sin(w.tick*.42)*Math.PI/72:0,float:walking?Math.abs(Math.sin(w.tick*.31))*s*.04:0};
+    actors.push(player);
 
     // L2: Whole-scene grounding before painting the sprites.
     const firePos=fire&&fire.fuel>0?{x:fire.gx+1,y:fire.gy+1.18}:null;
@@ -166,7 +194,7 @@ export class ArkView {
     const feet=project(pl.x,pl.y);
     this.lightmap.paint(c,w,project,s,{x:feet.x+lens.x,y:feet.y+lens.y-(player.float??0)});
     if(b && w.weather!=='clear')this.lowClouds(c,b,w.tick,true);
-    this.weather.paint(c,w);
+    this.weather.paint(c,w,this.art.image('frost-frame'));
     if(this.canvas.dataset.artReady!=='true')this.canvas.dataset.artReady='true';
   }
 
@@ -186,29 +214,44 @@ export class ArkView {
     ovalGlow(c,p.x+s*.17,p.y+s*.79,b.w*.66,b.d*.26,'rgba(12,31,46,.48)');
     this.lowClouds(c,b,w.tick,false);
 
-    const hull=cells.filter(t=>t.front||t.left||t.right).sort((a,b)=>a.y-b.y);
-    for(const t of hull){
-      const side=!t.front;
-      const p=this.screen(t.x+(t.left&&side?.16:t.right&&side?.84:.5),t.y+1);
-      const span=side?.99:1.46;
-      const height=(side?1.03:1.44)+((t.hash>>>5)%5)*.17;
-      const tip=p.y+s*(height*.73-(side?.28:0));
-      this.art.paint(c,'rock',p.x,tip,s,{width:span,height,flip:!!(t.hash%2)});
-      if(!side||t.hash%3===0){
-        this.art.paint(c,'icicles',p.x+s*(t.hash%2===0?-.24:.27),p.y+s*(.53+((t.hash>>>6)%4)*.13),s,
-          {width:side?.49:.69,height:.65+((t.hash>>>13)%5)*.12,flip:!!(t.hash%2)});
+    const rim=cells.filter(t=>t.left||t.right);
+    for(const t of rim){
+      for(const side of [t.left?-1:0,t.right?1:0]){
+        if(!side)continue;
+        const point=this.screen(t.x+(side<0?0:1),t.y+.5);
+        // Thin side cross-sections are kept near the wood line, never a tall
+        // hanging cone. Mirroring keeps the visible cut face outside on both sides.
+        this.art.paint(c,'rock-side',point.x+side*s*.025,point.y+s*.02,s,
+          {width:.31,height:1.05,flip:side>0});
       }
+    }
+    // Long cones and icicles only belong to the ground-facing front contour.
+    for(const t of cells.filter(t=>t.front)){
+      const p=this.screen(t.x+.5,t.y+1);
+      const height=1.42+((t.hash>>>5)%5)*.17;
+      this.art.paint(c,'rock',p.x,p.y+s*height*.73,s,{width:1.46,height,flip:!!(t.hash%2)});
+      this.art.paint(c,'icicles',p.x+s*(t.hash%2===0?-.24:.27),p.y+s*(.53+((t.hash>>>6)%4)*.13),s,
+        {width:.69,height:.65+((t.hash>>>13)%5)*.12,flip:!!(t.hash%2)});
       if(t.hash%3!==1){
         c.save();c.globalCompositeOperation='screen';
-        ovalGlow(c,p.x+s*.17,p.y+s*(side?.18:.47),s*.18,s*.22,'rgba(64,155,172,.18)','rgba(64,155,172,0)');
+        ovalGlow(c,p.x+s*.17,p.y+s*.47,s*.18,s*.22,'rgba(64,155,172,.18)','rgba(64,155,172,0)');
         c.restore();
       }
     }
     for(const t of cells){
       const p=this.screen(t.x,t.y);
-      const id=deckIds[t.hash%4];
+      const id=t.iron?ironDeck:deckIds[t.hash%4];
       this.art.paintTile(c,id,p.x,p.y,s,s);
       this.frost(c,t,p);
+      for(const side of [t.left?-1:0,t.right?1:0]){
+        if(!side)continue;
+        c.save();
+        c.translate(p.x+(side<0?.052:.948)*s,p.y+s*.5);
+        c.rotate(Math.PI/2);
+        c.filter='brightness(1.23) saturate(.85)';
+        this.art.paintTile(c,id,-s*.5,-s*.052,s,s*.104);
+        c.restore();
+      }
     }
     return b;
   }
@@ -269,14 +312,16 @@ export class ArkView {
     const put=(x:number,y:number,art:string,width:number,height:number,flip=false)=>
       trims.push({x,y,art,width,height,shadow:art==='corner'?.17:.26,flip});
     const center=w.ark.size/2;
-    const hasGhost=(x:number,y:number)=>!!ghost&&ghost.x===x&&ghost.y===y&&ghost.ok&&!ghost.torch&&!ghost.wall;
+    const hasGhost=(x:number,y:number)=>!!ghost&&ghost.x===x&&ghost.y===y&&ghost.ok&&
+      (!ghost.defId||ghost.defId==='wood_deck')&&!ghost.torch&&!ghost.wall;
+    const hasNet=(x:number,y:number)=>w.ark.buildings.some(b=>b.defId==='catch_net'&&b.gx===x&&b.gy===y);
     for(const t of cells){
       const {x,y}=t;
       // A main gap on each side of the launch deck; expanded cells follow the outer contour.
-      if(t.back&&!hasGhost(x,y-1)&&x!==center)put(x+.5,y+.10,'rail',1.18,.54);
-      if(t.front&&!hasGhost(x,y+1)&&x!==center)put(x+.5,y+.97,'rail',1.14,.55);
-      if(t.left&&!hasGhost(x-1,y)&&y!==center-1)put(x+.11,y+.79,'rail',.48,.89,true);
-      if(t.right&&!hasGhost(x+1,y)&&y!==center-1)put(x+.88,y+.79,'rail',.48,.89);
+      if(t.back&&!hasNet(x,y)&&!hasGhost(x,y-1)&&x!==center)put(x+.5,y+.10,'rail',1.18,.54);
+      if(t.front&&!hasNet(x,y)&&!hasGhost(x,y+1)&&x!==center)put(x+.5,y+.97,'rail',1.14,.55);
+      if(t.left&&!hasNet(x,y)&&!hasGhost(x-1,y)&&y!==center-1)put(x+.08,y+1.02,'rail-side',.405,1.11);
+      if(t.right&&!hasNet(x,y)&&!hasGhost(x+1,y)&&y!==center-1)put(x+.92,y+1.02,'rail-side',.405,1.11,true);
       if(t.back&&t.left)put(x+.10,y+.12,'corner',.43,.58,true);
       if(t.back&&t.right)put(x+.88,y+.12,'corner',.43,.58);
       if(t.front&&t.left)put(x+.10,y+.99,'corner',.43,.58,true);
@@ -290,12 +335,24 @@ export class ArkView {
   private paintGhost(c:CanvasRenderingContext2D,ghost:Ghost):void {
     const p=this.screen(ghost.x,ghost.y),s=this.scale;
     c.save();
+    const id=ghost.defId??(ghost.wall?'wind_wall':ghost.torch?'torch_post':'wood_deck');
+    const [spanX,spanY]=buildingDefs.get(id)?.size??[1,1];
+    const visual=buildingVisuals[id];
     c.globalAlpha=ghost.ok?.57:.30;
-    if(ghost.wall||ghost.torch)
-      this.art.paint(c,ghost.wall?'wall':'torch',p.x+s*.5,p.y+s*.8,s,{width:ghost.wall?1.18:.82,height:ghost.wall?1.24:1.31});
-    else this.art.paintTile(c,deckIds[hash(ghost.x,ghost.y)%4],p.x,p.y,s,s);
-    c.globalAlpha=.97;c.strokeStyle=ghost.ok?P.uiConfirmTeal:P.uiDanger;
-    c.lineWidth=2;c.setLineDash([5,4]);c.strokeRect(p.x+.5,p.y+.5,s-1,s-1);
+    if(visual){
+      this.art.paint(c,visual.art,p.x+s*spanX*.5,p.y+s*spanY*(visual.ground??.80),s,visual);
+    }else if(id==='wood_deck'||id==='iron_deck'){
+      this.art.paintTile(c,id==='iron_deck'?ironDeck:deckIds[hash(ghost.x,ghost.y)%4],p.x,p.y,s,s);
+    }
+    c.globalAlpha=.96;c.strokeStyle=ghost.ok?P.uiConfirmTeal:P.uiDanger;
+    c.fillStyle=ghost.ok?'rgba(56,168,157,.12)':'rgba(217,91,91,.14)';
+    c.fillRect(p.x,p.y,s*spanX,s*spanY);
+    c.lineWidth=2;c.setLineDash([5,4]);c.strokeRect(p.x+.5,p.y+.5,s*spanX-1,s*spanY-1);
+    c.lineWidth=1;c.globalAlpha=.46;
+    c.beginPath();
+    for(let j=1;j<spanX;j++){c.moveTo(p.x+s*j,p.y);c.lineTo(p.x+s*j,p.y+s*spanY);}
+    for(let j=1;j<spanY;j++){c.moveTo(p.x,p.y+s*j);c.lineTo(p.x+s*spanX,p.y+s*j);}
+    c.stroke();
     c.restore();
   }
 
@@ -319,9 +376,10 @@ export class ArkView {
 
   private paintFire(c:CanvasRenderingContext2D,actor:Actor,p:Vec2,tick:number):void {
     const hearth=actor.fire==='hearth',s=this.scale;
-    const anchor=this.art.offset(actor.art,hearth?.48:.50,hearth?.79:.17,s*actor.width!,s*actor.height!);
+    const sourceV=hearth?.79:actor.fire==='forge'?.74:actor.fire==='relay'?.53:actor.fire==='stove'?.69:.17;
+    const anchor=this.art.offset(actor.art,hearth?.48:actor.fire==='stove'?.58:.50,sourceV,s*actor.width!,s*actor.height!);
     const x=p.x+anchor.x,y=p.y+anchor.y;
-    const r=s*(hearth?.30:.14),up=r*(1.12+Math.sin(tick*.29)*.16+Math.sin(tick*.73)*.07);
+    const r=s*(hearth?.30:actor.fire==='stove'?.09:.14),up=r*(1.12+Math.sin(tick*.29)*.16+Math.sin(tick*.73)*.07);
     c.save();
     c.globalCompositeOperation='screen';
     ovalGlow(c,x,y,r*1.45,r*1.07,'rgba(230,105,44,.54)','rgba(230,105,44,0)');
@@ -337,23 +395,32 @@ export class ArkView {
       c.bezierCurveTo(xx+r*.22,y-h*.58,xx+r*.64,y-r*.08,xx+r*.31,y+r*.28);
       c.closePath();c.fill();
     }
-    for(let i=0;i<(hearth?10:5);i++){
-      const f=((tick*.027+i*.179)%1),ex=x+(i%2===0?1:-1)*r*(f*.82+Math.sin(f*6+i)*.2);
-      const ey=y-f*r*2.25;
-      c.globalAlpha=(1-f)*.65;c.fillStyle=i%2?'#f4a04f':'#ffdf99';
-      c.beginPath();c.arc(ex,ey,.7+(i%3)*.26,0,tau);c.fill();
-    }
     c.restore();
+    this.paintSparks(c,x,y,r,tick,hearth?17:8,hearth?3.36:3.0);
     if(hearth){
       const leveled=actor.hearthLevel===2;
       const chimney=this.art.offset(actor.art,leveled?.79:.80,.035,s*actor.width!,s*actor.height!);
       const chimneyX=p.x+chimney.x,chimneyY=p.y+chimney.y;
+      this.paintSparks(c,chimneyX,chimneyY,r*.73,tick+37,7,2.8);
       for(let i=0;i<6;i++){
         const f=(tick*.013+i/6)%1;
         ovalGlow(c,chimneyX+s*(f*.37+Math.sin(f*6+tick*.03)*.12),chimneyY-s*f*.75,
           s*(.12+f*.22),s*(.078+f*.14),`rgba(144,170,177,${.23*(1-f)})`,'rgba(144,170,177,0)');
       }
     }
+  }
+
+  private paintSparks(c:CanvasRenderingContext2D,x:number,y:number,r:number,tick:number,n:number,rise:number):void{
+    c.save();c.globalCompositeOperation='screen';c.lineCap='round';
+    for(let i=0;i<n;i++){
+      const speed=.014+(i%5)*.0032, f=(tick*speed+i*.179)%1;
+      const dx=(i%2?-1:1)*r*(f*.96+Math.sin(f*5+i*1.8)*.26);
+      const ex=x+dx,ey=y-f*r*rise;
+      c.globalAlpha=Math.min(1,f*9)*(1-f)*(.76+(i%3)*.10);
+      c.strokeStyle=i%2?'#f7a64c':'#ffe2a6';c.lineWidth=.65+(i%4)*.24;
+      c.beginPath();c.moveTo(ex,ey);c.lineTo(ex-dx*.028,ey+r*(.06+(i%3)*.04));c.stroke();
+    }
+    c.restore();
   }
 }
 

@@ -1,5 +1,6 @@
 import data from '../data/buildings.json';
 import items from '../data/items.json';
+import { getIndustrySave } from './m2-state';
 import { countItem, inventoryChange, isDeck } from './ark';
 import { TICK_RATE, type BuildingInstance, type Vec2, type WorldState } from './types';
 
@@ -50,6 +51,10 @@ export function emitters(w:WorldState){
   return w.ark.buildings.flatMap(b=>{
     const d=definitions.get(b.defId);
     if(!d||!d.heatOutput||!d.heatRadius||(b.defId==='hearth_core'&&b.fuel<=0))return [];
+    if(b.defId==='furnace'||b.defId==='stove'){
+      const job=getIndustrySave(w)?.stations[b.id]?.job;
+      if(!job||job.progress>=job.duration||b.frozen)return [];
+    }
     const gain=b.defId==='hearth_core'&&b.level>=2?1.28:1;
     return [{...middle(b),radius:d.heatRadius*gain,power:d.heatOutput*gain,kind:b.defId}];
   });

@@ -1318,3 +1318,38 @@ assert.equal(chooseBeastLead(variety.w,variety.healer.id),null);
 assert.equal(castBeastSkill(variety.w).issue,null,'another leader has an independent timer');
 assert.ok(beastCooldown(variety.w,variety.healer)>0&&beastCooldown(variety.w,variety.leader)>0);
 console.log('[sim-smoke:P2-25] OK: 7 working skills, level cap and derived stats, independent cooldowns, persistent leader and active visual signal');
+
+import { beastBond,feedBond } from '../src/sim/beast-bond';
+import { dismantleIssue } from '../src/sim/industry';
+import { breedBeasts,breedPanel,EGG_ITEM,INCUBATION,inheritedMorph,startIncubating,stepBreeding,takeIncubating } from '../src/sim/breeding';
+import { breedNaturally,nurseryFixture } from './p2-breed-fixture';
+const {w:brood,a:mother,b:father,cell:nestCell}=nurseryFixture(202611,true);
+const incubator=brood.ark.buildings.find(b=>b.defId==='incubator')!;
+assert.match(breedBeasts(brood,mother.denBuildingId!,mother.id,father.id)!,/羁绊/);
+for(let pass=0;pass<2;pass++){
+ for(const parent of [mother,father])assert.equal(feedBond(brood,parent.id),null);
+ if(pass===0)stepWorld(brood,40);
+}
+assert.equal(beastBond(brood,mother.id),70);
+assert.equal(breedBeasts(brood,mother.denBuildingId!,mother.id,father.id),null);
+assert.equal(countItem(brood,EGG_ITEM),1);
+assert.equal(startIncubating(brood,incubator.id),null);
+assert.equal(countItem(brood,EGG_ITEM),0);
+assert.match(dismantleIssue(brood,nestCell.x,nestCell.y)!,/收回/);
+const nestAt=nestCell.y*brood.ark.size+nestCell.x;
+brood.ark.heatGrid[nestAt]=19;stepBreeding(brood);
+assert.equal(breedPanel(brood).nests[0].progress,0);
+brood.ark.heatGrid[nestAt]=46;stepBreeding(brood);
+assert.equal(breedPanel(brood).nests[0].progress,0);
+brood.ark.heatGrid[nestAt]=20;stepBreeding(brood);
+brood.ark.heatGrid[nestAt]=45;stepBreeding(brood);
+assert.equal(breedPanel(brood).nests[0].progress,2);
+const warmedEgg=deserializeWorld(serializeWorld(brood));
+assert.equal(breedPanel(warmedEgg).nests[0].progress,2);
+assert.equal(takeIncubating(warmedEgg,incubator.id),null);
+assert.equal(countItem(warmedEgg,EGG_ITEM),1);
+const baby=breedNaturally(202611);
+assert.equal(baby.morph.variant,'ember');assert.equal(baby.morph.young,true);
+assert.ok(baby.child.id.startsWith('born_'));
+assert.equal(inheritedMorph(deserializeWorld(serializeWorld(baby.w)),baby.child.id).variant,'ember');
+console.log('[sim-smoke:P2-26] OK: paired original profiles, two exact temperature boundaries, egg retention on reload, occupied dismantle guard and a real rare hatch');

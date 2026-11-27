@@ -1,3 +1,4 @@
+import { inheritedMorph,type Variant } from '../sim/breeding';
 import beasts from '../data/beasts.json';
 import type { Vec2, WorldState } from '../sim/types';
 import { clamp, ovalGlow } from './atmosphere';
@@ -19,14 +20,14 @@ interface BeastMark {
   hp:number; restraint:boolean; progress:number; feeds:number; wild:boolean; resting:boolean;
 }
 export interface BeastActor extends BeastVisual {
-  id:string;x:number;y:number;float:number;flip:boolean;scale:number;rotation:number;beastMark?:BeastMark;
+  id:string;x:number;y:number;float:number;flip:boolean;scale:number;rotation:number;tint?:Variant;beastMark?:BeastMark;
 }
 
 export class BeastScene {
   private recent=new Map<string,{x:number;y:number;flip:boolean;lastMotion:number}>();
   actors(w:WorldState,tile:number):BeastActor[]{
     const actors:BeastActor[]=[], alive=new Set<string>();
-    const add=(id:string,kind:string,x:number,y:number,mark?:BeastMark)=>{
+    const add=(id:string,kind:string,x:number,y:number,mark?:BeastMark,tint?:Variant,young=false)=>{
       const visual=visuals[kind];if(!visual)return;
       alive.add(id);
       const prev=this.recent.get(id);
@@ -40,7 +41,7 @@ export class BeastScene {
       const lift=visual.lift&&!mark?.restraint&&!mark?.resting?
         (visual.lift+.04*Math.sin(phase*.73))*tile:walking?Math.abs(Math.sin(phase))*tile*.035:0;
       actors.push({...visual,id,x,y,flip:next.flip,rotation:walking?Math.sin(phase)*.035:0,
-        float:lift,scale:1+Math.sin(phase*.40)*(mark?.restraint?.005:.021),beastMark:mark});
+        float:lift,scale:(young?.67:1)*(1+Math.sin(phase*.40)*(mark?.restraint?.005:.021)),tint,beastMark:mark});
     };
     for(const b of w.wildEntities){
       if(b.kind!=='beast'||b.hp<=0||!w.ark.anchoredIslandId)continue;
@@ -56,8 +57,9 @@ export class BeastScene {
       if(b.hp<=0)continue;
       const hp=clamp(b.hp/Math.max(1,b.maxHp));
       const near=Math.hypot(w.player.x-b.x,w.player.y-b.y)<=3.4;
+      const morph=inheritedMorph(w,b.id);
       add(b.id,b.defId,b.x,b.y,near&&(hp<.99||b.role==='rest')?
-        {hp,restraint:false,progress:0,feeds:0,wild:false,resting:b.role==='rest'}:undefined);
+        {hp,restraint:false,progress:0,feeds:0,wild:false,resting:b.role==='rest'}:undefined,morph.variant??undefined,morph.young);
     }
     for(const id of this.recent.keys())if(!alive.has(id))this.recent.delete(id);
     return actors;

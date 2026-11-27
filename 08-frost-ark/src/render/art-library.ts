@@ -17,6 +17,7 @@ const urls = import.meta.glob<string>('../assets/art/*.{png,webp}', {eager:true,
 const manifest = Object.values(manifests)[0];
 
 export class ArtLibrary {
+  private tones=new Map<string,HTMLCanvasElement>();
   private images = new Map<string, {image:HTMLImageElement; asset:ArtAsset}>();
   readonly ready: Promise<void>;
 
@@ -61,10 +62,22 @@ export class ArtLibrary {
     c.drawImage(image,left,top,right-left,bottom-top,x,y,w,h);
   }
 
+  private recolor(id:string,image:HTMLImageElement,theme:'aurora'|'ember'):HTMLCanvasElement {
+    const key=id+':'+theme,prior=this.tones.get(key);if(prior)return prior;
+    const layer=document.createElement('canvas');layer.width=image.width;layer.height=image.height;
+    const c=layer.getContext('2d')!;c.drawImage(image,0,0);
+    c.globalCompositeOperation='source-atop';
+    const g=c.createLinearGradient(0,0,layer.width*.5,layer.height);
+    if(theme==='aurora'){g.addColorStop(0,'#a6e7d1');g.addColorStop(.54,'#468f98');g.addColorStop(1,'#244959');}
+    else {g.addColorStop(0,'#eec08b');g.addColorStop(.55,'#ae683e');g.addColorStop(1,'#513e3b');}
+    c.globalAlpha=.48;c.fillStyle=g;c.fillRect(0,0,layer.width,layer.height);
+    if(this.tones.size>=32)this.tones.delete(this.tones.keys().next().value!);
+    this.tones.set(key,layer);return layer;
+  }
   /** Position using the authored ground anchor. Overrides are in tile units. */
   paint(c:CanvasRenderingContext2D, id:string, x:number, y:number, tile:number,
-        {width, height, rotation=0, scale=1, flip=false}: {
-          width?:number; height?:number; rotation?:number; scale?:number; flip?:boolean;
+        {width, height, rotation=0, scale=1, flip=false,tint}: {
+          width?:number; height?:number; rotation?:number; scale?:number; flip?:boolean;tint?:'aurora'|'ember';
         }={}):void {
     const entry=this.images.get(id);
     if(!entry) throw new Error(`美术资产未载入：${id}`);
@@ -74,7 +87,7 @@ export class ArtLibrary {
     c.translate(x,y);
     if(rotation) c.rotate(rotation);
     if(flip) c.scale(-1,1);
-    c.drawImage(image,-asset.anchorX/asset.width*w,-asset.anchorY/asset.height*h,w,h);
+    c.drawImage(tint?this.recolor(id,image,tint):image,-asset.anchorX/asset.width*w,-asset.anchorY/asset.height*h,w,h);
     c.restore();
   }
 }

@@ -1,3 +1,5 @@
+import { beastBond } from './beast-bond';
+import { inheritedMorph } from './breeding';
 import { beastAttackScale,beastWorkScale,gainBeastXp,growthDetails } from './beast-growth';
 import { getIndustrySave } from './m2-state';
 import { beastProfile,luckyParcel,traitStrike,traitSupport,traitTailwind,traitTravel,traitWorkRate } from './beast-traits';
@@ -130,7 +132,7 @@ export function tameBeast(w:WorldState,id:string):string|null{
 function facilities(w:WorldState,id:string){return w.ark.buildings.filter(b=>b.defId===id);}
 function onArk(w:WorldState){return areaAt(w,w.player.x,w.player.y)==='ark';}
 export function nearestBeastFacility(w:WorldState):BuildingInstance|undefined{
-  return onArk(w)?w.ark.buildings.filter(b=>['beast_den','feed_trough'].includes(b.defId)&&distance(w.player,at(b))<=2.15)
+  return onArk(w)?w.ark.buildings.filter(b=>['beast_den','feed_trough','incubator'].includes(b.defId)&&distance(w.player,at(b))<=2.15)
     .sort((a,b)=>distance(w.player,at(a))-distance(w.player,at(b)))[0]:undefined;
 }
 function currentDen(w:WorldState,b:BeastEntity){
@@ -307,7 +309,7 @@ export function beastPanel(w:WorldState){
       const d=beastDefinitions.get(b.defId)!,den=currentDen(w,b);
       const status=b.warmth<=16?'失温停工':b.hunger<=10?'饥饿待喂':b.role==='companion'?'正在随行':
         !den?'未分配兽窝':!denWarm(w,den)?'兽窝太冷':b.role==='work'?'正在打工':'窝内休息';
-      return {...b,profile:beastProfile(w,b),growth:growthDetails(w,b),workRate:traitWorkRate(w,b)*beastWorkScale(w,b),preferredBait:d.preferredBait,workSkill:d.workSkill,companionSkill:d.companionSkill,status};
+      return {...b,profile:beastProfile(w,b),growth:growthDetails(w,b),morph:inheritedMorph(w,b.id),bond:beastBond(w,b.id),workRate:traitWorkRate(w,b)*beastWorkScale(w,b),preferredBait:d.preferredBait,workSkill:d.workSkill,companionSkill:d.companionSkill,status};
     }),
     wild:w.wildEntities.filter(e=>activeWild(w,e)).map(e=>{
       const d=beastDefinitions.get(e.defId)!;

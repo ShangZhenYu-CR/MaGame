@@ -1,3 +1,5 @@
+import { feedBond } from '../sim/beast-bond';
+import { breedBeasts,breedPanel,INCUBATION,startIncubating,takeIncubating } from '../sim/breeding';
 import { chooseBeastLead } from '../sim/beast-growth';
 import { skills } from '../sim/beast-skills';
 import { renameBeast,traitList } from '../sim/beast-traits';
@@ -32,8 +34,8 @@ export function beastUi(h:BeastUIHooks){
  const progress=el<HTMLProgressElement>('tame-progress'),hp=el<HTMLMeterElement>('wild-hp'),feedButton=el<HTMLButtonElement>('wild-feed');
  const load=el<HTMLButtonElement>('beast-feed-load');
  const sector=document.querySelector<HTMLElement>('.sector');
- let targetId:string|null=null,last=0,packKey='',cardKey='';
- const cards=new Map<string,{role:HTMLElement,status:HTMLElement,vitals:HTMLElement,label:HTMLElement,rate:HTMLElement,training:HTMLElement,lead:HTMLButtonElement,rename:HTMLDetailsElement,input:HTMLInputElement,buttons:HTMLButtonElement[]}>();
+ let targetId:string|null=null,last=0,packKey='',cardKey='',breedKey='';
+ const cards=new Map<string,{role:HTMLElement,status:HTMLElement,vitals:HTMLElement,label:HTMLElement,rate:HTMLElement,training:HTMLElement,lead:HTMLButtonElement,bond:HTMLElement,feed:HTMLButtonElement,rename:HTMLDetailsElement,input:HTMLInputElement,buttons:HTMLButtonElement[]}>();
  const button=(label:string,fn:()=>void)=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.onclick=fn;return b;};
  const img=(src:string)=>{const i=document.createElement('img');i.src=src;i.alt='';return i;};
  function feedback(issue:string|null,msg:string,event?:'craft'|'hit'){h.msg(issue,msg,event);update(performance.now(),encounter.hidden,true);}
@@ -88,6 +90,7 @@ export function beastUi(h:BeastUIHooks){
   subtype.textContent='潜力 '+beast.profile.stars+'/5 星 · '+beast.profile.temperament;
   rate.dataset.beastWorkRate='true';profile.append(subtype,rate);
   const training=document.createElement('small');training.dataset.beastGrowth='true';profile.append(training);
+  const bond=document.createElement('small');bond.dataset.beastBond='true';profile.append(bond);
   const traits=document.createElement('ul');traits.className='beast-traits';traits.setAttribute('aria-label','个体词条');
   for(const id of beast.profile.traits){
     const tag=document.createElement('li');tag.dataset.trait=id;tag.textContent=traitList[id].name;tag.title=traitList[id].text;
@@ -115,8 +118,35 @@ export function beastUi(h:BeastUIHooks){
   });
   const lead=button('设为领队',()=>feedback(chooseBeastLead(h.state(),beast.id),beast.name+'已带队。','craft'));
   lead.dataset.beastLeader='true';lead.hidden=beast.role!=='companion';lead.setAttribute('aria-label',beast.name+'设为领队');
-  row.append(...buttons,lead);card.append(head,status,vitals,profile,skillText,row,rename);
-  cards.set(beast.id,{role,status,vitals,label,rate,training,lead,rename,input:edit,buttons});return card;
+  const feed=button('喂暖粮',()=>feedback(feedBond(h.state(),beast.id),'已投喂，羁绊提升。','craft'));
+  feed.dataset.beastBondFeed='true';feed.setAttribute('aria-label',beast.name+'喂暖粮');
+  row.append(...buttons,lead,feed);card.append(head,status,vitals,profile,skillText,row,rename);
+  cards.set(beast.id,{role,status,vitals,label,rate,training,lead,bond,feed,rename,input:edit,buttons});return card;
+ }
+ function updateBreeding(w:WorldState){
+  const info=breedPanel(w),shell=el('breeding-panel');
+  shell.hidden=!info.pairs.length&&!info.nests.length&&!info.eggs;
+  if(shell.hidden)return;
+  put(el('breeding-eggs'),'随身云兽蛋 '+info.eggs+' 枚 · 设法把巢温维持在 20°C–45°C。');
+  const key=JSON.stringify([info.eggs,info.pairs.map(p=>[p.a.name,p.b.name,p.issue]),info.nests.map(n=>[n.id,Math.round(n.temp),Math.floor(n.progress/8),n.egg,n.running,n.near])]);
+  if(key===breedKey)return;breedKey=key;
+  const lines:HTMLElement[]=[];
+  for(const pair of info.pairs){
+   const row=document.createElement('div'),label=document.createElement('small');
+   row.className='breeding-row';label.textContent=pair.a.name+' ＋ '+pair.b.name+(pair.issue?'：'+pair.issue:' · 可配对');
+   const pairButton=button('配对产蛋',()=>feedback(breedBeasts(h.state(),pair.den,pair.a.id,pair.b.id),'获得云兽蛋。','craft'));
+   pairButton.dataset.breedPair='true';pairButton.disabled=!!pair.issue;
+   row.append(label,pairButton);lines.push(row);
+  }
+  for(const nest of info.nests){
+   const row=document.createElement('div'),label=document.createElement('small');row.className='breeding-row';row.dataset.incubator=nest.id;
+   row.dataset.incubating=String(!!nest.egg);row.dataset.progress=String(nest.progress);
+   label.textContent=Math.round(nest.temp)+'°C · '+(nest.egg?nest.egg+' '+(nest.running?'孵化 ':'停温 ')+Math.floor(nest.progress/INCUBATION*100)+'%':'空巢');
+   const act=nest.egg?button('收回蛋',()=>feedback(takeIncubating(h.state(),nest.id),'已收回云兽蛋，重新放入时从头保温。')):button('放入蛋',()=>feedback(startIncubating(h.state(),nest.id),'云兽蛋已放入孵化巢。','craft'));
+   act.dataset.incubatorAction=nest.egg?'take':'load';act.disabled=!nest.near||(!nest.egg&&!info.eggs);
+   row.append(label,act);lines.push(row);
+  }
+  el('breeding-actions').replaceChildren(...lines);
  }
  function updatePack(w:WorldState,data:Info){
   pack.hidden=!data.packAvailable;
@@ -141,6 +171,7 @@ export function beastUi(h:BeastUIHooks){
   const troughs=w.ark.buildings.filter(x=>x.defId==='feed_trough'),near=troughs.some(b=>Math.hypot(w.player.x-b.gx-.5,w.player.y-b.gy-.5)<=2);
   put(el('beast-feed-details'),troughs.length?`饲槽库存 ${data.feed} · 背包 ${countItem(w,'beast_feed')}${near?'':' · 靠近饲料槽加料'}`:'尚无饲料槽 · 在建造手册中制作');
   load.disabled=!near||countItem(w,'beast_feed')===0;
+  updateBreeding(w);
   const key=data.beasts.map(x=>x.id).join('|');
   if(key!==cardKey){
    cardKey=key;cards.clear();list.replaceChildren(...data.beasts.map(makeCard));
@@ -153,6 +184,10 @@ export function beastUi(h:BeastUIHooks){
    put(card.role,roles.find(([id])=>id===x.role)?.[1]??'');
    put(card.status,x.status);
    put(card.label,x.name);
+   put(card.bond,'羁绊 '+Math.round(x.bond));
+   card.label.closest('article')!.setAttribute('data-morph',x.morph.variant??'');
+   card.feed.disabled=x.bond>=100||countItem(w,'beast_feed')<1||Math.hypot(w.player.x-x.x,w.player.y-x.y)>2.5;
+   card.feed.setAttribute('aria-label',x.name+'喂暖粮');
    put(card.rate,'工作 '+Math.round(x.workRate*100)+'%');
    put(card.training,'Lv.'+x.growth.level+' · '+x.growth.xp+'/'+x.growth.next+' 经验');
    card.lead.hidden=x.role!=='companion';card.lead.disabled=x.growth.lead;

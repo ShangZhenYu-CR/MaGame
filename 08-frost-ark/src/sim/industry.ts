@@ -1,3 +1,4 @@
+import { incubatorOccupied } from './breeding';
 import { brewTea,homePanel,sleepToDawn } from './home';
 import { overlayKind,repairAt,repairPanel,utilityAt } from './utilities';
 import { loadHopper,routePanel,runNetworkPass,setLogisticsRoute } from './logistics';
@@ -246,6 +247,7 @@ export function dismantleIssue(w:WorldState,gx:number,gy:number):string|null {
 
   if(getIndustrySave(w)?.removal)return '上一项仍在撤销期';
   const b=utilityAt(w,gx,gy,'wall_lamp')??buildingAt(w,gx,gy)??utilityAt(w,gx,gy);
+  if(b?.defId==='incubator'&&incubatorOccupied(w,b.id))return '先从孵化巢收回云兽蛋。';
   if(b?.defId==='hearth_core'||b?.id==='storage_main')return '开局主炉与储物箱不可拆除';
   if(b){
     const d=buildingDefs.get(b.defId)!;

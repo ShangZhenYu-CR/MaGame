@@ -411,3 +411,11 @@ button[aria-disabled=true]{opacity:.62}
 #companion-skill[data-ready="true"]{border-color:#bea06a;background:#384544}
 #companion-skill output{color:#c3d9e1}
 .beast-roles{flex-wrap:wrap}
+
+#breeding-panel{margin:.45rem 0;padding:.45rem;border:1px solid #64828a;border-radius:.3rem;background:#203b47}
+#breeding-title{margin:0 0 .32rem;color:#f0d2a8;font-size:12px}
+#breeding-eggs{margin:0 0 .33rem;color:#b4c9d4;font-size:10px}
+.breeding-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:4px;margin:.30rem 0}
+.breeding-row small{font-size:10px;color:#d7e4e9}
+.beast-roster [data-morph="aurora"]{border-color:#68b4ac}
+.beast-roster [data-morph="ember"]{border-color:#c99968}

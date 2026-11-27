@@ -1,3 +1,4 @@
+import { stepBreeding } from './breeding';
 import { stepSkyEvents } from './sky-events';
 import { stepCave } from './cave';
 import { stepLandmarks } from './landmarks';
@@ -154,6 +155,7 @@ export function stepWorld(world: WorldState, ticks = 1, direction: Vec2 = {x: 0,
     stepCave(world);
     stepHunger(world);
     stepBeasts(world);
+    stepBreeding(world);
     stepIndustry(world);
     updateLatte(world);
     stepFinale(world);

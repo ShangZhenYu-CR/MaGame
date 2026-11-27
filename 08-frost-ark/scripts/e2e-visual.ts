@@ -1,3 +1,4 @@
+import { runP2Breeding } from "./p2-breed-e2e";
 import { runP2Skills } from "./p2-skills-e2e";
 import { runP2Traits } from "./p2-traits-e2e";
 import { runP2Survey } from "./p2-survey-e2e";
@@ -667,6 +668,7 @@ try {
   await runP2Survey(browser,baseUrl,outDir,errors);
   await runP2Traits(browser,baseUrl,outDir,errors);
   await runP2Skills(browser,baseUrl,outDir,errors);
+  await runP2Breeding(browser,baseUrl,outDir,errors);
 
   if (errors.length > 0) {
     throw new Error(errors.join('\n'));

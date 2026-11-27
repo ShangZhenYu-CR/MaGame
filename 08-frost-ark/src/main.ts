@@ -633,7 +633,7 @@ canvas.addEventListener('pointerdown',e=>{
     const hit=buildingAt(w,x,y);
     if(hit&&hit.id===nearestStorage(w)?.id){toggleStorage();return;}
     if(hit&&industryPanel(w,hit.id)){openIndustry(hit.id);return;}
-    if(hit&&['beast_den','feed_trough'].includes(hit.defId)&&industryDistance(w,hit)<=1.4){toggleBeastRoster(true);return;}
+    if(hit&&['beast_den','feed_trough','incubator'].includes(hit.defId)&&industryDistance(w,hit)<=1.4){toggleBeastRoster(true);return;}
     if(startCharge(w,at))canvas.setPointerCapture(e.pointerId);
   } else if(mode==='dismantle'){
     finishAction(dismantle(w,x,y),'已拆除。可在 4 秒内撤销。','dismantle');
@@ -656,9 +656,12 @@ canvas.addEventListener('contextmenu',e=>e.preventDefault());
 function simulation():void {
   const g=w.player.grapple;
   const pending=w.latte.autoLootUnlocked&&w.sky.debris.filter(isDeckDrop).length;
-  const wasDown=incapacitated(w);
+  const wasDown=incapacitated(w),beastCount=w.beasts.length;
   if(mode==='weapon'&&!w.player.weapon)choose('hook');
   stepWorld(w,1,{x:Number(keys.has('d'))-Number(keys.has('a')),y:Number(keys.has('s'))-Number(keys.has('w'))});
+  if(w.beasts.length>beastCount&&w.beasts.at(-1)?.id.startsWith('born_')){
+    tell('孵化完成！'+w.beasts.at(-1)!.name+'加入方舟。');audio.play('craft');void saveNow();
+  }
   if(!wasDown&&incapacitated(w)){
     keys.clear();expedition.cancel();chart.hide(false);beasts.show(false);skyEvents.close();
     toggleStorage(false);toggleBag(false);industry.showStation(null);industry.showCatalog(false);

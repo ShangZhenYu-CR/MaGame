@@ -74,5 +74,6 @@
   {"id":"ice_squid","name":"冰幕鱿","category":"food","stack":40,"gatherable":true},
   {"id":"drift_treasure","name":"稀有漂流宝匣","category":"loot","stack":15,"gatherable":true},
   {"id":"ancient_cave_blueprint","name":"冰窟稀有图纸","category":"quest","stack":16,"gatherable":true},
-  {"id":"merchant_route_blueprint","name":"游商航路图纸","category":"quest","stack":16,"gatherable":true}
+  {"id":"merchant_route_blueprint","name":"游商航路图纸","category":"quest","stack":16,"gatherable":true},
+  {"id":"cloud_egg","name":"云兽蛋","category":"quest","stack":12,"gatherable":true}
 ]

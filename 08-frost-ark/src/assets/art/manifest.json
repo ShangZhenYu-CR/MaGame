@@ -4672,6 +4672,86 @@
         62
       ],
       "bytes": 6792
+    },
+    "building-incubator": {
+      "file": "building-incubator.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 114,
+      "tileW": 1.28,
+      "tileH": 1.18,
+      "contentBox": [
+        18,
+        17,
+        110,
+        126
+      ],
+      "bytes": 22244
+    },
+    "icon-cloud-egg": {
+      "file": "icon-cloud-egg.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        8,
+        2,
+        56,
+        62
+      ],
+      "bytes": 6766
+    },
+    "variant-aurora-wisp": {
+      "file": "variant-aurora-wisp.png",
+      "width": 96,
+      "height": 96,
+      "anchorX": 48,
+      "anchorY": 54,
+      "tileW": 1,
+      "tileH": 0.7,
+      "contentBox": [
+        9,
+        3,
+        87,
+        93
+      ],
+      "bytes": 8698
+    },
+    "variant-ember-wisp": {
+      "file": "variant-ember-wisp.png",
+      "width": 96,
+      "height": 96,
+      "anchorX": 48,
+      "anchorY": 54,
+      "tileW": 1,
+      "tileH": 0.7,
+      "contentBox": [
+        8,
+        4,
+        87,
+        93
+      ],
+      "bytes": 7983
+    },
+    "icon-incubator": {
+      "file": "icon-incubator.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        57,
+        62
+      ],
+      "bytes": 3134
     }
   }
 }

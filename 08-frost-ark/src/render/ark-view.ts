@@ -1,3 +1,4 @@
+import { incubatorOccupied,type Variant } from '../sim/breeding';
 import { paintCompanionBurst } from './beast-skills-view';
 import { paintWindZone } from './wind-zones';
 import { EVENT_ART,paintSkyEvent } from './sky-events-view';
@@ -47,6 +48,7 @@ const buildingVisuals:Readonly<Record<string,BuildingVisual>>={
   furnace:{art:'building-smelter',width:1.25,height:1.42,shadow:.51},
   stove:{art:'building-stove',width:1.20,height:1.33,shadow:.50},
   heat_relay:{art:'building-heat-relay',width:1.22,height:1.5,shadow:.45},
+  incubator:{art:'building-incubator',width:1.28,height:1.18,shadow:.52},
   fishing_spot:{art:'building-fishing-spot',width:1.43,height:1.24,shadow:.27},
   catch_net:{art:'building-net',width:1.23,height:1.20,shadow:.45},
   sorter_arm:{art:'building-sorter',width:1.20,height:1.46,shadow:.47},
@@ -76,12 +78,12 @@ const ironDeck='building-iron-deck';
 const required=[
   ...deckIds,'boss-frost-whale-1','boss-frost-whale-2','boss-frost-whale-3','solar-hearth','aurora-crystal','manan-south','manan-north','manan-west','manan-east','latte-sleep','latte-alert','latte-walk','latte-walk-alt',
   'hearth-1','hearth-2','hearth-3','rail','corner','rock','icicles',ironDeck,...Object.values(buildingVisuals).map(v=>v.art),
-  'debris-wood','debris-iron','debris-rope','debris-heavy','clouds','rail-side','rock-side','frost-frame','floor-insulated','icon-driftwood','icon-coal-chunk','icon-iron','icon-raw-root','icon-cloud-fish','icon-raw-meat','icon-beast-feed','building-wind-door-open','building-airlock-open','forage-berries','forage-grass','forage-tubers','forage-crystal','icon-fishing-bobber',...ISLAND_ART,...LANDMARK_ART,...CAVE_ART,...EVENT_ART,...BEAST_ART,...HOSTILE_ART,...ELEMENT_ART,
+  'debris-wood','debris-iron','debris-rope','debris-heavy','clouds','rail-side','rock-side','frost-frame','floor-insulated','icon-driftwood','icon-coal-chunk','icon-iron','icon-raw-root','icon-cloud-fish','icon-raw-meat','icon-beast-feed','building-wind-door-open','building-airlock-open','forage-berries','forage-grass','forage-tubers','forage-crystal','icon-fishing-bobber','icon-cloud-egg','variant-aurora-wisp','variant-ember-wisp',...ISLAND_ART,...LANDMARK_ART,...CAVE_ART,...EVENT_ART,...BEAST_ART,...HOSTILE_ART,...ELEMENT_ART,
 ] as const;
 interface Cell { x:number; y:number; hash:number; iron:boolean; insulated:boolean; temperature:number; left:boolean; right:boolean; front:boolean; back:boolean }
 interface Actor {
   id?:string;x:number;y:number;art:string;shadow:number;
-  steam?:boolean;width?:number;height?:number;rotation?:number;scale?:number;flip?:boolean;float?:number;fire?:'hearth'|'torch'|'forge'|'stove'|'relay';hearthLevel?:number;
+  tint?:Variant;steam?:boolean;width?:number;height?:number;rotation?:number;scale?:number;flip?:boolean;float?:number;fire?:'hearth'|'torch'|'forge'|'stove'|'relay';hearthLevel?:number;
 }
 function dataHull(canvas:HTMLCanvasElement,hull:HullProfile):void{
   canvas.dataset.hullCones=String(hull.cones.reduce((n,x)=>n+x,0));
@@ -362,6 +364,8 @@ export class ArkView {
       const doorArt=doorOpen(bld)?visuals.art+'-open':visuals.art;
       const r=w.sky.cruising&&bld.hp>1&&bld.defId==='wind_sail'?.032*Math.sin(w.tick*.31+gx):undefined;
       actors.push({...visuals,art:doorArt,id:bld.id,rotation:r,steam:w.sky.cruising&&bld.defId==='steam_thruster'&&bld.hp>1,x:gx+spanX*.5,y:gy+(GROUND_FOOTPRINTS[bld.defId]?.anchorY??spanY*.80),fire:effect});
+      if(bld.defId==='incubator'&&incubatorOccupied(w,bld.id))
+        actors.push({x:gx+.50,y:gy+.94,art:'icon-cloud-egg',width:.39,height:.42,shadow:0,float:s*.33});
     }
     const latte=w.latte;
     const perch=catPerch(w);
@@ -482,7 +486,14 @@ export class ArkView {
     paintM5CombatEffects(c,w,project,s);
     paintCompanionBurst(c,w,project,s);
     for(const hostile of hostiles)paintHostileBar(c,project(hostile.x,hostile.y),hostile,s);
-    for(const b of beasts)paintBeastCues(c,project(b.x,b.y),b,s,w.tick);
+    for(const b of beasts){
+      const p=project(b.x,b.y);paintBeastCues(c,p,b,s,w.tick);
+      if(b.tint){
+        c.save();c.globalAlpha=.46+.20*Math.sin(w.tick*.072);c.globalCompositeOperation='screen';
+        this.art.paint(c,'variant-'+b.tint+'-wisp',p.x,p.y-s*(.08+.08*Math.sin(w.tick*.11)),s,{width:b.width*.82,height:.51});
+        c.restore();
+      }
+    }
     paintElementSigns(c,this.art,actors,w,project,s);
     this.juice.paint(c,project,s,now);
     // Aiming is a control cue, not world geometry. Keep it above night tint,

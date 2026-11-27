@@ -240,5 +240,6 @@
   {"id": "latte_climber", "name": "拿铁猫爬架", "category": "home", "size": [1, 1], "buoyancyDelta": -1, "maxHp": 105, "cost": [{"itemId": "driftwood", "count": 3}, {"itemId": "rope", "count": 2}]},
   {"id": "water_purifier", "name": "融冰净水器", "category": "home", "size": [1, 1], "buoyancyDelta": -1, "maxHp": 105, "cost": [{"itemId": "frost_iron_ingot", "count": 2}, {"itemId": "driftwood", "count": 3}]},
   {"id": "wall_lamp", "name": "壁挂暖灯", "category": "home", "size": [1, 1], "buoyancyDelta": 0, "maxHp": 105, "cost": [{"itemId": "frost_iron_scrap", "count": 2}, {"itemId": "torch_item", "count": 1}], "heatOutput": 6, "heatRadius": 1.9},
-  {"id":"fishing_spot","name":"云海垂钓位","size":[1,1],"maxHp":98,"buoyancyDelta":-2,"cost":[{"itemId":"driftwood","count":3},{"itemId":"rope","count":1}]}
+  {"id":"fishing_spot","name":"云海垂钓位","size":[1,1],"maxHp":98,"buoyancyDelta":-2,"cost":[{"itemId":"driftwood","count":3},{"itemId":"rope","count":1}]},
+  {"id":"incubator","name":"恒温孵化巢","size":[1,1],"maxHp":125,"buoyancyDelta":-3,"cost":[{"itemId":"driftwood","count":4},{"itemId":"frost_iron_ingot","count":2},{"itemId":"warm_fur","count":2}]}
 ]

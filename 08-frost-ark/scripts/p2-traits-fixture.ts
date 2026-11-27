@@ -7,8 +7,8 @@ import { ensureFauna } from '../src/sim/m4-state';
 import { createInitialWorld } from '../src/sim/world';
 import type { BeastEntity } from '../src/sim/types';
 
-export function traitsFixture(){
- const w=createInitialWorld(202608),def=beastDefinitions.get('frostyak')!;
+export function traitsFixture(seed=202608){
+ const w=createInitialWorld(seed),def=beastDefinitions.get('frostyak')!;
  w.ark.buildings.push(makeBuilding('beast_den',23,26,'warm_yak_barn'));
  const work=(id:string):BeastEntity=>({id,defId:def.id,name:def.name,x:23.65,y:26.65,hp:def.maxHp,maxHp:def.maxHp,
   warmth:82,hunger:90,role:'work',denBuildingId:'warm_yak_barn',workCooldown:0});

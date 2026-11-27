@@ -7,6 +7,7 @@ import { bindTooltips } from './tooltip';
 
 const el=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id)! as T;
 const descriptions:Partial<Record<BuildKind,string>>={
+ incubator:'只在 20°C–45°C 生效，走近后按 E 放入云兽蛋。',
  fishing_spot:'放在开放舷边，停船后靠近按 E 下钩。',
  warm_cot:'暖室里安全过夜，恢复全部体力。',tea_table:'消耗一份净水，喝茶回温和回体力。',latte_climber:'给拿铁留一块安心休息的高台。',
  water_purifier:'把冰晶碎块融成净水。',wall_lamp:'挂在挡风墙上，提供暖光与舒适度。',
@@ -52,8 +53,8 @@ export function createIndustryUi(cb:Callbacks){
  let activeStation:string|null=null,catalogKey='',stationKey='',liftKey='',routeKey='',repairKey='';
  const buttons=new Map<BuildKind,HTMLButtonElement>();
  const itemIcon=(id:string)=>cb.icon(id.replaceAll('_','-'))??cb.icon(materialIcons[id]??'');
- const lateBlueprints=new Set<string>(['beast_den','feed_trough','frost_turret','fire_oil_turret','wind_door','frost_airlock','fuel_hopper','steam_chute','wind_sail','steam_thruster','wind_vane','heat_pipe','insulated_floor','repair_station','warm_cot','tea_table','latte_climber','water_purifier','wall_lamp']);
- const categoryGroup=(kind:BuildKind)=>el(['workbench','furnace','stove','catch_net','sorter_arm','greenhouse','beast_den','feed_trough','fuel_hopper','steam_chute','repair_station','water_purifier','fishing_spot'].includes(kind)?'catalog-industry':'catalog-structure');
+ const lateBlueprints=new Set<string>(['beast_den','feed_trough','frost_turret','fire_oil_turret','wind_door','frost_airlock','fuel_hopper','steam_chute','wind_sail','steam_thruster','wind_vane','heat_pipe','insulated_floor','repair_station','warm_cot','tea_table','latte_climber','water_purifier','wall_lamp','incubator']);
+ const categoryGroup=(kind:BuildKind)=>el(['workbench','furnace','stove','catch_net','sorter_arm','greenhouse','beast_den','feed_trough','fuel_hopper','steam_chute','repair_station','water_purifier','fishing_spot','incubator'].includes(kind)?'catalog-industry':'catalog-structure');
  for(const kind of buildKinds){
   const def=buildDefinitions[kind],[gw,gh]=def.size;
   const lift=def.buoyancyDelta>0?`+${def.buoyancyDelta} 浮力`:def.buoyancyDelta<0?`占用 ${-def.buoyancyDelta} 浮力`:'不占浮力';

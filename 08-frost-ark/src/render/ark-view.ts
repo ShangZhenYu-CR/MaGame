@@ -1,11 +1,13 @@
 import { aimEnd, hookTip } from '../sim/cloud';
 import type { Vec2, WorldState } from '../sim/types';
 import { PALETTE as P } from './palette';
+import { makeMananAtlas, MANAN_FRAME, type Direction } from './manan-atlas';
 
 export interface Ghost { x: number; y: number; ok: boolean; torch: boolean }
 export class ArkView {
   private ctx: CanvasRenderingContext2D;
   private scale = 40;
+  private actorAtlas = makeMananAtlas();
   private origin: Vec2 = {x:0,y:0};
 
   constructor(private canvas: HTMLCanvasElement) { this.ctx = canvas.getContext('2d')!; }
@@ -179,19 +181,14 @@ export class ArkView {
       c.lineWidth=g.charging?2:3;c.setLineDash(g.charging?[6,7]:[]);c.stroke();c.setLineDash([]);
       c.strokeStyle=P.hearthCore;c.strokeRect(q.x-4,q.y-4,8,8);
     }
-    const x=pl.x,y=pl.y, stride=Math.hypot(pl.vx,pl.vy)>0?Math.sin(w.tick*.55)*.09:0;
-    this.tile(x-.32,y+.26,.64,.23,P.deckWoodEdge);
-    this.tile(x-.2,y+.19+stride,.15,.24,P.uiSurface);
-    this.tile(x+.05,y+.19-stride,.15,.24,P.uiSurface);
-    this.tile(x-.23,y+.36+stride,.19,.1,P.snowHighlight);
-    this.tile(x+.04,y+.36-stride,.19,.1,P.snowHighlight);
-    this.tile(x-.31,y-.15,.62,.39,P.uiSurface);
-    this.tile(x-.18,y-.49,.36,.35,P.skyDeep);
-    this.tile(x-.135,y-.39,.27,.22,P.deckWood);
-    this.tile(x-.14,y-.46,.28,.1,P.uiPanel);
-    this.tile(x-.31,y-.12,.12,.24,P.deckIron);
-    this.tile(x+.21,y-.11,.12,.24,P.deckIron);
-    this.tile(x-.07,y-.03,.14,.055,P.uiMuted);
-    this.tile(x+(pl.facing.x<-.1?-.39:.29),y+.03,.1,.14,P.hearthCore);
+    const dir:Direction=Math.abs(pl.facing.x)>Math.abs(pl.facing.y)
+      ? (pl.facing.x<0?1:2) : (pl.facing.y<0?3:0);
+    const phase=pl.vx||pl.vy ? 1+Math.floor(w.tick/4)%4 : 0;
+    const spriteSize=Math.min(64,Math.round(s*1.53));
+    const drawX=p.x-Math.round(spriteSize/2), drawY=p.y-Math.round(spriteSize*54/64);
+    this.tile(pl.x-.36,pl.y-.02,.72,.17,P.deckWoodEdge);
+    c.imageSmoothingEnabled=false;
+    c.drawImage(this.actorAtlas,phase*MANAN_FRAME,dir*MANAN_FRAME,MANAN_FRAME,MANAN_FRAME,
+      drawX,drawY,spriteSize,spriteSize);
   }
 }

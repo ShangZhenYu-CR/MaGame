@@ -1,3 +1,4 @@
+import { emitJuice } from './juice';
 import { equippedItem } from './equipment';
 import { isGrappleItem } from './grapple-tools';
 import { damagePlayer, healPlayer } from './rescue';
@@ -83,14 +84,17 @@ export function strikeWildBeast(w:WorldState,id:string):string|null{
   state.lastStrike=w.tick;
   const axe=toolStatus(w,'wood_axe');
   const power=(axe?.durability?axe.tier===2?21:17:13)+Math.floor(companionStrikePower(w)*.15);
-  e.hp=Math.max(0,e.hp-power);
+  const before=e.hp;e.hp=Math.max(0,e.hp-power);
+  emitJuice(w,'hit',e,before-e.hp,{target:e.id});
   e.hostile=e.hp>e.maxHp*.35&&!e.stunnedTicks;
   return null;
 }
 
 export function strikeWildWithWeapon(w:WorldState,e:WildEntity,damage:number):boolean{
   if(!activeWild(w,e))return false;
-  e.hp=Math.max(0,e.hp-damage);e.hostile=e.hp>e.maxHp*.35&&!e.stunnedTicks;return true;
+  const before=e.hp;e.hp=Math.max(0,e.hp-damage);
+  emitJuice(w,'hit',e,before-e.hp,{target:e.id});
+  e.hostile=e.hp>e.maxHp*.35&&!e.stunnedTicks;return true;
 }
 
 export function tameBeast(w:WorldState,id:string):string|null{

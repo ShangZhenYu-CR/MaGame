@@ -1,5 +1,5 @@
 // Browser-only sound engine. The sim stays deterministic and independent of audio.
-type Effect = 'hook' | 'hit' | 'place' | 'craft' | 'dismantle' | 'undo' | 'solar' | 'whale' | 'victory';
+type Effect = 'wood' | 'ore' | 'impact' | 'hook' | 'hit' | 'place' | 'craft' | 'dismantle' | 'undo' | 'solar' | 'whale' | 'victory';
 const MUTE_KEY = 'frost-ark-muted';
 
 class ArkAudio {
@@ -77,6 +77,9 @@ class ArkAudio {
     const ctx = this.ctx;
     if (!ctx || !this.master || this.muted || ctx.state !== 'running') return;
     const patterns: Record<Effect, [number, number, number, OscillatorType]> = {
+      wood: [154, 58, .16, 'triangle'],
+      ore: [715, 211, .22, 'sine'],
+      impact: [120, 40, .18, 'triangle'],
       hook: [320, 125, 0.22, 'triangle'],
       hit: [184, 73, 0.14, 'triangle'],
       place: [118, 46, 0.17, 'sine'],
@@ -100,12 +103,12 @@ class ArkAudio {
     osc.connect(gain);
     osc.start();
     osc.stop(now + seconds);
-    if (effect === 'hook' || effect === 'hit' || effect === 'place' || effect === 'dismantle') {
+    if (effect === 'wood' || effect === 'ore' || effect === 'impact' || effect === 'hook' || effect === 'hit' || effect === 'place' || effect === 'dismantle') {
       const noise = ctx.createBufferSource();
       noise.buffer = this.noise!;
       const filter = ctx.createBiquadFilter();
       filter.type = 'bandpass';
-      filter.frequency.value = effect === 'hook' ? 1610 : effect === 'hit' ? 860 : 420;
+      filter.frequency.value = effect === 'hook' ? 1610 : effect === 'hit' || effect === 'impact' ? 860 : effect === 'ore' ? 1880 : 420;
       noise.connect(filter).connect(gain);
       noise.start(now, Math.random());
       noise.stop(now + seconds * 0.64);

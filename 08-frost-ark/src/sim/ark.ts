@@ -1,3 +1,4 @@
+import { emitJuice } from './juice';
 import { incapacitated } from './rescue';
 import { feetSupported, GROUND_FOOTPRINTS, PLAYER_FOOT_RADIUS } from './ground-footprint';
 import buildings from '../data/buildings.json';
@@ -166,6 +167,8 @@ export function build(w: WorldState, kind: BuildKind, x: number, y: number): boo
     if(!isDeck(w,x,y))w.ark.heatGrid[y*w.ark.size+x]=w.ambientTemp;
     w.ark.decks[y*w.ark.size+x]=kind==='wood_deck'?1:2;
   }else w.ark.buildings.push(makeBuilding(kind,x,y,`${kind}_${x}_${y}`));
+  const [span]=buildingDefs.get(kind)?.size??[1,1];
+  emitJuice(w,'build',{x:x+span*.5,y:y+.78},0,{target:`${kind}_${x}_${y}`});
   refreshBuoyancy(w);
   return true;
 }

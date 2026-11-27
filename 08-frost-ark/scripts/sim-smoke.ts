@@ -768,3 +768,32 @@ assert.ok(earlyRollSave.player.roll.stamina>=ROLL_COST);
 const r7=JSON.parse(serializeWorld(createInitialWorld()));r7.saveVersion=7;delete r7.player.roll;
 assert.equal(deserializeWorld(JSON.stringify(r7)).player.roll.stamina,100);
 console.log('[sim-smoke:P2-08] OK: in-circle i-frames, directional inertia, bounded diagonal edge, stamina, active-roll archive');
+
+import { emitJuice,takeJuice } from '../src/sim/juice';
+import { JuiceView } from '../src/render/juice-view';
+
+// P2-09: the feedback measures actual applied deltas, not nominal bonuses.
+const feedbackWorld=createInitialWorld();
+Object.assign(feedbackWorld.player,{hp:98,warmth:91});
+feedbackWorld.player.inventory[6]={itemId:'baked_root',count:1};
+assert.equal(eatMeal(feedbackWorld,'baked_root'),null);
+assert.deepEqual(takeJuice(feedbackWorld).map(e=>[e.type,e.amount]),[['warmth',9],['heal',2]]);
+assert.deepEqual(takeJuice(feedbackWorld),[]);
+assert.ok(build(feedbackWorld,'wood_deck',28,25));
+assert.equal(takeJuice(feedbackWorld)[0].type,'build');
+assert.equal(build(feedbackWorld,'wood_deck',28,25),false);
+assert.deepEqual(takeJuice(feedbackWorld),[],'failed action must not generate feedback');
+assert.equal(damagePlayer(feedbackWorld,7),true);
+assert.deepEqual(takeJuice(feedbackWorld).map(e=>[e.type,e.amount]),[['hurt',7]]);
+emitJuice(feedbackWorld,'hit',feedbackWorld.player,13,{target:'whale',critical:true});
+const cue=takeJuice(feedbackWorld),visible=new JuiceView();
+visible.push(cue,80,true);
+assert.equal(visible.freezeUntil,120,'clock pauses for precisely 40 ms');
+assert.equal(visible.flash('whale',115),true);
+assert.equal(visible.flash('whale',191),false);
+assert.notDeepEqual(visible.shake(91),{x:0,y:0});
+visible.reset();visible.push(cue,80,false);
+assert.deepEqual(visible.shake(91),{x:0,y:0},'shake preference does not suppress combat numbers');
+assert.equal(visible.freezeUntil,120);
+assert.deepEqual(takeJuice(deserializeWorld(serializeWorld(feedbackWorld))),[],'transient screen cues are never saved');
+console.log('[sim-smoke:P2-09] OK: actual deltas, no failed action cue, capped 40 ms hitstop and optional critical shake');

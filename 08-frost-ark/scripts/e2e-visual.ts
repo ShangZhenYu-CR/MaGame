@@ -1,3 +1,4 @@
+import { runP2Juice } from './p2-juice-e2e';
 import { runP2Roll } from './p2-roll-e2e';
 import { runP2Weapons } from './p2-weapons-e2e';
 import { runP2Gear } from './p2-gear-e2e';
@@ -628,6 +629,7 @@ try {
   await runP2Gear(browser,baseUrl,outDir,errors);
   await runP2Weapons(browser,baseUrl,outDir,errors);
   await runP2Roll(browser,baseUrl,outDir,errors);
+  await runP2Juice(browser,baseUrl,outDir,errors);
 
   if (errors.length > 0) {
     throw new Error(errors.join('\n'));

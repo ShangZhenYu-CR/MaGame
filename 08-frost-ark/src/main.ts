@@ -27,6 +27,7 @@ import { beastUi } from './ui/beasts';
 import { equipmentUi } from './ui/equipment';
 import { weaponsUi } from './ui/weapons';
 import { chooseWeapon, selectedWeapon, triggerWeapon, weaponById } from './sim/weapons';
+import { takeJuice } from './sim/juice';
 import { rollGuard,rolling,startRoll } from './sim/roll';
 import { combatM5Ui } from './ui/combat-m5';
 
@@ -41,6 +42,21 @@ const stats=el('hud-stats'), hint=el('hint'), action=el('action'), save=el('save
 const meter=el('meter'), bar=el('charge-bar'), panel=el('inventory'), input=el<HTMLInputElement>('save-file');
 const keys=new Set<string>();
 const locker=el('storage-panel');
+const shakeOption=el<HTMLInputElement>('critical-shake');
+const shakePref='frost-ark-critical-shake';
+shakeOption.checked=!matchMedia('(prefers-reduced-motion: reduce)').matches;
+try{const stored=localStorage.getItem(shakePref);if(stored!==null)shakeOption.checked=stored==='1';}catch{}
+shakeOption.onchange=()=>{
+  if(!shakeOption.checked)view.juice.stopShake();
+  try{localStorage.setItem(shakePref,shakeOption.checked?'1':'0');}catch{}
+};
+function collectJuice(now:number):void{
+  const events=takeJuice(w);
+  if(!events.length)return;
+  view.juice.push(events,now,shakeOption.checked);
+  const sound=events.find(e=>e.type==='wood'||e.type==='ore'||e.type==='hit'||e.type==='hurt');
+  if(sound)audio.play(sound.type==='wood'||sound.type==='ore'?sound.type:'impact');
+}
 let lockerSignature='';
 type Mode = 'hook' | 'weapon' | 'dismantle' | BuildKind;
 const controls: Partial<Record<Mode,HTMLElement>>={ hook:el('hook'),wood_deck:el('build-deck'),torch_post:el('build-torch'),wind_wall:el('build-wall'),dismantle:el('dismantle-mode') };
@@ -322,7 +338,7 @@ function saveNow():Promise<void> {
   return saveQueue;
 }
 function safeWorld(next:WorldState):void {
-  finale.reset();
+  finale.reset();view.juice.reset();
   expedition.cancel();chart.hide(false);beasts.show(false);w=next;toggleStorage(false);industry.showStation(null);industry.showCatalog(false);lockerSignature='';cancelCharge(w);
   caught=null;keys.clear();messageUntil=0;message='';stackSignature='';
   if(mode==='weapon'&&!w.player.weapon)choose('hook');
@@ -523,11 +539,14 @@ function simulation():void {
   if(w.tick%90===0)void saveNow();
 }
 function frame(now:number):void {
-  elapsed+=Math.min(100,Math.max(0,now-last));last=now;
-  while(elapsed>=1000/TICK_RATE){
+  collectJuice(now);
+  elapsed+=Math.min(100,Math.max(0,now-Math.max(last,view.juice.freezeUntil)));last=now;
+  while(now>=view.juice.freezeUntil&&elapsed>=1000/TICK_RATE){
     if(active)simulation();
     elapsed-=1000/TICK_RATE;
+    collectJuice(now);
   }
+  if(canvas.dataset.hitstop!==String(now<view.juice.freezeUntil))canvas.dataset.hitstop=String(now<view.juice.freezeUntil);
   const down=incapacitated(w), shield=rescueShield(w), rescue=el('rescue-status');
   rescue.hidden=!down&&!shield;
   rescue.dataset.phase=down?'down':'shield';
@@ -595,7 +614,7 @@ function frame(now:number):void {
   if(hint.textContent!==interactionHint)hint.textContent=interactionHint;
   meter.hidden=!g.charging;bar.style.width=(g.charge*100)+'%';
   note.hidden=mode==='hook'||mode==='weapon'||!pointer||here!=='ark';
-  view.draw(w,ghostAt());
+  view.draw(w,ghostAt(),now);
   if(!panel.hidden)fillBag();
   if(!locker.hidden)fillLocker();
   requestAnimationFrame(frame);

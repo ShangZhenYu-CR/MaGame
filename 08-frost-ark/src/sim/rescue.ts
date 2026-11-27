@@ -1,3 +1,4 @@
+import { emitJuice } from './juice';
 import { rollGuard } from './roll';
 import { gearModifiers } from './equipment';
 import { fitsOnDeck, hasBuildingContact, inventoryChange } from './ark';
@@ -13,13 +14,16 @@ export function damagePlayer(w: WorldState, amount: number, kind:'physical'|'col
   const p=w.player;
   const gear=gearModifiers(w);
   const reduction=kind==='physical'?gear.guard:kind==='cold'?gear.cold*.5:0;
-  p.hp=Math.max(0,p.hp-amount*(1-reduction));
+  const before=p.hp;p.hp=Math.max(0,p.hp-amount*(1-reduction));
+  if(kind==='physical'&&before-p.hp>=.5)emitJuice(w,'hurt',p,before-p.hp,{target:'player'});
   if (p.hp===0) begin(w);
   return true;
 }
 
 export function healPlayer(w: WorldState, amount: number): void {
-  if (!incapacitated(w)) w.player.hp=Math.min(w.player.maxHp,w.player.hp+amount);
+  if(incapacitated(w))return;
+  const p=w.player,before=p.hp;p.hp=Math.min(p.maxHp,p.hp+amount);
+  if(p.hp-before>=.5)emitJuice(w,'heal',p,p.hp-before,{target:'player'});
 }
 
 function begin(w: WorldState): void {

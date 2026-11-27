@@ -19,7 +19,7 @@ interface BeastMark {
   hp:number; restraint:boolean; progress:number; feeds:number; wild:boolean; resting:boolean;
 }
 export interface BeastActor extends BeastVisual {
-  x:number;y:number;float:number;flip:boolean;scale:number;rotation:number;beastMark?:BeastMark;
+  id:string;x:number;y:number;float:number;flip:boolean;scale:number;rotation:number;beastMark?:BeastMark;
 }
 
 export class BeastScene {
@@ -39,7 +39,7 @@ export class BeastScene {
       const phase=w.tick*.24+x*.60+y*.42;
       const lift=visual.lift&&!mark?.restraint&&!mark?.resting?
         (visual.lift+.04*Math.sin(phase*.73))*tile:walking?Math.abs(Math.sin(phase))*tile*.035:0;
-      actors.push({...visual,x,y,flip:next.flip,rotation:walking?Math.sin(phase)*.035:0,
+      actors.push({...visual,id,x,y,flip:next.flip,rotation:walking?Math.sin(phase)*.035:0,
         float:lift,scale:1+Math.sin(phase*.40)*(mark?.restraint?.005:.021),beastMark:mark});
     };
     for(const b of w.wildEntities){

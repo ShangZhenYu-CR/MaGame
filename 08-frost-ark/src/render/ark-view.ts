@@ -1,3 +1,4 @@
+import { JuiceView } from './juice-view';
 import { paintWeaponCombat } from './weapon-view';
 import { contourHull, HULL_NORTH, HULL_EAST, HULL_SOUTH, HULL_WEST, type HullProfile } from '../sim/hull';
 import { GROUND_FOOTPRINTS } from '../sim/ground-footprint';
@@ -49,7 +50,7 @@ const required=[
 ] as const;
 interface Cell { x:number; y:number; hash:number; iron:boolean; temperature:number; left:boolean; right:boolean; front:boolean; back:boolean }
 interface Actor {
-  x:number;y:number;art:string;shadow:number;
+  id?:string;x:number;y:number;art:string;shadow:number;
   width?:number;height?:number;rotation?:number;scale?:number;flip?:boolean;float?:number;fire?:'hearth'|'torch'|'forge'|'stove'|'relay';hearthLevel?:number;
 }
 function dataHull(canvas:HTMLCanvasElement,hull:HullProfile):void{
@@ -68,6 +69,7 @@ export class ArkView {
   private lightmap=new Lightmap();
   private beastScene=new BeastScene();
   private weather=new WeatherFinish();
+  readonly juice=new JuiceView();
   private hull:HullProfile|null=null;
   private hullSignature='';
   private loaded=false;
@@ -133,8 +135,9 @@ export class ArkView {
       y:((clientY-b.top)*this.canvas.height/Math.max(1,b.height)-this.origin.y)/this.scale};
   }
 
-  draw(w:WorldState,ghost:Ghost|null):void {
+  draw(w:WorldState,ghost:Ghost|null,now=performance.now()):void {
     this.position(w);
+    const tremor=this.juice.shake(now);this.origin.x+=tremor.x;this.origin.y+=tremor.y;
     const c=this.ctx,s=this.scale;
     if(!this.loaded){
       c.fillStyle=P.skyDeep;c.fillRect(0,0,c.canvas.width,c.canvas.height);
@@ -223,7 +226,7 @@ export class ArkView {
     }
     const finale=finaleStatus(w), whale=finale.atAurora?finale.whale:null;
     if(whale){
-      actors.push({x:whale.x,y:whale.y,art:whale.art,width:4.0,height:3.64,shadow:1.27,
+      actors.push({id:'whale',x:whale.x,y:whale.y,art:whale.art,width:4.0,height:3.64,shadow:1.27,
         float:s*(.35+.10*Math.sin(w.tick*.085)),rotation:.017*Math.sin(w.tick*.042)});
       if(whale.warning){
         const {warning,radius}=whale;
@@ -260,7 +263,7 @@ export class ArkView {
       const working=getIndustrySave(w)?.stations[bld.id]?.job;
       const effect=bld.defId==='torch_post'?'torch':bld.defId==='heat_relay'?'relay':
         working?(bld.defId==='furnace'?'forge':bld.defId==='stove'?'stove':undefined):undefined;
-      actors.push({...visuals,x:gx+spanX*.5,y:gy+(GROUND_FOOTPRINTS[bld.defId]?.anchorY??spanY*.80),fire:effect});
+      actors.push({...visuals,id:bld.id,x:gx+spanX*.5,y:gy+(GROUND_FOOTPRINTS[bld.defId]?.anchorY??spanY*.80),fire:effect});
     }
     const latte=w.latte;
     const catWalking=fire?Math.hypot(latte.x-fire.gx-2.4,latte.y-fire.gy-2.4)>.23:false;
@@ -273,7 +276,7 @@ export class ArkView {
     const target=pull?rescuePoint(w):pl;
     const actorX=pl.x+(target.x-pl.x)*pull,actorY=pl.y+(target.y-pl.y)*pull;
     const tumble=rolling(w),ease=tumble?Math.sin(rollAge(w)/ROLL_TICKS*Math.PI):0;
-    const player:Actor={x:actorX,y:actorY,art:`manan-${dir}`,width:1.43,height:1.43,shadow:.34,scale:tumble?1-.19*ease:walking?1:1+(.5+.5*Math.sin(w.tick*.115))*.03,
+    const player:Actor={id:'player',x:actorX,y:actorY,art:`manan-${dir}`,width:1.43,height:1.43,shadow:.34,scale:tumble?1-.19*ease:walking?1:1+(.5+.5*Math.sin(w.tick*.115))*.03,
       rotation:down?clamp(age/14)*1.49:tumble?(pl.roll.dx<0?-1:1)*ease*1.43:walking?Math.sin(w.tick*.42)*Math.PI/72:0,float:walking?Math.abs(Math.sin(w.tick*.31))*s*.04:0};
     actors.push(player);
     // Reuse the checked player sprites for short, translucent silhouettes.
@@ -307,7 +310,10 @@ export class ArkView {
     actors.sort((a,b)=>a.y-b.y);
     for(const actor of actors){
       const p=project(actor.x,actor.y);
-      this.art.paint(c,actor.art,p.x,p.y-(actor.float??0),s,actor);
+      const glow=this.juice.flash(actor.id,now);
+      if(glow){c.save();c.filter='brightness(2.55) saturate(.15)';}
+      this.art.paint(c,actor.art,p.x,p.y-(actor.float??0)-this.juice.bounce(actor.id,now)*s,s,actor);
+      if(glow)c.restore();
       if(actor.fire)this.paintFire(c,actor,p,w.tick);
     }
     if(g.active)this.paintHook(c,w,held);
@@ -321,6 +327,7 @@ export class ArkView {
     paintM5CombatEffects(c,w,project,s);
     for(const hostile of hostiles)paintHostileBar(c,project(hostile.x,hostile.y),hostile,s);
     for(const b of beasts)paintBeastCues(c,project(b.x,b.y),b,s,w.tick);
+    this.juice.paint(c,project,s,now);
     // Aiming is a control cue, not world geometry. Keep it above night tint,
     // snow and frost so a reachable endpoint stays visible in all weather.
     if(g.charging)this.paintGrapplePreview(c,w);

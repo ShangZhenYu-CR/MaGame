@@ -1,3 +1,4 @@
+import { emitJuice } from './juice';
 import { damagePlayer } from './rescue';
 import phases from '../data/whale.json';
 import { refreshBuoyancy } from './ark';
@@ -89,7 +90,8 @@ export function strikeWhaleWithWeapon(w:WorldState,damage:number):boolean{
 }
 
 function damageWhale(w:WorldState,f:FinaleState,b:Whale,damage:number):void{
-  b.hp=Math.max(0,b.hp-damage);
+  const before=b.hp;b.hp=Math.max(0,b.hp-damage);
+  emitJuice(w,'hit',b,before-b.hp,{target:'whale',critical:true});
   if(b.hp>0)return;
   if(b.phase===phases.length-1){win(w,f);return;}
   b.phase++;b.hp=phases[b.phase].hp;b.warning=null;b.recovery=0;b.next=w.tick+56;

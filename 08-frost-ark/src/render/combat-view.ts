@@ -12,7 +12,7 @@ const hostileArt={
 type HostileId=keyof typeof hostileArt;
 export const HOSTILE_ART=Object.values(hostileArt).map(x=>x.art);
 export type CombatActor=typeof hostileArt[HostileId]&{x:number;y:number;flip:boolean;scale:number;rotation:number;
-  telegraph:boolean;reach:number;hp:number;boss:boolean;name:string};
+  id:string;telegraph:boolean;reach:number;hp:number;boss:boolean;name:string};
 
 export function m5Actors(w:WorldState):CombatActor[]{
   return w.wildEntities.flatMap(e=>{
@@ -21,7 +21,7 @@ export function m5Actors(w:WorldState):CombatActor[]{
     const id=e.defId as HostileId;
     const def=combat.hostiles[id], charge=m5Telegraph(w,e.id);
     const motion=w.tick*.11+e.x*.9+e.y*.6;
-    return [{...hostileArt[id],x:e.x,y:e.y,telegraph:charge,reach:def.range,
+    return [{...hostileArt[id],id:e.id,x:e.x,y:e.y,telegraph:charge,reach:def.range,
       hp:clamp(e.hp/Math.max(1,e.maxHp)),boss:e.kind==='boss',name:def.name,flip:w.player.x>e.x,
       scale:charge?1.035:1+Math.sin(motion)*.014,rotation:charge?Math.sin(w.tick*.46)*.021:0}];
   });

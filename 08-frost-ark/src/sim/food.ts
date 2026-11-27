@@ -1,3 +1,4 @@
+import { emitJuice } from './juice';
 import items from '../data/items.json';
 import { countItem, inventoryChange } from './ark';
 import { whaleBattleActive } from './finale';
@@ -27,7 +28,8 @@ export function eatMeal(w:WorldState,id:MealId):string|null{
     return '背包里没有这份熟食。';
   const p=w.player;
   p.hunger=Math.min(p.maxHunger,p.hunger+food.hunger);
-  p.warmth=Math.min(p.maxWarmth,p.warmth+food.warmth);
+  const before=p.warmth;p.warmth=Math.min(p.maxWarmth,p.warmth+food.warmth);
+  if(p.warmth>before)emitJuice(w,'warmth',p,p.warmth-before,{target:'player'});
   healPlayer(w,meal.recover);
   if(w.tick+meal.seconds*TICK_RATE>=p.diet.warmUntil){
     p.diet.warmUntil=w.tick+meal.seconds*TICK_RATE;p.diet.last=id;

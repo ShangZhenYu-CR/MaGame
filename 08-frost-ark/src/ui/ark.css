@@ -299,3 +299,5 @@ button[aria-disabled=true]{opacity:.62}
 #weapon-toggle[hidden]{display:none}
 @media(max-width:820px){#weapon-toggle{left:12px;bottom:113px}}
 .stamina-row{margin-top:3px;color:#c6d9df;--meter-color:#7da7bc}
+
+.feedback-switch{display:flex;align-items:center;gap:8px;margin:10px 0;color:#c6d9df}.feedback-switch input{accent-color:#c9985c}

@@ -27,6 +27,7 @@ import { beastUi } from './ui/beasts';
 import { equipmentUi } from './ui/equipment';
 import { weaponsUi } from './ui/weapons';
 import { chooseWeapon, selectedWeapon, triggerWeapon, weaponById } from './sim/weapons';
+import { rollGuard,rolling,startRoll } from './sim/roll';
 import { combatM5Ui } from './ui/combat-m5';
 
 function el<T extends HTMLElement = HTMLElement>(id: string): T { return document.getElementById(id)! as T; }
@@ -59,7 +60,7 @@ const toolbar=([
   return button.querySelector('output')!;
 });
 const vitals=([
-  ['warmth','warmth-value'],['life','life-value'],['fuel','fuel-value'],['hunger','hunger-value'],
+  ['warmth','warmth-value'],['life','life-value'],['fuel','fuel-value'],['hunger','hunger-value'],['stamina','stamina-value'],
 ] as const).map(([id,value])=>[el<HTMLMeterElement>(id+'-meter'),el(value)] as const);
 const localTemperature=el('local-temp');
 const industry=createIndustryUi({
@@ -402,11 +403,18 @@ addEventListener('keydown',e=>{
     return;
   }
   if(!chart.open()&&k==='j'&&!e.repeat){e.preventDefault();finale.toggle();return;}
-  if(!chart.open()&&k==='f'&&!e.repeat&&finale.strikeWhale()){e.preventDefault();return;}
+  if(!rolling(w)&&!chart.open()&&k==='f'&&!e.repeat&&finale.strikeWhale()){e.preventDefault();return;}
   audio.unlock();
   if(chart.open()){
     if(!e.repeat&&(k==='escape'||k==='n')){e.preventDefault();toggleChart(false);}
     else if(!e.repeat&&k==='m')toggleMute();
+    return;
+  }
+  if(e.code==='Space'&&panel.hidden&&locker.hidden&&!industry.catalogOpen()&&!industry.stationOpen()&&!beasts.open()){
+    e.preventDefault();
+    if(e.repeat)return;
+    const issue=startRoll(w,{x:Number(keys.has('d'))-Number(keys.has('a')),y:Number(keys.has('s'))-Number(keys.has('w'))});
+    if(issue)tell(issue);else {expedition.cancel();void saveNow();}
     return;
   }
   if('wasd'.split('').includes(k)){keys.add(k);e.preventDefault();return;}
@@ -436,7 +444,7 @@ addEventListener('keydown',e=>{
   else if(k==='u')warmthAction('upgrade');
   else if(k==='g')warmthAction('drop');
   else if(k==='h'){e.preventDefault();consumeMeal();}
-  else if(k==='f'){if(!m5Ui.strike())warmthAction('pickup');}
+  else if(k==='f'&&!rolling(w)){if(!m5Ui.strike())warmthAction('pickup');}
   else if(k==='i'){ e.preventDefault();toggleBag(); }
 });
 addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
@@ -446,7 +454,7 @@ canvas.addEventListener('pointermove',e=>{
 });
 canvas.addEventListener('pointerleave',()=>{pointer=null;});
 canvas.addEventListener('pointerdown',e=>{
-  if(!active||incapacitated(w)||e.button!==0||chart.open()||finale.open()||finale.blocking())return;
+  if(!active||incapacitated(w)||rolling(w)||e.button!==0||chart.open()||finale.open()||finale.blocking())return;
   pointer={x:e.clientX,y:e.clientY};
   const at=view.world(e.clientX,e.clientY);
   const x=Math.floor(at.x),y=Math.floor(at.y);
@@ -524,6 +532,8 @@ function frame(now:number):void {
   rescue.hidden=!down&&!shield;
   rescue.dataset.phase=down?'down':'shield';
   canvas.dataset.playerState=down?'down':shield?'shield':'awake';
+  const rollPhase=rolling(w)?rollGuard(w)?'guard':'recover':'ready';
+  if(canvas.dataset.roll!==rollPhase)canvas.dataset.roll=rollPhase;
   if(!rescue.hidden){
     const at=w.player.rescue.startedAt??w.tick;
     const title=down?'马楠失去意识':'复苏护盾';
@@ -557,7 +567,7 @@ function frame(now:number):void {
   setVital(0,w.player.warmth,w.player.maxWarmth);
   setVital(1,w.player.hp,w.player.maxHp);
   setVital(2,h?.fuel??0,FUEL_MAX[Math.min(4,h?.level??0)]||120);
-  setVital(3,w.player.hunger,w.player.maxHunger);updateFoodHud();weaponUi.frame(mode==='weapon');
+  setVital(3,w.player.hunger,w.player.maxHunger);setVital(4,w.player.roll.stamina,100);updateFoodHud();weaponUi.frame(mode==='weapon');
   const reading=`脚下 ${local}°C`;
   if(localTemperature.textContent!==reading)localTemperature.textContent=reading;
   updateToolbar();

@@ -1,3 +1,4 @@
+import { rollGuard } from './roll';
 import { gearModifiers } from './equipment';
 import { fitsOnDeck, hasBuildingContact, inventoryChange } from './ark';
 import { TICK_RATE, type Vec2, type WorldState } from './types';
@@ -8,7 +9,7 @@ export const incapacitated = (w: WorldState): boolean => w.player.hp <= 0 || w.p
 export const rescueShield = (w: WorldState): number => Math.max(0,w.player.rescue.shieldUntil - w.tick);
 
 export function damagePlayer(w: WorldState, amount: number, kind:'physical'|'cold'|'hunger'='physical'): boolean {
-  if (incapacitated(w) || rescueShield(w) || amount <= 0) return false;
+  if (incapacitated(w) || rescueShield(w) || (kind==='physical'&&rollGuard(w)) || amount <= 0) return false;
   const p=w.player;
   const gear=gearModifiers(w);
   const reduction=kind==='physical'?gear.guard:kind==='cold'?gear.cold*.5:0;
@@ -24,7 +25,7 @@ export function healPlayer(w: WorldState, amount: number): void {
 function begin(w: WorldState): void {
   const p=w.player;
   p.hp=0;p.vx=0;p.vy=0;p.portraitMood=3;
-  p.rescue.startedAt=w.tick;p.rescue.shieldUntil=0;
+  p.rescue.startedAt=w.tick;p.rescue.shieldUntil=0;p.roll.startedAt=null;
   p.grapple.active=false;p.grapple.charging=false;p.grapple.charge=0;p.grapple.caughtDebrisId=null;
   w.sky.cruising=false;
 }

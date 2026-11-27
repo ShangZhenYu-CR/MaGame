@@ -26,7 +26,7 @@ console.log(
 );
 
 // M0: play the same world actions without Canvas or browser storage.
-import { build, countItem, craftTorch, isDeck } from '../src/sim/ark';
+import { build, countItem, craftTorch, isDeck, fitsOnDeck } from '../src/sim/ark';
 import { aim, fire, startCharge } from '../src/sim/cloud';
 const m0 = createInitialWorld(202608);
 const mid = m0.ark.size / 2;
@@ -731,3 +731,40 @@ assert.equal(deserializeWorld(JSON.stringify(unarmedLegacy)).player.weapon,null)
 assert.equal(deserializeWorld(JSON.stringify(unarmedLegacy)).player.weaponReadyTick,0);
 const downCombat=createInitialWorld();downCombat.player.hp=0;
 assert.match(triggerWeapon(downCombat,{x:27,y:25})!,/昏迷/);
+
+import { startRoll, rolling, rollGuard, ROLL_COST, ROLL_IFRAME_TICKS, ROLL_TICKS } from '../src/sim/roll';
+import { rollArena } from './p2-roll-fixture';
+
+// P2-08: identical in-circle position, only the actual roll changes whether
+// a whale hit lands. Evasive inertia remains on the original heading.
+const bareRoll=rollArena(4),safeRoll=rollArena(4),rollStartX=safeRoll.player.x;
+assert.equal(startRoll(safeRoll,{x:1,y:0}),null);
+assert.equal(safeRoll.player.roll.stamina,100-ROLL_COST);
+assert.equal(rollGuard(safeRoll),true);
+assert.ok(rolling(safeRoll));
+stepWorld(bareRoll,4);stepWorld(safeRoll,4,{x:-1,y:0});
+assert.ok(safeRoll.player.x>rollStartX&&safeRoll.player.x-rollStartX<1.75,'inertia inside the actual impact radius');
+assert.equal(bareRoll.player.hp,85);
+assert.equal(safeRoll.player.hp,100,'real warning-circle hit is negated by the i-frame');
+assert.equal(safeRoll.player.warmth,100);
+stepWorld(safeRoll,ROLL_IFRAME_TICKS-4);
+assert.equal(rollGuard(safeRoll),false);
+assert.equal(damagePlayer(safeRoll,8),true,'recovery frames are not invulnerable');
+stepWorld(safeRoll,ROLL_TICKS-ROLL_IFRAME_TICKS);
+assert.equal(rolling(safeRoll),false);
+const rollEdge=createInitialWorld();
+Object.assign(rollEdge.player,{x:27.5,y:27.5});
+assert.equal(startRoll(rollEdge,{x:1,y:1}),null);
+const earlyRollSave=deserializeWorld(serializeWorld(rollEdge));
+assert.ok(rolling(earlyRollSave));
+stepWorld(earlyRollSave,ROLL_TICKS);
+assert.equal(areaAt(earlyRollSave,earlyRollSave.player.x,earlyRollSave.player.y),'ark');
+assert.ok(fitsOnDeck(earlyRollSave,earlyRollSave.player.x,earlyRollSave.player.y));
+assert.ok(earlyRollSave.player.x<27.80&&earlyRollSave.player.y<27.80);
+earlyRollSave.player.roll.stamina=ROLL_COST-1;
+assert.match(startRoll(earlyRollSave,{x:1,y:0})!,/体力/);
+stepWorld(earlyRollSave,95);
+assert.ok(earlyRollSave.player.roll.stamina>=ROLL_COST);
+const r7=JSON.parse(serializeWorld(createInitialWorld()));r7.saveVersion=7;delete r7.player.roll;
+assert.equal(deserializeWorld(JSON.stringify(r7)).player.roll.stamina,100);
+console.log('[sim-smoke:P2-08] OK: in-circle i-frames, directional inertia, bounded diagonal edge, stamina, active-roll archive');

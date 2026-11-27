@@ -18,6 +18,7 @@ import { stepFinale } from './finale';
 import { stepRescue } from './rescue';
 import { stepHunger } from './food';
 import { stepWeapons } from './weapons';
+import { rollMotion,stepRoll } from './roll';
 
 export function createInitialWorld(seed = 202608): WorldState {
   const decks = new Array<number>(ARK_SIZE * ARK_SIZE).fill(0);
@@ -61,6 +62,7 @@ export function createInitialWorld(seed = 202608): WorldState {
       selectedSlot: 0,
       gear: {outer:null,guard:null,charm:null},
       weapon:null,weaponReadyTick:0,
+      roll:{stamina:100,startedAt:null,dx:0,dy:1,restUntil:0},
       rescue: {startedAt:null, shieldUntil:0},
       diet: {warmUntil:0,last:null,quick:null},
       inventory: [
@@ -135,7 +137,8 @@ export function createInitialWorld(seed = 202608): WorldState {
 export function stepWorld(world: WorldState, ticks = 1, direction: Vec2 = {x: 0, y: 0}): void {
   for (let i = 0; i < ticks; i++) {
     world.tick += 1;
-    walkExpedition(world, direction);
+    const motion=rollMotion(world,direction);
+    walkExpedition(world,motion.direction,motion.scale);
     stepNavigation(world);
     stepCloud(world);
     advanceClimate(world);
@@ -148,5 +151,6 @@ export function stepWorld(world: WorldState, ticks = 1, direction: Vec2 = {x: 0,
     stepWeapons(world);
     stepM5(world);
     stepRescue(world);
+    stepRoll(world);
   }
 }

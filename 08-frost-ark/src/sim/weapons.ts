@@ -5,6 +5,7 @@ import { strikeWildWithWeapon } from './beasts';
 import { finaleStatus,strikeWhaleWithWeapon } from './finale';
 import { areaAt } from './island';
 import { strikeHostileWithWeapon } from './m5';
+import { rolling } from './roll';
 import { incapacitated } from './rescue';
 import type { Vec2,WildEntity,WorldState } from './types';
 
@@ -69,6 +70,7 @@ function hit(w:WorldState,s:Spec,target:Target):boolean {
 
 export function triggerWeapon(w:WorldState,at:Vec2):string|null{
   if(incapacitated(w))return '昏迷中，等待救援。';
+  if(rolling(w))return '翻滚时不能攻击。';
   const s=selectedWeapon(w),p=w.player;
   if(!s||!countItem(w,s.id))return '先在背包装备武器。';
   if(weaponCooldown(w))return '武器正在回手。';

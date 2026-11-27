@@ -21,6 +21,7 @@
         <div class="underfoot" id="local-temp"></div>
       </div>
       <div class="survival-row nutrition-row numbers"><label for="hunger-meter">饱食</label><meter id="hunger-meter" min="0" max="100"></meter><output id="hunger-value"></output></div>
+      <div class="survival-row stamina-row numbers"><label for="stamina-meter">体力</label><meter id="stamina-meter" min="0" max="100"></meter><output id="stamina-value"></output></div>
       <div id="meal-buff" hidden><img alt=""><span>暖胃抗寒</span><output class="numbers"></output></div>
       <div class="survival-row lift-row numbers"><label for="buoyancy-gauge">浮力</label><meter id="buoyancy-gauge" min="0" max="64"></meter><output id="buoyancy-spare"></output></div>
       <section class="m5-seeds numbers" id="m5-seed-count" aria-label="天穹火种进度"></section>
@@ -170,7 +171,7 @@
   <div id="ui-tip" class="ui-tip" role="tooltip" hidden></div>
   <div class="build-note" id="build-note" hidden></div>
   <div class="save-label" id="save-label" role="status">读取存档…</div>
-  <div class="key-note"><kbd>WASD</kbd> 移动 <span>／</span> <kbd>E</kbd> 互动 <span>／</span> <kbd>Esc</kbd> 返回 <span>／</span> 滚轮缩放<div id="hint">按住左键蓄力，松开抛钩</div></div>
+  <div class="key-note"><kbd>WASD</kbd> 移动 <span>／</span> <kbd>Space</kbd> 翻滚 <span>／</span> <kbd>E</kbd> 互动 <span>／</span> <kbd>Esc</kbd> 返回 <span>／</span> 滚轮缩放<div id="hint">按住左键蓄力，松开抛钩</div></div>
 </main>
 <script type="module" src="/src/main.ts"></script>
 </body>

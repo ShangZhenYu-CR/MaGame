@@ -6,6 +6,7 @@ import { ArtLibrary } from './art-library';
 import { clamp, cloudscape, ovalGlow, WeatherFinish } from './atmosphere';
 import { primaryHearth } from '../sim/heatField';
 import { finaleStatus } from '../sim/finale';
+import { rollAge,rollTrail,rolling,ROLL_TICKS } from '../sim/roll';
 import { incapacitated, RESCUE_TICKS, rescuePoint } from '../sim/rescue';
 import { isDeckDrop } from '../sim/latte';
 import { buildingDefs } from '../sim/ark';
@@ -271,9 +272,19 @@ export class ArkView {
     const pull=down&&!land?clamp((age-RESCUE_TICKS*.55)/(RESCUE_TICKS*.45)):0;
     const target=pull?rescuePoint(w):pl;
     const actorX=pl.x+(target.x-pl.x)*pull,actorY=pl.y+(target.y-pl.y)*pull;
-    const player:Actor={x:actorX,y:actorY,art:`manan-${dir}`,width:1.43,height:1.43,shadow:.34,scale:walking?1:1+(.5+.5*Math.sin(w.tick*.115))*.03,
-      rotation:down?clamp(age/14)*1.49:walking?Math.sin(w.tick*.42)*Math.PI/72:0,float:walking?Math.abs(Math.sin(w.tick*.31))*s*.04:0};
+    const tumble=rolling(w),ease=tumble?Math.sin(rollAge(w)/ROLL_TICKS*Math.PI):0;
+    const player:Actor={x:actorX,y:actorY,art:`manan-${dir}`,width:1.43,height:1.43,shadow:.34,scale:tumble?1-.19*ease:walking?1:1+(.5+.5*Math.sin(w.tick*.115))*.03,
+      rotation:down?clamp(age/14)*1.49:tumble?(pl.roll.dx<0?-1:1)*ease*1.43:walking?Math.sin(w.tick*.42)*Math.PI/72:0,float:walking?Math.abs(Math.sin(w.tick*.31))*s*.04:0};
     actors.push(player);
+    // Reuse the checked player sprites for short, translucent silhouettes.
+    // Only actual swept/grounded poses appear in the trail.
+    for(const mark of rollTrail(w)){
+      if(Math.hypot(mark.x-pl.x,mark.y-pl.y)<.15)continue;
+      const path=project(mark.x,mark.y);
+      c.save();c.globalAlpha=.23*Math.max(0,1-(w.tick-mark.tick)/13);
+      this.art.paint(c,player.art,path.x,path.y,s,{width:1.28,height:1.28,rotation:player.rotation,scale:.88});
+      c.restore();
+    }
 
     // L2: Whole-scene grounding before painting the sprites.
     const firePos=fire&&fire.fuel>0?{x:fire.gx+1,y:fire.gy+1.18}:null;

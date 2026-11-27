@@ -196,10 +196,14 @@ export function walkOnGround(w:WorldState,direction:Vec2,speed:number,supported:
     return lo;
   }
   const dx=p.facing.x*speed,dy=p.facing.y*speed;
-  p.vx=dx*advance(dx,0);p.x+=p.vx;
-  p.vy=dy*advance(0,dy);p.y+=p.vy;
+  const slices=Math.max(1,Math.ceil(speed/.095)),x0=p.x,y0=p.y;
+  for(let i=0;i<slices;i++){
+    p.x+=dx/slices*advance(dx/slices,0);
+    p.y+=dy/slices*advance(0,dy/slices);
+  }
+  p.vx=p.x-x0;p.vy=p.y-y0;
 }
 
-export function walk(w:WorldState,direction:Vec2):void {
-  walkOnGround(w,direction,.095,(x,y)=>fitsOnDeck(w,x,y));
+export function walk(w:WorldState,direction:Vec2,pace=1):void {
+  walkOnGround(w,direction,.095*pace,(x,y)=>fitsOnDeck(w,x,y));
 }

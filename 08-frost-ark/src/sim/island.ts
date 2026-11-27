@@ -190,7 +190,7 @@ export function toggleGangway(w:WorldState):string|null{
   return null;
 }
 
-export function walkExpedition(w:WorldState,direction:Vec2):void{
+export function walkExpedition(w:WorldState,direction:Vec2,pace=1):void{
   const g=gangwayGeometry(w),p=w.player;
   if(incapacitated(w)){p.vx=p.vy=0;return;}
   if(!g?.deployed){
@@ -198,11 +198,11 @@ export function walkExpedition(w:WorldState,direction:Vec2):void{
     // ship but their feet still overlapped the seam. Let a step back free them
     // without moving any valid old-save position, even on an irregular deck.
     if(g&&direction.x<0&&!fitsOnDeck(w,p.x,p.y))stepBackFromDockSeam(w,g);
-    walk(w,direction);
+    walk(w,direction,pace);
     return;
   }
   const speed=areaAt(w,p.x,p.y)==='island'?.087:.095;
-  walkOnGround(w,direction,speed,(x,y)=>feetSupported(x,y,(px,py)=>areaAt(w,px,py)!=='void'));
+  walkOnGround(w,direction,speed*pace,(x,y)=>feetSupported(x,y,(px,py)=>areaAt(w,px,py)!=='void'));
   const area=areaAt(w,p.x,p.y);
   if(area!=='ark'&&(p.grapple.charging||p.grapple.active)){
     p.grapple.charging=p.grapple.active=false;p.grapple.caughtDebrisId=null;p.grapple.charge=0;

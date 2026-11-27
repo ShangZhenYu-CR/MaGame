@@ -298,3 +298,4 @@ button[aria-disabled=true]{opacity:.62}
 #weapon-toggle output{color:#d9b681;text-align:right}
 #weapon-toggle[hidden]{display:none}
 @media(max-width:820px){#weapon-toggle{left:12px;bottom:113px}}
+.stamina-row{margin-top:3px;color:#c6d9df;--meter-color:#7da7bc}

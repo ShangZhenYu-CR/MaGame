@@ -1,4 +1,5 @@
 import { verifyM5 } from './m5';
+import { ROLL_TICKS } from './roll';
 import { RESCUE_SHIELD_TICKS } from './rescue';
 import { isMeal, MAX_MEAL_TICKS } from './food';
 import { isGrappleItem } from './grapple-tools';
@@ -103,7 +104,7 @@ function validateFauna(p:Record<string,unknown>,ids:Set<string>):void{
 
 export function deserializeWorld(raw: string): WorldState {
   const p:unknown=JSON.parse(raw);
-  if(!record(p)||![1,2,3,4,5,6,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
+  if(!record(p)||![1,2,3,4,5,6,7,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
     throw new Error('存档版本不受支持');
   if(p.saveVersion===1){
     if(record(p.player))p.player.rescue={startedAt:null,shieldUntil:0};
@@ -121,6 +122,7 @@ export function deserializeWorld(raw: string): WorldState {
   }
   if(p.saveVersion<6&&record(p.player))p.player.gear={outer:null,guard:null,charm:null};
   if(p.saveVersion<7&&record(p.player)){p.player.weapon=null;p.player.weaponReadyTick=0;}
+  if(p.saveVersion<8&&record(p.player))p.player.roll={stamina:100,startedAt:null,dx:0,dy:1,restUntil:0};
   p.saveVersion=SAVE_VERSION;
   const {ark, player, sky, latte}=p;
   if(!eachNumber(p,['seed','rngState','tick','day','timeOfDay','ambientTemp','skyheartCores'])||
@@ -199,6 +201,13 @@ export function deserializeWorld(raw: string): WorldState {
     !num(player.rescue.shieldUntil)||!Number.isSafeInteger(player.rescue.shieldUntil)||
     player.rescue.shieldUntil<0||player.rescue.shieldUntil>p.tick+RESCUE_SHIELD_TICKS)
     throw new Error('救援存档不符合方舟格式');
+  const roll=player.roll;
+  if(!record(roll)||!num(roll.stamina)||roll.stamina<0||roll.stamina>100||
+    !num(roll.dx)||!num(roll.dy)||Math.abs(Math.hypot(roll.dx,roll.dy)-1)>.001||
+    !num(roll.restUntil)||!Number.isSafeInteger(roll.restUntil)||roll.restUntil<0||roll.restUntil>p.tick+36||
+    (roll.startedAt!==null&&(!num(roll.startedAt)||!Number.isSafeInteger(roll.startedAt)||
+     roll.startedAt<0||roll.startedAt>p.tick||p.tick-roll.startedAt>=ROLL_TICKS||player.hp===0)))
+    throw new Error('翻滚存档不符合方舟格式');
   if(!record(player.diet)||!num(player.diet.warmUntil)||!Number.isSafeInteger(player.diet.warmUntil)||
     player.diet.warmUntil<0||player.diet.warmUntil>p.tick+MAX_MEAL_TICKS||
     !(player.diet.last===null||isMeal(player.diet.last))||!(player.diet.quick===null||isMeal(player.diet.quick))||

@@ -234,5 +234,10 @@
   {"id": "wind_vane", "name": "导航风标", "category": "navigation", "size": [1, 1], "buoyancyDelta": -1, "maxHp": 95, "cost": [{"itemId": "driftwood", "count": 3}, {"itemId": "frost_iron_scrap", "count": 2}, {"itemId": "rope", "count": 1}]},
   {"id": "heat_pipe", "name": "热力导气管", "category": "heat", "size": [1, 1], "buoyancyDelta": 0, "maxHp": 80, "cost": [{"itemId": "frost_iron_scrap", "count": 1}]},
   {"id": "insulated_floor", "name": "防寒地板", "category": "structure", "size": [1, 1], "buoyancyDelta": 0, "maxHp": 90, "insulation": 0.42, "cost": [{"itemId": "driftwood", "count": 2}, {"itemId": "warm_fur", "count": 1}]},
-  {"id": "repair_station", "name": "修理台", "category": "industry", "size": [1, 1], "buoyancyDelta": -1, "maxHp": 150, "cost": [{"itemId": "driftwood", "count": 4}, {"itemId": "frost_iron_ingot", "count": 2}]}
+  {"id": "repair_station", "name": "修理台", "category": "industry", "size": [1, 1], "buoyancyDelta": -1, "maxHp": 150, "cost": [{"itemId": "driftwood", "count": 4}, {"itemId": "frost_iron_ingot", "count": 2}]},
+  {"id": "warm_cot", "name": "行军暖床", "category": "home", "size": [1, 2], "buoyancyDelta": -1, "maxHp": 105, "cost": [{"itemId": "driftwood", "count": 4}, {"itemId": "warm_fur", "count": 3}]},
+  {"id": "tea_table", "name": "热茶桌", "category": "home", "size": [1, 1], "buoyancyDelta": -1, "maxHp": 105, "cost": [{"itemId": "driftwood", "count": 3}, {"itemId": "frost_iron_scrap", "count": 2}]},
+  {"id": "latte_climber", "name": "拿铁猫爬架", "category": "home", "size": [1, 1], "buoyancyDelta": -1, "maxHp": 105, "cost": [{"itemId": "driftwood", "count": 3}, {"itemId": "rope", "count": 2}]},
+  {"id": "water_purifier", "name": "融冰净水器", "category": "home", "size": [1, 1], "buoyancyDelta": -1, "maxHp": 105, "cost": [{"itemId": "frost_iron_ingot", "count": 2}, {"itemId": "driftwood", "count": 3}]},
+  {"id": "wall_lamp", "name": "壁挂暖灯", "category": "home", "size": [1, 1], "buoyancyDelta": 0, "maxHp": 105, "cost": [{"itemId": "frost_iron_scrap", "count": 2}, {"itemId": "torch_item", "count": 1}], "heatOutput": 6, "heatRadius": 1.9}
 ]

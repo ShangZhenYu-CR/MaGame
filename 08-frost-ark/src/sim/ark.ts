@@ -15,7 +15,7 @@ import type { BuildingInstance, ItemStack, Vec2, WorldState } from './types';
 export const buildKinds = [
   'wood_deck','torch_post','wind_wall','workbench','furnace','stove','heat_relay',
   'catch_net','sorter_arm','greenhouse','warm_wall','buoyancy_core','iron_deck','beast_den','feed_trough',
-  'frost_turret','fire_oil_turret','wind_door','frost_airlock','fuel_hopper','steam_chute','wind_sail','steam_thruster','wind_vane','heat_pipe','insulated_floor','repair_station',
+  'frost_turret','fire_oil_turret','wind_door','frost_airlock','fuel_hopper','steam_chute','wind_sail','steam_thruster','wind_vane','heat_pipe','insulated_floor','repair_station','warm_cot','tea_table','latte_climber','water_purifier','wall_lamp',
 ] as const;
 export type BuildKind = typeof buildKinds[number];
 export const itemNames = new Map(items.map(({ id, name }) => [id, name]));
@@ -157,6 +157,7 @@ export function buildIssue(w: WorldState, kind: BuildKind, x: number, y: number)
   }else if(overlayKind(kind)){
     if(!isDeck(w,x,y))return '先铺设这格甲板';
     if(utilityAt(w,x,y,kind))return '这里已有同类铺装';
+    if(kind==='wall_lamp'&&!['wind_wall','warm_wall'].includes(buildingAt(w,x,y)?.defId??''))return '把壁挂暖灯放在一面挡风墙上';
   }else{
     for(let dy=0;dy<sh;dy++)for(let dx=0;dx<sw;dx++){
       if(!isDeck(w,x+dx,y+dy))return '建筑须完整放在甲板上';

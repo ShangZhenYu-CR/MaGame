@@ -1,3 +1,4 @@
+import { catPerch } from '../sim/home';
 import { heatedPipes,overlayKind } from '../sim/utilities';
 import { cruiseSpeed } from '../sim/sky-map';
 import { transportEvents } from '../sim/logistics';
@@ -41,6 +42,11 @@ const buildingVisuals:Readonly<Record<string,BuildingVisual>>={
   catch_net:{art:'building-net',width:1.23,height:1.20,shadow:.45},
   sorter_arm:{art:'building-sorter',width:1.20,height:1.46,shadow:.47},
   greenhouse:{art:'building-greenhouse',width:2.26,height:2.17,shadow:.98},
+  warm_cot:{art:'building-warm-cot',width:1.13,height:2.05,shadow:.61},
+  tea_table:{art:'building-tea-table',width:1.21,height:1.19,shadow:.46},
+  latte_climber:{art:'building-latte-climber',width:1.18,height:1.38,shadow:.45},
+  water_purifier:{art:'building-water-purifier',width:1.23,height:1.28,shadow:.50},
+  wall_lamp:{art:'building-wall-lamp',width:.63,height:.71,shadow:0},
   repair_station:{art:'building-repair-station',width:1.23,height:1.19,shadow:.54},
   heat_pipe:{art:'building-heat-pipe',width:1.12,height:1.09,shadow:0},
   wind_sail:{art:'building-wind-sail',width:1.40,height:1.50,shadow:.50},
@@ -290,8 +296,11 @@ export class ArkView {
     const fireArt=fire?.level===4?'solar-hearth':fire?.level===3?'hearth-3':fire?.level===2?'hearth-2':'hearth-1';
     if(this.canvas.dataset.hearthArt!==fireArt)this.canvas.dataset.hearthArt=fireArt;
     for(const bld of w.ark.buildings){
-      if(overlayKind(bld.defId))continue;
+      if(overlayKind(bld.defId)&&bld.defId!=='wall_lamp')continue;
       const {gx,gy}=bld;
+      if(bld.defId==='wall_lamp'){
+        actors.push({...buildingVisuals.wall_lamp,x:gx+.65,y:gy+.88,float:s*.30});continue;
+      }
       if(bld.defId==='hearth_core')actors.push({x:gx+1,y:gy+GROUND_FOOTPRINTS.hearth_core!.anchorY,art:fireArt,
         width:2.65,height:2.43,shadow:1.15,fire:bld.fuel>0?'hearth':undefined,hearthLevel:bld.level});
       const visuals=buildingVisuals[bld.defId];
@@ -305,9 +314,12 @@ export class ArkView {
       actors.push({...visuals,art:doorArt,id:bld.id,rotation:r,steam:w.sky.cruising&&bld.defId==='steam_thruster'&&bld.hp>1,x:gx+spanX*.5,y:gy+(GROUND_FOOTPRINTS[bld.defId]?.anchorY??spanY*.80),fire:effect});
     }
     const latte=w.latte;
-    const catWalking=fire?Math.hypot(latte.x-fire.gx-2.4,latte.y-fire.gy-2.4)>.23:false;
+    const perch=catPerch(w);
+    const perched=perch&&latte.mood==='cozy'&&Math.hypot(latte.x-perch.gx-.52,latte.y-perch.gy-.59)<.23;
+    if(this.canvas.dataset.catPerched!==String(!!perched))this.canvas.dataset.catPerched=String(!!perched);
+    const catWalking=!perched&&fire?Math.hypot(latte.x-fire.gx-2.4,latte.y-fire.gy-2.4)>.23:false;
     actors.push({x:latte.x,y:latte.y,art:catWalking?(Math.floor(w.tick/7)%2?'latte-walk':'latte-walk-alt'):latte.mood==='cozy'?'latte-sleep':'latte-alert',
-      width:.94*.65,height:.94*.65,shadow:.32*.65,scale:1+(.5+.5*Math.sin(w.tick*.12))*.03,rotation:catWalking?Math.sin(w.tick*.45)*.026:0});
+      width:.94*.65,height:.94*.65,shadow:.32*.65,scale:1+(.5+.5*Math.sin(w.tick*.12))*.03,rotation:catWalking?Math.sin(w.tick*.45)*.026:0,float:perched?s*.39:0});
     const dir=Math.abs(pl.facing.x)>Math.abs(pl.facing.y)?(pl.facing.x<0?'west':'east'):(pl.facing.y<0?'north':'south');
     const down=incapacitated(w), walking=!!(pl.vx||pl.vy), age=w.tick-(pl.rescue.startedAt??w.tick);
     const land=w.activeIsland||!deck(Math.floor(pl.x),Math.floor(pl.y));

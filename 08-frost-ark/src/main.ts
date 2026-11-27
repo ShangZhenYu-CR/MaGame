@@ -27,6 +27,8 @@ import { beastUi } from './ui/beasts';
 import { equipmentUi } from './ui/equipment';
 import { weaponsUi } from './ui/weapons';
 import { chooseWeapon, selectedWeapon, triggerWeapon, weaponHover, weaponById } from './sim/weapons';
+import { helmPoint } from './sim/sky-map';
+import { roomComfort } from './sim/home';
 import { utilityAt } from './sim/utilities';
 import { logisticsStats } from './sim/logistics';
 import { doorCenter,doorOpen,indoorsAt,nearestManualDoor,operateWindDoor } from './sim/rooms';
@@ -135,7 +137,8 @@ function primaryInteraction():PrimaryInteraction{
     const wild=nearestWildBeast(w);
     if(wild&&(wild.stunnedTicks>0||wild.hp<=wild.maxHp*.35||!nearestIslandNode(w,1.8)))return {kind:'feed'};
   }
-  if(expedition.keyAction())return {kind:'expedition'};
+  const travel=expedition.keyAction();
+  if(travel&&travel!=='helm')return {kind:'expedition'};
   if(here!=='ark')return {kind:'none'};
   const door=nearestManualDoor(w),box=nearestStorage(w),station=nearestIndustry(w),animal=nearestBeastFacility(w);
   if(door){
@@ -143,6 +146,13 @@ function primaryInteraction():PrimaryInteraction{
     const others=[box,station,animal].filter(b=>b!==undefined);
     if(others.every(b=>dist<=Math.hypot(b.gx+.5-w.player.x,b.gy+.5-w.player.y)+.24))
       return {kind:'door',id:door.id,open:doorOpen(door)};
+  }
+  // A relocated helm can share an enclosed room with furniture. Preserve E
+  // at the helm itself, but let nearer machinery take priority when the
+  // player is standing at its interaction boundary rather than at the wheel.
+  if(travel==='helm'){
+    const helm=helmPoint(w),dist=Math.hypot(w.player.x-helm.x,w.player.y-helm.y);
+    if(!station||dist<=Math.max(.55,industryDistance(w,station)+.28))return {kind:'expedition'};
   }
   if(animal&&(!box||industryDistance(w,animal)<industryDistance(w,box))&&
     (!station||industryDistance(w,animal)<industryDistance(w,station)))return {kind:'beasts'};
@@ -338,7 +348,10 @@ buffs[0].title='防寒装备减缓失温';
 buffs[1].title='救援苏醒后的短暂免伤';
 buffs[2].title='暖区内能快速回温';
 function paintBuffHud(local:number,shield:number):void{
-  const active=[gearModifiers(w).cold>0,shield>0,local>=15&&!incapacitated(w)];
+  const comfort=roomComfort(w);
+  const active=[gearModifiers(w).cold>0,shield>0,(comfort>0||local>=15)&&!incapacitated(w)];
+  const label=buffs[2].querySelector('span')!,tag=comfort?'舒适 Lv.'+comfort:'舒适';
+  if(label.textContent!==tag)label.textContent=tag;
   buffs.forEach((b,i)=>{if(b.hidden===active[i])b.hidden=!active[i];});
   const hide=active.every(s=>!s);if(buffBar.hidden!==hide)buffBar.hidden=hide;
   if(shield){
@@ -394,7 +407,7 @@ function safeWorld(next:WorldState):void {
 function ghostAt(): Ghost|null {
   if(mode==='hook'||mode==='weapon'||mode==='tool'||!pointer||expedition.area()!=='ark')return null;
   const at=view.world(pointer.x,pointer.y), x=Math.floor(at.x), y=Math.floor(at.y);
-  const targeted=mode==='dismantle'?(buildingAt(w,x,y)??utilityAt(w,x,y)):null;
+  const targeted=mode==='dismantle'?(utilityAt(w,x,y,'wall_lamp')??buildingAt(w,x,y)??utilityAt(w,x,y)):null;
   const issue=mode==='dismantle'?dismantleIssue(w,x,y):buildIssue(w,mode,x,y);
   const defId=mode==='dismantle'?(targeted?.defId??'wood_deck'):mode;
   const label=issue??(mode==='wood_deck'?'吸附就绪 · 浮木板 ×2':mode==='torch_post'?'放置就绪 · 防风火把 ×1':

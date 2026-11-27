@@ -14,7 +14,7 @@ export function doorBlocksFeet(b:BuildingInstance,p:Vec2,r=PLAYER_FOOT_RADIUS):b
  return !doorOpen(b)||p.x-r<b.gx+.11||p.x+r>b.gx+.89;
 }
 export interface IndoorSpan{x:number;y:number;width:number}
-interface RoomMask{inside:Uint8Array;spans:IndoorSpan[];tiles:number}
+interface RoomMask{inside:Uint8Array;spans:IndoorSpan[];tiles:number;room:Uint16Array;roomAreas:number[]}
 const cache=new WeakMap<WorldState,RoomMask>();
 export const invalidateRoomTopology=(w:WorldState)=>cache.delete(w);
 export function nearestManualDoor(w:WorldState):BuildingInstance|undefined{
@@ -54,10 +54,10 @@ export function indoor(w:WorldState):RoomMask{
  const existing=cache.get(w);
  if(existing)return existing;
  const {size,decks,buildings}=w.ark,total=size*size;
- const inside=new Uint8Array(total),barrier=new Uint8Array(total);
+ const inside=new Uint8Array(total),barrier=new Uint8Array(total),room=new Uint16Array(total),roomAreas=[0];
  const envelopes=buildings.filter(b=>walls.has(b.defId)||isDoor(b.defId)&&!doorOpen(b));
  if(envelopes.length<4){
-  const empty={inside,spans:[],tiles:0};cache.set(w,empty);return empty;
+  const empty={inside,spans:[],tiles:0,room,roomAreas};cache.set(w,empty);return empty;
  }
  for(const b of envelopes)barrier[b.gy*size+b.gx]=1;
  const outside=new Uint8Array(total),queue=new Int32Array(total);
@@ -85,7 +85,19 @@ export function indoor(w:WorldState):RoomMask{
    else if(run>=0){spans.push({x:run,y,width:x-run});run=-1;}
   }
  }
- const mask={inside,spans,tiles};cache.set(w,mask);return mask;
+ let next=0;
+ for(let i=0;i<total;i++){
+  if(!inside[i]||room[i])continue;
+  const label=++next;room[i]=label;head=0;tail=0;queue[tail++]=i;
+  const labelNext=(j:number)=>{if(inside[j]&&!room[j]){room[j]=label;queue[tail++]=j;}};
+  while(head<tail){
+   const at=queue[head++],x=at%size,y=Math.floor(at/size);
+   if(x>0)labelNext(at-1);if(x<size-1)labelNext(at+1);
+   if(y>0)labelNext(at-size);if(y<size-1)labelNext(at+size);
+  }
+  roomAreas[label]=tail;
+ }
+ const mask={inside,spans,tiles,room,roomAreas};cache.set(w,mask);return mask;
 }
 export function indoorsAt(w:WorldState,p:Vec2):boolean{
  const x=Math.floor(p.x),y=Math.floor(p.y),size=w.ark.size;

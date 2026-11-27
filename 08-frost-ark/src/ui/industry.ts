@@ -1,4 +1,4 @@
-import { addFuelToHopper,changeRoute,treatDamage } from '../sim/industry';
+import { actInHome,addFuelToHopper,changeRoute,treatDamage } from '../sim/industry';
 import { buildKinds, buildCosts, buildDefinitions, countItem, itemNames, type BuildKind } from '../sim/ark';
 import { collectIndustry, industryPanel, pendingDismantle, startIndustry, techOptions, undoDismantle, unlockTech } from '../sim/industry';
 import type { ItemStack, WorldState } from '../sim/types';
@@ -7,6 +7,8 @@ import { bindTooltips } from './tooltip';
 
 const el=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id)! as T;
 const descriptions:Partial<Record<BuildKind,string>>={
+ warm_cot:'暖室里安全过夜，恢复全部体力。',tea_table:'消耗一份净水，喝茶回温和回体力。',latte_climber:'给拿铁留一块安心休息的高台。',
+ water_purifier:'把冰晶碎块融成净水。',wall_lamp:'挂在挡风墙上，提供暖光与舒适度。',
  heat_pipe:'铺在甲板上，不占位。从主炉沿相邻管道传热。',insulated_floor:'覆在木甲板或铁甲板上保温，不影响行走。',repair_station:'手持修理锤，可按建筑修补或一次修复全船。',
  wind_sail:'增加巡航速度，顺风鼓帆更快。',steam_thruster:'提高巡航推力并抵消逆风阻力。',wind_vane:'减少偏航损耗，扩大新岛搜寻范围。',
  fuel_hopper:'自动给紧邻的主炉或熔炉补燃料。',steam_chute:'将相邻分拣臂与远端容器相连。',
@@ -49,8 +51,8 @@ export function createIndustryUi(cb:Callbacks){
  let activeStation:string|null=null,catalogKey='',stationKey='',liftKey='',routeKey='',repairKey='';
  const buttons=new Map<BuildKind,HTMLButtonElement>();
  const itemIcon=(id:string)=>cb.icon(id.replaceAll('_','-'))??cb.icon(materialIcons[id]??'');
- const lateBlueprints=new Set<string>(['beast_den','feed_trough','frost_turret','fire_oil_turret','wind_door','frost_airlock','fuel_hopper','steam_chute','wind_sail','steam_thruster','wind_vane','heat_pipe','insulated_floor','repair_station']);
- const categoryGroup=(kind:BuildKind)=>el(['workbench','furnace','stove','catch_net','sorter_arm','greenhouse','beast_den','feed_trough','fuel_hopper','steam_chute','repair_station'].includes(kind)?'catalog-industry':'catalog-structure');
+ const lateBlueprints=new Set<string>(['beast_den','feed_trough','frost_turret','fire_oil_turret','wind_door','frost_airlock','fuel_hopper','steam_chute','wind_sail','steam_thruster','wind_vane','heat_pipe','insulated_floor','repair_station','warm_cot','tea_table','latte_climber','water_purifier','wall_lamp']);
+ const categoryGroup=(kind:BuildKind)=>el(['workbench','furnace','stove','catch_net','sorter_arm','greenhouse','beast_den','feed_trough','fuel_hopper','steam_chute','repair_station','water_purifier'].includes(kind)?'catalog-industry':'catalog-structure');
  for(const kind of buildKinds){
   const def=buildDefinitions[kind],[gw,gh]=def.size;
   const lift=def.buoyancyDelta>0?`+${def.buoyancyDelta} 浮力`:def.buoyancyDelta<0?`占用 ${-def.buoyancyDelta} 浮力`:'不占浮力';
@@ -106,7 +108,14 @@ export function createIndustryUi(cb:Callbacks){
  function updateStation(){
   if(!activeStation)return;
   const info=industryPanel(cb.state(),activeStation);if(!info){showStation(null);return;}
-  const {id,defId,recipes,job,output,intake,efficiency,status,logistics,fuel,repair}=info;
+  const {id,defId,recipes,job,output,intake,efficiency,status,logistics,fuel,repair,home}=info;
+  el('home-panel').hidden=!home;
+  const homeButton=el<HTMLButtonElement>('home-action');
+  if(home){
+    homeButton.disabled=!!home.issue;homeButton.dataset.action=home.action;
+    text(homeButton,home.action==='sleep'?'睡到天亮':'喝一杯热茶');
+    text(el('home-status'),home.issue??('暖室舒适 Lv.'+home.level));
+  }
   el('repair-panel').hidden=!repair;
   if(repair){
     const key=JSON.stringify([id,repair]);
@@ -177,6 +186,12 @@ export function createIndustryUi(cb:Callbacks){
  for(const [button,id] of [['hopper-wood','driftwood'],['hopper-coal','coal_chunk']]){
   el(button).onclick=()=>{if(activeStation){cb.message(addFuelToHopper(cb.state(),activeStation,id),'燃料已装入料斗。');updateStation();}};
  }
+ el('home-action').onclick=e=>{
+   const mode=(e.currentTarget as HTMLButtonElement).dataset.action;
+   if(activeStation&&(mode==='sleep'||mode==='tea')){
+     cb.message(actInHome(cb.state(),activeStation,mode),mode==='sleep'?'睡到清晨，体力已回满。':'热茶暖身，恢复体力。','craft');updateStation();
+   }
+ };
  el('repair-all').onclick=()=>{if(activeStation){cb.message(treatDamage(cb.state(),activeStation),'已修复全船。','craft');updateStation();}};
  collect.onclick=()=>{if(activeStation){cb.message(collectIndustry(cb.state(),activeStation),'物资已收入背包。','craft');updateStation();}};
  el('catalog-close').onclick=()=>{showCatalog(false);el('build-catalog-toggle').focus();};

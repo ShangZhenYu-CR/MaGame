@@ -1,3 +1,4 @@
+import { catPerch } from './home';
 import { inventoryChange, isDeck } from './ark';
 import { incapacitated, RESCUE_TICKS, rescuePoint } from './rescue';
 import { heatAt, primaryHearth } from './heatField';
@@ -39,7 +40,8 @@ export function updateLatte(w:WorldState):void{
     ?w.sky.debris.find(v=>isDeckDrop(v)&&isDeck(w,Math.floor(v.x),Math.floor(v.y))&&
       Math.hypot(v.x-hearth.gx-1,v.y-hearth.gy-1)<=6&&heatAt(w,v.x,v.y)>=15)
     :undefined;
-  const x=d?.x??hx,y=d?.y??hy, gap=Math.hypot(x-cat.x,y-cat.y);
+  const perch=!d&&cat.mood==='cozy'?catPerch(w):undefined;
+  const x=d?.x??(perch?perch.gx+.52:hx),y=d?.y??(perch?perch.gy+.59:hy), gap=Math.hypot(x-cat.x,y-cat.y);
   if(gap>.19){
     const k=Math.min(.08,gap)/gap;
     cat.x+=(x-cat.x)*k;cat.y+=(y-cat.y)*k;

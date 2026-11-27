@@ -1,7 +1,7 @@
 import type { BuildingInstance,WorldState } from './types';
 import { buildingDefs,countItem,inventoryChange } from './ark';
 
-export const overlayKind=(defId:string)=>defId==='heat_pipe'||defId==='insulated_floor';
+export const overlayKind=(defId:string)=>defId==='heat_pipe'||defId==='insulated_floor'||defId==='wall_lamp';
 export const utilityAt=(w:WorldState,x:number,y:number,id?:string)=>
   w.ark.buildings.find(b=>overlayKind(b.defId)&&b.gx===x&&b.gy===y&&(!id||b.defId===id));
 const cardinal=[[-1,0],[1,0],[0,-1],[0,1]] as const;

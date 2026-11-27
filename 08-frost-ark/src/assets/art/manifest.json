@@ -2848,6 +2848,182 @@
         60
       ],
       "bytes": 9165
+    },
+    "building-warm-cot": {
+      "file": "building-warm-cot.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.17,
+      "tileH": 1.28,
+      "contentBox": [
+        15,
+        2,
+        113,
+        121
+      ],
+      "bytes": 27482
+    },
+    "icon-warm-cot": {
+      "file": "icon-warm-cot.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1.17,
+      "tileH": 1.28,
+      "contentBox": [
+        8,
+        2,
+        56,
+        60
+      ],
+      "bytes": 7448
+    },
+    "building-tea-table": {
+      "file": "building-tea-table.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.17,
+      "tileH": 1.28,
+      "contentBox": [
+        10,
+        2,
+        117,
+        121
+      ],
+      "bytes": 26177
+    },
+    "icon-tea-table": {
+      "file": "icon-tea-table.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1.17,
+      "tileH": 1.28,
+      "contentBox": [
+        6,
+        2,
+        58,
+        60
+      ],
+      "bytes": 7530
+    },
+    "building-latte-climber": {
+      "file": "building-latte-climber.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.17,
+      "tileH": 1.28,
+      "contentBox": [
+        16,
+        2,
+        112,
+        121
+      ],
+      "bytes": 22751
+    },
+    "icon-latte-climber": {
+      "file": "icon-latte-climber.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1.17,
+      "tileH": 1.28,
+      "contentBox": [
+        8,
+        2,
+        55,
+        60
+      ],
+      "bytes": 6375
+    },
+    "building-water-purifier": {
+      "file": "building-water-purifier.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.17,
+      "tileH": 1.28,
+      "contentBox": [
+        2,
+        22,
+        126,
+        121
+      ],
+      "bytes": 31368
+    },
+    "icon-water-purifier": {
+      "file": "icon-water-purifier.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1.17,
+      "tileH": 1.28,
+      "contentBox": [
+        2,
+        12,
+        62,
+        60
+      ],
+      "bytes": 8681
+    },
+    "building-wall-lamp": {
+      "file": "building-wall-lamp.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.17,
+      "tileH": 1.28,
+      "contentBox": [
+        18,
+        2,
+        110,
+        121
+      ],
+      "bytes": 22290
+    },
+    "icon-wall-lamp": {
+      "file": "icon-wall-lamp.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1.17,
+      "tileH": 1.28,
+      "contentBox": [
+        10,
+        2,
+        55,
+        60
+      ],
+      "bytes": 6688
+    },
+    "icon-fresh-water": {
+      "file": "icon-fresh-water.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 60,
+      "tileW": 1.17,
+      "tileH": 1.28,
+      "contentBox": [
+        14,
+        2,
+        51,
+        60
+      ],
+      "bytes": 5813
     }
   }
 }

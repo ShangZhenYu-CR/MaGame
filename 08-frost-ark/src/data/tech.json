@@ -15,8 +15,8 @@
       "prerequisite": "tier1_basics",
       "researchCost": [],
       "name": "拾荒与供暖拓展",
-      "unlocksBuildings": ["furnace", "heat_relay", "buoyancy_core", "catch_net", "sorter_arm", "beast_den", "feed_trough", "wind_door", "fuel_hopper", "steam_chute", "wind_sail", "wind_vane"],
-      "unlocksRecipes": ["smelt_frost_iron", "craft_paralysis_net", "craft_beast_trap", "craft_beast_feed"]
+      "unlocksBuildings": ["furnace", "heat_relay", "buoyancy_core", "catch_net", "sorter_arm", "beast_den", "feed_trough", "wind_door", "fuel_hopper", "steam_chute", "wind_sail", "wind_vane", "warm_cot", "tea_table", "latte_climber", "water_purifier", "wall_lamp"],
+      "unlocksRecipes": ["smelt_frost_iron", "craft_paralysis_net", "craft_beast_trap", "craft_beast_feed", "purify_ice"]
     },
     {
       "id": "tier3_fortress",

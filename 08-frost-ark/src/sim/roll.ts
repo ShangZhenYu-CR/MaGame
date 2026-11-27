@@ -1,3 +1,4 @@
+import { roomComfort } from './home';
 import { TICK_RATE,type Vec2,type WorldState } from './types';
 
 export const ROLL_TICKS=12;
@@ -45,5 +46,5 @@ export function stepRoll(w:WorldState):void{
   }
   if(rollAge(w)>=ROLL_TICKS)r.startedAt=null;
  }
- if(p.hp>0&&r.startedAt===null&&w.tick>=r.restUntil)r.stamina=Math.min(100,r.stamina+.58);
+ if(p.hp>0&&r.startedAt===null&&w.tick>=r.restUntil)r.stamina=Math.min(100,r.stamina+.58+roomComfort(w)*.10);
 }

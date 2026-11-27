@@ -22,3 +22,10 @@
 - `npm run gate` 通过。浏览器零报错，补测储物存取、刷新和 JSON 回读；原有断言未删改。解压试玩 ZIP 后重新走完同一套浏览器验收。已逐张查看 4 张实机截图和角色逐帧图；测试版本 `635f20631d27d36d76610902e9be7c0cd8e5486a`。
 - [最新验收图](https://drive.google.com/drive/folders/1kaJjzAQi4XdaCETR-2N0NolvKRlqld38) · [角色逐帧图](https://drive.google.com/file/d/1VhuswPY66WGHNdiKmgIaGHbb27FuV71d/view) · [更新试玩包](https://drive.google.com/file/d/1DY7y7GlZkKPo0-XpvR6Gyt7nPdpaKP7D/view)。
 - **偏离报告**：上一版的储物箱交互缺口已补齐。仍按已验证的云端提交和 Chromium 路径交付，未改项目外文件，无新增功能偏离。M0 开发验收通过，等待玩家确认，未开始 M1。
+
+## 2026-11-27 · 双击白屏修复与 GitHub Actions 在线构建
+
+- 复现：旧构建双击 HTML 时，浏览器拒绝本地跨来源 JS/CSS，只剩未加载样式和脚本的白底内容。修复后完整解压即可双击 `08-frost-ark/index.html`，无需 Python 或本地服务器。
+- 门禁通过；对新 ZIP 解压后的主入口和 `dist/index.html` 逐个跑通抓钩、建造、储物和存档实机回归；已查看并上传第 6 张本地双击开局截图。
+- [GitHub Actions 在线构建](https://github.com/ShangZhenYu-CR/MaGame/actions/runs/45956832321) 已成功（构建提交 `3a9d058a443a113482565169c062ba63e7b8e748`）；已产出 `frost-ark-playtest` 和实机截图。Drive 上同一试玩包链接已替换为可双击的修正版。
+- **偏离报告**：此前门禁只测了 HTTP，现已把双击启动检查加入门禁。为响应在线构建，在专用分支新增一份 GitHub Actions 配置（GitHub 规定路径为 `.github/workflows/`）；不写 `main`，不更改现有 Pages 发布或共享资产。M1 未开始。

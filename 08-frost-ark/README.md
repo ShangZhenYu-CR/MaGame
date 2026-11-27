@@ -24,7 +24,8 @@
 - 走到储物箱旁按 **E**，可存取物品；箱内物品会随自动存档和 JSON 一起保存。
 - **I** 打开背包并手制火把；**2** 选择火把，左键放到空甲板上。
 - **Esc** 先关背包，再退回抓钩。进度存到当前浏览器，也可在背包导出或导入 JSON。
-- 如从 ZIP 试玩，解压后在同时包含 `08-frost-ark/` 和 `assets/` 的目录运行 `python -m http.server 8000`，访问 `http://localhost:8000/08-frost-ark/`。不要双击 HTML；浏览器需通过 HTTP 加载游戏模块。标题状态卡读取同级共享资产中的原头像。
+- **ZIP 试玩**：把整个 ZIP 解压，再双击 `08-frost-ark/index.html`。不用启动服务器，也不用装 Python。请保留解压后的目录结构，左上角头像从同级共享资产目录读取。旧的 HTTP 存档和双击打开的本地存档不一定共用；可用背包中的 JSON 导入导出迁移。
+- [GitHub 在线构建和产物](https://github.com/ShangZhenYu-CR/MaGame/actions/runs/45956832321)：Actions 只在专用分支构建；从 Artifacts 下载安装包，和现有 GitHub Pages 发布互不影响。
 
 ## 开发与验收命令
 

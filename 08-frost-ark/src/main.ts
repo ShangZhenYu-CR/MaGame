@@ -1,4 +1,6 @@
 import './ui/ark.css';
+import './ui/finale.css';
+import { finaleUi } from './ui/finale-ui';
 import { ArkView, type Ghost } from './render/ark-view';
 import { build, buildCosts, buildDefinitions, buildingAt, buildIssue, countItem, craftTorch, itemNames, type BuildKind } from './sim/ark';
 import { aim, cancelCharge, fire, startCharge } from './sim/cloud';
@@ -61,6 +63,8 @@ const industry=createIndustryUi({
 const chart=navigationUi({state:()=>w,icon:iconPath,close:()=>toggleChart(false),onCommand:finishAction});
 const expedition=expeditionUi({state:()=>w,message:finishAction});
 const toolUi=expeditionToolsUi({state:()=>w,icon:iconPath,message:finishAction});
+const finale=finaleUi({state:()=>w,say:finishAction,sound:x=>audio.play(x),icon:iconPath,
+  prepare:()=>{keys.clear();cancelCharge(w);expedition.cancel();chart.hide();closeOtherPanels('catalog');industry.showCatalog(false);}});
 const beastSprites=import.meta.glob<string>('./assets/art/beast-*.png',{eager:true,query:'?inline',import:'default'});
 const beastArt=(id:string)=>beastSprites['./assets/art/beast-'+id+'.png'];
 const beasts=beastUi({state:()=>w,msg:finishAction,icon:iconPath,art:beastArt});
@@ -224,6 +228,7 @@ function saveNow():Promise<void> {
   return saveQueue;
 }
 function safeWorld(next:WorldState):void {
+  finale.reset();
   expedition.cancel();chart.hide(false);beasts.show(false);w=next;toggleStorage(false);industry.showStation(null);industry.showCatalog(false);lockerSignature='';cancelCharge(w);
   caught=null;keys.clear();messageUntil=0;message='';stackSignature='';view.position(w);fillBag();
 }
@@ -286,6 +291,14 @@ addEventListener('pointerdown',()=>audio.unlock());
 addEventListener('keydown',e=>{
   const k=e.key.toLowerCase();
   if(e.ctrlKey||e.metaKey||e.altKey||e.target===input)return;
+  if(finale.blocking())return;
+  if(finale.open()){
+    if(!e.repeat&&(k==='j'||k==='escape')){e.preventDefault();finale.showCodex(false);}
+    if(!e.repeat&&k==='m')toggleMute();
+    return;
+  }
+  if(!chart.open()&&k==='j'&&!e.repeat){e.preventDefault();finale.toggle();return;}
+  if(!chart.open()&&k==='f'&&!e.repeat&&finale.strikeWhale()){e.preventDefault();return;}
   audio.unlock();
   if(chart.open()){
     if(!e.repeat&&(k==='escape'||k==='n')){e.preventDefault();toggleChart(false);}
@@ -327,7 +340,7 @@ canvas.addEventListener('pointermove',e=>{
 });
 canvas.addEventListener('pointerleave',()=>{pointer=null;});
 canvas.addEventListener('pointerdown',e=>{
-  if(!active||e.button!==0||chart.open())return;
+  if(!active||e.button!==0||chart.open()||finale.open()||finale.blocking())return;
   pointer={x:e.clientX,y:e.clientY};
   const at=view.world(e.clientX,e.clientY);
   const x=Math.floor(at.x),y=Math.floor(at.y);
@@ -398,14 +411,15 @@ function frame(now:number):void {
   }
   industry.update();chart.paint(false,now);
   const overlay=chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||beasts.open();
-  const here=expedition.update(now,overlay||(mode!=='hook'&&expedition.area()==='ark'));
+  const here=expedition.update(now,overlay||finale.arena()||(mode!=='hook'&&expedition.area()==='ark'));
   beasts.update(now,overlay);m5Ui.update(now,overlay);
   toolUi.update(here);
+  finale.update(chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||finale.open());
   const region=regions.get(w.activeIsland?.biomeId??w.sky.islands.find(n=>n.id===w.ark.anchoredIslandId)?.biomeId??'')??'碎云浅海';
   if(el('sector-name').textContent!==region)el('sector-name').textContent=region;
   setVital(0,w.player.warmth,w.player.maxWarmth);
   setVital(1,w.player.hp,w.player.maxHp);
-  setVital(2,h?.fuel??0,FUEL_MAX[Math.min(2,h?.level??0)]||120);
+  setVital(2,h?.fuel??0,FUEL_MAX[Math.min(4,h?.level??0)]||120);
   const reading=`脚下 ${local}°C`;
   if(localTemperature.textContent!==reading)localTemperature.textContent=reading;
   updateToolbar();

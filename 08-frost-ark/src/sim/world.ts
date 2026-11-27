@@ -14,6 +14,7 @@ import { advanceClimate, initializeHeat, stepHeat } from './heatField';
 import { stepIndustry } from './industry';
 import { updateLatte } from './latte';
 import { nextRng } from './rng';
+import { stepFinale } from './finale';
 
 export function createInitialWorld(seed = 202608): WorldState {
   const decks = new Array<number>(ARK_SIZE * ARK_SIZE).fill(0);
@@ -135,6 +136,7 @@ export function stepWorld(world: WorldState, ticks = 1, direction: Vec2 = {x: 0,
     stepBeasts(world);
     stepIndustry(world);
     updateLatte(world);
+    stepFinale(world);
     stepM5(world);
   }
 }

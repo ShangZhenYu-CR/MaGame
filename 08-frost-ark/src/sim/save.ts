@@ -5,6 +5,7 @@ import recipes from '../data/recipes.json';
 import { STORAGE_SLOTS } from './storage-box';
 import { areaAt, dockedIsland, validIslandDeltas } from './island';
 import { ensureNavigation } from './sky-map';
+import { validFinale, canReachAurora } from './finale';
 import { toolDefinition } from './tools';
 import biomes from '../data/biomes.json';
 import { beastDefinitions, MAX_COMPANIONS } from './beasts';
@@ -170,6 +171,10 @@ export function deserializeWorld(raw: string): WorldState {
   }else if(ark.anchoredIslandId!==null)throw invalidNavigation();
 
   const world=p as unknown as WorldState;
+  if(!validFinale(world)||
+    (world.ark.anchoredIslandId&&!canReachAurora(world,world.ark.anchoredIslandId))||
+    (nav&&record(nav)&&typeof nav.targetId==='string'&&!canReachAurora(world,nav.targetId)))
+    throw new Error('太阳方舟或终局存档不符合方舟格式');
   const active=p.activeIsland;
   world.activeIsland=null;
   ensureNavigation(world);

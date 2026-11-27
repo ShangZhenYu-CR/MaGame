@@ -2,6 +2,7 @@ import { Lightmap } from './lightmap';
 import { ArtLibrary } from './art-library';
 import { clamp, cloudscape, ovalGlow, WeatherFinish } from './atmosphere';
 import { primaryHearth } from '../sim/heatField';
+import { finaleStatus } from '../sim/finale';
 import { isDeckDrop } from '../sim/latte';
 import { buildingDefs } from '../sim/ark';
 import { getIndustrySave } from '../sim/m2-state';
@@ -37,7 +38,7 @@ const buildingVisuals:Readonly<Record<string,BuildingVisual>>={
 };
 const ironDeck='building-iron-deck';
 const required=[
-  ...deckIds,'manan-south','manan-north','manan-west','manan-east','latte-sleep','latte-alert','latte-walk','latte-walk-alt',
+  ...deckIds,'boss-frost-whale-1','boss-frost-whale-2','boss-frost-whale-3','solar-hearth','aurora-crystal','manan-south','manan-north','manan-west','manan-east','latte-sleep','latte-alert','latte-walk','latte-walk-alt',
   'hearth-1','hearth-2','rail','corner','rock','icicles',ironDeck,...Object.values(buildingVisuals).map(v=>v.art),
   'debris-wood','debris-iron','debris-rope','clouds','rail-side','rock-side','frost-frame',...ISLAND_ART,...BEAST_ART,...HOSTILE_ART,
 ] as const;
@@ -168,6 +169,19 @@ export class ArkView {
     // L1: Both traversable surfaces and the physical gangway share one
     // projection and one scenery pass, including the space between them.
     const island=dockedIsland(w), gangway=gangwayGeometry(w);
+    if(island?.nodeId==='aurora_vault'){
+      c.save();c.globalCompositeOperation='screen';
+      for(let i=0;i<6;i++){
+        const top=height*(.08+i*.019);
+        const sky=c.createLinearGradient(0,0,width,0);
+        sky.addColorStop(0,'rgba(40,101,127,0)');sky.addColorStop(.35,'rgba(90,194,186,.23)');
+        sky.addColorStop(.70,'rgba(123,190,212,.12)');sky.addColorStop(1,'rgba(39,122,146,0)');
+        c.strokeStyle=sky;c.lineWidth=5+i;
+        c.beginPath();c.moveTo(0,top+s*.8);
+        c.bezierCurveTo(width*.32,top-s*.75,width*.76,top+s*1.3,width,top-s*.32);c.stroke();
+      }
+      c.restore();
+    }
     if(island)paintIsland(c,this.art,island,project,s,w.tick);
     const b=this.deckStructure(c,cells,w);
     if(gangway?.deployed)paintGangway(c,this.art,gangway,project,s);
@@ -178,6 +192,29 @@ export class ArkView {
         if(p.x< -s*2||p.x>width+s*2||p.y< -s*2||p.y>height+s*3)continue;
         const actor=islandActor(node,islandNodeRemaining(w,node),island.biomeId);
         if(actor)actors.push(actor);
+      }
+    }
+    if(island?.nodeId==='aurora_vault'&&gangway?.deployed){
+      const start=gangway.x+gangway.width;
+      for(const [dx,dy] of [[4,-3],[9,4],[11,-3]]){
+        const x=start+dx+.5,y=gangway.y+dy+.5;
+        const i=(Math.floor(y)-island.offsetY)*island.size+Math.floor(x)-island.offsetX;
+        if(island.tiles[i])actors.push({x,y,art:'aurora-crystal',width:1.25,height:1.26,shadow:.36});
+      }
+    }
+    const finale=finaleStatus(w), whale=finale.atAurora?finale.whale:null;
+    if(whale){
+      actors.push({x:whale.x,y:whale.y,art:whale.art,width:4.0,height:3.64,shadow:1.27,
+        float:s*(.35+.10*Math.sin(w.tick*.085)),rotation:.017*Math.sin(w.tick*.042)});
+      if(whale.warning){
+        const {warning,radius}=whale;
+        for(const [spot,r] of [[warning,radius],[warning.echo,radius*.87]] as const){
+          if(!spot)continue;
+          const at=project(spot.x,spot.y), pulse=.26+.06*Math.sin(w.tick*.43);
+          ovalGlow(c,at.x,at.y,s*r,s*r,`rgba(235,162,100,${pulse})`,'rgba(242,134,66,.02)');
+          c.save();c.strokeStyle='rgba(255,207,155,.86)';c.lineWidth=2.4;
+          c.setLineDash([7,5]);c.lineDashOffset=-w.tick*.62;c.beginPath();c.arc(at.x,at.y,s*r,0,Math.PI*2);c.stroke();c.restore();
+        }
       }
     }
     const helm=helmPoint(w);
@@ -194,7 +231,7 @@ export class ArkView {
     const fire=primaryHearth(w);
     for(const bld of w.ark.buildings){
       const {gx,gy}=bld;
-      if(bld.defId==='hearth_core')actors.push({x:gx+1,y:gy+1.76,art:bld.level>=2?'hearth-2':'hearth-1',
+      if(bld.defId==='hearth_core')actors.push({x:gx+1,y:gy+1.76,art:bld.level>=4?'solar-hearth':bld.level>=2?'hearth-2':'hearth-1',
         width:2.65,height:2.43,shadow:1.15,fire:bld.fuel>0?'hearth':undefined,hearthLevel:bld.level});
       const visuals=buildingVisuals[bld.defId];
       if(!visuals)continue;

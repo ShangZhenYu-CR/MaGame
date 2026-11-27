@@ -1,5 +1,6 @@
 import { DISCOVERY_RADIUS, DOCK_RADIUS, nearHelm, navigationPanel, setDestination, toggleCruise } from '../sim/sky-map';
 import { gangwayGeometry } from '../sim/island';
+import { canReachAurora } from '../sim/finale';
 import type { WorldState } from '../sim/types';
 import biomes from '../data/biomes.json';
 
@@ -61,7 +62,9 @@ export function navigationUi(hooks:ChartHooks){
    `${choice.discovered?zone?.name??'已发现浮岛':'未实地探测的航图信号'} · T${choice.tier} · ${units(choice.distance)}${choice.distance<=DOCK_RADIUS?' · 靠泊范围内':''}`:
    '点击航图或右侧记录，查看浮岛距离与所在风区。');
   put(set,choice&&choice.id===nav.targetId?'已设为目的地':'设为目的地');
-  set.disabled=!choice||!nearHelm(w)||choice.id===nav.anchoredIslandId||choice.id===nav.targetId;
+  const locked=!!choice&&!canReachAurora(w,choice.id);
+  if(locked)put(get('sky-destination-detail'),'极光天穹 · 点燃太阳方舟后开放');
+  set.disabled=locked||!choice||!nearHelm(w)||choice.id===nav.anchoredIslandId||choice.id===nav.targetId;
   const bridge=gangwayGeometry(w)?.deployed;
   cruise.disabled=!nearHelm(w)||(!nav.cruising&&!!bridge);
   cruise.dataset.cruising=String(nav.cruising);put(cruise,nav.cruising?'停止巡航':nav.anchoredIslandId?'解缆巡航':'开始巡航');

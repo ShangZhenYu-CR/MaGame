@@ -2,6 +2,7 @@ import { buildingAt, isDeck } from './ark';
 import { ensureNavigationState, getNavigation } from './m3-state';
 import { beastCompanions, crewCruiseMultiplier } from './beasts';
 import { nextRng } from './rng';
+import { canReachAurora } from './finale';
 import { TICK_RATE, type IslandNode, type Vec2, type WorldState } from './types';
 
 export const DISCOVERY_RADIUS=7;
@@ -54,6 +55,7 @@ export function nearHelm(w:WorldState):boolean{
 }
 
 export function setDestination(w:WorldState,id:string):string|null{
+  if(!canReachAurora(w,id))return '点燃太阳方舟后才能前往极光天穹。';
   ensureNavigation(w);
   if(!w.sky.islands.some(n=>n.id===id))return '航图上没有这个信号';
   if(w.ark.anchoredIslandId===id)return '方舟已靠泊这座浮岛';
@@ -75,7 +77,7 @@ export function toggleCruise(w:WorldState):string|null{
   if(w.sky.cruising){w.sky.cruising=false;return null;}
   if(nav.dock?.deployed)return '先到右舷收起登岛跳板';
   if(!nav.targetId||nav.targetId===w.ark.anchoredIslandId){
-    const next=w.sky.islands.filter(n=>n.id!==w.ark.anchoredIslandId).sort((a,b)=>distance(w,a)-distance(w,b))[0];
+    const next=w.sky.islands.filter(n=>n.id!==w.ark.anchoredIslandId&&canReachAurora(w,n.id)).sort((a,b)=>distance(w,a)-distance(w,b))[0];
     if(!next)return '航图还没有其他可前往的信号';
     nav.targetId=next.id;
   }
@@ -112,7 +114,7 @@ export function stepNavigation(w:WorldState):void{
   if(!w.sky.cruising)return;
   const nav=ensureNavigationState(w);
   const destination=w.sky.islands.find(n=>n.id===nav.targetId);
-  if(!destination){w.sky.cruising=false;return;}
+  if(!destination||!canReachAurora(w,destination.id)){w.sky.cruising=false;return;}
   const dx=destination.skyX-w.sky.x,dy=destination.skyY-w.sky.y,gap=Math.hypot(dx,dy);
   if(gap<=DOCK_RADIUS){
     const dock=findDock(w);

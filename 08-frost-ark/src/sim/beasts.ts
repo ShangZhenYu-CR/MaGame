@@ -37,7 +37,7 @@ function syncFauna(w:WorldState):void{
   let locals=saved;
   if(!locals){
     const biome=biomes.find(b=>b.id===map.biomeId);
-    const species=(biome?.wildBeasts??[]).filter(id=>(beastDefinitions.get(id)?.biomeTier??9)<=node.tier);
+    const species=(node.id==='aurora_vault'?[]:biome?.wildBeasts??[]).filter(id=>(beastDefinitions.get(id)?.biomeTier??9)<=node.tier);
     let rng=node.seed^0x89beec3;
     locals=species.map((id,i)=>{
       const d=beastDefinitions.get(id)!;

@@ -2096,6 +2096,102 @@
         46
       ],
       "bytes": 4745
+    },
+    "boss-frost-whale-1": {
+      "file": "boss-frost-whale-1.png",
+      "width": 256,
+      "height": 256,
+      "anchorX": 110,
+      "anchorY": 148,
+      "tileW": 4.1,
+      "tileH": 3.6,
+      "contentBox": [
+        2,
+        13,
+        253,
+        246
+      ],
+      "bytes": 82358
+    },
+    "boss-frost-whale-2": {
+      "file": "boss-frost-whale-2.png",
+      "width": 256,
+      "height": 256,
+      "anchorX": 110,
+      "anchorY": 148,
+      "tileW": 4.1,
+      "tileH": 3.6,
+      "contentBox": [
+        2,
+        13,
+        253,
+        245
+      ],
+      "bytes": 83758
+    },
+    "boss-frost-whale-3": {
+      "file": "boss-frost-whale-3.png",
+      "width": 256,
+      "height": 256,
+      "anchorX": 110,
+      "anchorY": 148,
+      "tileW": 4.1,
+      "tileH": 3.6,
+      "contentBox": [
+        2,
+        13,
+        253,
+        245
+      ],
+      "bytes": 87598
+    },
+    "aurora-crystal": {
+      "file": "aurora-crystal.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 121,
+      "tileW": 1.17,
+      "tileH": 1.18,
+      "contentBox": [
+        8,
+        2,
+        119,
+        121
+      ],
+      "bytes": 25368
+    },
+    "solar-hearth": {
+      "file": "solar-hearth.png",
+      "width": 224,
+      "height": 224,
+      "anchorX": 112,
+      "anchorY": 212,
+      "tileW": 2.2,
+      "tileH": 2.13,
+      "contentBox": [
+        2,
+        9,
+        222,
+        212
+      ],
+      "bytes": 24894
+    },
+    "icon-solar-ark": {
+      "file": "icon-solar-ark.png",
+      "width": 48,
+      "height": 48,
+      "anchorX": 24,
+      "anchorY": 24,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        2,
+        46,
+        45
+      ],
+      "bytes": 4269
     }
   }
 }

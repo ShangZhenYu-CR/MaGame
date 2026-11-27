@@ -63,10 +63,12 @@
 > M4 已发 [GitHub Pages](https://shangzhenyu-cr.github.io/MaGame/08-frost-ark/)，[验收截图](https://drive.google.com/drive/folders/1Xpqwvi9jDbhn6T8ahrJh0zHTE7We3fqB)。
 
 ## M5 · 寒潮攻防与四大风区
-- [ ] 实现每 5 天「大寒潮（Whiteout）」事件、霜影猎手与破甲冰兽夜袭、防霜箭塔与火油喷射塔
-- [ ] 开放 Tier 3 硫磺裂谷岛与 Tier 4 永冻遗迹群、上线熔核蜥与风暴翼龙
-- [ ] 实现 2 个区域守岛小 Boss（霜鬃领主、裂谷炎甲兽）与天穹火种掉落
-- [ ] 跑通 `npm run gate`，截图上传 `M5/`（1. 大寒潮炮台攻防 2. 硫磺岛与熔核蜥 3. 区域小 Boss 战）
+- [x] 实现每 5 天「大寒潮（Whiteout）」事件、霜影猎手与破甲冰兽夜袭、防霜箭塔与火油喷射塔
+- [x] 开放 Tier 3 硫磺裂谷岛与 Tier 4 永冻遗迹群、上线熔核蜥与风暴翼龙
+- [x] 实现 2 个区域守岛小 Boss（霜鬃领主、裂谷炎甲兽）与天穹火种掉落
+- [x] 跑通 `npm run gate`，截图上传 `M5/`（1. 大寒潮炮台攻防 2. 硫磺岛与熔核蜥 3. 区域小 Boss 战）
+
+> M5 已发 GitHub Pages；[验收截图](https://drive.google.com/drive/folders/1aa3icV8dhTrwkCeJZKAlUKqOQsXSnC06)。
 
 ## M6 · 永冬霜鲸终局与体验打磨
 - [ ] 实现 4 枚天穹火种升级「太阳方舟」与极光天穹三阶段终局 Boss「永冬霜鲸」

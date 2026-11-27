@@ -1,0 +1,28 @@
+.finale-card, .frost-guide {position:fixed;z-index:12;background:rgba(18,31,44,.96);color:#e4eef7;border:1px solid rgba(153,191,218,.34);border-radius:10px;font-variant-numeric:tabular-nums}
+.finale-card{padding:14px 16px;box-shadow:0 12px 32px rgba(9,20,34,.38);}
+.finale-card h2,.finale-card p{margin:0 0 8px}
+.finale-card button,.codex-toggle,.frost-guide button{min-height:29px;min-width:28px}
+.codex-toggle{position:static}
+.codex-card{left:50%;top:72px;transform:translateX(-50%);width:min(480px,calc(100vw - 34px));max-height:68vh;display:grid;grid-template-rows:auto auto minmax(0,1fr);overflow:hidden}
+.codex-card header{display:flex;align-items:center;justify-content:space-between}
+.codex-card nav{display:flex;gap:7px;margin:6px 0}
+.codex-card [aria-pressed=true]{border-color:#c38957;color:#ffd292}
+.codex-card ul{overflow:auto;list-style:none;padding:0;margin:3px 0}
+.codex-card li{display:grid;gap:4px;padding:7px 2px;border-bottom:1px solid rgba(153,191,218,.16)}
+.codex-card li span{color:#aac1d4;line-height:1.4}
+.whale-card{left:50%;bottom:118px;transform:translateX(-50%);width:min(356px,calc(100vw - 36px));text-align:center}
+.whale-card strong,.whale-card output{display:block}
+.whale-card output{color:#b4cce3;font-size:12px}
+.whale-card meter{width:82%;height:11px;margin:6px auto}
+.whale-card[data-vulnerable=true]{border-color:#e19959}
+.whale-card p{font-size:13px}
+.victory-card{left:50%;top:50%;transform:translate(-50%,-50%);width:min(430px,calc(100vw - 28px));text-align:center;border-color:#d59960;z-index:18}
+.victory-card small{color:#edaa68}
+.victory-card dl{display:grid;grid-template-columns:1fr auto;gap:7px;text-align:left;padding:10px 15px;background:rgba(108,156,184,.10);border-radius:8px}
+.victory-card dd{margin:0;color:#ffe0ac}
+.frost-guide{display:flex;align-items:center;gap:8px;bottom:88px;left:14px;max-width:min(300px,78vw);padding:3px 6px 3px 9px;font-size:12px;z-index:8;opacity:.94}
+.frost-guide button{padding:0}
+.finale-card[hidden],.frost-guide[hidden],.finale-card [hidden]{display:none}
+@media(max-width:700px){.m2-tools{max-width:calc(100vw - 20px);flex-wrap:wrap}.codex-card{top:108px}.frost-guide{bottom:142px}}
+
+#forge-solar img{width:19px;height:19px;object-fit:contain;vertical-align:middle;margin-right:3px}

@@ -72,3 +72,10 @@
 - 11 张新精绘素材双背景逐件确认，运行 `npm run gate`，含过往全流程、HTTP 与双 `file://` 入口、寒潮蓄力线和 M4 实机。
 - 工作分支构建 `86189d5`；Pages 发布提交 `8d178b0`。
 - [M4 实机证据](https://drive.google.com/drive/folders/1Xpqwvi9jDbhn6T8ahrJh0zHTE7We3fqB)。
+
+## 2026-11-27 · M5 寒潮攻防与四个风区
+
+- 每逢五日的寒夜，方舟接到预警并抵御三波霜影猎手、破甲冰兽；防霜箭塔和火油喷射塔自动应战。
+- 航图开放硫磺裂谷和永冻遗迹，新增熔核蜥、风暴翼龙、硫磺矿和秘银。霜鬃领主、裂谷炎甲兽与两只遗迹箱分别给出四枚不重复的天穹火种。旧航图节点和开采记录保留。
+- 21 张新精绘素材双背景审查。通过全套 `npm run gate` 和实机寒潮、守卫反击、熔核蜥证据。
+- 工作分支构建 `f1c007b`；Pages 发布提交 `ddbf267`。[M5 实机证据](https://drive.google.com/drive/folders/1aa3icV8dhTrwkCeJZKAlUKqOQsXSnC06)。

@@ -1,5 +1,5 @@
 // Browser-only sound engine. The sim stays deterministic and independent of audio.
-type Effect = 'hook' | 'hit' | 'place' | 'craft' | 'dismantle' | 'undo';
+type Effect = 'hook' | 'hit' | 'place' | 'craft' | 'dismantle' | 'undo' | 'solar' | 'whale' | 'victory';
 const MUTE_KEY = 'frost-ark-muted';
 
 class ArkAudio {
@@ -83,6 +83,9 @@ class ArkAudio {
       craft: [269, 411, 0.18, 'triangle'],
       dismantle: [160, 65, 0.15, 'triangle'],
       undo: [260, 495, 0.20, 'sine'],
+      solar: [196, 528, .66, 'triangle'],
+      whale: [92, 42, .72, 'sine'],
+      victory: [392, 784, 1.1, 'sine'],
     };
     const [from, to, seconds, tone] = patterns[effect], now = ctx.currentTime;
     const gain = ctx.createGain();

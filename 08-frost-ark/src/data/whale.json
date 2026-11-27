@@ -1,0 +1,5 @@
+[
+  {"id":"ice_wake","name":"裂霜尾潮","hp":90,"windup":48,"delay":56,"radius":1.75,"damage":15,"chill":10,"art":"boss-frost-whale-1"},
+  {"id":"aurora_lance","name":"极光冰矛","hp":132,"windup":36,"delay":48,"radius":2.15,"damage":20,"chill":15,"art":"boss-frost-whale-2"},
+  {"id":"endless_winter","name":"永冬坠星","hp":166,"windup":44,"delay":38,"radius":2.65,"damage":26,"chill":22,"art":"boss-frost-whale-3"}
+]

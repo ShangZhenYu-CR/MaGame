@@ -1,4 +1,4 @@
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;
 export const TICK_RATE = 30;
 export const ARK_SIZE = 48;
 export const ISLAND_SIZE = 64;
@@ -33,6 +33,7 @@ export interface PlayerState {
   maxHunger: number;
   portraitMood: PortraitMood;
   selectedSlot: number;
+  rescue: { startedAt: number | null; shieldUntil: number };
   inventory: (ItemStack | null)[];
   grapple: {
     active: boolean;

@@ -1,3 +1,4 @@
+import { damagePlayer } from './rescue';
 import phases from '../data/whale.json';
 import { refreshBuoyancy } from './ark';
 import { hearthNear, primaryHearth } from './heatField';
@@ -94,7 +95,7 @@ export function stepFinale(w:WorldState):void{
     if(w.tick<b.warning.until)return;
     const target=b.warning;
     if(gap(p,target)<=d.radius||(target.echo&&gap(p,target.echo)<=d.radius*.87)){
-      p.hp=Math.max(0,p.hp-d.damage);p.warmth=Math.max(0,p.warmth-d.chill);
+      if(damagePlayer(w,d.damage))p.warmth=Math.max(0,p.warmth-d.chill);
     }
     b.warning=null;b.recovery=w.tick+76-b.phase*6;b.next=b.recovery+d.delay;
   }else if(w.tick>=b.next&&gap(p,b)<9){

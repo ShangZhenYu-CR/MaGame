@@ -1,3 +1,4 @@
+import { runP2Rescue } from './p2-rescue-e2e';
 import { runDeckMovement } from './deck-movement-e2e';
 import { runFootprints } from './footprints-e2e';
 import { createServer } from 'node:http';
@@ -612,6 +613,7 @@ try {
 
   await runFootprints(browser,baseUrl,outDir,errors);
   await runDeckMovement(browser,baseUrl,outDir,errors);
+  await runP2Rescue(browser,baseUrl,outDir,errors);
 
   if (errors.length > 0) {
     throw new Error(errors.join('\n'));

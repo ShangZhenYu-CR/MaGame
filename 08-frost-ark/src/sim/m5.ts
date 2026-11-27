@@ -1,3 +1,4 @@
+import { damagePlayer } from './rescue';
 import specs from '../data/combat_m5.json';
 import beastSpecs from '../data/beasts.json';
 import { isDeck } from './ark';
@@ -151,7 +152,7 @@ function stepEnemy(w:WorldState,e:WildEntity,s:M5State){
     clock.cooldown=w.tick+d.cadence;
     if(pos&&length(e,pos)<=d.range+.17){
       if(obj)obj.hp=Math.max(1,obj.hp-d.damage); // critical fixtures remain recoverable after a failed night
-      else w.player.hp=Math.max(0,w.player.hp-d.damage);
+      else if(!damagePlayer(w,d.damage))return;
       flash(w,e,pos,'strike');
     }
     return;

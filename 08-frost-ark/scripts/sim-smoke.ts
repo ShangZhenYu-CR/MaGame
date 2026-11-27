@@ -458,3 +458,45 @@ const tampered=JSON.parse(onLand);
 tampered.sky.islands[0].deltas[tree.key]=tree.count+1;
 assert.throws(()=>deserializeWorld(JSON.stringify(tampered)),/航图/);
 console.log('[sim-smoke:M3] OK: cruising, discovery, deployment, border-safe boarding, cold, seeded terrain, sparse depletion and pre-M3 archive migration');
+
+import { damagePlayer, rescueShield, RESCUE_SHIELD_TICKS, RESCUE_TICKS } from '../src/sim/rescue';
+import { harvestIslandResource } from '../src/sim/tools';
+import { SAVE_VERSION } from '../src/sim/types';
+
+// P2-01: start from an ordinary on-island save with full health and exhaust
+// warmth through the same per-tick cold solver used in the actual game.
+const rescueTrip=deserializeWorld(onLand);
+rescueTrip.player.hp=rescueTrip.player.maxHp;
+rescueTrip.player.warmth=rescueTrip.player.maxWarmth;
+rescueTrip.player.inventory[6]={itemId:'wood_axe',count:1,durability:5};
+for(let i=0;i<6000&&rescueTrip.player.hp>0;i++)stepWorld(rescueTrip);
+assert.equal(rescueTrip.player.hp,0,'standing in island cold naturally reaches zero life');
+assert.equal(rescueTrip.player.rescue.startedAt,rescueTrip.tick);
+assert.equal(rescueTrip.player.grapple.active,false);
+const lyingAt={x:rescueTrip.player.x,y:rescueTrip.player.y}, inventoryAtFall=JSON.stringify(rescueTrip.player.inventory);
+stepWorld(rescueTrip,30,{x:1,y:0});
+assert.deepEqual({x:rescueTrip.player.x,y:rescueTrip.player.y},lyingAt,'movement keys do not move an unconscious player');
+assert.equal(harvestIslandResource(rescueTrip,tree).ok,false);
+assert.equal(JSON.stringify(rescueTrip.player.inventory),inventoryAtFall,'cannot gather or spend supplies before rescue');
+const carried=deserializeWorld(serializeWorld(rescueTrip));
+assert.deepEqual(carried.player.rescue,rescueTrip.player.rescue,'mid-rescue save keeps timer');
+stepWorld(carried,RESCUE_TICKS-30);
+assert.equal(carried.activeIsland,null);
+assert.equal(areaAt(carried,carried.player.x,carried.player.y),'ark');
+assert.ok(carried.player.hp>0&&carried.player.warmth>0);
+assert.equal(carried.player.inventory[6]?.durability,4);
+assert.equal(rescueShield(carried),RESCUE_SHIELD_TICKS);
+assert.equal(damagePlayer(carried,100),false,'recovery guard prevents all damage');
+stepWorld(carried,RESCUE_SHIELD_TICKS-1);
+assert.equal(damagePlayer(carried,100),false);
+stepWorld(carried,1);
+assert.equal(damagePlayer(carried,10),true,'protection ends after exactly ten seconds');
+const preP2=JSON.parse(serializeWorld(createInitialWorld()));
+preP2.saveVersion=1;delete preP2.player.rescue;
+const migratedP2=deserializeWorld(JSON.stringify(preP2));
+assert.equal(migratedP2.saveVersion,SAVE_VERSION);
+assert.deepEqual(migratedP2.player.rescue,{startedAt:null,shieldUntil:0});
+migratedP2.player.hp=0;migratedP2.ark.buildings[0].fuel=0;
+stepWorld(migratedP2,RESCUE_TICKS+1);
+assert.ok(migratedP2.player.hp>0&&migratedP2.ark.buildings[0].fuel===14,'old zero-HP save recovers even with an empty stove');
+console.log('[sim-smoke:P2-01] OK: natural cold unconsciousness, input lock, archive migration, rescue penalty and 10s shield');

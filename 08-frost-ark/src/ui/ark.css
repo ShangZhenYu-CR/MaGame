@@ -236,3 +236,10 @@ button[aria-disabled=true]{opacity:.62}
 .m5-attack-prompt{position:absolute;right:24px;bottom:113px;z-index:1;display:grid;grid-template-columns:minmax(80px,1fr) auto;align-items:center;gap:7px;padding:6px 8px;border:1px solid #557187;background:#233d4e;border-radius:4px;font-size:12px}
 .m5-attack-prompt button{font-size:11px}
 @media(max-width:620px){.m5-seeds{left:10px;top:168px}.raid-alert,.island-guardian{top:197px}.m5-attack-prompt{right:10px;bottom:183px}}
+
+#rescue-status{position:absolute;left:50%;top:20%;transform:translateX(-50%);z-index:30;display:grid;gap:.28rem;min-width:12rem;padding:.65rem 1rem;text-align:center;pointer-events:none;background:#0c1520e8;color:#ecf4f6;border:1px solid #879fb3;border-radius:.44rem;box-shadow:0 5px 26px #0c152099}
+#rescue-status[hidden]{display:none}
+#rescue-status strong{font-size:1rem;letter-spacing:.08em}
+#rescue-status small{color:#c1d3e0;font-size:.74rem}
+#rescue-status[data-phase=shield]{top:15%;min-width:9rem;border-color:#a7875d}
+#rescue-status[data-phase=shield] strong{color:#ffe1a8}

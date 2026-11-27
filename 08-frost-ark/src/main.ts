@@ -9,6 +9,7 @@ import { nearestStorage, storageContents, STORAGE_SLOTS, transferStorage } from 
 import { addFuel, FUEL_MAX, heatAt, partOfDay, primaryHearth, upgradeHearth } from './sim/heatField';
 import { dropSupply, isDeckDrop, manuallyRecover } from './sim/latte';
 import { TICK_RATE, type WorldState } from './sim/types';
+import { incapacitated, RESCUE_TICKS, rescueShield } from './sim/rescue';
 import { createInitialWorld, stepWorld } from './sim/world';
 import { openArchive, savedWorld, storeWorld } from './ui/storage';
 import { createIndustryUi, itemList } from './ui/industry';
@@ -288,10 +289,11 @@ document.addEventListener('visibilitychange',()=>{
   if(document.hidden){ keys.clear();cancelCharge(w);void saveNow(); }
 });
 addEventListener('pointerdown',()=>audio.unlock());
+document.addEventListener('click',e=>{if(incapacitated(w)){e.preventDefault();e.stopImmediatePropagation();}},true);
 addEventListener('keydown',e=>{
   const k=e.key.toLowerCase();
   if(e.ctrlKey||e.metaKey||e.altKey||e.target===input)return;
-  if(finale.blocking())return;
+  if(finale.blocking()||incapacitated(w))return;
   if(finale.open()){
     if(!e.repeat&&(k==='j'||k==='escape')){e.preventDefault();finale.showCodex(false);}
     if(!e.repeat&&k==='m')toggleMute();
@@ -340,7 +342,7 @@ canvas.addEventListener('pointermove',e=>{
 });
 canvas.addEventListener('pointerleave',()=>{pointer=null;});
 canvas.addEventListener('pointerdown',e=>{
-  if(!active||e.button!==0||chart.open()||finale.open()||finale.blocking())return;
+  if(!active||incapacitated(w)||e.button!==0||chart.open()||finale.open()||finale.blocking())return;
   pointer={x:e.clientX,y:e.clientY};
   const at=view.world(e.clientX,e.clientY);
   const x=Math.floor(at.x),y=Math.floor(at.y);
@@ -372,7 +374,15 @@ canvas.addEventListener('contextmenu',e=>e.preventDefault());
 function simulation():void {
   const g=w.player.grapple;
   const pending=w.latte.autoLootUnlocked&&w.sky.debris.filter(isDeckDrop).length;
+  const wasDown=incapacitated(w);
   stepWorld(w,1,{x:Number(keys.has('d'))-Number(keys.has('a')),y:Number(keys.has('s'))-Number(keys.has('w'))});
+  if(!wasDown&&incapacitated(w)){
+    keys.clear();expedition.cancel();chart.hide(false);beasts.show(false);
+    toggleStorage(false);toggleBag(false);industry.showStation(null);industry.showCatalog(false);
+    caught=null;messageUntil=0;void saveNow();
+  }else if(wasDown&&!incapacitated(w)){
+    keys.clear();tell('已在主炉边苏醒，获得 10 秒复苏护盾。');void saveNow();
+  }
   if(caught!==g.caughtDebrisId){
     if(g.caughtDebrisId){
       audio.play('hit');
@@ -400,6 +410,19 @@ function frame(now:number):void {
     if(active)simulation();
     elapsed-=1000/TICK_RATE;
   }
+  const down=incapacitated(w), shield=rescueShield(w), rescue=el('rescue-status');
+  rescue.hidden=!down&&!shield;
+  rescue.dataset.phase=down?'down':'shield';
+  canvas.dataset.playerState=down?'down':shield?'shield':'awake';
+  if(!rescue.hidden){
+    const at=w.player.rescue.startedAt??w.tick;
+    const title=down?'马楠失去意识':'复苏护盾';
+    const detail=down?(expedition.area()==='ark'?'拿铁正在拖你回炉边':'主炉启动应急拖回')+
+      ' · '+Math.max(1,Math.ceil((RESCUE_TICKS-w.tick+at)/TICK_RATE))+' 秒':
+      Math.ceil(shield/TICK_RATE)+' 秒 · 暂时免受伤害';
+    if(el('rescue-title').textContent!==title)el('rescue-title').textContent=title;
+    if(el('rescue-description').textContent!==detail)el('rescue-description').textContent=detail;
+  }
   const g=w.player.grapple;
   const nextStats=`DAY ${w.day}　${w.ambientTemp}°C　浮力 ${w.ark.buoyancyUsed}/${w.ark.buoyancyMax}`;
   if(stats.textContent!==nextStats)stats.textContent=nextStats;
@@ -410,7 +433,7 @@ function frame(now:number):void {
       fire:h&&h.fuel>0?Math.min(1,Math.max(0,(local+8)/44)):0});
   }
   industry.update();chart.paint(false,now);
-  const overlay=chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||beasts.open();
+  const overlay=down||chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||beasts.open();
   const here=expedition.update(now,overlay||finale.arena()||(mode!=='hook'&&expedition.area()==='ark'));
   beasts.update(now,overlay);m5Ui.update(now,overlay);
   toolUi.update(here);

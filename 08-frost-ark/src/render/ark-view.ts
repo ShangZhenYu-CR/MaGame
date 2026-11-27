@@ -4,6 +4,7 @@ import { ArtLibrary } from './art-library';
 import { clamp, cloudscape, ovalGlow, WeatherFinish } from './atmosphere';
 import { primaryHearth } from '../sim/heatField';
 import { finaleStatus } from '../sim/finale';
+import { incapacitated, RESCUE_TICKS, rescuePoint } from '../sim/rescue';
 import { isDeckDrop } from '../sim/latte';
 import { buildingDefs } from '../sim/ark';
 import { getIndustrySave } from '../sim/m2-state';
@@ -247,9 +248,13 @@ export class ArkView {
     actors.push({x:latte.x,y:latte.y,art:catWalking?(Math.floor(w.tick/7)%2?'latte-walk':'latte-walk-alt'):latte.mood==='cozy'?'latte-sleep':'latte-alert',
       width:.94*.65,height:.94*.65,shadow:.32*.65,scale:1+(.5+.5*Math.sin(w.tick*.12))*.03,rotation:catWalking?Math.sin(w.tick*.45)*.026:0});
     const dir=Math.abs(pl.facing.x)>Math.abs(pl.facing.y)?(pl.facing.x<0?'west':'east'):(pl.facing.y<0?'north':'south');
-    const walking=!!(pl.vx||pl.vy);
-    const player:Actor={x:pl.x,y:pl.y,art:`manan-${dir}`,width:1.43,height:1.43,shadow:.34,scale:walking?1:1+(.5+.5*Math.sin(w.tick*.115))*.03,
-      rotation:walking?Math.sin(w.tick*.42)*Math.PI/72:0,float:walking?Math.abs(Math.sin(w.tick*.31))*s*.04:0};
+    const down=incapacitated(w), walking=!!(pl.vx||pl.vy), age=w.tick-(pl.rescue.startedAt??w.tick);
+    const land=w.activeIsland||!deck(Math.floor(pl.x),Math.floor(pl.y));
+    const pull=down&&!land?clamp((age-RESCUE_TICKS*.55)/(RESCUE_TICKS*.45)):0;
+    const target=pull?rescuePoint(w):pl;
+    const actorX=pl.x+(target.x-pl.x)*pull,actorY=pl.y+(target.y-pl.y)*pull;
+    const player:Actor={x:actorX,y:actorY,art:`manan-${dir}`,width:1.43,height:1.43,shadow:.34,scale:walking?1:1+(.5+.5*Math.sin(w.tick*.115))*.03,
+      rotation:down?clamp(age/14)*1.49:walking?Math.sin(w.tick*.42)*Math.PI/72:0,float:walking?Math.abs(Math.sin(w.tick*.31))*s*.04:0};
     actors.push(player);
 
     // L2: Whole-scene grounding before painting the sprites.

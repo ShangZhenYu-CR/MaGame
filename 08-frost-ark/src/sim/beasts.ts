@@ -1,3 +1,4 @@
+import { damagePlayer, healPlayer } from './rescue';
 import beastData from '../data/beasts.json';
 import biomes from '../data/biomes.json';
 import { buildingDefs, inventoryChange, itemNames, itemStackLimits, refreshBuoyancy } from './ark';
@@ -227,7 +228,7 @@ function companionWork(w:WorldState,b:BeastEntity):void{
     if(ore&&inventoryChange(w,[],[{itemId:ore.itemId,count:1}]))consumeIslandNode(w,ore);
   }else if(b.defId==='glacierstag'){
     w.player.warmth=Math.min(w.player.maxWarmth,w.player.warmth+5);
-    w.player.hp=Math.min(w.player.maxHp,w.player.hp+2);
+    healPlayer(w,2);
   }
 }
 
@@ -282,7 +283,7 @@ export function stepBeasts(w:WorldState):void{
     const p=w.player,d=distance(p,e);
     if(d>5){e.hostile=false;continue;}
     if(d>.8)moveToward(e,p.x,p.y,.047,w);
-    else if(w.tick%(TICK_RATE*2)===0)p.hp=Math.max(0,p.hp-(beastDefinitions.get(e.defId)?.attack??6)*.28);
+    else if(w.tick%(TICK_RATE*2)===0)damagePlayer(w,(beastDefinitions.get(e.defId)?.attack??6)*.28);
   }
   let companionIndex=0;
   for(const b of w.beasts){

@@ -1,4 +1,5 @@
 import { verifyM5 } from './m5';
+import { RESCUE_SHIELD_TICKS } from './rescue';
 import items from '../data/items.json';
 import buildings from '../data/buildings.json';
 import recipes from '../data/recipes.json';
@@ -98,7 +99,12 @@ function validateFauna(p:Record<string,unknown>,ids:Set<string>):void{
 
 export function deserializeWorld(raw: string): WorldState {
   const p:unknown=JSON.parse(raw);
-  if(!record(p)||p.saveVersion!==SAVE_VERSION)throw new Error('存档版本不受支持');
+  if(!record(p)||![1,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
+    throw new Error('存档版本不受支持');
+  if(p.saveVersion===1){
+    if(record(p.player))p.player.rescue={startedAt:null,shieldUntil:0};
+    p.saveVersion=SAVE_VERSION;
+  }
   const {ark, player, sky, latte}=p;
   if(!eachNumber(p,['seed','rngState','tick','day','timeOfDay','ambientTemp','skyheartCores'])||
      !num(p.tick)||!Number.isSafeInteger(p.tick)||p.tick<0||!['clear','snow','whiteout'].includes(String(p.weather))||
@@ -170,6 +176,12 @@ export function deserializeWorld(raw: string): WorldState {
     }else if(ark.anchoredIslandId!==null)throw invalidNavigation();
   }else if(ark.anchoredIslandId!==null)throw invalidNavigation();
 
+  if(!record(player.rescue)||
+    (player.rescue.startedAt!==null&&(!num(player.rescue.startedAt)||!Number.isSafeInteger(player.rescue.startedAt)||
+      player.rescue.startedAt<0||player.rescue.startedAt>p.tick||player.hp!==0))||
+    !num(player.rescue.shieldUntil)||!Number.isSafeInteger(player.rescue.shieldUntil)||
+    player.rescue.shieldUntil<0||player.rescue.shieldUntil>p.tick+RESCUE_SHIELD_TICKS)
+    throw new Error('救援存档不符合方舟格式');
   const world=p as unknown as WorldState;
   if(!validFinale(world)||
     (world.ark.anchoredIslandId&&!canReachAurora(world,world.ark.anchoredIslandId))||

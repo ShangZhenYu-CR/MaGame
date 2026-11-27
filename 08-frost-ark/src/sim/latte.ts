@@ -1,4 +1,5 @@
 import { inventoryChange, isDeck } from './ark';
+import { incapacitated, RESCUE_TICKS, rescuePoint } from './rescue';
 import { heatAt, primaryHearth } from './heatField';
 import type { CloudDebris, ItemStack, WorldState } from './types';
 
@@ -25,6 +26,15 @@ export function updateLatte(w:WorldState):void{
   cat.autoLootUnlocked=!!hearth&&hearth.level>=2;
   if(!hearth)return;
   const hx=hearth.gx+2.4, hy=hearth.gy+2.4;
+  if(incapacitated(w)){
+    const p=w.player, aboard=isDeck(w,Math.floor(p.x),Math.floor(p.y));
+    const destination=rescuePoint(w);
+    const target=aboard&&w.tick-(p.rescue.startedAt??w.tick)<RESCUE_TICKS*.50?
+      {x:p.x+.3,y:p.y+.1}:destination;
+    const dx=target.x-cat.x,dy=target.y-cat.y,gap=Math.hypot(dx,dy);
+    if(gap>.13){const step=Math.min(.13,gap)/gap;cat.x+=dx*step;cat.y+=dy*step;}
+    cat.mood='alert';return;
+  }
   const d=cat.autoLootUnlocked&&hearth.fuel>0
     ?w.sky.debris.find(v=>isDeckDrop(v)&&isDeck(w,Math.floor(v.x),Math.floor(v.y))&&
       Math.hypot(v.x-hearth.gx-1,v.y-hearth.gy-1)<=6&&heatAt(w,v.x,v.y)>=15)

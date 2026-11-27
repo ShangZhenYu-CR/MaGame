@@ -1,3 +1,4 @@
+import { incapacitated } from './rescue';
 import { feetSupported, GROUND_FOOTPRINTS, PLAYER_FOOT_RADIUS } from './ground-footprint';
 import buildings from '../data/buildings.json';
 import recipes from '../data/recipes.json';
@@ -123,6 +124,7 @@ export function playerOverTile(w: WorldState, x: number, y: number): boolean {
 }
 
 export function buildIssue(w: WorldState, kind: BuildKind, x: number, y: number): string | null {
+  if(incapacitated(w))return '昏迷中，等待救援。';
   const def=buildDefinitions[kind];
   if(!def)return '未知建筑';
   const [sw,sh]=def.size;

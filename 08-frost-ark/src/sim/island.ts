@@ -1,3 +1,4 @@
+import { incapacitated } from './rescue';
 import { feetSupported, PLAYER_FOOT_RADIUS } from './ground-footprint';
 import { highTierCache, highTierOre } from './m5-zones';
 import biomes from '../data/biomes.json';
@@ -133,6 +134,7 @@ function liveNode(w:WorldState,node:IslandResource):IslandResource|undefined{
   return islandNodes(w).find(n=>n.id===node.id&&n.key===node.key);
 }
 export function harvestIssue(w:WorldState,node:IslandResource,maxDistance=1.8):string|null{
+  if(incapacitated(w))return '昏迷中，等待救援。';
   if(!w.activeIsland)return '先走过跳板到浮岛上';
   const live=liveNode(w,node);
   if(!live||distanceToIslandNode(w,live)>maxDistance)return '走近资源后再收集';
@@ -189,6 +191,7 @@ export function toggleGangway(w:WorldState):string|null{
 
 export function walkExpedition(w:WorldState,direction:Vec2):void{
   const g=gangwayGeometry(w),p=w.player;
+  if(incapacitated(w)){p.vx=p.vy=0;return;}
   if(!g?.deployed){
     // Older saves could retract the bridge while the player's centre was on the
     // ship but their feet still overlapped the seam. Let a step back free them

@@ -1,3 +1,5 @@
+import { gangwayGeometry } from './island';
+import { rotateDockPoint } from './dock-direction';
 import { envelope,indoorsAt } from './rooms';
 import { armorBroken,burnDamage,elementalSpeed,frozen,resolveElement,type Element } from './elements';
 import { emitJuice } from './juice';
@@ -99,7 +101,8 @@ function stepBoss(w:WorldState,s:M5State){
   const node=w.sky.islands.find(n=>n.id===id);
   const defId=id?bossByIsland[id]:undefined;
   if(!island||!node||!defId||node.bossDefeated||w.wildEntities.some(e=>e.kind==='boss'&&e.defId===defId))return;
-  const x=island.offsetX+25.5,y=island.offsetY+32.5;
+  const p=rotateDockPoint(gangwayGeometry(w)?.side??'east',island.size,25.5,32.5);
+  const x=island.offsetX+p.x,y=island.offsetY+p.y;
   if(Math.hypot(w.player.x-x,w.player.y-y)<=11)
     add(w,defId,'boss_'+node.id,'boss',{x,y});
 }

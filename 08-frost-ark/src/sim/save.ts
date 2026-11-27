@@ -1,4 +1,5 @@
 import { verifyM5 } from './m5';
+import { docks,type DockSide } from './dock-direction';
 import { isDoor } from './rooms';
 import { validHotbar } from './hotbar';
 import { validElements } from './elements';
@@ -112,7 +113,7 @@ function validateFauna(p:Record<string,unknown>,ids:Set<string>):void{
 
 export function deserializeWorld(raw: string): WorldState {
   const p:unknown=JSON.parse(raw);
-  if(!record(p)||![1,2,3,4,5,6,7,8,9,10,11,12,13,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
+  if(!record(p)||![1,2,3,4,5,6,7,8,9,10,11,12,13,14,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
     throw new Error('存档版本不受支持');
   if(p.saveVersion===1){
     if(record(p.player))p.player.rescue={startedAt:null,shieldUntil:0};
@@ -198,8 +199,10 @@ export function deserializeWorld(raw: string): WorldState {
     if(dock!==null){
       if(!record(dock)||typeof dock.nodeId!=='string'||dock.nodeId!==ark.anchoredIslandId||!ids.has(dock.nodeId)
         ||!grid(dock.gx)||!grid(dock.gy)||!ark.decks[dock.gy*ARK_SIZE+dock.gx]
-        ||(dock.gx<ARK_SIZE-1&&ark.decks[dock.gy*ARK_SIZE+dock.gx+1])
+        ||(dock.side!==undefined&&(typeof dock.side!=='string'||!Object.hasOwn(docks,dock.side)))
         ||typeof dock.deployed!=='boolean'||sky.cruising)throw invalidNavigation();
+      const dir=docks[(dock.side??'east') as DockSide],x=dock.gx+dir.x,y=dock.gy+dir.y;
+      if(grid(x)&&grid(y)&&ark.decks[y*ARK_SIZE+x])throw invalidNavigation();
     }else if(ark.anchoredIslandId!==null)throw invalidNavigation();
   }else if(ark.anchoredIslandId!==null)throw invalidNavigation();
 

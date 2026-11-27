@@ -27,6 +27,7 @@ import { beastUi } from './ui/beasts';
 import { equipmentUi } from './ui/equipment';
 import { weaponsUi } from './ui/weapons';
 import { chooseWeapon, selectedWeapon, triggerWeapon, weaponHover, weaponById } from './sim/weapons';
+import { setupHeatRadar } from './ui/heat-radar';
 import { helmPoint } from './sim/sky-map';
 import { roomComfort } from './sim/home';
 import { utilityAt } from './sim/utilities';
@@ -105,6 +106,7 @@ const m5Ui=combatM5Ui({state:()=>w,msg:finishAction});
 const skyToggle=el('sky-map-toggle');
 const helmIcon=iconPath('helm');
 if(helmIcon){const img=document.createElement('img');img.alt='';img.src=helmIcon;skyToggle.prepend(img);}
+const radar=setupHeatRadar();
 const quickbar=setupHotbar({state:()=>w,mode:()=>mode,icon:iconPath,action:runShortcut,changed:()=>{void saveNow();}});
 const regions=new Map(biomes.map(b=>[b.id,b.name]));
 
@@ -510,6 +512,7 @@ addEventListener('keydown',e=>{
   else if(k==='n'){e.preventDefault();toggleChart();}
   else if(k==='b')toggleCatalog();
   else if(k==='v')toggleBeastRoster();
+  else if(k==='y')radar.toggle();
   else if(k==='x'){toggleCatalog(false);choose(mode==='dismantle'?'hook':'dismantle');}
   else if(k==='z')industry.undoAction();
   else if(k==='m')toggleMute();
@@ -634,6 +637,7 @@ function frame(now:number):void {
   }
   industry.update();chart.paint(false,now);
   const overlay=down||chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||beasts.open();
+  radar.update(w,!overlay&&!w.activeIsland&&!finale.open()&&!finale.blocking());
   const context=primaryInteraction();
   const here=expedition.update(now,overlay||finale.arena(),context.kind==='expedition');
   const feedKey=el('wild-feed').querySelector('kbd')!;

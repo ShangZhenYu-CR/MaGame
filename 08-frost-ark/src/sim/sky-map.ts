@@ -1,3 +1,4 @@
+import { dockSide,docks } from './dock-direction';
 import { rigDrive,sailingRig } from './rigging';
 import { buildingAt, isDeck } from './ark';
 import { ensureNavigationState, getNavigation } from './m3-state';
@@ -76,7 +77,7 @@ export function toggleCruise(w:WorldState):string|null{
   ensureNavigation(w);
   const nav=ensureNavigationState(w);
   if(w.sky.cruising){w.sky.cruising=false;return null;}
-  if(nav.dock?.deployed)return '先到右舷收起登岛跳板';
+  if(nav.dock?.deployed)return '先到'+docks[dockSide(nav.dock.side)].label+'收起登岛跳板';
   if(!nav.targetId||nav.targetId===w.ark.anchoredIslandId){
     const next=w.sky.islands.filter(n=>n.id!==w.ark.anchoredIslandId&&canReachAurora(w,n.id)).sort((a,b)=>distance(w,a)-distance(w,b))[0];
     if(!next)return '航图还没有其他可前往的信号';
@@ -98,14 +99,17 @@ function findDock(w:WorldState){
       seen.add(at);frontier.push(at);
     }
   }
-  // Keep the whole island landing east of the outermost deck, not just east of
-  // the local row; this prevents boarding through another constructed wing.
-  const east=Math.max(...w.ark.decks.flatMap((deck,i)=>deck?[i%size]:[]));
-  const rows=Array.from({length:size},(_,i)=>i).sort((a,b)=>Math.abs(a-size/2)-Math.abs(b-size/2));
-  for(const gy of rows){
-    for(let gx=east;gx>=east-2;gx--){
-      const at=gy*size+gx;
-      if(seen.has(at)&&clear(w,gx,gy)&&!isDeck(w,gx+1,gy))return {gx,gy};
+  const surface=w.ark.decks.flatMap((v,i)=>v?[{x:i%size,y:Math.floor(i/size)}]:[]);
+  if(!surface.length)return null;
+  const strips=Array.from({length:size},(_,i)=>i).sort((a,b)=>Math.abs(a-size/2)-Math.abs(b-size/2));
+  // Keep the scene clear of distant hull wings, preferring a standard
+  // starboard berth when both sides work equally well.
+  for(const side of ['east','west','south','north'] as const){
+    const d=docks[side],outer=Math.max(...surface.map(p=>p.x*d.x+p.y*d.y));
+    for(const strip of strips)for(let inset=0;inset<=2;inset++){
+      const gx=d.x?(outer-inset)*d.x:strip,gy=d.y?(outer-inset)*d.y:strip;
+      if(gx>=0&&gx<size&&gy>=0&&gy<size&&seen.has(gy*size+gx)&&clear(w,gx,gy)&&
+         !isDeck(w,gx+d.x,gy+d.y))return {gx,gy,side};
     }
   }
   return null;

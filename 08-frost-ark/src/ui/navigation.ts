@@ -1,3 +1,4 @@
+import { docks } from '../sim/dock-direction';
 import { cruiseSpeed } from '../sim/sky-map';
 import { DISCOVERY_RADIUS, DOCK_RADIUS, nearHelm, navigationPanel, setDestination, toggleCruise } from '../sim/sky-map';
 import { gangwayGeometry } from '../sim/island';
@@ -67,10 +68,10 @@ export function navigationUi(hooks:ChartHooks){
   const locked=!!choice&&!canReachAurora(w,choice.id);
   if(locked)put(get('sky-destination-detail'),'极光天穹 · 点燃太阳方舟后开放');
   set.disabled=locked||!choice||!nearHelm(w)||choice.id===nav.anchoredIslandId||choice.id===nav.targetId;
-  const bridge=gangwayGeometry(w)?.deployed;
+  const connection=gangwayGeometry(w),bridge=connection?.deployed;
   cruise.disabled=!nearHelm(w)||(!nav.cruising&&!!bridge);
   cruise.dataset.cruising=String(nav.cruising);put(cruise,nav.cruising?'停止巡航':nav.anchoredIslandId?'解缆巡航':'开始巡航');
-  put(hint,now<noticeUntil?notice:nearHelm(w)?bridge?'离港前请先到右舷收起登岛跳板。':'设置目的地后按「开始巡航」，方舟抵达时会自动靠泊。':'航图可随时查看；走近甲板北面的舵轮才能改航向。');
+  put(hint,now<noticeUntil?notice:nearHelm(w)?bridge?'离港前请先到'+docks[connection!.side].label+'收起登岛跳板。':'设置目的地后按「开始巡航」，方舟抵达时会自动靠泊。':'航图可随时查看；走近甲板北面的舵轮才能改航向。');
   // The ship is always the chart centre. Zoom to cover the local navigation envelope.
   const extentX=Math.max(DISCOVERY_RADIUS*1.12,...nav.islands.map(v=>Math.abs(v.skyX-nav.x)));
   const extentY=Math.max(DISCOVERY_RADIUS*1.12,...nav.islands.map(v=>Math.abs(v.skyY-nav.y)));

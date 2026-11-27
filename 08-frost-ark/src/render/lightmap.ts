@@ -65,7 +65,7 @@ export class Lightmap {
       l.fillStyle=bloom;l.fillRect(x-r,y-r,r*2,r*2);
     }
     target.save();
-    target.imageSmoothingEnabled=true;
+    target.imageSmoothingEnabled=true;target.imageSmoothingQuality='low';
     target.drawImage(this.shade,0,0,width,height);
     target.globalCompositeOperation='screen';
     target.drawImage(this.warm,0,0,width,height);

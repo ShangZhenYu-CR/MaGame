@@ -33,7 +33,14 @@
       <section class="m5-seeds numbers" id="m5-seed-count" aria-label="天穹火种进度"></section>
     </div>
   </header>
-  <aside class="sector"><div class="eyebrow">SKY SECTOR <span>01</span></div><strong id="sector-name">碎云浅海</strong><div id="weather-status" class="numbers"></div><div id="latte-status"></div><div class="hearth-tools"><button id="fuel-hearth" type="button"><kbd>R</kbd> 添柴</button><button id="upgrade-hearth" type="button" title="浮木板 ×4、冻铁废件 ×2"><kbd>U</kbd> 升炉</button></div></aside>
+  <aside class="sector"><div class="eyebrow">SKY SECTOR <span>01</span></div><strong id="sector-name">碎云浅海</strong><div id="weather-status" class="numbers"></div><div id="latte-status"></div><div class="hearth-tools"><button id="fuel-hearth" type="button"><kbd>R</kbd> 添柴</button><button id="upgrade-hearth" type="button" title="浮木板 ×4、冻铁废件 ×2"><kbd>U</kbd> 升炉</button></div>
+    <button type="button" id="heat-radar-toggle" aria-expanded="false" aria-controls="heat-radar"><kbd>Y</kbd> 热力雷达</button>
+    <section id="heat-radar" aria-label="方舟热力地图" hidden>
+      <canvas id="heat-radar-map" width="180" height="128" aria-label="暖区、冷区与入侵者位置"></canvas>
+      <small id="heat-radar-metrics" class="numbers"></small>
+      <p class="heat-radar-legend"><i></i>暖区 <i></i>冷区 <i></i>设施 <i></i>敌袭</p>
+    </section>
+  </aside>
   <section id="rescue-status" aria-live="polite" hidden>
     <strong id="rescue-title"></strong><small id="rescue-description" class="numbers"></small>
   </section>

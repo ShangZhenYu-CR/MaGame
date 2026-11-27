@@ -982,3 +982,29 @@ assert.equal(furnished.player.roll.stamina,64);
 assert.equal(countItem(furnished,'fresh_water'),0);
 assert.equal(roomComfort(deserializeWorld(serializeWorld(furnished))),5);
 console.log('[sim-smoke:P2-16] OK: furnished warm room reaches Lv.5, tea spends water, rest to dawn and refuses first whiteout');
+
+import { largeRadarArk,sideTrial,westOnlyTravel } from './p2-dock-fixture';
+import { docks,downDock } from '../src/sim/dock-direction';
+const alternate=westOnlyTravel();
+assert.equal(setDestination(alternate,'shallows_lantern'),null);
+assert.equal(toggleCruise(alternate),null);
+while(alternate.sky.cruising&&alternate.tick<1000)stepWorld(alternate);
+assert.equal(gangwayGeometry(alternate)?.side,'west','pick another reachable berth after the starboard side is blocked');
+for(const side of ['east','west','north','south'] as const){
+ const rig=sideTrial(side),d=docks[side],g=gangwayGeometry(rig)!;
+ assert.equal(toggleGangway(rig),null);assert.equal(areaAt(rig,g.landing.x,g.landing.y),'island');
+ assert.equal(startRoll(rig,d),null);stepWorld(rig,60,d);
+ assert.equal(areaAt(rig,rig.player.x,rig.player.y),'island');
+ const loaded=deserializeWorld(serializeWorld(rig));
+ assert.equal(gangwayGeometry(loaded)?.side,side);assert.equal(loaded.activeIsland?.nodeId,'shallows_lantern');
+ const seam=sideTrial(side);assert.equal(toggleGangway(seam),null);
+ Object.assign(seam.player,downDock(g.deck,side,.47));
+ assert.equal(toggleGangway(seam),null);
+ assert.ok(fitsOnDeck(seam,seam.player.x,seam.player.y));
+ assert.ok(!hasBuildingContact(seam,seam.player.x,seam.player.y));
+}
+const giant=largeRadarArk();
+assert.equal(giant.ark.decks.filter(Boolean).length,21*21);
+assert.ok(giant.ark.heatGrid.filter((v,i)=>giant.ark.decks[i]&&v>=15).length>0);
+assert.ok(giant.ark.heatGrid.filter((v,i)=>giant.ark.decks[i]&&v<=-16).length>300);
+console.log('[sim-smoke:P2-17] OK: real 21×21 construction, mixed heat, alternate dock, every launch direction and safe 4-way retraction');

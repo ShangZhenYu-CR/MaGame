@@ -353,3 +353,11 @@ button[aria-disabled=true]{opacity:.62}
 #repair-targets{padding:0}#repair-targets li{display:flex;gap:4px;justify-content:space-between;align-items:center;font-size:10px}#repair-summary{white-space:normal}
 
 #home-status{white-space:normal}#home-panel{border-top:1px solid var(--edge);padding-top:8px}
+
+#heat-radar-toggle{margin-top:5px;min-height:24px;font-size:10px;padding:2px 6px}
+#heat-radar{border-top:1px solid var(--edge);padding-top:5px;margin-top:5px;text-align:center;color:#d0e5e8}
+#heat-radar-map{width:180px;height:128px;margin:auto;border:1px solid #365567;border-radius:3px;cursor:default}
+#heat-radar small{margin:3px 0}
+.heat-radar-legend{display:flex;justify-content:center;align-items:center;gap:3px;margin-top:2px;font-size:10px}
+.heat-radar-legend i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#dc8e4b}
+.heat-radar-legend i:nth-of-type(2){background:#577eaf}.heat-radar-legend i:nth-of-type(3){background:#c9d3cf}.heat-radar-legend i:nth-of-type(4){background:#fb7569}

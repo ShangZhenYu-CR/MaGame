@@ -1,3 +1,4 @@
+import { dockSide,docks,downDock,rotateDockPoint,type DockSide } from './dock-direction';
 import { incapacitated } from './rescue';
 import { feetSupported, PLAYER_FOOT_RADIUS } from './ground-footprint';
 import { highTierCache, highTierOre } from './m5-zones';
@@ -106,15 +107,44 @@ function generate(node:IslandNode,offsetX:number,offsetY:number):GeneratedIsland
   return fresh;
 }
 
-export function gangwayGeometry(w:WorldState){
-  const dock=getNavigation(w)?.dock;
-  if(!dock||dock.nodeId!==w.ark.anchoredIslandId)return null;
-  return {x:dock.gx+1,y:dock.gy,width:GANGWAY_LENGTH,height:1,deployed:dock.deployed};
+type GangwayView={x:number;y:number;width:number;height:number;deployed:boolean;side:DockSide;gx:number;gy:number;deck:Vec2;landing:Vec2};
+const bridgeViews=new WeakMap<object,GangwayView>();
+export function gangwayGeometry(w:WorldState):GangwayView|null{
+ const dock=getNavigation(w)?.dock;
+ if(!dock||dock.nodeId!==w.ark.anchoredIslandId)return null;
+ const side=dockSide(dock.side),d=docks[side],{gx,gy}=dock,L=GANGWAY_LENGTH;
+ const prior=bridgeViews.get(dock);
+ if(prior&&prior.side===side&&prior.gx===gx&&prior.gy===gy&&prior.deployed===dock.deployed)return prior;
+ const x=gx+(d.x<0?-L:d.x),y=gy+(d.y<0?-L:d.y);
+ // Preserve the original public rectangle shape; orientation metadata is
+ // available to renderers and movement without changing legacy snapshots.
+ const rect={x,y,width:d.x?L:1,height:d.y?L:1,deployed:dock.deployed} as GangwayView;
+ Object.defineProperties(rect,{side:{value:side},gx:{value:gx},gy:{value:gy},
+  deck:{value:{x:gx+.5,y:gy+.5}},landing:{value:{x:gx+.5+d.x*(L+1),y:gy+.5+d.y*(L+1)}}});
+ bridgeViews.set(dock,rect);
+ return rect;
 }
 function generatedAtDock(w:WorldState):GeneratedIsland|null{
   const g=gangwayGeometry(w);
   const point=g&&w.sky.islands.find(n=>n.id===w.ark.anchoredIslandId);
-  return g&&point?generate(point,g.x+g.width-PORT_X,g.y-PORT_Y):null;
+  if(!g||!point)return null;
+  if(g.side==='east')return generate(point,g.x+g.width-PORT_X,g.y-PORT_Y);
+  const s=ISLAND_SIZE,port=rotateDockPoint(g.side,s,PORT_X+.5,PORT_Y+.5);
+  const offsetX=g.landing.x-port.x,offsetY=g.landing.y-port.y;
+  const cacheKey='rot:'+point.id+':'+g.side+':'+offsetX+':'+offsetY;
+  const cached=cache.get(cacheKey);if(cached)return cached;
+  const raw=generate(point,0,0),tiles=new Array<number>(s*s).fill(0);
+  for(let y=0;y<s;y++)for(let x=0;x<s;x++){
+    const q=rotateDockPoint(g.side,s,x+.5,y+.5);tiles[Math.floor(q.y)*s+Math.floor(q.x)]=raw.map.tiles[y*s+x];
+  }
+  Object.freeze(tiles);
+  const resources=raw.resources.map(node=>{
+    const p=rotateDockPoint(g.side,s,node.x,node.y);
+    return {...node,x:offsetX+p.x,y:offsetY+p.y};
+  });
+  const fresh={map:{nodeId:point.id,biomeId:point.biomeId,size:s,offsetX,offsetY,tiles},resources};
+  if(cache.size>=8)cache.delete(cache.keys().next().value!);cache.set(cacheKey,fresh);
+  return fresh;
 }
 export function dockedIsland(w:WorldState):IslandState|null{return generatedAtDock(w)?.map??null;}
 export function islandNodes(w:WorldState):readonly IslandResource[]{return generatedAtDock(w)?.resources??[];}
@@ -166,24 +196,27 @@ export function areaAt(w:WorldState,x:number,y:number):'ark'|'gangway'|'island'|
 
 const distanceToDock=(w:WorldState)=>{
   const g=gangwayGeometry(w);
-  return g?Math.hypot(w.player.x-(g.x-.5),w.player.y-(g.y+.5)):Infinity;
+  return g?Math.hypot(w.player.x-g.deck.x,w.player.y-g.deck.y):Infinity;
 };
 export const nearGangway=(w:WorldState):boolean=>areaAt(w,w.player.x,w.player.y)==='ark'&&distanceToDock(w)<=1.35;
 
 /** The centre is already aboard. Move no further than the shoe margin
  * before removing the floor beneath the remaining overhang. */
 function stepBackFromDockSeam(w:WorldState,g:NonNullable<ReturnType<typeof gangwayGeometry>>):boolean {
-  const p=w.player,r=PLAYER_FOOT_RADIUS,x=g.x-r-.001;
-  if(p.x>=g.x||p.x<g.x-r||p.y<g.y||p.y>=g.y+g.height||
-    !fitsOnDeck(w,x,p.y)||hasBuildingContact(w,x,p.y))return false;
-  p.x=x;p.vx=p.vy=0;
+  const dir=docks[g.side],p=w.player,r=PLAYER_FOOT_RADIUS;
+  const along=(p.x-g.deck.x)*dir.x+(p.y-g.deck.y)*dir.y;
+  const across=(p.y-g.deck.y)*dir.x-(p.x-g.deck.x)*dir.y;
+  if(along>=.5||along<.5-r||Math.abs(across)>=.5)return false;
+  const safe=downDock(g.deck,g.side,.5-r-.001,across);
+  if(!fitsOnDeck(w,safe.x,safe.y)||hasBuildingContact(w,safe.x,safe.y))return false;
+  p.x=safe.x;p.y=safe.y;p.vx=p.vy=0;
   return true;
 }
 
 export function toggleGangway(w:WorldState):string|null{
   const dock=getNavigation(w)?.dock;
   if(!dock||w.sky.cruising)return '请先靠泊浮岛';
-  if(!nearGangway(w))return '走到右舷登岛口后再操作';
+  if(!nearGangway(w))return '走到'+docks[dockSide(dock.side)].label+'登岛口后再操作';
   if(dock.deployed&&!fitsOnDeck(w,w.player.x,w.player.y)&&
     !stepBackFromDockSeam(w,gangwayGeometry(w)!))return '先退回甲板站稳，再收跳板';
   dock.deployed=!dock.deployed;
@@ -197,7 +230,7 @@ export function walkExpedition(w:WorldState,direction:Vec2,pace=1):void{
     // Older saves could retract the bridge while the player's centre was on the
     // ship but their feet still overlapped the seam. Let a step back free them
     // without moving any valid old-save position, even on an irregular deck.
-    if(g&&direction.x<0&&!fitsOnDeck(w,p.x,p.y))stepBackFromDockSeam(w,g);
+    if(g&&(direction.x*docks[g.side].x+direction.y*docks[g.side].y)<0&&!fitsOnDeck(w,p.x,p.y))stepBackFromDockSeam(w,g);
     walk(w,direction,pace);
     return;
   }

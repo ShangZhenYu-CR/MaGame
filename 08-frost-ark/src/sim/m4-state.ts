@@ -1,8 +1,10 @@
+import type { DockSide } from './dock-direction';
 import type { ItemStack, WildEntity, WorldState } from './types';
 
 export interface FaunaSave {
   islandId:string|null;
   offsetX:number;
+  side?:DockSide;
   offsetY:number;
   fauna:Record<string,WildEntity[]>;
   feed:number;

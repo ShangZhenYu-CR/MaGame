@@ -1,3 +1,4 @@
+import { dockSide,docks } from './dock-direction';
 import { overlayKind,utilityAt } from './utilities';
 import { doorBlocksFeet,invalidateRoomTopology,isDoor } from './rooms';
 import { emitJuice } from './juice';
@@ -137,8 +138,15 @@ export function buildIssue(w: WorldState, kind: BuildKind, x: number, y: number)
   const [sw,sh]=def.size;
   if(!Number.isInteger(x)||!Number.isInteger(y)||x<0||y<0||x+sw>w.ark.size||y+sh>w.ark.size)return '超出方舟范围';
   const dock=getNavigation(w)?.dock;
-  if(dock && ((x<=dock.gx&&x+sw>dock.gx&&y<=dock.gy&&y+sh>dock.gy&&kind!=='wood_deck'&&kind!=='iron_deck'&&!overlayKind(kind)) ||
-    (x>dock.gx&&y<=dock.gy&&y+sh>dock.gy)))return '给登岛跳板留出右舷航道';
+  if(dock){
+    const direction=docks[dockSide(dock.side)];
+    for(let dx=0;dx<sw;dx++)for(let dy=0;dy<sh;dy++){
+      const rx=x+dx-dock.gx,ry=y+dy-dock.gy;
+      const along=rx*direction.x+ry*direction.y,across=ry*direction.x-rx*direction.y;
+      if(across===0&&(along>0||(along===0&&kind!=='wood_deck'&&kind!=='iron_deck'&&!overlayKind(kind))))
+        return '给登岛跳板留出'+direction.label+'航道';
+    }
+  }
   if(w.activeIsland)return '返回方舟后才能建造';
 
   const node=tech.nodes.find(n=>n.unlocksBuildings.includes(kind));

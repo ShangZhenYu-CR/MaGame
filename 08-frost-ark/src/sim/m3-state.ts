@@ -1,3 +1,4 @@
+import type { DockSide } from './dock-direction';
 import type { WorldState } from './types';
 
 export interface IslandDock {
@@ -6,6 +7,7 @@ export interface IslandDock {
   gx:number;
   gy:number;
   deployed:boolean;
+  side?:DockSide;
 }
 export interface NavigationState {
   targetId:string|null;

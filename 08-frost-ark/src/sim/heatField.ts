@@ -1,3 +1,4 @@
+import { downDock } from './dock-direction';
 import { roomComfort } from './home';
 import { pipeHeat } from './utilities';
 import { doorOpen,indoor } from './rooms';
@@ -66,7 +67,8 @@ export function heatAt(w:WorldState,x:number,y:number):number{
   if(isDeck(w,gx,gy))return w.ark.heatGrid[gy*w.ark.size+gx];
   const ambient=expeditionTemperature(w,x,y)??w.ambientTemp;
   const hearth=primaryHearth(w),bridge=w.ark.anchoredIslandId==='aurora_vault'&&hearth&&hearth.level>=4&&hearth.fuel>0?gangwayGeometry(w):null;
-  const solar=bridge?.deployed?Math.max(0,1-Math.hypot(x-bridge.x-bridge.width-3,y-bridge.y-.5)/14)*60:0;
+  const shore=bridge?.deployed?downDock(bridge.landing,bridge.side,2.5):null;
+  const solar=shore?Math.max(0,1-Math.hypot(x-shore.x,y-shore.y)/14)*60:0;
   return ambient+solar+beastHeatEmitters(w).reduce((sum,source)=>sum+source.power*Math.max(0,1-Math.hypot(x-source.x,y-source.y)/source.radius),0);
 }
 export function emitters(w:WorldState){

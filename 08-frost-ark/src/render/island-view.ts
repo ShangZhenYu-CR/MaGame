@@ -203,13 +203,17 @@ export function paintGangway(c:CanvasRenderingContext2D,art:ArtLibrary,
 ):void{
   if(!bounds.deployed)return;
   const a=project(bounds.x,bounds.y);
-  const span=bounds.width*tile, h=bounds.height*tile;
+  const vertical=bounds.height>bounds.width;
+  const span=(vertical?bounds.height:bounds.width)*tile,h=tile;
+  c.save();
+  if(vertical){c.translate(a.x+tile,a.y);c.rotate(Math.PI/2);a.x=0;a.y=0;}
   ovalGlow(c,a.x+span/2,a.y+h*.90,span*.63,h*.58,'rgba(9,28,42,.53)','rgba(9,28,42,0)');
-  const modules=Math.max(1,Math.round(bounds.width));
+  const modules=Math.max(1,Math.round(span/tile));
   for(let i=0;i<modules;i++){
     // Keep the side-view timbers and guardrails in their original orientation.
     // A slight overlap tucks the authored module into both actual surfaces.
     art.paintTile(c,'ark-gangway',a.x+i*span/modules-tile*.068,a.y-h*.13,
       span/modules+tile*.136,h*1.20);
   }
+  c.restore();
 }

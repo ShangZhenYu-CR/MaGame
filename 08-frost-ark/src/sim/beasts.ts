@@ -1,3 +1,4 @@
+import { dockSide,inverseDock,rotateDockPoint } from './dock-direction';
 import { doorBlocksFeet,isDoor } from './rooms';
 import { burnDamage,elementalSpeed,frozen,resolveElement,type Element } from './elements';
 import { emitJuice } from './juice';
@@ -8,7 +9,7 @@ import beastData from '../data/beasts.json';
 import biomes from '../data/biomes.json';
 import { buildingDefs, inventoryChange, itemNames, itemStackLimits, refreshBuoyancy } from './ark';
 import { FUEL_MAX, heatAt, primaryHearth } from './heatField';
-import { areaAt, consumeIslandNode, dockedIsland, harvestIssue, islandNodes, islandNodeRemaining } from './island';
+import { areaAt, consumeIslandNode, dockedIsland, gangwayGeometry, harvestIssue, islandNodes, islandNodeRemaining } from './island';
 import { ensureFauna, getFauna } from './m4-state';
 import { nextRng } from './rng';
 import { toolDefinition, toolStatus } from './tools';
@@ -25,19 +26,19 @@ const at=(b:BuildingInstance)=>({x:b.gx+(b.defId==='beast_den'?1:.5),y:b.gy+(b.d
 const clamp=(n:number,lo:number,hi:number)=>Math.max(lo,Math.min(n,hi));
 
 function syncFauna(w:WorldState):void{
-  const map=dockedIsland(w);
+  const map=dockedIsland(w),side=gangwayGeometry(w)?.side??'east';
   const current=getFauna(w);
   if(!map&&!current)return;
   const fauna=ensureFauna(w);
-  if((map?.nodeId??null)===fauna.islandId&&(!map||(map.offsetX===fauna.offsetX&&map.offsetY===fauna.offsetY)))return;
+  if((map?.nodeId??null)===fauna.islandId&&(!map||(map.offsetX===fauna.offsetX&&map.offsetY===fauna.offsetY&&dockSide(fauna.side)===side)))return;
   if(fauna.islandId){
     fauna.fauna[fauna.islandId]=w.wildEntities.filter(e=>e.kind==='beast'&&e.homeIslandId===fauna.islandId)
-      .map(e=>({...e,x:e.x-fauna.offsetX,y:e.y-fauna.offsetY}));
+      .map(e=>({...e,...rotateDockPoint(inverseDock(dockSide(fauna.side)),64,e.x-fauna.offsetX,e.y-fauna.offsetY)}));
   }
   w.wildEntities=w.wildEntities.filter(e=>e.kind!=='beast');
   fauna.islandId=map?.nodeId??null;
   if(!map)return;
-  fauna.offsetX=map.offsetX;fauna.offsetY=map.offsetY;
+  fauna.offsetX=map.offsetX;fauna.offsetY=map.offsetY;fauna.side=side;
   const node=w.sky.islands.find(n=>n.id===map.nodeId)!;
   const saved=fauna.fauna[map.nodeId];
   let locals=saved;
@@ -53,7 +54,10 @@ function syncFauna(w:WorldState):void{
         x:x+.5+r.value*.32,y:y+.5,hp:d.maxHp,maxHp:d.maxHp,stunnedTicks:0,tameProgress:0,hostile:false};
     });
   }
-  w.wildEntities.push(...locals.map(e=>({...e,x:e.x+map.offsetX,y:e.y+map.offsetY})));
+  w.wildEntities.push(...locals.map(e=>{
+    const rot=rotateDockPoint(side,map.size,e.x,e.y);
+    return {...e,x:rot.x+map.offsetX,y:rot.y+map.offsetY};
+  }));
   delete fauna.fauna[map.nodeId];
 }
 

@@ -1,3 +1,4 @@
+import { docks,downDock } from '../sim/dock-direction';
 import { catPerch } from '../sim/home';
 import { heatedPipes,overlayKind } from '../sim/utilities';
 import { cruiseSpeed } from '../sim/sky-map';
@@ -93,6 +94,8 @@ export class ArkView {
   readonly juice=new JuiceView();
   private hull:HullProfile|null=null;
   private hullSignature='';
+  private deckLayer?:HTMLCanvasElement;
+  private deckFinishKey='';
   private loaded=false;
   private loadError='';
   readonly ready:Promise<void> = this.art.ready;
@@ -131,6 +134,14 @@ export class ArkView {
       const connection=gangwayGeometry(w);
       // Reveal the shore from the deck and track the player over the same world
       // coordinates. Neither zoom nor crossing relocates the camera namespace.
+      if(connection&&connection.side!=='east'){
+        const d=docks[connection.side],p=w.player;
+        const toward=(p.x-connection.deck.x)*d.x+(p.y-connection.deck.y)*d.y;
+        const t=clamp((toward+.63)/5.2);
+        const lx=clamp(p.x+d.x*.7,bounds.left+1.55,bounds.right-1.55);
+        const ly=clamp(p.y+d.y*.7,bounds.top+1.55,bounds.bottom-1.55);
+        cx=(cx+d.x*2.6)*(1-t)+lx*t;cy=(cy+d.y*2.1)*(1-t)+ly*t;yFraming+=t*.064;
+      }else{
       const landWeight=clamp((w.player.x-(connection?.x??bounds.left)+1.1)/5.2);
       const shoreNudge=clamp((bounds.left-center)*.40,1.7,4.1);
       const landX=clamp(w.player.x+.7,center+shoreNudge,bounds.right-1.65);
@@ -138,6 +149,7 @@ export class ArkView {
       cx=(cx+shoreNudge)*(1-landWeight)+landX*landWeight;
       cy=cy*(1-landWeight)+landY*landWeight;
       yFraming+=landWeight*.064;
+      }
     }
     this.origin={x:Math.round(width/2-cx*this.scale),y:Math.round(height*yFraming+clamp((680-height)*.15,0,24)-cy*this.scale)};
     const data=this.canvas.dataset;
@@ -227,7 +239,7 @@ export class ArkView {
       c.restore();
     }
     if(island)paintIsland(c,this.art,island,project,s,w.tick);
-    const b=this.deckStructure(c,cells,w,hull);
+    const b=this.deckStructure(c,cells,w,hull,surface,thawed);
     const hotPipes=heatedPipes(w),allPipes=w.ark.buildings.filter(b=>b.defId==='heat_pipe');
     const pipeLocations=new Set(allPipes.map(b=>b.gy*w.ark.size+b.gx));
     for(const pipe of allPipes){
@@ -259,9 +271,8 @@ export class ArkView {
       }
     }
     if(island?.nodeId==='aurora_vault'&&gangway?.deployed){
-      const start=gangway.x+gangway.width;
       for(const [dx,dy] of [[4,-3],[9,4],[11,-3]]){
-        const x=start+dx+.5,y=gangway.y+dy+.5;
+        const {x,y}=downDock(gangway.landing,gangway.side,dx,dy);
         const i=(Math.floor(y)-island.offsetY)*island.size+Math.floor(x)-island.offsetX;
         if(island.tiles[i])actors.push({x,y,art:'aurora-crystal',width:1.25,height:1.26,shadow:.36});
       }
@@ -441,7 +452,7 @@ export class ArkView {
       top:Math.max(0,Math.floor(-this.origin.y/s)-5),bottom:Math.ceil((height-this.origin.y)/s)+2};
   }
 
-  private deckStructure(c:CanvasRenderingContext2D,cells:Cell[],w:WorldState,hull:HullProfile):HullBounds|null{
+  private deckStructure(c:CanvasRenderingContext2D,cells:Cell[],w:WorldState,hull:HullProfile,floors:Set<number>,thawed:Set<number>|null):HullBounds|null{
     if(!cells.length)return null;
     const s=this.scale;
     const {minX,minY,maxX,maxY}=hull;
@@ -450,11 +461,43 @@ export class ArkView {
     ovalGlow(c,p.x+s*.17,p.y+s*.79,b.w*.66,b.d*.26,'rgba(12,31,46,.48)');
     this.lowClouds(c,b,w.tick,false);
 
+    // Static hull and stains are recomposed only when geometry or a visible
+    // frost band changes. One reusable texture replaces hundreds of tile
+    // draws and per-cell gradients every frame on a large ship.
+    let frosting='';
+    const prepared:Cell[]=[];
+    for(let i=0;i<w.ark.decks.length;i++){
+      if(!w.ark.decks[i])continue;
+      const level=Math.round(clamp((8-(w.ark.heatGrid[i]??w.ambientTemp)-(thawed?.has(i)?9:0))/28)*14);
+      const floor=floors.has(i);
+      frosting+=(level+(floor?16:0)).toString(32);
+      const x=i%w.ark.size,y=Math.floor(i/w.ark.size),mask=hull.edges[i];
+      prepared.push({x,y,hash:hash(x,y),iron:w.ark.decks[i]===2,insulated:floor,temperature:8-level*2,
+        left:!!(mask&HULL_WEST),right:!!(mask&HULL_EAST),front:!!(mask&HULL_SOUTH),back:!!(mask&HULL_NORTH)});
+    }
+    const x0=minX-1,y0=minY-1,finish=this.hullSignature+'|'+s+'|'+frosting;
+    const layer=this.deckLayer??(this.deckLayer=document.createElement('canvas'));
+    if(finish!==this.deckFinishKey){
+      this.deckFinishKey=finish;
+      const width=(maxX-x0+1)*s,height=(maxY-y0+3)*s;
+      if(layer.width!==width||layer.height!==height){layer.width=width;layer.height=height;}
+      const ctx=layer.getContext('2d')!;
+      ctx.clearRect(0,0,width,height);ctx.imageSmoothingEnabled=true;
+      this.paintDeckLayer(ctx,prepared,w,hull,(x,y)=>({x:(x-x0)*s,y:(y-y0)*s}));
+    }
+    const corner=this.screen(x0,y0);
+    c.drawImage(layer,corner.x,corner.y);
+    return b;
+  }
+
+  private paintDeckLayer(c:CanvasRenderingContext2D,cells:Cell[],w:WorldState,hull:HullProfile,
+    project:(x:number,y:number)=>Vec2):void{
+    const s=this.scale;
     const rim=cells.filter(t=>t.left||t.right);
     for(const t of rim){
       for(const side of [t.left?-1:0,t.right?1:0]){
         if(!side)continue;
-        const point=this.screen(t.x+(side<0?0:1),t.y+.5);
+        const point=project(t.x+(side<0?0:1),t.y+.5);
         // Thin side cross-sections are kept near the wood line, never a tall
         // hanging cone. Mirroring keeps the visible cut face outside on both sides.
         this.art.paint(c,'rock-side',point.x+side*s*.025,point.y+s*.02,s,
@@ -463,7 +506,7 @@ export class ArkView {
     }
     // Long cones and icicles only belong to the ground-facing front contour.
     for(const t of cells.filter(t=>t.front)){
-      const p=this.screen(t.x+.5,t.y+1);
+      const p=project(t.x+.5,t.y+1);
       if(!hull.cones[t.y*w.ark.size+t.x]){
         this.art.paint(c,'rock',p.x,p.y+s*.23,s,{width:1.10,height:.32,flip:!!(t.hash%2)});
         continue;
@@ -479,7 +522,7 @@ export class ArkView {
       }
     }
     for(const t of cells){
-      const p=this.screen(t.x,t.y);
+      const p=project(t.x,t.y);
       const id=t.insulated?'floor-insulated':t.iron?ironDeck:deckIds[t.hash%4];
       this.art.paintTile(c,id,p.x,p.y,s,s);
       this.frost(c,t,p);
@@ -493,7 +536,6 @@ export class ArkView {
         c.restore();
       }
     }
-    return b;
   }
 
   private lowClouds(c:CanvasRenderingContext2D,b:HullBounds,tick:number,front:boolean):void {
@@ -561,18 +603,18 @@ export class ArkView {
     for(const t of cells){
       const {x,y}=t;
       if(hasNet(x,y))continue;
-      const bridgeExit=!!gangway?.deployed&&x+1===gangway.x&&y<gangway.y+gangway.height&&y+1>gangway.y;
+      const bridgeExit=(side:string)=>gangway?.deployed&&gangway.side===side&&gangway.gx===x&&gangway.gy===y;
       const bowGap=isLaunchPort(x,y,'north'),sternGap=isLaunchPort(x,y,'south');
       if(t.back&&!hasGhost(x,y-1)){
-        if(!bowGap)put(x+.5,y+.10,'rail',1.18,.54);
+        if(!bowGap&&!bridgeExit('north'))put(x+.5,y+.10,'rail',1.18,.54);
         else{put(x+.16,y+.1,'corner',.34,.46);put(x+.87,y+.1,'corner',.34,.46,true);}
       }
       if(t.front&&!hasGhost(x,y+1)){
-        if(!sternGap)put(x+.5,y+.97,'rail',1.14,.55);
+        if(!sternGap&&!bridgeExit('south'))put(x+.5,y+.97,'rail',1.14,.55);
         else{put(x+.16,y+1,'corner',.34,.46);put(x+.87,y+1,'corner',.34,.46,true);}
       }
-      if(t.left&&!hasGhost(x-1,y)&&!isLaunchPort(x,y,'west'))put(x+.08,y+1.02,'rail-side',.405,1.11);
-      if(t.right&&!bridgeExit&&!hasGhost(x+1,y)&&!isLaunchPort(x,y,'east'))put(x+.92,y+1.02,'rail-side',.405,1.11,true);
+      if(t.left&&!bridgeExit('west')&&!hasGhost(x-1,y)&&!isLaunchPort(x,y,'west'))put(x+.08,y+1.02,'rail-side',.405,1.11);
+      if(t.right&&!bridgeExit('east')&&!hasGhost(x+1,y)&&!isLaunchPort(x,y,'east'))put(x+.92,y+1.02,'rail-side',.405,1.11,true);
     }
     const visible=this.worldBounds();
     for(const corner of hull.corners){

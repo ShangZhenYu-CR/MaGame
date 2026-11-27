@@ -4,6 +4,7 @@ import { damagePlayer } from './rescue';
 import phases from '../data/whale.json';
 import { refreshBuoyancy } from './ark';
 import { hearthNear, primaryHearth } from './heatField';
+import { downDock } from './dock-direction';
 import { areaAt, gangwayGeometry } from './island';
 import { toolStatus } from './tools';
 import { TICK_RATE, type Vec2, type WorldState } from './types';
@@ -44,9 +45,8 @@ export function forgeSolarArk(w:WorldState):string|null{
 function encounterPoint(w:WorldState):Vec2|null{
   const bridge=gangwayGeometry(w);
   if(!bridge)return null;
-  const start=bridge.x+bridge.width;
   for(let dx=5;dx<=11;dx++)for(const dy of [0,-1,1,-2,2,-3,3]){
-    const x=start+dx+.5,y=bridge.y+dy+.5;
+    const {x,y}=downDock(bridge.landing,bridge.side,dx,dy);
     if(areaAt(w,x,y)==='island')return {x,y};
   }
   return null;

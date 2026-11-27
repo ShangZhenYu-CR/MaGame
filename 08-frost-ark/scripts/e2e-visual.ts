@@ -1,3 +1,4 @@
+import { runP2Dock } from './p2-dock-e2e';
 import { runP2Home } from './p2-home-e2e';
 import { runP2Utilities } from './p2-utilities-e2e';
 import { runP2Rig } from './p2-rig-e2e';
@@ -644,6 +645,7 @@ try {
   await runP2Rig(browser,baseUrl,outDir,errors);
   await runP2Utilities(browser,baseUrl,outDir,errors);
   await runP2Home(browser,baseUrl,outDir,errors);
+  await runP2Dock(browser,baseUrl,outDir,errors);
 
   if (errors.length > 0) {
     throw new Error(errors.join('\n'));

@@ -1,3 +1,4 @@
+import { docks } from '../sim/dock-direction';
 import { areaAt, gangwayGeometry, islandNodeRemaining, islandNodes, nearestIslandNode, nearGangway, toggleGangway,
  type IslandResource } from '../sim/island';
 import { helmPoint, nearHelm, toggleCruise } from '../sim/sky-map';
@@ -66,7 +67,7 @@ export function expeditionUi(hooks:Hooks){
   }
   if(a==='gangway')return true;
   const g=gangwayGeometry(w);
-  if(g&&nearGangway(w)&&Math.hypot(at.x-(g.x-.5),at.y-(g.y+.5))<.84){gangway();return true;}
+  if(g&&nearGangway(w)&&Math.hypot(at.x-g.deck.x,at.y-g.deck.y)<.84){gangway();return true;}
   const h=helmPoint(w);
   if(nearHelm(w)&&Math.hypot(at.x-h.x,at.y-h.y)<.65){cruise();return true;}
   return false;
@@ -98,14 +99,15 @@ export function expeditionUi(hooks:Hooks){
   }else if(here==='gangway'){action='board';title='在跳板上';detail='靠着板中央继续走，上岛和回船都不用再次按键。';}
   else if(box&&nearGangway(w)){
    action=box.deployed?'stow':'deploy';
-   title=box.deployed?'跳板已搭好':'已靠泊 · 右舷登岛口';
-   detail=box.deployed?'沿跳板向右走即可登岛；回到甲板后可收回。':'搭跳板后沿板向右走，进入浮岛。';
+   title=box.deployed?'跳板已搭好':'已靠泊 · '+docks[box.side].label+'登岛口';
+   const verb=docks[box.side].verb;
+   detail=box.deployed?'沿跳板'+verb+'走即可登岛；回到甲板后可收回。':'搭跳板后沿板'+verb+'走，进入浮岛。';
    label=box.deployed?'收跳板':'搭跳板';
   }else if(nearHelm(w)){
    action='helm';title='方舟舵轮';detail='按 N 打开航图，选择目标浮岛。';
    label=w.sky.cruising?'停航':'巡航';
   }else if(w.ark.anchoredIslandId){
-   action='dock';title='已靠泊';detail='走到右舷登岛口搭跳板。';
+   action='dock';title='已靠泊';detail='走到'+(box?docks[box.side].label:'舷侧')+'登岛口搭跳板。';
   }
   if(current!==action){current=action;root.dataset.action=action;view.dataset.context=action;}
   root.dataset.area=here;root.dataset.anchored=String(!!w.ark.anchoredIslandId);root.dataset.resourceKind=node?.kind??'';

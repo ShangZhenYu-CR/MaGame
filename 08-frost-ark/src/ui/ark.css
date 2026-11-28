@@ -464,3 +464,15 @@ button[aria-disabled=true]{opacity:.62}
 #voyage-slot-toggle{margin-top:5px;width:100%}
 .audio-mix{top:82px;bottom:auto;left:50%;transform:translateX(-50%);width:min(318px,calc(100vw - 38px));max-height:calc(100dvh - 144px);overflow:auto}
 #voyage-title~.audio-mix #day-pace{min-width:68px}
+
+.voyage-journal{position:absolute;z-index:8;left:20px;bottom:153px;width:min(315px,calc(100vw - 35px));max-height:min(268px,39vh);display:flex;flex-direction:column;padding:10px 12px;background:#142737ed;border:1px solid #8198ab;border-radius:7px}
+.voyage-journal .panel-head{display:flex;align-items:center;justify-content:space-between;gap:4px}
+.voyage-journal h2{font-size:15px;margin:0}
+#journal-current{font-size:12px;color:#f1d5af;line-height:1.42;margin:6px 0 7px}
+#journal-list{overflow:auto;list-style:none;padding:0;margin:0;min-height:0;scrollbar-gutter:stable}
+#journal-list li{padding:4px 0;border-top:1px solid #3c5366;font-size:11px}
+#journal-list li div{display:flex;justify-content:space-between;gap:7px}
+#journal-list li span{color:#a6bbc9}
+#journal-list li[data-complete=true] span{color:#e4af72}
+#journal-list button{margin:3px 0 1px;min-height:28px}
+#journal-toggle span{color:#d6bb96;font-size:10px}

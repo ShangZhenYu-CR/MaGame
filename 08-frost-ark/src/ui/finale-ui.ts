@@ -129,7 +129,7 @@ export function finaleUi({state,say,prepare,sound,icon}:Wiring){
   };
   node('frost-guide-close').onclick=()=>{if(liveHint)hints.add(liveHint);guide.hidden=true;};
 
-  function update(covered:boolean){
+  function update(covered:boolean,hideGuide=false){
     const w=state();
     if(w!==last){prior='';priorMode='';warnAt=-1;last=w;}
     const f=finaleStatus(w),b=f.whale;
@@ -192,7 +192,7 @@ export function finaleUi({state,say,prepare,sound,icon}:Wiring){
       w.tick>=75&&w.tick<440?'deck':w.tick>=520&&w.tick<850&&f.nearHearth?'fuel':
       w.tick>=940&&w.tick<1290&&!w.sky.islands.some(x=>x.discovered&&x.id!=='shallows_lantern')?'chart':null;
     if(next!==liveHint){if(liveHint)hints.add(liveHint);liveHint=next;}
-    guide.hidden=covered||!next||hints.has(next)||!victory.hidden;
+    guide.hidden=covered||hideGuide||!next||hints.has(next)||!victory.hidden;
     if(next&&!guide.hidden)text('frost-guide-copy',texts[next]);
   }
   return {update, open:()=>!codex.hidden, blocking:()=>!victory.hidden, showCodex,

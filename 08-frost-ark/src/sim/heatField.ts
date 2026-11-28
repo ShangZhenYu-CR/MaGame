@@ -1,3 +1,4 @@
+import { markChapter } from './journal';
 import { challenge,daySpeed } from './challenge';
 import { endlessTemperature,hasAncientWhiteout } from './endless';
 import { whaleIced } from './whale-sea';
@@ -44,7 +45,7 @@ export function addFuel(w:WorldState):string|null {
   const cap=FUEL_MAX[Math.min(4,h.level)]||120;
   if(h.fuel>=cap-3)return '主炉燃料已满。';
   for(const [id,v] of fuelValues)if(countItem(w,id)&&inventoryChange(w,[{itemId:id,count:1}],[])){
-    h.fuel=Math.min(cap,h.fuel+v);
+    h.fuel=Math.min(cap,h.fuel+v);markChapter(w,'fuel');
     return null;
   }
   return '背包里没有燃料。';

@@ -72,10 +72,13 @@ export async function runP2Landmarks(browser:Browser,url:string,dir:string,error
     assert.ok(landmarkLit(await exportWorld(p),mark)>0);
    }else if(kind==='vent'){
     await ctx.getByText(/岩圈发亮/).waitFor({timeout:16000});
-    await shot('vent-warning');
     const a=await exportWorld(p);
-    await ctx.getByText(/正在喷发/).waitFor({timeout:14000});
-    await shot('vent-burst');
+    // Subscribe before the full-frame screenshot, which can take longer
+    // than a burst when two browser workloads share software rendering.
+    await Promise.all([
+      ctx.getByText(/正在喷发/).waitFor({timeout:24000}).then(()=>shot('vent-burst')),
+      shot('vent-warning'),
+    ]);
     await p.waitForTimeout(640);
     const b=await exportWorld(p);
     assert.ok(a.player.hp>b.player.hp,'real sulfur vent damages the player inside the warning radius');

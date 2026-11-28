@@ -1,3 +1,4 @@
+import { markChapter } from './journal';
 import { gearModifiers } from './equipment';
 import { incapacitated } from './rescue';
 import { inventoryChange, isDeck } from './ark';
@@ -104,6 +105,7 @@ export function stepCloud(w: WorldState): void {
     const dist = Math.hypot(p.x-held.x,p.y-held.y);
     if (dist <= .34) {
       if (!inventoryChange(w,[],held.loot)) dropOnDeck(w,held.loot);
+      markChapter(w,'hook');
       w.sky.debris = w.sky.debris.filter(d=>d!==held);
       g.caughtDebrisId = null; g.active = false; g.charge = 0;
     } else {

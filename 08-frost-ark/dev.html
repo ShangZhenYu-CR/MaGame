@@ -149,6 +149,10 @@
   <section id="m5-attack-prompt" class="m5-attack-prompt" hidden>
     <strong id="m5-target-name"></strong><button type="button" id="m5-attack"><kbd>F</kbd> 反击</button>
   </section>
+  <aside id="voyage-journal" class="voyage-journal" aria-labelledby="journal-title" hidden>
+    <div class="panel-head"><h2 id="journal-title">马楠航海日志</h2><button type="button" id="journal-close">折叠</button></div>
+    <p id="journal-current"></p><ol id="journal-list"></ol>
+  </aside>
   <section id="voyage-title" class="voyage-title" aria-labelledby="voyage-heading" hidden>
     <div class="panel-head"><div><div class="eyebrow">FROST ARK ／ 航行档案</div><h2 id="voyage-heading">选择你的航程</h2></div><button type="button" id="voyage-close">返回游戏</button></div>
     <div id="voyage-slots" aria-label="本地存档槽"></div>
@@ -197,6 +201,7 @@
     <button type="button" id="dismantle-mode" aria-pressed="false" data-tip="点击一处建筑或可拆甲板；拆除后可在 4 秒内撤销"><kbd>X</kbd> 拆除</button>
     <button type="button" id="sky-map-toggle" aria-expanded="false" aria-controls="sky-map" data-tip="打开航图，检查风区、可用岛屿与当前航向"><kbd>N</kbd> 航图</button>
     <button type="button" id="beast-roster-toggle" aria-expanded="false" aria-controls="beast-roster" data-tip="查看云兽的饥饿、体温和分工"><kbd>V</kbd> 云兽</button>
+    <button type="button" id="journal-toggle" aria-controls="voyage-journal" aria-expanded="false" data-tip="查看并折叠航海日志"><kbd>L</kbd> 日志 <span></span></button>
     <button type="button" id="audio-mix-toggle" aria-controls="audio-mix" aria-expanded="false"><kbd>K</kbd> 调音</button>
     <button type="button" id="audio-toggle" aria-pressed="false" data-tip="开关炉火、风雪和施工音效"><kbd>M</kbd> 音效开</button>
   </div>

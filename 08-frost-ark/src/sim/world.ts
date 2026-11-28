@@ -1,3 +1,4 @@
+import { stepJournal } from './journal';
 import { observeCodex } from './codex';
 import { stepEndless } from './endless';
 import { guardianWalkScale } from './guardians-p2';
@@ -167,7 +168,7 @@ export function stepWorld(world: WorldState, ticks = 1, direction: Vec2 = {x: 0,
     stepM5(world);
     stepRescue(world);
     stepRoll(world);
-    if(world.tick%30===0)observeCodex(world);
+    if(world.tick%30===0){observeCodex(world);stepJournal(world);}
     cleanElements(world);
   }
 }

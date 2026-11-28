@@ -92,6 +92,15 @@ function paintLatte(){
   if(b.getAttribute('aria-pressed')!==String(p.outfit===style))b.setAttribute('aria-pressed',String(p.outfit===style));
  }
 }
+const sectorPanel=document.querySelector<HTMLElement>('.sector')!,wildPanel=el('wild-encounter');
+const panelEdges=new ResizeObserver(entries=>{
+ for(const {target} of entries){
+  if((target as HTMLElement).hidden)continue;
+  const name=target===sectorPanel?'--sector-bottom':'--wild-bottom';
+  document.body.style.setProperty(name,`${Math.ceil(target.getBoundingClientRect().bottom)}px`);
+ }
+});
+panelEdges.observe(sectorPanel);panelEdges.observe(wildPanel);
 let mood=0;
 const thermal=el('thermal-stats'), briefing=el('weather-status'), catStatus=el('latte-status');
 const stats=el('hud-stats'), hint=el('hint'), action=el('action'), save=el('save-label'), note=el('build-note');

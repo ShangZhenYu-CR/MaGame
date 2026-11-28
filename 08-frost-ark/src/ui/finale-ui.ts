@@ -1,16 +1,12 @@
+import { codexRows,tabs,type CodexTab } from '../sim/codex';
 import { endlessView,reclaimBounty } from '../sim/endless';
-import beasts from '../data/beasts.json';
-import buildings from '../data/buildings.json';
 import { itemNames } from '../sim/ark';
 import { attackWhale, continueEndless, finaleStatus, forgeSolarArk, repairSeaHearth,startWhale,volleyWhale } from '../sim/finale';
 import type { WorldState } from '../sim/types';
 
-const skills:Record<string,string> = {
-  mine_crush:'破碎原矿',auto_mine:'自动采矿',stoke_hearth:'自动添柴',mobile_warmth:'移动暖圈',
-  fetch_debris:'出海叼取残骸',scout_dive:'扩张航图视野和俯冲',produce_fur_repair:'产绒和修补',
-  pack_charge:'移动载货和冲锋',boost_greenhouse:'促进作物生长',warm_heal_aura:'回暖和治疗',
-  power_furnace_deice:'熔炉供能',flame_cone:'火线喷吐',boost_buoyancy_speed:'提升浮力和航速',gale_blade:'释放风刃',
-};
+const artSources=import.meta.glob<string>('../assets/art/*.{png,webp}',{eager:true,query:'?inline',import:'default'});
+const art=(id:string)=>artSources['../assets/art/'+id+'.png']??artSources['../assets/art/'+id+'.webp'];
+const tabTitle={beasts:'云兽',buildings:'建筑',gear:'装备武器',supplies:'料理物资',enemies:'敌怪与 Boss'};
 const bead=(n:number)=>String(n).padStart(2,'0');
 type Sound='solar'|'whale'|'victory'|'hit';
 type Cmd='deck'|'fuel'|'chart';
@@ -28,9 +24,10 @@ export function finaleUi({state,say,prepare,sound,icon}:Wiring){
     <button id="codex-toggle" class="codex-toggle" type="button" aria-expanded="false" aria-controls="codex"><kbd>J</kbd> 图鉴</button>
     <aside id="codex" class="finale-card codex-card" hidden aria-labelledby="codex-title">
       <header><h2 id="codex-title">方舟图鉴</h2><button type="button" id="codex-close" aria-label="关闭图鉴">关闭</button></header>
-      <nav aria-label="图鉴分类"><button type="button" id="codex-beasts" aria-pressed="true">云兽</button>
-      <button type="button" id="codex-buildings" aria-pressed="false">建筑</button></nav>
-      <ul id="codex-list"></ul>
+      <nav aria-label="图鉴分类">${tabs.map(id=>`<button type="button" id="codex-${id}" data-codex-tab="${id}" aria-pressed="false">${tabTitle[id]}</button>`).join('')}</nav>
+      <div class="codex-meter"><label for="codex-progress">收集进度</label><progress id="codex-progress" max="1" value="0"></progress>
+      <output id="codex-count"></output></div>
+      <ul id="codex-list" aria-live="off"></ul>
     </aside>
     <aside id="whale-context" class="finale-card whale-card" hidden>
       <strong id="whale-title">永冬霜鲸</strong><output id="whale-phase"></output>
@@ -71,7 +68,8 @@ export function finaleUi({state,say,prepare,sound,icon}:Wiring){
   forge.append(label);
   document.querySelector('.hearth-tools')?.append(forge);
 
-  let biomeTab=true, prior='',priorMode='',warnAt=-1,last:WorldState|undefined;
+  let codexTab:CodexTab='beasts';
+  let prior='',priorMode='',warnAt=-1,last:WorldState|undefined;
   const hints=new Set<Cmd>();let liveHint:Cmd|null=null;
   const texts:Record<Cmd,string>={
     deck:'长按左键看射程，松开钩取云海木料。',
@@ -82,21 +80,24 @@ export function finaleUi({state,say,prepare,sound,icon}:Wiring){
   function command(fn:(w:WorldState)=>string|null,success:string,kind:Sound){
     const issue=fn(state());say(issue,success);if(!issue)sound(kind);
   }
-  const replaceRows=(values:{title:string;copy:string}[])=>{
-    list.replaceChildren(...values.map(v=>{
-      const li=document.createElement('li'),name=document.createElement('strong'),copy=document.createElement('span');
-      name.textContent=v.title;copy.textContent=v.copy;li.append(name,copy);return li;
-    }));
-  };
   function paintCodex(){
-    node('codex-beasts').setAttribute('aria-pressed',String(biomeTab));
-    node('codex-buildings').setAttribute('aria-pressed',String(!biomeTab));
-    if(biomeTab)replaceRows(beasts.map(b=>({title:b.name,
-      copy:`T${b.biomeTier} · 诱饵：${itemNames.get(b.preferredBait)??b.preferredBait} · 打工：${skills[b.workSkill]??b.workSkill} · 随行：${skills[b.companionSkill]??b.companionSkill}`})));
-    else replaceRows([...buildings.map(b=>({title:b.name,
-      copy:`${b.size.join('×')} 格 · ${b.buoyancyDelta>=0?'供给':'消耗'}浮力 ${Math.abs(b.buoyancyDelta)} · `+
-        (b.cost.length?b.cost.map(x=>`${itemNames.get(x.itemId)??x.itemId} ×${x.count}`).join('、'):'已装配／专属升级')})),
-      {title:'太阳方舟',copy:'主炉 Lv.4 · 4 枚天穹火种 · 增温、提升浮力并开放极光天穹'}]);
+    const rows=codexRows(state(),codexTab),seen=rows.filter(x=>x.seen).length;
+    codex.dataset.tab=codexTab;
+    for(const tab of tabs)node('codex-'+tab).setAttribute('aria-pressed',String(tab===codexTab));
+    const progress=node<HTMLProgressElement>('codex-progress');progress.max=rows.length;progress.value=seen;
+    text('codex-count',seen+' / '+rows.length);
+    list.replaceChildren(...rows.map((v,index)=>{
+      const li=document.createElement('li'),thumb=document.createElement('div'),image=document.createElement('img'),copy=document.createElement('div');
+      const title=document.createElement('strong'),details=document.createElement('span'),note=document.createElement('small');
+      li.dataset.entry=v.id;li.dataset.discovered=String(v.seen);
+      thumb.className='codex-thumb';image.src=art(v.art);image.alt=v.seen?v.name:'待发现剪影';image.decoding='async';
+      thumb.append(image);copy.className='codex-copy';
+      title.textContent=v.seen?v.name:'待发现 · '+bead(index+1);
+      details.textContent=v.seen?v.detail:'首次遇见、建造或取得后收录';
+      if(v.seen){note.textContent='马楠记：'+v.note;}
+      copy.append(title,details,...(v.seen?[note]:[]));li.append(thumb,copy);return li;
+    }));
+    list.scrollTop=0;
   }
   function showCodex(show:boolean){
     if(show){prepare();paintCodex();}
@@ -108,8 +109,7 @@ export function finaleUi({state,say,prepare,sound,icon}:Wiring){
   }
   button.onclick=()=>showCodex(codex.hidden);
   node('codex-close').onclick=()=>showCodex(false);
-  node('codex-beasts').onclick=()=>{biomeTab=true;paintCodex();};
-  node('codex-buildings').onclick=()=>{biomeTab=false;paintCodex();};
+  for(const tab of tabs)node('codex-'+tab).onclick=()=>{codexTab=tab;paintCodex();};
   forge.onclick=()=>command(forgeSolarArk,'太阳方舟点燃。极光天穹已开放。','solar');
   start.onclick=()=>command(startWhale,'霜鲸苏醒。先避开地上的冰圈。','whale');
   strike.onclick=()=>strikeWhale();

@@ -176,3 +176,8 @@
 
 - S5 锁定版本 `973eeda1831e87380a4948e2f9f8f43849fdb630`，HTTP 门禁和全新解压直接打开 index.html 双入口都通过。
 - [23 张阶段实机截图与审片](https://drive.google.com/drive/folders/1K1BiOfSXmtT-w5ZLMsj3dTxhIP69co3s) · [阶段试玩 ZIP](https://drive.google.com/file/d/1itVw2-r09kju0eTg4gC7-UCduznortty/view) · [测试证明](https://drive.google.com/file/d/1Sl_GC7f3fbN5e7ITleD1N6swMYeEr9Oj/view)
+
+### Phase 2 / S7 · P2-35
+
+- J 图鉴分为云兽、建筑、装备武器、料理物资、敌怪与 Boss。139 条记录都有已审精绘缩略图、未发现剪影、分栏收集进度，以及发现后的说明和马楠手记。
+- 1280×720 和 1920×1080 逐页实机核对 139 张图全部解码、行内无溢出、字号与滚动区正常；收藏发现跨存档，坏 ID 会被拒绝。现场发现右侧野兽卡可能盖住天气入口，已改为按实测边界顺排并复测。

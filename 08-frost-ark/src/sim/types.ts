@@ -1,4 +1,4 @@
-export const SAVE_VERSION = 30;
+export const SAVE_VERSION = 31;
 export const TICK_RATE = 30;
 export const ARK_SIZE = 48;
 export const ISLAND_SIZE = 64;

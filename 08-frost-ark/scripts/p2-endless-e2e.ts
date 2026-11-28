@@ -36,6 +36,12 @@ export async function runP2Endless(browser:Browser,url:string,dir:string,errors:
    await p.keyboard.down('d');await p.waitForTimeout(165);await p.keyboard.up('d');before=await exportWorld(p);
   }
   assert.ok(before.wildEntities.some(isBountyEnemy));
+  const lay=await p.locator('#deep-voyage').evaluate(el=>{
+   const wild=document.getElementById('wild-encounter')!,sector=document.querySelector('.sector')!;
+   const a=sector.getBoundingClientRect(),b=wild.getBoundingClientRect(),c=el.getBoundingClientRect();
+   return a.bottom<=c.top&&(wild.hidden||a.bottom<=b.top&&b.bottom<=c.top);
+  });
+  assert.equal(lay,true,'weather, active wildlife and bounty panels must not cover one another');
   await shot('02-ancient-encounter');
   await p.keyboard.press('4');
   await canvas.and(p.locator('[data-mode=weapon]')).waitFor();

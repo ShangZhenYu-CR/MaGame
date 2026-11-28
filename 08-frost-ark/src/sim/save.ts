@@ -1,3 +1,4 @@
+import { validCodex } from './codex';
 import { validEndless } from './endless';
 import { validGuardians } from './guardians-p2';
 import { validDefenses } from './defenses-p2';
@@ -127,7 +128,7 @@ function validateFauna(p:Record<string,unknown>,ids:Set<string>):void{
 
 export function deserializeWorld(raw: string): WorldState {
   const p:unknown=JSON.parse(raw);
-  if(!record(p)||![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
+  if(!record(p)||![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
     throw new Error('存档版本不受支持');
   if(p.saveVersion===1){
     if(record(p.player))p.player.rescue={startedAt:null,shieldUntil:0};
@@ -253,6 +254,7 @@ export function deserializeWorld(raw: string): WorldState {
     (world.ark.anchoredIslandId&&!canReachAurora(world,world.ark.anchoredIslandId))||
     (nav&&record(nav)&&typeof nav.targetId==='string'&&!canReachAurora(world,nav.targetId)))
     throw new Error('太阳方舟或终局存档不符合方舟格式');
+  if(!validCodex(world))throw new Error('方舟图鉴存档不符合风区格式');
   if(!validEndless(world))throw new Error('无尽深空悬赏存档不符合方舟格式');
   if(!validGuardians(world))throw new Error('守卫招式或掉落存档不符合方舟格式');
   if(!validDefenses(world))throw new Error('防御抛射存档不符合方舟格式');

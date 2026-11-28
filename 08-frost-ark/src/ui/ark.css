@@ -495,3 +495,12 @@ button[aria-disabled=true]{opacity:.62}
 @media(min-width:1100px){
  .voyage-journal{bottom:var(--journal-bottom,153px);max-height:min(268px,39vh,var(--journal-room,268px))}
 }
+
+/* Keep the exposed radar, fuel, and event controls clickable with a station open. */
+@media(min-width:621px){
+ .industry-panel{
+  --industry-top:max(165px,calc(var(--sector-bottom,190px) + 9px));
+  top:var(--industry-top);
+  max-height:calc(100dvh - var(--industry-top) - 102px);
+ }
+}

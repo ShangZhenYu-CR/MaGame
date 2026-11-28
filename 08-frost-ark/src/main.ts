@@ -27,7 +27,7 @@ import { navigationUi } from './ui/navigation';
 import { expeditionUi } from './ui/expedition';
 import { expeditionToolsUi } from './ui/expedition-tools';
 import biomes from './data/biomes.json';
-import { nearestBeastFacility, nearestWildBeast } from './sim/beasts';
+import { nearestBeastFacility } from './sim/beasts';
 import { nearestIslandNode } from './sim/island';
 import { beastUi } from './ui/beasts';
 import { equipmentUi } from './ui/equipment';
@@ -188,7 +188,7 @@ function primaryInteraction():PrimaryInteraction{
   if(chart.open()||finale.arena()||skyEvents.open())return {kind:'none'};
   const here=expedition.area(),travel=expedition.keyAction();
   if(here==='island'){
-    const wild=nearestWildBeast(w);
+    const wild=beasts.nearby();
     if(travel!=='cave-enter'&&wild&&(wild.stunnedTicks>0||wild.hp<=wild.maxHp*.35||(travel!=='landmark'&&travel!=='forage'&&travel!=='quarry'&&!nearestIslandNode(w,1.8))))return {kind:'feed'};
   }
   if(fishingPanel(w))return {kind:'fishing'};
@@ -467,7 +467,7 @@ function saveNow():Promise<void> {
 }
 function safeWorld(next:WorldState):void {
   finale.reset();view.juice.reset();cancelFishing(w);skyEvents.close();
-  expedition.cancel();chart.hide(false);beasts.show(false);w=next;toggleStorage(false);industry.showStation(null);industry.showCatalog(false);lockerSignature='';cancelCharge(w);
+  expedition.cancel();chart.hide(false);beasts.show(false);beasts.resetTarget();w=next;toggleStorage(false);industry.showStation(null);industry.showCatalog(false);lockerSignature='';cancelCharge(w);
   caught=null;keys.clear();messageUntil=0;message='';stackSignature='';
   if(mode==='weapon'&&!w.player.weapon||mode==='tool'&&!heldTool(w))choose('hook');
   view.position(w);fillBag();
@@ -574,6 +574,7 @@ addEventListener('keydown',e=>{
     if(issue)tell(issue);else {expedition.cancel();void saveNow();}
     return;
   }
+  if(k==='shift'){keys.add(k);return;}
   if('wasd'.split('').includes(k)){keys.add(k);e.preventDefault();return;}
   if(e.repeat)return;
   if(k==='escape'){
@@ -584,7 +585,7 @@ addEventListener('keydown',e=>{
     else if(!locker.hidden)toggleStorage(false);
     else if(!panel.hidden){if(!quickbar.closeEditor())toggleBag(false);}
     else if(mode!=='hook')choose('hook');
-    else cancelCharge(w);
+    else if(!beasts.clearTarget())cancelCharge(w);
   } else if(k==='e')useNearby();
   else if(k==='n'){e.preventDefault();toggleChart();}
   else if(k==='b')toggleCatalog();
@@ -627,6 +628,7 @@ canvas.addEventListener('pointerdown',e=>{
     if(issue)tell(issue);else{audio.play('hit');void saveNow();}
     return;
   }
+  if((mode==='hook'||mode==='tool')&&expedition.area()==='island'&&panel.hidden&&!beasts.open()&&beasts.lockAt(at))return;
   if((mode==='hook'||mode==='tool'||expedition.area()!=='ark')&&expedition.pointer(at))return;
   if(mode==='tool')return;
   if(mode==='hook'){
@@ -658,7 +660,7 @@ function simulation():void {
   const pending=w.latte.autoLootUnlocked&&w.sky.debris.filter(isDeckDrop).length;
   const wasDown=incapacitated(w),beastCount=w.beasts.length;
   if(mode==='weapon'&&!w.player.weapon)choose('hook');
-  stepWorld(w,1,{x:Number(keys.has('d'))-Number(keys.has('a')),y:Number(keys.has('s'))-Number(keys.has('w'))});
+  stepWorld(w,1,{x:Number(keys.has('d'))-Number(keys.has('a')),y:Number(keys.has('s'))-Number(keys.has('w'))},keys.has('shift')&&expedition.area()==='island'?.53:1);
   if(w.beasts.length>beastCount&&w.beasts.at(-1)?.id.startsWith('born_')){
     tell('孵化完成！'+w.beasts.at(-1)!.name+'加入方舟。');audio.play('craft');void saveNow();
   }

@@ -140,12 +140,12 @@ export function createInitialWorld(seed = 202608): WorldState {
   return world;
 }
 
-export function stepWorld(world: WorldState, ticks = 1, direction: Vec2 = {x: 0, y: 0}): void {
+export function stepWorld(world: WorldState, ticks = 1, direction: Vec2 = {x: 0, y: 0},walkScale=1): void {
   for (let i = 0; i < ticks; i++) {
     world.tick += 1;
     stepAirlocks(world);
     const motion=rollMotion(world,direction);
-    walkExpedition(world,motion.direction,motion.scale);
+    walkExpedition(world,motion.direction,motion.scale*(motion.scale===1?walkScale:1));
     stepNavigation(world);
     stepSkyEvents(world);
     stepCloud(world);

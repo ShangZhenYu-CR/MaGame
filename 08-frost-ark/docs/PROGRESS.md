@@ -128,3 +128,8 @@
 - **门禁**：`npm run gate` 完整通过；独立解压交付 ZIP 后 `file://` 浏览器整套回归通过；保留 M0–M6 和 P2-01 至 P2-23 的断言，两条路径页面异常与控制台错误均为 0。实机普通巡航遇到游商并实付 3 浮木换 1 暖莓汤；下洞、打守卫、刷新、拿图纸、返回地表；新版捕网物流两条路径持续实跑各超过 180 秒。
 - **交付**：[46 张实机图、对照和双背景审片](https://drive.google.com/drive/folders/1wZbvsAi9AgX7IzVC7fdNDFBN7gOzVu8n) · [解压试玩 ZIP](https://drive.google.com/file/d/1z4IjWcEGd89Jg5e_ZrGXDZOeytVIXzCn/view) · [验收报告](https://drive.google.com/file/d/1bHSRFlVV8keUCEXHwJPqXWH9EAdVpJoQ/view) · [双套门禁日志及实机数据](https://drive.google.com/file/d/11Lr8EJuL9tlW6nTKud-hRrYkJNUiMown/view)。S4 构建 `2181d8bb4d82a0d97ab22ab522b6a4b3bba8746e`、存档 v20；284 件正式美术共 4,338,338 字节。
 - **【偏离报告】**：旧 M2 图标计数原来把 P2-20 新钓位算成旧卡，第 14 张并非遗失或多出旧内容；保持原 13 张图标精确检查，另独立断言新图标正确解码。离线截图等待改为等待 Toast 真正隐藏，不删任何玩法断言。实际发现气球重叠已靠泊岛岸，已修复。准备档不替代 P2-42 后的七组终验。开发继续 S5，未触碰 `main` 或 Pages。
+
+### Phase 2 / S5 · P2-27 浏览器复测通过
+
+- 山林里的精英头领会巡游觅食、趋暖及响应惊扰。点击其精绘角色或观察卡上的「追踪头领」可保留同一个目标；走出射程继续显示距离，不改麻痹网 2.8 格及手喂 1.8 格的规则。
+- Playwright 实机用键鼠追踪并退出投网射程，验证按钮禁用，再缓步靠近、投网、完成三次投喂。只消耗一张网，原目标实际麻痹，金词条在伙伴页和重载后均保留；全无头门禁通过。

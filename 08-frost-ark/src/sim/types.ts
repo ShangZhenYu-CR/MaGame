@@ -1,4 +1,4 @@
-export const SAVE_VERSION = 23;
+export const SAVE_VERSION = 24;
 export const TICK_RATE = 30;
 export const ARK_SIZE = 48;
 export const ISLAND_SIZE = 64;
@@ -141,6 +141,7 @@ export interface BeastEntity {
 }
 
 export interface WildEntity {
+  alpha?: true;
   id: string;
   kind: 'beast' | 'raider' | 'boss';
   defId: string;

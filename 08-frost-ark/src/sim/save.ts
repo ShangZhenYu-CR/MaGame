@@ -1,3 +1,4 @@
+import { alphaMaxHp } from './wild-ecology';
 import { validBond } from './beast-bond';
 import { validBreedingArchive } from './breeding';
 import { beastMaxHealth,validGrowthArchive } from './beast-growth';
@@ -87,7 +88,7 @@ function isWildEntity(e:unknown):e is import('./types').WildEntity{
     !num(e.stunnedTicks)||!Number.isSafeInteger(e.stunnedTicks)||e.stunnedTicks<0||
     !num(e.tameProgress)||!Number.isSafeInteger(e.tameProgress)||e.tameProgress<0)return false;
   const d=beastDefinitions.get(e.defId);
-  return e.kind==='beast'?!!d&&typeof e.homeIslandId==='string'&&e.maxHp===d.maxHp&&
+  return e.kind==='beast'?!!d&&typeof e.homeIslandId==='string'&&(e.alpha===undefined||e.alpha===true)&&e.maxHp===(e.alpha?alphaMaxHp(d.maxHp):d.maxHp)&&
     e.tameProgress<d.tameFeedsRequired:e.homeIslandId===undefined||typeof e.homeIslandId==='string';
 }
 function isBeast(b:unknown,w:WorldState):b is import('./types').BeastEntity{
@@ -122,7 +123,7 @@ function validateFauna(p:Record<string,unknown>,ids:Set<string>):void{
 
 export function deserializeWorld(raw: string): WorldState {
   const p:unknown=JSON.parse(raw);
-  if(!record(p)||![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
+  if(!record(p)||![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
     throw new Error('存档版本不受支持');
   if(p.saveVersion===1){
     if(record(p.player))p.player.rescue={startedAt:null,shieldUntil:0};

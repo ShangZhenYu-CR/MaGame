@@ -1,3 +1,4 @@
+import { alphaHue } from '../sim/wild-ecology';
 import { inheritedMorph,type Variant } from '../sim/breeding';
 import beasts from '../data/beasts.json';
 import type { Vec2, WorldState } from '../sim/types';
@@ -20,14 +21,14 @@ interface BeastMark {
   hp:number; restraint:boolean; progress:number; feeds:number; wild:boolean; resting:boolean;
 }
 export interface BeastActor extends BeastVisual {
-  id:string;x:number;y:number;float:number;flip:boolean;scale:number;rotation:number;tint?:Variant;beastMark?:BeastMark;
+  id:string;x:number;y:number;float:number;flip:boolean;scale:number;rotation:number;tint?:Variant;alpha?:boolean;beastMark?:BeastMark;
 }
 
 export class BeastScene {
   private recent=new Map<string,{x:number;y:number;flip:boolean;lastMotion:number}>();
   actors(w:WorldState,tile:number):BeastActor[]{
     const actors:BeastActor[]=[], alive=new Set<string>();
-    const add=(id:string,kind:string,x:number,y:number,mark?:BeastMark,tint?:Variant,young=false)=>{
+    const add=(id:string,kind:string,x:number,y:number,mark?:BeastMark,tint?:Variant,young=false,alpha=false)=>{
       const visual=visuals[kind];if(!visual)return;
       alive.add(id);
       const prev=this.recent.get(id);
@@ -40,8 +41,8 @@ export class BeastScene {
       const phase=w.tick*.24+x*.60+y*.42;
       const lift=visual.lift&&!mark?.restraint&&!mark?.resting?
         (visual.lift+.04*Math.sin(phase*.73))*tile:walking?Math.abs(Math.sin(phase))*tile*.035:0;
-      actors.push({...visual,id,x,y,flip:next.flip,rotation:walking?Math.sin(phase)*.035:0,
-        float:lift,scale:(young?.67:1)*(1+Math.sin(phase*.40)*(mark?.restraint?.005:.021)),tint,beastMark:mark});
+      actors.push({...visual,shadow:visual.shadow*(alpha?1.23:1),id,x,y,flip:next.flip,rotation:walking?Math.sin(phase)*.035:0,
+        float:lift,scale:(young?.67:alpha?1.3:1)*(1+Math.sin(phase*.40)*(mark?.restraint?.005:.021)),tint,alpha,beastMark:mark});
     };
     for(const b of w.wildEntities){
       if(b.kind!=='beast'||b.hp<=0||!w.ark.anchoredIslandId)continue;
@@ -51,7 +52,7 @@ export class BeastScene {
       const hp=clamp(b.hp/Math.max(1,b.maxHp));
       const restraint=b.stunnedTicks>0;
       add(b.id,b.defId,b.x,b.y,near&&(hp<.995||restraint||b.tameProgress>0)?
-        {hp,restraint,progress:b.tameProgress,feeds:def.tameFeedsRequired,wild:true,resting:false}:undefined);
+        {hp,restraint,progress:b.tameProgress,feeds:def.tameFeedsRequired,wild:true,resting:false}:undefined,b.alpha?alphaHue(b.defId):undefined,false,!!b.alpha);
     }
     for(const b of w.beasts){
       if(b.hp<=0)continue;
@@ -67,6 +68,12 @@ export class BeastScene {
 }
 
 export function paintBeastCues(c:CanvasRenderingContext2D,p:Vec2,b:BeastActor,tile:number,tick:number):void{
+  if(b.alpha){
+    c.save();c.globalCompositeOperation='screen';c.strokeStyle=b.tint==='ember'?'#ebaa70':'#75bfd0';
+    c.globalAlpha=.38+.13*Math.sin(tick*.081);c.lineWidth=Math.max(1.4,tile*.026);
+    c.setLineDash([5,5]);c.lineDashOffset=-tick*.24;
+    c.beginPath();c.ellipse(p.x,p.y-tile*.08,tile*b.shadow*1.20,tile*b.shadow*.49,0,0,Math.PI*2);c.stroke();c.restore();
+  }
   const mark=b.beastMark;if(!mark)return;
   const lift=b.float??0;
   if(mark.restraint){

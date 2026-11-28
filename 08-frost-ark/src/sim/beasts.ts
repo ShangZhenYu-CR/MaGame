@@ -1,8 +1,9 @@
+import { alphaAttack,alphaMaxHp,eliteProfile,naturalAlpha,stepWildEcology,wildMind } from './wild-ecology';
 import { beastBond } from './beast-bond';
 import { inheritedMorph } from './breeding';
 import { beastAttackScale,beastWorkScale,gainBeastXp,growthDetails } from './beast-growth';
 import { getIndustrySave } from './m2-state';
-import { beastProfile,luckyParcel,traitStrike,traitSupport,traitTailwind,traitTravel,traitWorkRate } from './beast-traits';
+import { beastProfile,inheritProfile,luckyParcel,traitStrike,traitSupport,traitTailwind,traitTravel,traitWorkRate } from './beast-traits';
 import { caveActive } from './cave';
 import { dockSide,inverseDock,rotateDockPoint } from './dock-direction';
 import { doorBlocksFeet,isDoor } from './rooms';
@@ -50,14 +51,18 @@ function syncFauna(w:WorldState):void{
   let locals=saved;
   if(!locals){
     const biome=biomes.find(b=>b.id===map.biomeId);
-    const species=(node.id==='aurora_vault'?[]:biome?.wildBeasts??[]).filter(id=>(beastDefinitions.get(id)?.biomeTier??9)<=node.tier);
+    const natives=(node.id==='aurora_vault'?[]:biome?.wildBeasts??[]).filter(id=>(beastDefinitions.get(id)?.biomeTier??9)<=node.tier);
+    const species=natives.map(id=>({id,suffix:''}));
+    if(node.id.startsWith('exp')&&natives.length)species.push({id:natives[Math.abs(node.seed)%natives.length],suffix:'_pack'});
     let rng=node.seed^0x89beec3;
-    locals=species.map((id,i)=>{
-      const d=beastDefinitions.get(id)!;
+    locals=species.map(({id:kind,suffix},i)=>{
+      const d=beastDefinitions.get(kind)!;
       const r=nextRng(rng);rng=r.state;
-      const x=[13,24,28,35][i]??31,y=[33,25,38,33][i]??37;
-      return {id:'wild_'+map.nodeId+'_'+id,kind:'beast',defId:id,homeIslandId:map.nodeId,
-        x:x+.5+r.value*.32,y:y+.5,hp:d.maxHp,maxHp:d.maxHp,stunnedTicks:0,tameProgress:0,hostile:false};
+      const x=[13,24,28,35,38][i]??31,y=[33,25,38,33,36][i]??37;
+      const id='wild_'+map.nodeId+'_'+kind+suffix,alpha=naturalAlpha(node,id);
+      const hp=alpha?alphaMaxHp(d.maxHp):d.maxHp;
+      return {id,kind:'beast',defId:kind,homeIslandId:map.nodeId,
+        x:x+.5+r.value*.32,y:y+.5,hp,maxHp:hp,stunnedTicks:0,tameProgress:0,hostile:false,...(alpha?{alpha:true as const}:{})};
     });
   }
   w.wildEntities.push(...locals.map(e=>{
@@ -74,12 +79,12 @@ export function nearestWildBeast(w:WorldState,maxDistance=RADIUS):WildEntity|und
   return w.wildEntities.filter(e=>activeWild(w,e)&&distance(w.player,e)<=maxDistance)
     .sort((a,b)=>distance(w.player,a)-distance(w.player,b))[0];
 }
-function target(w:WorldState,id:string,range=RADIUS){
+export function wildBeastTarget(w:WorldState,id:string,range=RADIUS){
   return w.activeIsland?w.wildEntities.find(e=>e.id===id&&activeWild(w,e)&&distance(w.player,e)<=range):undefined;
 }
 export function useRestraint(w:WorldState,id:string,kind:'paralysis_net'|'beast_trap'):string|null{
   if(kind!=='paralysis_net'&&kind!=='beast_trap')return '需要麻痹冰网或霜铁兽夹';
-  const e=target(w,id,kind==='paralysis_net'?2.8:1.65);
+  const e=wildBeastTarget(w,id,kind==='paralysis_net'?2.8:1.65);
   if(!e)return '走近一只野生云兽再使用';
   if(e.stunnedTicks>2*TICK_RATE)return '它已被控制，趁现在投喂';
   if(!inventoryChange(w,[{itemId:kind,count:1}],[]))return '背包里没有'+itemNames.get(kind);
@@ -89,7 +94,7 @@ export function useRestraint(w:WorldState,id:string,kind:'paralysis_net'|'beast_
 }
 
 export function strikeWildBeast(w:WorldState,id:string):string|null{
-  const e=target(w,id);
+  const e=wildBeastTarget(w,id);
   if(!e)return '请靠近要压制的云兽';
   const state=ensureFauna(w);
   if(w.tick-state.lastStrike<12)return '等它站稳再出手';
@@ -111,7 +116,7 @@ export function strikeWildWithWeapon(w:WorldState,e:WildEntity,damage:number,ele
 }
 
 export function tameBeast(w:WorldState,id:string):string|null{
-  const e=target(w,id);
+  const e=wildBeastTarget(w,id);
   if(!e)return '走近云兽后再投喂';
   const def=beastDefinitions.get(e.defId)!;
   if(!beastWeakened(e))return '用麻痹冰网或兽夹控制，或将生命压到 35% 以下';
@@ -124,8 +129,9 @@ export function tameBeast(w:WorldState,id:string):string|null{
   }
   w.wildEntities=w.wildEntities.filter(x=>x!==e);
   const role=w.beasts.filter(b=>b.role==='companion').length<MAX_COMPANIONS?'companion':'rest';
-  w.beasts.push({id:e.id,defId:e.defId,name:def.name,x:e.x,y:e.y,hp:Math.max(1,e.hp),
-    maxHp:e.maxHp,warmth:80,hunger:100,role,denBuildingId:null,workCooldown:3*TICK_RATE});
+  w.beasts.push({id:e.id,defId:e.defId,name:(e.alpha?'头领 ':'')+def.name,x:e.x,y:e.y,hp:Math.max(1,Math.min(def.maxHp,e.hp)),
+    maxHp:def.maxHp,warmth:80,hunger:100,role,denBuildingId:null,workCooldown:3*TICK_RATE});
+  if(e.alpha)inheritProfile(w,e.id,eliteProfile(w,e));
   return null;
 }
 
@@ -313,7 +319,7 @@ export function beastPanel(w:WorldState){
     }),
     wild:w.wildEntities.filter(e=>activeWild(w,e)).map(e=>{
       const d=beastDefinitions.get(e.defId)!;
-      return {...e,name:names[e.defId],profile:beastProfile(w,e),preferredBait:d.preferredBait,feedsRequired:d.tameFeedsRequired,weakened:beastWeakened(e)};
+      return {...e,name:names[e.defId],profile:e.alpha?eliteProfile(w,e):beastProfile(w,e),mind:wildMind(w,e.id),preferredBait:d.preferredBait,feedsRequired:d.tameFeedsRequired,weakened:beastWeakened(e)};
     }),
   };
 }
@@ -326,11 +332,12 @@ export function stepBeasts(w:WorldState):void{
     if(e.stunnedTicks)e.stunnedTicks--;
     if(!activeWild(w,e))continue;
     if(burnDamage(w,e.id)){const before=e.hp;e.hp=Math.max(0,e.hp-3);emitJuice(w,'burn',e,before-e.hp,{target:e.id});}
-    if(!e.hp||e.stunnedTicks||!e.hostile||frozen(w,e.id))continue;
+    if(!e.hp||e.stunnedTicks||frozen(w,e.id))continue;
+    if(!e.hostile){stepWildEcology(w,e);continue;}
     const p=w.player,d=distance(p,e);
     if(d>5){e.hostile=false;continue;}
     if(d>.8)moveToward(e,p.x,p.y,.047*elementalSpeed(w,e.id),w);
-    else if(w.tick%(TICK_RATE*2)===0)damagePlayer(w,(beastDefinitions.get(e.defId)?.attack??6)*.28);
+    else if(w.tick%(TICK_RATE*2)===0)damagePlayer(w,(beastDefinitions.get(e.defId)?.attack??6)*.28*alphaAttack(e));
   }
   let companionIndex=0;
   for(const b of w.beasts){

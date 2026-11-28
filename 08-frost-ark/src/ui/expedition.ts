@@ -163,7 +163,7 @@ export function expeditionUi(hooks:Hooks){
     label=available?'采集':'';
    }else if(v?.tag==='quarry'){
     action='quarry';title='狩猎掉落';detail='收下冻云兽肉 ×2，可带回方舟加工。';label='拾取';
-   }else if(!node){action='return';title='浮岛探索';detail='靠近树林、矿脉和遗迹箱可采集；沿来时的跳板回船。';}
+   }else if(!node){action='return';title='浮岛探索';detail='靠近树林、矿脉和遗迹箱可采集；按住 Shift 缓步接近云兽。';}
    else {
     const kind=node.kind==='tree'?'wood_axe':node.kind==='ore'?'mining_pick':undefined;
     const tool=kind&&toolStatus(w,kind),name=kind==='wood_axe'?'手斧':'矿镐';

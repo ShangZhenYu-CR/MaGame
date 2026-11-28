@@ -341,6 +341,7 @@ export class ArkView {
       return p.x> -s*3&&p.x<width+s*3&&p.y> -s*3&&p.y<height+s*4;
     });
     actors.push(...beasts);
+    this.canvas.dataset.alphaVisible=String(beasts.filter(b=>b.alpha).length);
     const hostiles=m5Actors(w);
     for(const hostile of hostiles)paintAttackTell(c,project(hostile.x,hostile.y),hostile,s,w.tick);
     actors.push(...hostiles);
@@ -490,7 +491,7 @@ export class ArkView {
       const p=project(b.x,b.y);paintBeastCues(c,p,b,s,w.tick);
       if(b.tint){
         c.save();c.globalAlpha=.46+.20*Math.sin(w.tick*.072);c.globalCompositeOperation='screen';
-        this.art.paint(c,'variant-'+b.tint+'-wisp',p.x,p.y-s*(.08+.08*Math.sin(w.tick*.11)),s,{width:b.width*.82,height:.51});
+        this.art.paint(c,'variant-'+b.tint+'-wisp',p.x,p.y-s*(.08+.08*Math.sin(w.tick*.11)),s,{width:b.width*(b.alpha?1.16:.82),height:b.alpha?.67:.51});
         c.restore();
       }
     }

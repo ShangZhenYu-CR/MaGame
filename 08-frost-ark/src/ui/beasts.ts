@@ -5,7 +5,7 @@ import { skills } from '../sim/beast-skills';
 import { renameBeast,traitList } from '../sim/beast-traits';
 import { isGrappleItem } from '../sim/grapple-tools';
 import {
- beastPanel, loadBeastFeed, nearestWildBeast, setBeastRole, strikeWildBeast, tameBeast, transferBeastPack, useRestraint,
+ beastPanel, loadBeastFeed, nearestWildBeast, setBeastRole, strikeWildBeast, tameBeast, transferBeastPack, useRestraint, wildBeastTarget,
 } from '../sim/beasts';
 import { countItem, itemNames } from '../sim/ark';
 import type { BeastRole, WorldState } from '../sim/types';
@@ -34,14 +34,40 @@ export function beastUi(h:BeastUIHooks){
  const progress=el<HTMLProgressElement>('tame-progress'),hp=el<HTMLMeterElement>('wild-hp'),feedButton=el<HTMLButtonElement>('wild-feed');
  const load=el<HTMLButtonElement>('beast-feed-load');
  const sector=document.querySelector<HTMLElement>('.sector');
- let targetId:string|null=null,last=0,packKey='',cardKey='',breedKey='';
+ let lockedId:string|null=null,targetId:string|null=null,last=0,packKey='',cardKey='',breedKey='';
  const cards=new Map<string,{role:HTMLElement,status:HTMLElement,vitals:HTMLElement,label:HTMLElement,rate:HTMLElement,training:HTMLElement,lead:HTMLButtonElement,bond:HTMLElement,feed:HTMLButtonElement,rename:HTMLDetailsElement,input:HTMLInputElement,buttons:HTMLButtonElement[]}>();
  const button=(label:string,fn:()=>void)=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.onclick=fn;return b;};
  const img=(src:string)=>{const i=document.createElement('img');i.src=src;i.alt='';return i;};
  function feedback(issue:string|null,msg:string,event?:'craft'|'hit'){h.msg(issue,msg,event);update(performance.now(),encounter.hidden,true);}
+ function subject(w:WorldState,range:number){
+  if(lockedId){
+   const locked=wildBeastTarget(w,lockedId,Infinity);
+   if(locked)return wildBeastTarget(w,lockedId,range);
+   lockedId=null;
+  }
+  return nearestWildBeast(w,range);
+ }
+ function lockAt(at:{x:number;y:number}){
+  const w=h.state(),picked=w.wildEntities.filter(e=>e.alpha&&wildBeastTarget(w,e.id,11)&&
+   Math.abs(e.x-at.x)<=.62&&at.y>=e.y-1.18&&at.y<=e.y+.24)
+   .sort((a,b)=>Math.hypot(a.x-at.x,a.y-.4-at.y)-Math.hypot(b.x-at.x,b.y-.4-at.y))[0];
+  if(!picked)return false;
+  lockedId=picked.id;
+  update(performance.now(),false,true);
+  return true;
+ }
+ function clearTarget(){
+  if(!lockedId)return false;
+  lockedId=null;targetId=null;
+  update(performance.now(),encounter.hidden,true);
+  return true;
+ }
  function perform(task:'tame'|'strike'|'paralysis_net'|'beast_trap'):boolean{
-  const w=h.state(),current=nearestWildBeast(w);
+  const w=h.state(),range=task==='paralysis_net'?2.8:task==='beast_trap'?1.65:1.8,current=subject(w,range);
   if(!current)return false;
+  // Revalidate range and the represented entity at the moment of activation.
+  // Never spend a net or bait on a nearer, different creature.
+  if(current.id!==targetId)return false;
   const id=current.id,title=beastPanel(w).wild.find(x=>x.id===id)?.name??'云兽';
   if(task==='strike')feedback(strikeWildBeast(w,id),`压制了${title}。`,'hit');
   else if(task==='tame'){
@@ -52,13 +78,16 @@ export function beastUi(h:BeastUIHooks){
   return true;
  }
  function updateWild(w:WorldState,data:Info,hide:boolean){
-  const nearest=nearestWildBeast(w);
+  // The observation card lets the player use a net at its real 2.8-tile
+  // cast range; touch, bait and traps still use their shorter reach.
+  const nearest=subject(w,lockedId?Infinity:2.8);
   const wild=nearest&&data.wild.find(b=>b.id===nearest.id);
   targetId=wild?.id??null;
   encounter.hidden=hide||!wild;
-  if(!wild){delete encounter.dataset.wildId;delete encounter.dataset.species;delete encounter.dataset.weakened;return;}
-  encounter.dataset.wildId=wild.id;encounter.dataset.species=wild.defId;encounter.dataset.weakened=String(wild.weakened);
-  put(el('wild-species'),wild.name);put(el('wild-status'),wild.stunnedTicks>0?`压制中 ${Math.ceil(wild.stunnedTicks/30)}s`:wild.weakened?'虚弱，可投喂':'警戒');
+  if(!wild){delete encounter.dataset.wildId;delete encounter.dataset.species;delete encounter.dataset.weakened;delete encounter.dataset.alpha;delete encounter.dataset.behavior;delete encounter.dataset.locked;return;}
+  encounter.dataset.wildId=wild.id;encounter.dataset.species=wild.defId;
+  encounter.dataset.alpha=String(!!wild.alpha);encounter.dataset.behavior=wild.mind.mood;encounter.dataset.weakened=String(wild.weakened);
+  put(el('wild-species'),(wild.alpha?'精英头领 · ':'')+wild.name);put(el('wild-status'),wild.stunnedTicks>0?`压制中 ${Math.ceil(wild.stunnedTicks/30)}s`:wild.weakened?'虚弱，可投喂':wild.hostile?'警戒':wild.mind.label);
   hp.max=wild.maxHp;hp.value=wild.hp;progress.max=wild.feedsRequired;progress.value=wild.tameProgress;
   const profile=wild.profile;
   put(el('wild-traits'),profile.temperament+' · '+profile.stars+' 星 · '+profile.traits.map(t=>traitList[t].name).join('、'));
@@ -69,13 +98,23 @@ export function beastUi(h:BeastUIHooks){
    const src=h.icon(wild.preferredBait.replaceAll('_','-'));
    bait.replaceChildren(...(src?[img(src),description]:[description]));
   }
+  const gap=Math.hypot(w.player.x-wild.x,w.player.y-wild.y);
+  encounter.dataset.locked=String(wild.id===lockedId);
+  encounter.dataset.distance=gap.toFixed(3);
+  const lock=el<HTMLButtonElement>('wild-lock');
+  lock.hidden=!wild.alpha;
+  lock.setAttribute('aria-pressed',String(wild.id===lockedId));
+  put(lock,lockedId?'取消追踪':'追踪头领');
+  put(el('wild-distance'),gap>2.8?`请靠近 · ${gap.toFixed(1)} 格 · 麻痹网 2.8 格`:gap>1.8?`${gap.toFixed(1)} 格 · 麻痹网可投 · 投喂 1.8 格`:`${gap.toFixed(1)} 格 · 已到投喂距离`);
+  el('wild-distance').hidden=!wild.alpha;
   const net=el<HTMLButtonElement>('wild-net'),trap=el<HTMLButtonElement>('wild-trap');
   for(const [btn,id,label] of [[net,'paralysis_net','麻痹网'],[trap,'beast_trap','兽夹']] as const){
    const qty=countItem(w,id),txt=label+' '+qty;
    if(btn.lastChild?.textContent!==txt)btn.lastChild!.textContent=txt;
-   btn.disabled=qty===0;
+   btn.disabled=qty===0||gap>(id==='paralysis_net'?2.8:1.65);
   }
-  feedButton.disabled=!wild.weakened||quantity<1;
+  feedButton.disabled=!wild.weakened||quantity<1||gap>1.8;
+  el<HTMLButtonElement>('wild-strike').disabled=gap>1.8;
  }
  function makeCard(beast:Animal){
   const card=document.createElement('article');card.dataset.beastId=beast.id;card.dataset.species=beast.defId;
@@ -203,6 +242,13 @@ export function beastUi(h:BeastUIHooks){
   if(!force&&now-last<90)return;last=now;
   const w=h.state(),data=beastPanel(w);updateWild(w,data,hide);updateRoster(w,data);
  }
+ el('wild-lock').onclick=()=>{
+  if(lockedId){clearTarget();return;}
+  if(targetId&&wildBeastTarget(h.state(),targetId,Infinity)?.alpha){
+   lockedId=targetId;
+   update(performance.now(),false,true);
+  }
+ };
  el('wild-strike').onclick=()=>perform('strike');
  feedButton.onclick=()=>perform('tame');
  for(const [elem,id] of [['wild-net','paralysis_net'],['wild-trap','beast_trap']] as const){
@@ -220,5 +266,6 @@ export function beastUi(h:BeastUIHooks){
    if(!detail)return false;
    detail.open=false;detail.querySelector('summary')?.focus({preventScroll:true});return true;
  }
- return { update,show,closeRename,open:()=>!roster.hidden,tame:()=>perform('tame'),target:()=>targetId };
+ return { update,show,closeRename,lockAt,clearTarget,resetTarget:()=>{lockedId=null;targetId=null;},
+ nearby:()=>subject(h.state(),1.8),open:()=>!roster.hidden,tame:()=>perform('tame'),target:()=>targetId };
 }

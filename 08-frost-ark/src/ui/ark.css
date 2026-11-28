@@ -419,3 +419,10 @@ button[aria-disabled=true]{opacity:.62}
 .breeding-row small{font-size:10px;color:#d7e4e9}
 .beast-roster [data-morph="aurora"]{border-color:#68b4ac}
 .beast-roster [data-morph="ember"]{border-color:#c99968}
+
+.wild-encounter[data-alpha="true"]{border-color:#c19b68}
+.wild-encounter[data-alpha="true"] h2{color:#f1d7a6}
+
+.wild-observe{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;color:var(--ink-muted)}
+.wild-observe button{padding:3px 6px}
+.wild-observe button[aria-pressed=true]{border-color:#c19b68;color:#f1d7a6}

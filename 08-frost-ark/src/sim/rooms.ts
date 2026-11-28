@@ -9,9 +9,9 @@ const touches=(b:BuildingInstance,p:Vec2,r=PLAYER_FOOT_RADIUS)=>
   p.x+r>b.gx&&p.x-r<b.gx+1&&p.y+r>b.gy+.49&&p.y-r<b.gy+.81;
 const walls=new Set(['wind_wall','warm_wall']);
 export const envelope=(id:string)=>walls.has(id)||isDoor(id);
-export function doorBlocksFeet(b:BuildingInstance,p:Vec2,r=PLAYER_FOOT_RADIUS):boolean{
+export function doorBlocksFeet(b:BuildingInstance,p:Vec2,r=PLAYER_FOOT_RADIUS,assumeOpen=false):boolean{
  if(!isDoor(b.defId)||!touches(b,p,r))return false;
- return !doorOpen(b)||p.x-r<b.gx+.11||p.x+r>b.gx+.89;
+ return (!assumeOpen&&!doorOpen(b))||p.x-r<b.gx+.11||p.x+r>b.gx+.89;
 }
 export interface IndoorSpan{x:number;y:number;width:number}
 interface RoomMask{inside:Uint8Array;spans:IndoorSpan[];tiles:number;room:Uint16Array;roomAreas:number[]}

@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
 
 const root = process.cwd();
@@ -27,6 +28,8 @@ if (!runtime) throw new Error('Bundled runtime missing');
 html = html.replace(runtime, '').replace(/^ +$/gm,'').replace('</body>', () => runtime + '\n</body>');
 const scenario=execFileSync(process.execPath,['--import','tsx','scripts/p2-bench-fixture-json.ts'],{encoding:'utf8'});
 const scenarioNode='<script id="bench-world" type="application/json">'+scenario.replace(/</g,'\\u003c')+'</script>';
+const buildId=createHash('sha256').update(html).update('\0').update(scenario).digest('hex').slice(0,20);
+html=html.replace('<head>', '<head>\n  <meta name="frost-benchmark-build" content="'+buildId+'">');
 html=html.replace(runtime,()=>scenarioNode+'\n'+runtime);
 writeFileSync(resolve(root, 'index.html'), html);
 

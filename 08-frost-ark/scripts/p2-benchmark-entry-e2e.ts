@@ -47,6 +47,14 @@ export async function checkBenchmark(browser:Browser,entry:string,dir:string,err
    const stats=JSON.parse(readFileSync((await file.path())!,'utf8'));
    assert.ok(stats.averageFPS>0&&stats.logic.samples>=2000);
    assert.equal(stats.wave,3);
+   assert.equal(stats.receiptVersion,2);
+   assert.match(stats.buildId,/^[a-f0-9]{20}$/);
+   assert.deepEqual([stats.canvasWidth,stats.canvasHeight,stats.tilePx],[1920,1080,32]);
+   assert.ok(stats.elapsedMs>=120000&&stats.totalTicks===stats.logic.samples);
+   assert.ok(stats.whiteoutTicks>0&&stats.whiteoutTicks<=stats.totalTicks);
+   assert.deepEqual(stats.waves.map((x:{wave:number})=>x.wave),[1,2,3]);
+   assert.ok(stats.workload.length>0&&stats.minActiveHeatBuildings>=25);
+
    assert.deepEqual([stats.deck,stats.buildings,stats.beasts],[576,50,12]);
    assert.equal(await readSave(p),before);
    writeFileSync(resolve(dir,'P2-41-benchmark.json'),JSON.stringify(stats,null,2));

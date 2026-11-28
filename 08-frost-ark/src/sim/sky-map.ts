@@ -3,7 +3,7 @@ import { displayChartIslands,noteIslandVisit } from './expansion';
 import { eventWindDrag } from './sky-events';
 import { dockSide,docks } from './dock-direction';
 import { rigDrive,sailingRig } from './rigging';
-import { buildingAt, isDeck } from './ark';
+import { buildingAt, fitsOnDeck, hasBuildingContact, isDeck } from './ark';
 import { ensureNavigationState, getNavigation } from './m3-state';
 import { beastCompanions, crewCruiseMultiplier } from './beasts';
 import { nextRng } from './rng';
@@ -93,30 +93,48 @@ export function toggleCruise(w:WorldState):string|null{
 }
 
 function findDock(w:WorldState){
-  const size=w.ark.size, helm=helmPoint(w);
+  const size=w.ark.size,helm=helmPoint(w);
+  const surface=w.ark.decks.flatMap((v,i)=>v?[{x:i%size,y:Math.floor(i/size)}]:[]);
+  if(!surface.length)return null;
   const head=Math.floor(helm.y)*size+Math.floor(helm.x),frontier=[head],seen=new Set(frontier);
+  const directions=[[-1,0],[1,0],[0,-1],[0,1]] as const;
   for(let i=0;i<frontier.length;i++){
     const x=frontier[i]%size,y=Math.floor(frontier[i]/size);
-    for(const [dx,dy] of [[-1,0],[1,0],[0,-1],[0,1]]){
+    for(const [dx,dy] of directions){
       const xx=x+dx,yy=y+dy,at=yy*size+xx;
       if(seen.has(at)||!clear(w,xx,yy))continue;
       seen.add(at);frontier.push(at);
     }
   }
-  const surface=w.ark.decks.flatMap((v,i)=>v?[{x:i%size,y:Math.floor(i/size)}]:[]);
-  if(!surface.length)return null;
   const strips=Array.from({length:size},(_,i)=>i).sort((a,b)=>Math.abs(a-size/2)-Math.abs(b-size/2));
-  // Keep the scene clear of distant hull wings, preferring a standard
-  // starboard berth when both sides work equally well.
-  for(const side of ['east','west','south','north'] as const){
-    const d=docks[side],outer=Math.max(...surface.map(p=>p.x*d.x+p.y*d.y));
-    for(const strip of strips)for(let inset=0;inset<=2;inset++){
-      const gx=d.x?(outer-inset)*d.x:strip,gy=d.y?(outer-inset)*d.y:strip;
-      if(gx>=0&&gx<size&&gy>=0&&gy<size&&seen.has(gy*size+gx)&&clear(w,gx,gy)&&
-         !isDeck(w,gx+d.x,gy+d.y))return {gx,gy,side};
+  function berth(reachable:(x:number,y:number)=>boolean){
+    // Preserve the original preference for starboard and the middle of
+    // each edge, even if the ship has sparsely built wings.
+    for(const side of ['east','west','south','north'] as const){
+      const d=docks[side],outer=Math.max(...surface.map(p=>p.x*d.x+p.y*d.y));
+      for(const strip of strips)for(let inset=0;inset<=2;inset++){
+        const gx=d.x?(outer-inset)*d.x:strip,gy=d.y?(outer-inset)*d.y:strip;
+        if(clear(w,gx,gy)&&reachable(gx,gy)&&!isDeck(w,gx+d.x,gy+d.y))return {gx,gy,side};
+      }
+    }
+    return null;
+  }
+  const direct=berth((x,y)=>seen.has(y*size+x));
+  if(direct)return direct;
+  // A placed building reserves a full tile but often leaves space for a
+  // walking path around its actual footprint, especially behind a door.
+  const units=4,width=size*units,origin=Math.round(helm.y*units)*width+Math.round(helm.x*units);
+  const fine=[origin],walkable=new Set(fine);
+  const fits=(x:number,y:number)=>fitsOnDeck(w,x,y)&&!hasBuildingContact(w,x,y,true);
+  for(let i=0;i<fine.length;i++){
+    const x=fine[i]%width,y=Math.floor(fine[i]/width);
+    for(const [dx,dy] of directions){
+      const xx=x+dx,yy=y+dy,at=yy*width+xx;
+      if(walkable.has(at)||!fits(xx/units,yy/units)||!fits((x+dx*.5)/units,(y+dy*.5)/units))continue;
+      walkable.add(at);fine.push(at);
     }
   }
-  return null;
+  return berth((x,y)=>walkable.has((y*units+2)*width+x*units+2));
 }
 
 export function cruiseSpeed(w:WorldState,dx=w.sky.headingX,dy=w.sky.headingY){

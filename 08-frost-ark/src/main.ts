@@ -873,6 +873,7 @@ canvas.addEventListener('pointerup',e=>{
 canvas.addEventListener('pointercancel',()=>cancelCharge(w));
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
 
+let observeBenchmarkTick:((world:WorldState)=>void)|undefined;
 function simulation():void {
   const g=w.player.grapple;
   const pending=w.latte.autoLootUnlocked&&w.sky.debris.filter(isDeckDrop).length;
@@ -880,6 +881,7 @@ function simulation():void {
   if(mode==='weapon'&&!w.player.weapon)choose('hook');
   const priorMedals=readLife(w)?.shown.length??0;
   perfStep(()=>stepWorld(w,1,{x:Number(keys.has('d'))-Number(keys.has('a')),y:Number(keys.has('s'))-Number(keys.has('w'))},keys.has('shift')&&expedition.area()==='island'?.53:1));
+  observeBenchmarkTick?.(w);
   // A newly earned badge is durable as soon as the UI announces it, not
   // at the next periodic autosave. This also covers awards earned under menus.
   if((readLife(w)?.shown.length??0)>priorMedals)void saveNow();
@@ -1047,7 +1049,7 @@ async function restore():Promise<void> {
   if(benchmarkMode){
     provisional=false;
     save.textContent='压测沙盒 · 不写入正式存档';
-    setupShipBenchmark(canvas,{
+    observeBenchmarkTick=setupShipBenchmark(canvas,{
       start(raw){
         const scenario=deserializeWorld(raw);
         safeWorld(scenario);view.frameBenchmark(w);audio.unlock();active=true;

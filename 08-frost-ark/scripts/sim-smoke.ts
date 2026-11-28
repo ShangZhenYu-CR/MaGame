@@ -1718,3 +1718,5 @@ assert.ok(releaseBuild.includes('id="bench-world"'));
 assert.match(releaseBuild,/\.\.\/assets\/character\/head-\${[^}]+}\.png/);
 for(let i=0;i<4;i++)assert.equal(releaseRead('../assets/character/head-'+i+'.png').toString('hex',0,8),'89504e470d0a1a0a');
 console.log('[sim-smoke:P2-42] OK: compact cover, scoped links, benchmark fixture and four unchanged relative portrait paths');
+
+import './p2-enclosed-helm-smoke';

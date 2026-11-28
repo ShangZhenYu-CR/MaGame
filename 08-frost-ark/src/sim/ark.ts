@@ -43,13 +43,13 @@ export function buildingAt(w: WorldState, x: number, y: number): BuildingInstanc
 }
 
 /** Rectangle overlap for the player's feet, independent of tile-based placement/UI. */
-export function hasBuildingContact(w: WorldState, px: number, py: number): boolean {
+export function hasBuildingContact(w: WorldState, px: number, py: number, assumeDoorsOpen=false): boolean {
   const r = PLAYER_FOOT_RADIUS;
   return w.ark.buildings.some(b => {
     if(overlayKind(b.defId))return false;
     const [sx, sy] = buildingDefs.get(b.defId)?.size ?? [1, 1];
     const [left, top, right, bottom] = GROUND_FOOTPRINTS[b.defId]?.bounds ?? [0, 0, sx, sy];
-    if(isDoor(b.defId))return doorBlocksFeet(b,{x:px,y:py},r);
+    if(isDoor(b.defId))return doorBlocksFeet(b,{x:px,y:py},r,assumeDoorsOpen);
     return px + r > b.gx + left && px - r < b.gx + right &&
            py + r > b.gy + top && py - r < b.gy + bottom;
   });

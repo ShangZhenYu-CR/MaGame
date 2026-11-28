@@ -47,3 +47,21 @@ export function largeRadarArk(){
  assert.ok(w.wildEntities.some(e=>e.kind==='raider'&&e.hp>0));
  return w;
 }
+
+// Matches the natural Day 3 warm room built around the originally clear helm.
+export function enclosedHelmTravel(){
+ const w=createInitialWorld(202608);
+ w.unlockedTech.push('tier2_automation');
+ assert.ok(inventoryChange(w,[],[{itemId:'driftwood',count:50},{itemId:'rope',count:3}]));
+ Object.assign(w.player,{x:24.5,y:25.43});
+ for(let x=22;x<=25;x++)assert.ok(build(w,'wood_deck',x,20));
+ for(const x of [22,23,24,25]){
+  assert.ok(build(w,'wind_wall',x,20));
+  assert.ok(build(w,x===24?'wind_door':'wind_wall',x,22));
+ }
+ for(const x of [22,25])assert.ok(build(w,'wind_wall',x,21));
+ Object.assign(w.player,helmPoint(w));
+ const destination=w.sky.islands.find(n=>n.id==='shallows_lantern')!;
+ Object.assign(w.sky,{x:destination.skyX-.35,y:destination.skyY});
+ return w;
+}

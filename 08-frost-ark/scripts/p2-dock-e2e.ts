@@ -7,7 +7,7 @@ import { areaAt,gangwayGeometry } from '../src/sim/island';
 import { serializeWorld } from '../src/sim/save';
 import type { WorldState } from '../src/sim/types';
 import { exportWorld } from './p2-hook-e2e';
-import { largeRadarArk,sideTrial,westOnlyTravel } from './p2-dock-fixture';
+import { enclosedHelmTravel,largeRadarArk,sideTrial,westOnlyTravel } from './p2-dock-fixture';
 
 async function load(p:Page,w:WorldState){
  await p.keyboard.press('i');
@@ -89,6 +89,19 @@ export async function runP2Dock(browser:Browser,url:string,dir:string,errors:str
    assert.equal(gangwayGeometry(backOnDeck)?.deployed,false);
    console.log('[e2e:P2-17] real board + return:',side);
   }
+  // A real natural construction had confined the helm behind a working
+  // wind door. Start the enclosed-case cruise through the player's UI.
+  await load(p,enclosedHelmTravel());
+  await p.keyboard.press('n');
+  await p.locator('#sky-map [data-island-id=shallows_lantern]').click();
+  await p.locator('#sky-set-course').click();
+  await p.locator('#sky-cruise').click();
+  await p.locator('#sky-nav-status[data-nav-state=docked]').waitFor({timeout:15000});
+  await p.keyboard.press('Escape');
+  const warmDock=await exportWorld(p);
+  assert.equal(warmDock.ark.anchoredIslandId,'shallows_lantern');
+  assert.ok(gangwayGeometry(warmDock));
+  await p.screenshot({path:label('05-dock-through-warm-room')});
   console.log('[e2e:P2-17] OK: 21x21 rasterized heat and raid marks, auto fallback, four real keyboard boarding and safe stow');
  }finally{await p.close();}
 }

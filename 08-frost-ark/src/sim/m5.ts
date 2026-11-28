@@ -38,6 +38,7 @@ interface M5State {
 type M5World = WorldState & { combatM5?: M5State };
 const fresh = ():M5State => ({raidDay:0,wave:0,nextWave:0,playerStrike:0,seeds:[],clocks:{},turretClocks:{},bossIsland:null});
 const get = (w:WorldState) => (w as M5World).combatM5;
+export const currentRaidWave=(w:WorldState)=>{const raid=get(w);return raid?.raidDay===w.day?raid.wave:0;};
 const live = (w:WorldState) => (w as M5World).combatM5 ??= fresh();
 const length = (a:Vec2,b:Vec2)=>Math.hypot(a.x-b.x,a.y-b.y);
 const bossByIsland:Record<string,HostileId> = { frostpine_gate:'frostmane_lord', sulfur_reach:'rift_carapace' };

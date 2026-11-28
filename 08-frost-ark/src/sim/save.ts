@@ -1,3 +1,4 @@
+import { validLatteGrowth } from './latte-growth';
 import { alphaMaxHp } from './wild-ecology';
 import { validBond } from './beast-bond';
 import { validBreedingArchive } from './breeding';
@@ -123,7 +124,7 @@ function validateFauna(p:Record<string,unknown>,ids:Set<string>):void{
 
 export function deserializeWorld(raw: string): WorldState {
   const p:unknown=JSON.parse(raw);
-  if(!record(p)||![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
+  if(!record(p)||![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
     throw new Error('存档版本不受支持');
   if(p.saveVersion===1){
     if(record(p.player))p.player.rescue={startedAt:null,shieldUntil:0};
@@ -249,6 +250,7 @@ export function deserializeWorld(raw: string): WorldState {
     (world.ark.anchoredIslandId&&!canReachAurora(world,world.ark.anchoredIslandId))||
     (nav&&record(nav)&&typeof nav.targetId==='string'&&!canReachAurora(world,nav.targetId)))
     throw new Error('太阳方舟或终局存档不符合方舟格式');
+  if(!validLatteGrowth(world))throw new Error('拿铁成长存档不符合方舟格式');
   if(!validBond(world)||!validBreedingArchive(world))throw new Error('云兽繁育存档不符合方舟格式');
   if(!validGrowthArchive(world))throw new Error('云兽成长存档不符合方舟格式');
   if(!validTraitArchive(world))throw new Error('云兽词条存档不符合方舟格式');

@@ -1,3 +1,4 @@
+import { awardLatte,stepLatteGrowth } from './latte-growth';
 import { catPerch } from './home';
 import { inventoryChange, isDeck } from './ark';
 import { incapacitated, RESCUE_TICKS, rescuePoint } from './rescue';
@@ -36,6 +37,7 @@ export function updateLatte(w:WorldState):void{
     if(gap>.13){const step=Math.min(.13,gap)/gap;cat.x+=dx*step;cat.y+=dy*step;}
     cat.mood='alert';return;
   }
+  if(w.tick%30===0)stepLatteGrowth(w);
   const d=cat.autoLootUnlocked&&hearth.fuel>0
     ?w.sky.debris.find(v=>isDeckDrop(v)&&isDeck(w,Math.floor(v.x),Math.floor(v.y))&&
       Math.hypot(v.x-hearth.gx-1,v.y-hearth.gy-1)<=6&&heatAt(w,v.x,v.y)>=15)
@@ -46,6 +48,6 @@ export function updateLatte(w:WorldState):void{
     const k=Math.min(.08,gap)/gap;
     cat.x+=(x-cat.x)*k;cat.y+=(y-cat.y)*k;
   }else if(d&&w.tick%30===0&&inventoryChange(w,[],d.loot)){
-    w.sky.debris=w.sky.debris.filter(v=>v!==d);
+    w.sky.debris=w.sky.debris.filter(v=>v!==d);awardLatte(w,2);
   }
 }

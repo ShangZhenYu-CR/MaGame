@@ -34,7 +34,7 @@
       <section class="m5-seeds numbers" id="m5-seed-count" aria-label="天穹火种进度"></section>
     </div>
   </header>
-  <aside class="sector"><div class="eyebrow">SKY SECTOR <span>01</span></div><strong id="sector-name">碎云浅海</strong><div id="weather-status" class="numbers"></div><div id="latte-status"></div><div class="hearth-tools"><button id="fuel-hearth" type="button"><kbd>R</kbd> 添柴</button><button id="upgrade-hearth" type="button" title="浮木板 ×4、冻铁废件 ×2"><kbd>U</kbd> 升炉</button></div>
+  <aside class="sector"><div class="eyebrow">SKY SECTOR <span>01</span></div><strong id="sector-name">碎云浅海</strong><div id="weather-status" class="numbers"></div><button type="button" id="latte-status" aria-expanded="false" aria-controls="latte-care"></button><div class="hearth-tools"><button id="fuel-hearth" type="button"><kbd>R</kbd> 添柴</button><button id="upgrade-hearth" type="button" title="浮木板 ×4、冻铁废件 ×2"><kbd>U</kbd> 升炉</button></div>
     <section id="sky-event-brief" class="sky-event-brief" hidden>
       <img id="sky-event-icon" alt=""><div><b id="sky-event-title"></b><small id="sky-event-detail"></small>
       <button type="button" id="sky-event-moor" hidden><kbd>E</kbd> 靠泊交易</button></div>
@@ -149,6 +149,12 @@
   <section id="m5-attack-prompt" class="m5-attack-prompt" hidden>
     <strong id="m5-target-name"></strong><button type="button" id="m5-attack"><kbd>F</kbd> 反击</button>
   </section>
+  <aside id="latte-care" class="wild-encounter latte-care" aria-labelledby="latte-care-title" hidden>
+    <div class="panel-head"><div><div class="eyebrow">HEARTH COMPANION</div><h2 id="latte-care-title">炉边的拿铁</h2></div><button id="latte-close" type="button">关闭</button></div>
+    <div class="latte-profile"><img alt="当前拿铁装扮" id="latte-dress-preview"><div><strong id="latte-level"></strong><progress id="latte-exp" max="12" value="0" aria-label="拿铁成长"></progress><small id="latte-skill"></small></div></div>
+    <div class="wild-actions"><button type="button" id="latte-pet">抚摸</button><button type="button" id="latte-feed">喂 1 份云鳞鱼</button></div>
+    <div id="latte-outfits" class="wild-actions" aria-label="拿铁的装扮"></div>
+  </aside>
   <aside id="wild-encounter" class="wild-encounter" aria-labelledby="wild-species" hidden>
     <div class="eyebrow">FIELD ENCOUNTER <span>／</span> 野外驯服</div>
     <div class="wild-title"><h2 id="wild-species"></h2><span id="wild-status"></span></div>

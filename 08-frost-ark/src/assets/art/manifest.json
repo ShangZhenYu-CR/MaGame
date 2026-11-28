@@ -4832,6 +4832,198 @@
         62
       ],
       "bytes": 7914
+    },
+    "latte-scarf-sleep": {
+      "file": "latte-scarf-sleep.png",
+      "width": 96,
+      "height": 96,
+      "anchorX": 48,
+      "anchorY": 88,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        7,
+        94,
+        91
+      ],
+      "bytes": 5480
+    },
+    "latte-scarf-alert": {
+      "file": "latte-scarf-alert.png",
+      "width": 96,
+      "height": 96,
+      "anchorX": 48,
+      "anchorY": 88,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        5,
+        2,
+        93,
+        91
+      ],
+      "bytes": 5182
+    },
+    "latte-scarf-walk": {
+      "file": "latte-scarf-walk.png",
+      "width": 96,
+      "height": 96,
+      "anchorX": 48,
+      "anchorY": 88,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        2,
+        94,
+        91
+      ],
+      "bytes": 5127
+    },
+    "latte-scarf-walk-alt": {
+      "file": "latte-scarf-walk-alt.png",
+      "width": 96,
+      "height": 96,
+      "anchorX": 48,
+      "anchorY": 88,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        3,
+        7,
+        94,
+        90
+      ],
+      "bytes": 4915
+    },
+    "latte-goggles-sleep": {
+      "file": "latte-goggles-sleep.png",
+      "width": 96,
+      "height": 96,
+      "anchorX": 48,
+      "anchorY": 88,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        10,
+        94,
+        90
+      ],
+      "bytes": 5194
+    },
+    "latte-goggles-alert": {
+      "file": "latte-goggles-alert.png",
+      "width": 96,
+      "height": 96,
+      "anchorX": 48,
+      "anchorY": 88,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        3,
+        2,
+        93,
+        91
+      ],
+      "bytes": 5025
+    },
+    "latte-goggles-walk": {
+      "file": "latte-goggles-walk.png",
+      "width": 96,
+      "height": 96,
+      "anchorX": 48,
+      "anchorY": 88,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        4,
+        94,
+        91
+      ],
+      "bytes": 4867
+    },
+    "latte-goggles-walk-alt": {
+      "file": "latte-goggles-walk-alt.png",
+      "width": 96,
+      "height": 96,
+      "anchorX": 48,
+      "anchorY": 88,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        8,
+        94,
+        90
+      ],
+      "bytes": 4794
+    },
+    "latte-cape-sleep": {
+      "file": "latte-cape-sleep.png",
+      "width": 96,
+      "height": 96,
+      "anchorX": 48,
+      "anchorY": 88,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        12,
+        94,
+        90
+      ],
+      "bytes": 5110
+    },
+    "latte-cape-alert": {
+      "file": "latte-cape-alert.png",
+      "width": 96,
+      "height": 96,
+      "anchorX": 48,
+      "anchorY": 88,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        4,
+        2,
+        92,
+        91
+      ],
+      "bytes": 5057
+    },
+    "latte-cape-walk": {
+      "file": "latte-cape-walk.png",
+      "width": 96,
+      "height": 96,
+      "anchorX": 48,
+      "anchorY": 88,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        2,
+        93,
+        91
+      ],
+      "bytes": 5098
+    },
+    "latte-cape-walk-alt": {
+      "file": "latte-cape-walk-alt.png",
+      "width": 96,
+      "height": 96,
+      "anchorX": 48,
+      "anchorY": 88,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        5,
+        94,
+        91
+      ],
+      "bytes": 5100
     }
   }
 }

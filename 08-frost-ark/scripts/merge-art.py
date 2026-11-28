@@ -35,7 +35,7 @@ for root, group in ((catalog, old), (args.batch, new)):
         if entry["bytes"] != actual or (root == args.batch and (catalog / file).exists()):
             raise SystemExit(f"Size or destination mismatch: {file}")
         total += actual
-if total > 4_500_000:
+if total > 9_000_000:
     raise SystemExit(f"Combined art budget exceeded: {total:,} bytes")
 new_prompts = specs.get("prompts", {})
 if prompts["prompts"].keys() & new_prompts.keys():

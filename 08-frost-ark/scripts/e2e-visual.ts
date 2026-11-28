@@ -1,3 +1,4 @@
+import { runP2Latte } from "./p2-latte-e2e";
 import { runP2Bond } from "./p2-bond-e2e";
 import { runP2Alpha } from "./p2-alpha-e2e";
 import { runP2Breeding } from "./p2-breed-e2e";
@@ -673,6 +674,7 @@ try {
   await runP2Breeding(browser,baseUrl,outDir,errors);
   await runP2Alpha(browser,baseUrl,outDir,errors);
   await runP2Bond(browser,baseUrl,outDir,errors);
+  await runP2Latte(browser,baseUrl,outDir,errors);
 
   if (errors.length > 0) {
     throw new Error(errors.join('\n'));

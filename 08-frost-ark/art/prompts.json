@@ -82,6 +82,15 @@
     "p2-26-incubator": "Original Frost Ark painterly survival game sprite atlas EXACT 2 columns × 2 rows square equal cells. Four solo subjects on 100% perfectly flat solid #FF00FF pure magenta incl any holes, very generous margins, no outside shadows, grid dividers, text or labels. Painterly crisp 2.5D art, three-quarter straight-front orthographic 40 degree raised camera, top and front visible, winter soft cool upper-left light, tactile frost-gray wood, felt, weathered brass and matte graphite contours like material reference. TOP LEFT: a compact distinct one-tile terrestrial cloud-beast thermostatic egg incubator, physical construction with four short stout weathered cast iron feet, warm oaken support under a horizontal open shallow round woven straw bowl lined in dark ginger felt and capped on its rear half with a small glass hood and tarnished copper coils, clearly remaining OPEN for accepting egg, no egg inside, no emitted glow, no person. Not a cage and not a furnace. TOP RIGHT: an isolated small soft cream-white bluish cloud-beast egg with slightly irregular smooth pebbled shell and single curling dull copper fleck bushed on shell, elegant silhouette, large game inventory icon, no nest. BOTTOM LEFT: isolated little pair of small eucalyptus teal and mint artistic mineral wisps with short pale cyan spark, elegantly flowing narrow wind currents, aura overlay motif, NO purple, no neon, no circular badge. BOTTOM RIGHT: isolated small pair of slim muted ember-orange copper curling flame-wisp ribbons with two tiny amber glints, warm magic overlay motif distinct from blue, not a cartoon torch or background glow. All subjects complete in cells, stone and felt refinement, no hard black, no perspective distortion.",
     "p228-moods": {
       "text": "Five hand-painted cloud-beast mood marks: stitched rose heart, warm amber lantern, food bowl, frosty crystal, bright salvaged chest. Frost Ark art, magenta background, 3x2 grid, empty sixth cell."
+    },
+    "p229-scarf": {
+      "text": "Hand-painted matching Latte ginger kitten in 40-degree 3/4 perspective; 2x2 atlas of sleeping, alert and two walk poses wearing a warm red winter scarf on pure magenta. Reference original Latte."
+    },
+    "p229-goggles": {
+      "text": "Hand-painted matching Latte ginger kitten in 40-degree 3/4 perspective; 2x2 atlas of sleeping, alert and two walk poses wearing a pair of cloud-sea aviator goggles on pure magenta. Reference original Latte."
+    },
+    "p229-cape": {
+      "text": "Hand-painted matching Latte ginger kitten in 40-degree 3/4 perspective; 2x2 atlas of sleeping, alert and two walk poses wearing a tiny solar ochre cape on pure magenta. Reference original Latte."
     }
   },
   "assets": [
@@ -6681,6 +6690,342 @@
       "tileW": 1,
       "tileH": 1,
       "maxBytes": 9500
+    },
+    {
+      "id": "latte-scarf-sleep",
+      "source": "p229-scarf.png",
+      "crop": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "size": [
+        96,
+        96
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.97
+      ],
+      "targetAnchor": [
+        0.5,
+        0.92
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 12500
+    },
+    {
+      "id": "latte-scarf-alert",
+      "source": "p229-scarf.png",
+      "crop": [
+        627,
+        0,
+        1254,
+        627
+      ],
+      "size": [
+        96,
+        96
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.97
+      ],
+      "targetAnchor": [
+        0.5,
+        0.92
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 12500
+    },
+    {
+      "id": "latte-scarf-walk",
+      "source": "p229-scarf.png",
+      "crop": [
+        0,
+        627,
+        627,
+        1254
+      ],
+      "size": [
+        96,
+        96
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.97
+      ],
+      "targetAnchor": [
+        0.5,
+        0.92
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 12500
+    },
+    {
+      "id": "latte-scarf-walk-alt",
+      "source": "p229-scarf.png",
+      "crop": [
+        627,
+        627,
+        1254,
+        1254
+      ],
+      "size": [
+        96,
+        96
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.97
+      ],
+      "targetAnchor": [
+        0.5,
+        0.92
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 12500
+    },
+    {
+      "id": "latte-goggles-sleep",
+      "source": "p229-goggles.png",
+      "crop": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "size": [
+        96,
+        96
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.97
+      ],
+      "targetAnchor": [
+        0.5,
+        0.92
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 12500
+    },
+    {
+      "id": "latte-goggles-alert",
+      "source": "p229-goggles.png",
+      "crop": [
+        627,
+        0,
+        1254,
+        627
+      ],
+      "size": [
+        96,
+        96
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.97
+      ],
+      "targetAnchor": [
+        0.5,
+        0.92
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 12500
+    },
+    {
+      "id": "latte-goggles-walk",
+      "source": "p229-goggles.png",
+      "crop": [
+        0,
+        627,
+        627,
+        1254
+      ],
+      "size": [
+        96,
+        96
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.97
+      ],
+      "targetAnchor": [
+        0.5,
+        0.92
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 12500
+    },
+    {
+      "id": "latte-goggles-walk-alt",
+      "source": "p229-goggles.png",
+      "crop": [
+        627,
+        627,
+        1254,
+        1254
+      ],
+      "size": [
+        96,
+        96
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.97
+      ],
+      "targetAnchor": [
+        0.5,
+        0.92
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 12500
+    },
+    {
+      "id": "latte-cape-sleep",
+      "source": "p229-cape.png",
+      "crop": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "size": [
+        96,
+        96
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.97
+      ],
+      "targetAnchor": [
+        0.5,
+        0.92
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 12500
+    },
+    {
+      "id": "latte-cape-alert",
+      "source": "p229-cape.png",
+      "crop": [
+        627,
+        0,
+        1254,
+        627
+      ],
+      "size": [
+        96,
+        96
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.97
+      ],
+      "targetAnchor": [
+        0.5,
+        0.92
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 12500
+    },
+    {
+      "id": "latte-cape-walk",
+      "source": "p229-cape.png",
+      "crop": [
+        0,
+        627,
+        627,
+        1254
+      ],
+      "size": [
+        96,
+        96
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.97
+      ],
+      "targetAnchor": [
+        0.5,
+        0.92
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 12500
+    },
+    {
+      "id": "latte-cape-walk-alt",
+      "source": "p229-cape.png",
+      "crop": [
+        627,
+        627,
+        1254,
+        1254
+      ],
+      "size": [
+        96,
+        96
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.97
+      ],
+      "targetAnchor": [
+        0.5,
+        0.92
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 12500
     }
   ],
   "batchReferences": [

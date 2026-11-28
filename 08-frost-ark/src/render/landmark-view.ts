@@ -1,3 +1,5 @@
+import { latteTreasure } from '../sim/latte-growth';
+import { treasureCue } from './latte-view';
 import { islandLandmarks,landmarkLit,VENT_RADIUS,ventState,type Landmark } from '../sim/landmarks';
 import type { Vec2,WorldState } from '../sim/types';
 import type { ArtLibrary } from './art-library';
@@ -5,11 +7,14 @@ import { ovalGlow } from './atmosphere';
 
 export const LANDMARK_ART=['landmark-camp','landmark-spring','landmark-obelisk','landmark-obelisk-lit','landmark-vent','landmark-wreck'] as const;
 
-export function landmarkScene(c:CanvasRenderingContext2D,art:ArtLibrary,w:WorldState,project:(x:number,y:number)=>Vec2,tile:number){
+export function landmarkScene(c:CanvasRenderingContext2D,art:ArtLibrary,w:WorldState,project:(x:number,y:number)=>Vec2,tile:number,found:()=>void){
   const actors:{x:number;y:number;art:string;shadow:number}[]=[];
   for(const mark of islandLandmarks(w)){
     const at=project(mark.x,mark.y),cw=c.canvas.width,ch=c.canvas.height;
     if(at.x < -tile*6||at.x>cw+tile*6||at.y< -tile*6||at.y>ch+tile*6)continue;
+    if((mark.kind==='obelisk'||mark.kind==='wreck')&&at.x>=0&&at.y>=0&&at.x<=cw&&at.y<=ch&&latteTreasure(w,mark)){
+      treasureCue(c,at,tile,w.tick);found();
+    }
     const lit=landmarkLit(w,mark);
     const artId=lit?'landmark-obelisk-lit':('landmark-'+mark.kind);
     if(mark.kind==='spring'){

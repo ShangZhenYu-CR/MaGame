@@ -1,3 +1,4 @@
+import { careForLatte,latteBoon,latteNear,latteProfile,outfitLatte,outfits,outfitsAt } from './sim/latte-growth';
 import { nearBondBeast,petBond } from './sim/beast-bond';
 import { castBeastSkill,companionSkillStatus } from './sim/beast-skills';
 import { voyageBiome } from './sim/expansion';
@@ -52,6 +53,45 @@ const canvas=el<HTMLCanvasElement>('game-canvas'), view=new ArkView(canvas);
 const portrait=el<HTMLImageElement>('manan-portrait');
 const portraits=[0,1,2,3].map(n=>`../assets/character/head-${n}.png`);
 portrait.src=portraits[0];
+const latteCare=el('latte-care');
+const latteArt=import.meta.glob<string>('./assets/art/latte-*.png',{eager:true,query:'?inline',import:'default'});
+const latteNames={classic:'原装',scarf:'暖红围巾',goggles:'云海护目镜',cape:'太阳小披风'};
+function showLatte(open:boolean){
+ if(open){
+  if(!latteNear(w)){tell('走到炉边再找拿铁。');return;}
+  closeOtherPanels('latte');chart.hide(false);cancelCharge(w);keys.clear();
+ }
+ latteCare.hidden=!open;el('latte-status').setAttribute('aria-expanded',String(open));
+ if(open)paintLatte();
+}
+const outfitButtons=outfits.map(style=>{
+ const b=document.createElement('button');b.type='button';b.dataset.latteOutfit=style;
+ b.onclick=()=>{finishAction(outfitLatte(w,style),'拿铁换上了'+latteNames[style]+'。','place');paintLatte();};
+ el('latte-outfits').append(b);return b;
+});
+el('latte-status').onclick=()=>showLatte(latteCare.hidden);
+el('latte-close').onclick=()=>showLatte(false);
+el('latte-pet').onclick=()=>{finishAction(careForLatte(w,'pet'),'拿铁蹭了蹭你的手。','place');paintLatte();};
+el('latte-feed').onclick=()=>{finishAction(careForLatte(w,'feed'),'拿铁吃了一份云鳞鱼。','craft');paintLatte();};
+function paintLatte(){
+ if(latteCare.hidden)return;
+ if(!latteNear(w)){showLatte(false);return;}
+ const p=latteProfile(w);
+ const put=(id:string,t:string)=>{const n=el(id);if(n.textContent!==t)n.textContent=t;};
+ put('latte-level',p.level===4?'Lv.4 · 成长已满':`Lv.${p.level} · ${p.xp}/${p.next}`);
+ put('latte-skill',p.level>=4?'已习得 寻宝直觉、暖心喵鸣':p.level>=3?'寻宝直觉：金光标出远处稀有货箱与遗迹。':'抚摸、喂鱼、拾荒会增加成长。');
+ const prog=el<HTMLProgressElement>('latte-exp');prog.max=p.next;prog.value=p.xp;
+ const preview=el<HTMLImageElement>('latte-dress-preview'),name=p.outfit==='classic'?'latte-alert':`latte-${p.outfit}-alert`;
+ if(preview.dataset.art!==name){preview.src=latteArt[`./assets/art/${name}.png`];preview.dataset.art=name;}
+ el<HTMLButtonElement>('latte-pet').disabled=p.petWait>0;
+ el<HTMLButtonElement>('latte-feed').disabled=p.feedWait>0;
+ for(const [i,style] of outfits.entries()){
+  const b=outfitButtons[i];b.disabled=outfitsAt[style]>p.level;
+  const text=latteNames[style]+(b.disabled?' Lv.'+outfitsAt[style]:'');
+  if(b.textContent!==text)b.textContent=text;
+  if(b.getAttribute('aria-pressed')!==String(p.outfit===style))b.setAttribute('aria-pressed',String(p.outfit===style));
+ }
+}
 let mood=0;
 const thermal=el('thermal-stats'), briefing=el('weather-status'), catStatus=el('latte-status');
 const stats=el('hud-stats'), hint=el('hint'), action=el('action'), save=el('save-label'), note=el('build-note');
@@ -183,6 +223,7 @@ function finishAction(issue:string|null,success:string,event?:'craft'|'undo'|'di
 type PrimaryInteraction={kind:'expedition'|'trader'|'fishing'|'feed'|'storage'|'beasts'|'close-storage'|'close-station'|'close-beasts'|'none'}|
   {kind:'station';id:string;label:string}|{kind:'door';id:string;open:boolean}|{kind:'pet';id:string};
 function primaryInteraction():PrimaryInteraction{
+  if(!latteCare.hidden)return {kind:'none'};
   if(beasts.open())return {kind:'close-beasts'};
   if(industry.stationOpen())return {kind:'close-station'};
   if(!locker.hidden)return {kind:'close-storage'};
@@ -251,8 +292,9 @@ function useNearby():void{
 function openIndustry(id:string):void{
   closeOtherPanels('industry');cancelCharge(w);keys.clear();industry.showStation(id);
 }
-function closeOtherPanels(except:'bag'|'locker'|'catalog'|'industry'|'beasts'):void{
+function closeOtherPanels(except:'bag'|'locker'|'catalog'|'industry'|'beasts'|'latte'):void{
   cancelFishing(w);skyEvents.close();
+  if(except!=='latte')showLatte(false);
   if(except!=='bag')toggleBag(false);
   if(except!=='locker')locker.hidden=true;
   if(except!=='catalog')industry.showCatalog(false);
@@ -478,7 +520,7 @@ function saveNow():Promise<void> {
 }
 function safeWorld(next:WorldState):void {
   finale.reset();view.juice.reset();cancelFishing(w);skyEvents.close();
-  expedition.cancel();chart.hide(false);beasts.show(false);beasts.resetTarget();w=next;toggleStorage(false);industry.showStation(null);industry.showCatalog(false);lockerSignature='';cancelCharge(w);
+  expedition.cancel();chart.hide(false);beasts.show(false);beasts.resetTarget();showLatte(false);w=next;toggleStorage(false);industry.showStation(null);industry.showCatalog(false);lockerSignature='';cancelCharge(w);
   caught=null;keys.clear();messageUntil=0;message='';stackSignature='';
   if(mode==='weapon'&&!w.player.weapon||mode==='tool'&&!heldTool(w))choose('hook');
   view.position(w);fillBag();
@@ -590,7 +632,8 @@ addEventListener('keydown',e=>{
   if(e.repeat)return;
   if(k==='escape'){
     expedition.cancel();industry.closeTip();
-    if(beasts.open()){if(!beasts.closeRename())toggleBeastRoster(false);}
+    if(!latteCare.hidden)showLatte(false);
+    else if(beasts.open()){if(!beasts.closeRename())toggleBeastRoster(false);}
     else if(industry.stationOpen())industry.showStation(null);
     else if(industry.catalogOpen())toggleCatalog(false);
     else if(!locker.hidden)toggleStorage(false);
@@ -630,7 +673,7 @@ canvas.addEventListener('pointermove',e=>{
 });
 canvas.addEventListener('pointerleave',()=>{pointer=null;});
 canvas.addEventListener('pointerdown',e=>{
-  if(!active||incapacitated(w)||rolling(w)||skyEvents.open()||e.button!==0||fishingPanel(w)||chart.open()||finale.open()||finale.blocking())return;
+  if(!active||!latteCare.hidden||incapacitated(w)||rolling(w)||skyEvents.open()||e.button!==0||fishingPanel(w)||chart.open()||finale.open()||finale.blocking())return;
   pointer={x:e.clientX,y:e.clientY};
   const at=view.world(e.clientX,e.clientY);
   const x=Math.floor(at.x),y=Math.floor(at.y);
@@ -737,7 +780,7 @@ function frame(now:number):void {
       fire:h&&h.fuel>0?Math.min(1,Math.max(0,(local+8)/44)):0});
   }
   industry.update();chart.paint(false,now);
-  const overlay=down||skyEvents.open()||chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||beasts.open();
+  const overlay=down||!latteCare.hidden||skyEvents.open()||chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||beasts.open();
   radar.update(w,!overlay&&!w.activeIsland&&!finale.open()&&!finale.blocking());
   const context=primaryInteraction();
   const here=expedition.update(now,overlay||finale.arena()||context.kind==='fishing'||context.kind==='trader',context.kind==='expedition'||context.kind==='pet',
@@ -775,7 +818,8 @@ function frame(now:number):void {
   const report=`${phase} · 主炉 Lv.${level}${level===3?' 硫磺高压炉':''} · 燃料 ${Math.ceil(h?.fuel??0)}`;
   if(briefing.textContent!==report)briefing.textContent=report;
   const cat=w.latte.mood==='alert'?'拿铁 · 炸毛警戒':w.latte.mood==='hungry_hearth'?'拿铁 · 提醒添柴':'拿铁 · 炉边打呼';
-  const catLine=cat+(w.latte.autoLootUnlocked?' · 暖区拾取':'');
+  paintLatte();
+  const catLine=cat+(latteBoon(w)?' · 暖心喵鸣':'')+(w.latte.autoLootUnlocked?' · 暖区拾取':'');
   if(catStatus.textContent!==catLine)catStatus.textContent=catLine;
   if(mood!==w.player.portraitMood){mood=w.player.portraitMood;portrait.src=portraits[mood]??portraits[0];}
   toast(caught?'正在拉回：'+catchName:g.charging?'抓钩蓄力 '+Math.round(g.charge*100)+'%':

@@ -1,3 +1,5 @@
+import { latteBoon,latteProfile,latteTreasure,outfits } from '../sim/latte-growth';
+import { treasureCue } from './latte-view';
 import { beastMood } from '../sim/beast-bond';
 import { incubatorOccupied,type Variant } from '../sim/breeding';
 import { paintCompanionBurst } from './beast-skills-view';
@@ -79,6 +81,7 @@ const ironDeck='building-iron-deck';
 const required=[
   ...deckIds,'boss-frost-whale-1','boss-frost-whale-2','boss-frost-whale-3','solar-hearth','aurora-crystal','manan-south','manan-north','manan-west','manan-east','latte-sleep','latte-alert','latte-walk','latte-walk-alt',
   'hearth-1','hearth-2','hearth-3','rail','corner','rock','icicles',ironDeck,...Object.values(buildingVisuals).map(v=>v.art),
+  ...outfits.filter(o=>o!=='classic').flatMap(o=>['sleep','alert','walk','walk-alt'].map(p=>'latte-'+o+'-'+p)),
   'debris-wood','debris-iron','debris-rope','debris-heavy','clouds','rail-side','rock-side','frost-frame','floor-insulated','icon-driftwood','icon-coal-chunk','icon-iron','icon-raw-root','icon-cloud-fish','icon-raw-meat','icon-beast-feed','building-wind-door-open','building-airlock-open','forage-berries','forage-grass','forage-tubers','forage-crystal','icon-fishing-bobber','icon-cloud-egg','variant-aurora-wisp','variant-ember-wisp','icon-mood-heart','icon-mood-drive','icon-mood-hungry','icon-mood-cold','icon-mood-salvage',...ISLAND_ART,...LANDMARK_ART,...CAVE_ART,...EVENT_ART,...BEAST_ART,...HOSTILE_ART,...ELEMENT_ART,
 ] as const;
 interface Cell { x:number; y:number; hash:number; iron:boolean; insulated:boolean; temperature:number; left:boolean; right:boolean; front:boolean; back:boolean }
@@ -237,6 +240,7 @@ export class ArkView {
     const pl=w.player,g=pl.grapple;
     const held=w.sky.debris.find(d=>d.id===g.caughtDebrisId);
     const deckDrops:Actor[]=[];
+    let rareSalvage=0,relics=0;
     for(const d of w.sky.debris){
       if(d.x<0||!d.loot.length)continue;
       const pos=project(d.x,d.y);
@@ -249,6 +253,7 @@ export class ArkView {
       this.art.paint(c,art,pos.x,fy,s,{width:d.heavy?1.05:.78,height:d.heavy?1.05:.78,rotation:.048*Math.sin(w.tick*.052+d.y)});
       c.restore();
       ovalGlow(c,pos.x+s*.07,fy-s*.12,s*.55,s*.13,'rgba(159,192,211,.19)','rgba(159,192,211,0)');
+      if(d.heavy&&d!==held&&latteTreasure(w,d)){treasureCue(c,{x:pos.x,y:fy},s,w.tick);rareSalvage++;}
     }
     // L1: Both traversable surfaces and the physical gangway share one
     // projection and one scenery pass, including the space between them.
@@ -291,7 +296,7 @@ export class ArkView {
     if(gangway?.deployed)paintGangway(c,this.art,gangway,project,s);
     const actors:Actor[]=[...this.edgeActors(cells,w,ghost,gangway,hull),...deckDrops];
     if(island){
-      actors.push(...landmarkScene(c,this.art,w,project,s));
+      actors.push(...landmarkScene(c,this.art,w,project,s,()=>{relics++;}));
       const gate=caveEntrance(w);
       if(gate)actors.push({...gate,art:caveEntranceArt(gate.tier),shadow:.65,width:2.18,height:1.76});
       for(const item of quarryDrops(w))actors.push({x:item.x,y:item.y,art:'icon-raw-meat',shadow:.21,width:.45,height:.41});
@@ -374,7 +379,12 @@ export class ArkView {
     const perched=perch&&latte.mood==='cozy'&&Math.hypot(latte.x-perch.gx-.52,latte.y-perch.gy-.59)<.23;
     if(this.canvas.dataset.catPerched!==String(!!perched))this.canvas.dataset.catPerched=String(!!perched);
     const catWalking=!perched&&fire?Math.hypot(latte.x-fire.gx-2.4,latte.y-fire.gy-2.4)>.23:false;
-    actors.push({x:latte.x,y:latte.y,art:catWalking?(Math.floor(w.tick/7)%2?'latte-walk':'latte-walk-alt'):latte.mood==='cozy'?'latte-sleep':'latte-alert',
+    const wardrobe=latteProfile(w).outfit,catPose=catWalking?(Math.floor(w.tick/7)%2?'walk':'walk-alt'):latte.mood==='cozy'?'sleep':'alert';
+    const catArt=wardrobe==='classic'?'latte-'+catPose:'latte-'+wardrobe+'-'+catPose;
+    if(this.canvas.dataset.latteDraw!==catArt)this.canvas.dataset.latteDraw=catArt;
+    const findCount=`${rareSalvage}/${relics}`;
+    if(this.canvas.dataset.latteFind!==findCount)this.canvas.dataset.latteFind=findCount;
+    actors.push({x:latte.x,y:latte.y,art:catArt,
       width:.94*.65,height:.94*.65,shadow:.32*.65,scale:1+(.5+.5*Math.sin(w.tick*.12))*.03,rotation:catWalking?Math.sin(w.tick*.45)*.026:0,float:perched?s*.39:0});
     const dir=Math.abs(pl.facing.x)>Math.abs(pl.facing.y)?(pl.facing.x<0?'west':'east'):(pl.facing.y<0?'north':'south');
     const down=incapacitated(w), walking=!!(pl.vx||pl.vy), age=w.tick-(pl.rescue.startedAt??w.tick);
@@ -487,6 +497,12 @@ export class ArkView {
     this.weather.paint(c,w,this.art.image('frost-frame'),snowMask);
     paintM5CombatEffects(c,w,project,s);
     paintCompanionBurst(c,w,project,s);
+    if(latteBoon(w)){
+      const who=project(pl.x,pl.y);
+      ovalGlow(c,who.x,who.y-s*.24,s*.78,s*.42,'rgba(250,174,94,.39)','rgba(250,174,94,0)');
+      c.save();c.strokeStyle='rgba(255,211,144,.7)';c.lineWidth=2;
+      c.beginPath();c.ellipse(who.x,who.y,s*.52,s*.29,0,0,Math.PI*2);c.stroke();c.restore();
+    }
     for(const hostile of hostiles)paintHostileBar(c,project(hostile.x,hostile.y),hostile,s);
     const moodMarks:string[]=[];
     for(const b of beasts){

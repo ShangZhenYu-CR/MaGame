@@ -426,3 +426,13 @@ button[aria-disabled=true]{opacity:.62}
 .wild-observe{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;color:var(--ink-muted)}
 .wild-observe button{padding:3px 6px}
 .wild-observe button[aria-pressed=true]{border-color:#c19b68;color:#f1d7a6}
+
+#latte-status{padding:1px 5px;max-width:100%;min-height:26px;font-size:11px;text-align:left}
+.latte-care{z-index:5}
+.latte-care .panel-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.latte-care h2{font-size:16px;margin:3px 0 5px}
+.latte-profile{display:grid;grid-template-columns:62px minmax(0,1fr);gap:8px;align-items:center}
+.latte-profile img{width:62px;height:62px;object-fit:contain}
+.latte-profile progress,.latte-profile small{display:block;max-width:100%;margin-top:3px}
+.latte-profile small{color:#bad3de;line-height:1.45}
+#latte-outfits button[aria-pressed=true]{color:#f1d7a6;border-color:#c19b68}

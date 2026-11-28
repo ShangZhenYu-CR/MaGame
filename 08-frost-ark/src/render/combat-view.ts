@@ -7,13 +7,16 @@ import { clamp, ovalGlow } from './atmosphere';
 const hostileArt={
   froststalker:{art:'enemy-frost-stalker',width:1.46,height:1.25,shadow:.44},
   icebreaker_beast:{art:'enemy-ice-breaker',width:1.68,height:1.75,shadow:.64},
+  frostspike_bat:{art:'enemy-frostspike-bat',width:1.71,height:1.35,shadow:.35},
+  heatwraith:{art:'enemy-heatwraith',width:1.22,height:1.71,shadow:.34},
+  mist_priest:{art:'enemy-mist-priest',width:1.30,height:1.74,shadow:.47},
   frostmane_lord:{art:'boss-frost-mane',width:2.46,height:2.31,shadow:.94},
   rift_carapace:{art:'boss-rift-armor',width:2.63,height:2.34,shadow:1.03},
 };
 type HostileId=keyof typeof hostileArt;
 export const HOSTILE_ART=Object.values(hostileArt).map(x=>x.art);
 export type CombatActor=typeof hostileArt[HostileId]&{x:number;y:number;flip:boolean;scale:number;rotation:number;
-  id:string;telegraph:boolean;reach:number;hp:number;boss:boolean;name:string};
+  id:string;float?:number;telegraph:boolean;reach:number;hp:number;boss:boolean;name:string};
 
 export function m5Actors(w:WorldState):CombatActor[]{
   return w.wildEntities.flatMap(e=>{
@@ -23,6 +26,7 @@ export function m5Actors(w:WorldState):CombatActor[]{
     const def=combat.hostiles[id], charge=m5Telegraph(w,e.id);
     const motion=w.tick*.11+e.x*.9+e.y*.6;
     return [{...hostileArt[id],id:e.id,x:e.x,y:e.y,telegraph:charge,reach:def.range,
+      float:id==='frostspike_bat'?5+5*(1+Math.sin(motion*1.4)):id==='heatwraith'?3+3*(1+Math.sin(motion)):0,
       hp:clamp(e.hp/Math.max(1,e.maxHp)),boss:e.kind==='boss',name:def.name,flip:w.player.x>e.x,
       scale:charge?1.035:1+Math.sin(motion)*.014,rotation:charge?Math.sin(w.tick*.46)*.021:0}];
   });
@@ -62,7 +66,13 @@ export function paintM5CombatEffects(c:CanvasRenderingContext2D,w:WorldState,
     const fade=clamp((fx.expires-w.tick)/8);
     const x=from.x,y=from.y-tile*(fx.kind==='strike'?.38:.69);
     const tx=to.x,ty=to.y-tile*.53;
-    if(fx.kind==='arrow'){
+    if(fx.kind==='summon'){
+      c.globalAlpha=fade;c.lineWidth=2;c.strokeStyle='#a4d5db';
+      c.beginPath();c.ellipse(to.x,to.y,tile*.62,tile*.38,0,0,Math.PI*2);c.stroke();
+    }else if(fx.kind==='siphon'){
+      c.globalAlpha=fade;c.lineWidth=2.5;c.strokeStyle='#d0af7b';c.setLineDash([6,4]);
+      c.beginPath();c.moveTo(tx,ty);c.quadraticCurveTo(tx+(x-tx)*.54,ty-tile*.9,x,y);c.stroke();c.setLineDash([]);
+    }else if(fx.kind==='arrow'||fx.kind==='iceBolt'){
       const g=c.createLinearGradient(x,y,tx,ty);
       g.addColorStop(0,'rgba(148,188,220,0)');g.addColorStop(1,'rgba(224,239,245,.95)');
       c.globalAlpha=fade;c.lineWidth=2.2;c.strokeStyle=g;

@@ -41,6 +41,10 @@ export function combatM5Ui(h:Hooks){
    text(el('raid-detail'),s.active?
     `第 ${s.wave}/${specs.waves.length} 波 · 敌袭 ${s.raidsRemaining} · 防御塔 ${turretCount}`:
     `距降温约 ${Math.ceil(s.untilTicks/TICK_RATE)} 秒 · 添柴、布置防霜箭塔或火油炮台`);
+   const preview=el('raid-preview');
+   preview.hidden=!s.warning;
+   text(preview,s.warning?s.plan.map((batch,i)=>
+    '第 '+(i+1)+' 波：'+[...new Set(batch)].join(' · ')).join('\n'):'');
    const guardian=s.bosses.find(b=>b.hp>0);
    boss.hidden=overlay||!guardian;
    boss.dataset.guardian=guardian?.defId??'';

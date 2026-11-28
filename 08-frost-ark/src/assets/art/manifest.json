@@ -5152,6 +5152,54 @@
         62
       ],
       "bytes": 7129
+    },
+    "enemy-frostspike-bat": {
+      "file": "enemy-frostspike-bat.png",
+      "width": 144,
+      "height": 144,
+      "anchorX": 72,
+      "anchorY": 132,
+      "tileW": 1.72,
+      "tileH": 1.35,
+      "contentBox": [
+        2,
+        40,
+        142,
+        137
+      ],
+      "bytes": 21287
+    },
+    "enemy-heatwraith": {
+      "file": "enemy-heatwraith.png",
+      "width": 144,
+      "height": 144,
+      "anchorX": 72,
+      "anchorY": 132,
+      "tileW": 1.22,
+      "tileH": 1.71,
+      "contentBox": [
+        12,
+        2,
+        131,
+        139
+      ],
+      "bytes": 8249
+    },
+    "enemy-mist-priest": {
+      "file": "enemy-mist-priest.png",
+      "width": 144,
+      "height": 144,
+      "anchorX": 72,
+      "anchorY": 132,
+      "tileW": 1.3,
+      "tileH": 1.74,
+      "contentBox": [
+        10,
+        2,
+        135,
+        139
+      ],
+      "bytes": 9681
     }
   }
 }

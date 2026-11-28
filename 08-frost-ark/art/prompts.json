@@ -97,6 +97,9 @@
     },
     "p230-icons": {
       "text": "Frost Ark hand-painted 40-degree 3/4 view dark walnut and graphite precision icons atlas; top-left ice barricade, top-right warm amber searchlight, bottom-left fire-oil lobber, bottom-right automatic repairer; pure magenta wide gutters, no lettering or in-image shadows."
+    },
+    "p231-raiders": {
+      "text": "Frost Ark exact isolated 40° hand-painted 2×2 ice raider atlas on pure magenta: frostspike bat, heat-siphon wraith, ice-mist priest, frost spawn wolf. Dry matte cold skylight."
     }
   },
   "assets": [
@@ -7256,6 +7259,90 @@
       "tileW": 1,
       "tileH": 1,
       "maxBytes": 9500
+    },
+    {
+      "id": "enemy-frostspike-bat",
+      "source": "p231-raiders.png",
+      "crop": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "size": [
+        144,
+        144
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.95
+      ],
+      "targetAnchor": [
+        0.5,
+        0.92
+      ],
+      "tileW": 1.72,
+      "tileH": 1.35,
+      "maxBytes": 23000
+    },
+    {
+      "id": "enemy-heatwraith",
+      "source": "p231-raiders.png",
+      "crop": [
+        627,
+        0,
+        1254,
+        627
+      ],
+      "size": [
+        144,
+        144
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.95
+      ],
+      "targetAnchor": [
+        0.5,
+        0.92
+      ],
+      "tileW": 1.22,
+      "tileH": 1.71,
+      "maxBytes": 23000
+    },
+    {
+      "id": "enemy-mist-priest",
+      "source": "p231-raiders.png",
+      "crop": [
+        0,
+        627,
+        627,
+        1254
+      ],
+      "size": [
+        144,
+        144
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.95
+      ],
+      "targetAnchor": [
+        0.5,
+        0.92
+      ],
+      "tileW": 1.3,
+      "tileH": 1.74,
+      "maxBytes": 23000
     }
   ],
   "batchReferences": [

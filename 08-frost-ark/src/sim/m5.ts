@@ -19,7 +19,7 @@ import { TICK_RATE, type Vec2, type WildEntity, type WorldState } from './types'
 const seeds = ['frostpine_gate', 'sulfur_reach', 'sulfur_furnace', 'permafrost_ruins'] as const;
 export type M5SeedId = typeof seeds[number];
 type HostileId = keyof typeof specs.hostiles;
-type EnemyClock = { cooldown: number; strike: number; target: string };
+type EnemyClock = { cooldown: number; strike: number; target: string; summons?:number };
 interface M5State {
   raidDay: number;
   wave: number;
@@ -39,18 +39,19 @@ const bossByIsland:Record<string,HostileId> = { frostpine_gate:'frostmane_lord',
 const beastAttack = new Map(beastSpecs.map(b=>[b.id,b.attack]));
 const isOwned = (e:WildEntity) => !!e && (e.kind==='boss'||e.kind==='raider') && Object.hasOwn(specs.hostiles,e.defId);
 const onDeck = (w:WorldState,p:Vec2)=>isDeck(w,Math.floor(p.x),Math.floor(p.y));
-export interface M5Effect { from:Vec2;to:Vec2;kind:'arrow'|'fire'|'strike';expires:number }
+export interface M5Effect { from:Vec2;to:Vec2;kind:'arrow'|'fire'|'strike'|'iceBolt'|'siphon'|'summon';expires:number }
 const effects = new WeakMap<WorldState,M5Effect[]>();
 const flash = (w:WorldState,from:Vec2,to:Vec2,kind:M5Effect['kind'])=>{
   effects.set(w,[...m5CombatEffects(w),{from:{x:from.x,y:from.y},to:{x:to.x,y:to.y},kind,expires:w.tick+8}]);
 };
 export const m5CombatEffects=(w:WorldState):readonly M5Effect[]=>(effects.get(w)??[]).filter(e=>e.expires>w.tick);
 
+const raidPlan=(w:WorldState)=>specs.waves.map((wave,index)=>w.day>=10&&index===2?['mist_priest','heatwraith','frostspike_bat']:wave);
 export function m5Status(w:WorldState){
   const s=get(w),active=w.weather==='whiteout', warning=w.day%5===0&&!active&&w.timeOfDay>=.59;
   return { active, storm:active, warning,
     untilTicks:warning?Math.ceil((.74-w.timeOfDay)*DAY_TICKS):0,
-    wave:s?.raidDay===w.day?s.wave:0,
+    wave:s?.raidDay===w.day?s.wave:0, plan:raidPlan(w).map(wave=>wave.map(id=>specs.hostiles[id as HostileId].name)),
     raidsRemaining:w.wildEntities.filter(e=>e.kind==='raider'&&isOwned(e)&&e.hp>0).length,
     seeds:w.skyheartCores,
     bosses:w.wildEntities.filter(e=>e.kind==='boss'&&isOwned(e)&&e.hp>0),
@@ -137,7 +138,7 @@ function spawnWave(w:WorldState,s:M5State){
     const x=i%w.ark.size,y=Math.floor(i/w.ark.size);
     if(!isDeck(w,x-1,y)||!isDeck(w,x,y+1))edge.push({x:x+.5,y:y+.5});
   }
-  const batch=specs.waves[s.wave];
+  const batch=raidPlan(w)[s.wave];
   if(!edge.length)return;
   batch.forEach((id,i)=>{
     const p=edge[(w.day*5+s.wave*7+i*Math.max(1,Math.floor(edge.length/batch.length)))%edge.length];
@@ -151,7 +152,7 @@ function move(w:WorldState,e:WildEntity,p:Vec2,speed:number){
   if(gap<.08)return;
   const k=Math.min(gap,speed*defenseSlow(w,e)*elementalSpeed(w,e.id)/TICK_RATE)/gap;
   const xx=e.x+(p.x-e.x)*k,yy=e.y+(p.y-e.y)*k;
-  const pass=(x:number,y:number)=>e.kind==='boss'?areaAt(w,x,y)==='island':onDeck(w,{x,y})&&!w.ark.buildings.some(b=>envelope(b.defId)&&b.gx===Math.floor(x)&&b.gy===Math.floor(y));
+  const pass=(x:number,y:number)=>e.kind==='boss'?areaAt(w,x,y)==='island':onDeck(w,{x,y})&&(e.defId==='frostspike_bat'||!w.ark.buildings.some(b=>envelope(b.defId)&&b.gx===Math.floor(x)&&b.gy===Math.floor(y)));
   if(pass(xx,e.y))e.x=xx;
   if(pass(e.x,yy))e.y=yy;
 }
@@ -179,7 +180,10 @@ function stepEnemy(w:WorldState,e:WildEntity,s:M5State){
   if(e.hp<=0)return;
   if(frozen(w,e.id)){if(clock.strike)clock.strike++;return;}
   const building=(id:string)=>w.ark.buildings.find(b=>b.id===id&&b.hp>0);
-  const candidate=e.kind==='boss'||(w.player.hp>0&&onDeck(w,w.player)&&!indoorsAt(w,w.player)&&length(e,w.player)<2.4)?'player':
+  const heat=e.defId==='heatwraith'?w.ark.buildings.filter(b=>b.hp>1&&(b.defId==='hearth_core'||b.defId==='ward_searchlight'||b.defId==='heat_relay'||b.defId==='torch_post')&&
+    (b.defId!=='hearth_core'||b.fuel>0)).sort((a,b)=>length(e,center(a))-length(e,center(b)))[0]:undefined;
+  const belongsToPlayer=(e.defId==='frostspike_bat'||e.defId==='mist_priest')?d.range+.5:2.4;
+  const candidate=heat?heat.id:e.kind==='boss'||(w.player.hp>0&&onDeck(w,w.player)&&!indoorsAt(w,w.player)&&length(e,w.player)<belongsToPlayer)?'player':
     w.ark.buildings.filter(b=>b.hp>0).sort((a,b)=>length(e,center(a))-length(e,center(b)))[0]?.id??'';
   const target=clock.strike?clock.target:candidate;
   const obj=target==='player'?null:building(target);
@@ -189,9 +193,20 @@ function stepEnemy(w:WorldState,e:WildEntity,s:M5State){
     clock.strike=0;
     clock.cooldown=w.tick+d.cadence;
     if(pos&&length(e,pos)<=d.range+.17){
+      if(e.defId==='mist_priest'&&(clock.summons??0)<2){
+        const wide=w.wildEntities.filter(v=>v.kind==='raider'&&v.hp>0).length;
+        const site=[{x:e.x+.63,y:e.y},{x:e.x-.63,y:e.y},{x:e.x,y:e.y+.65},{x:e.x,y:e.y-.65}]
+          .find(p=>onDeck(w,p)&&w.wildEntities.every(v=>v.hp<=0||length(p,v)>.48));
+        if(site&&wide<12){
+          const n=clock.summons??0;clock.summons=n+1;
+          add(w,'froststalker','raid_'+w.day+'_summon_'+e.id+'_'+n,'raider',site);
+          flash(w,e,site,'summon');return;
+        }
+      }
+      if(e.defId==='heatwraith'&&obj&&obj.fuel>0)obj.fuel=Math.max(0,obj.fuel-3);
       if(obj)obj.hp=Math.max(1,obj.hp-d.damage); // critical fixtures remain recoverable after a failed night
       else if((e.kind==='raider'&&indoorsAt(w,w.player))||!damagePlayer(w,d.damage))return;
-      flash(w,e,pos,'strike');
+      flash(w,e,pos,e.defId==='frostspike_bat'?'iceBolt':e.defId==='heatwraith'?'siphon':'strike');
     }
     return;
   }
@@ -260,15 +275,15 @@ export function verifyM5(w:WorldState):boolean{
     !num(s.nextWave)||!num(s.playerStrike)||!Array.isArray(s.seeds)||s.seeds.length!==w.skyheartCores||
     new Set(s.seeds).size!==s.seeds.length||s.seeds.some(id=>!seeds.includes(id))||
     (s.bossIsland!==null&&!w.sky.islands.some(n=>n.id===s.bossIsland))||
-    !record(s.clocks)||Object.keys(s.clocks).length>24||!record(s.turretClocks)||
+    !record(s.clocks)||Object.keys(s.clocks).length>48||!record(s.turretClocks)||
     Object.keys(s.turretClocks).length>2304||!Object.values(s.turretClocks).every(num))return false;
   if(s.seeds.some(id=>{
     const node=w.sky.islands.find(n=>n.id===id);
     return !node||(id==='sulfur_furnace'||id==='permafrost_ruins'?!node.deltas.chest_2068:!node.bossDefeated);
   }))return false;
-  if(!Object.values(s.clocks).every(c=>record(c)&&num(c.cooldown)&&num(c.strike)&&typeof c.target==='string'&&c.target.length<=96))return false;
+  if(!Object.values(s.clocks).every(c=>record(c)&&num(c.cooldown)&&num(c.strike)&&typeof c.target==='string'&&c.target.length<=96&&(c.summons===undefined||num(c.summons)&&c.summons<=2)))return false;
   const enemies=w.wildEntities.filter(isOwned);
-  return enemies.length<=8&&new Set(enemies.map(e=>e.id)).size===enemies.length&&enemies.every(e=>
+  return enemies.length<=16&&new Set(enemies.map(e=>e.id)).size===enemies.length&&enemies.every(e=>
     typeof e.id==='string'&&e.id.length<=96&&Number.isFinite(e.x)&&Number.isFinite(e.y)&&
     Number.isFinite(e.hp)&&e.hp>=0&&e.hp<=e.maxHp&&e.maxHp===specs.hostiles[e.defId as HostileId].hp);
 }

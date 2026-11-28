@@ -799,7 +799,7 @@ assert.deepEqual(takeJuice(deserializeWorld(serializeWorld(feedbackWorld))),[],'
 console.log('[sim-smoke:P2-09] OK: actual deltas, no failed action cue, capped 40 ms hitstop and optional critical shake');
 
 import { armorBroken,burnDamage,elementalSpeed,frozen,resolveElement,status,thawedDeck } from '../src/sim/elements';
-import { stepM5,strikeHostileWithWeapon } from '../src/sim/m5';
+import { m5Status,stepM5,strikeHostileWithWeapon } from '../src/sim/m5';
 const reaction=createInitialWorld();
 const foe={kind:'raider' as const,id:'test_froststalker',defId:'froststalker',x:25.5,y:26.5,hp:50,maxHp:50,stunnedTicks:0,tameProgress:0,hostile:true};
 reaction.wildEntities.push(foe);
@@ -1456,3 +1456,25 @@ stepM5(inFlight);
 assert.ok(inFlight.wildEntities.filter(e=>e.kind==='raider').every(e=>e.hp<battleHp[1]));
 assert.ok(defenseEvents(inFlight).some(v=>v.kind==='blast'));
 console.log('[sim-smoke:P2-30] OK: spike speed and damage, true light reveal, archived mortar flight with splash, atomic locker-stocked repair');
+
+import { raiderArrival,raiderWarning } from './p2-raiders-fixture';
+import { initializeHeat } from '../src/sim/heatField';
+for(const day of [5,10]){
+ const forecast=m5Status(raiderWarning(day));
+ assert.ok(forecast.warning&&forecast.plan.length===3);
+ assert.ok(forecast.plan.flat().includes('霜刺飞蝠')&&forecast.plan.flat().includes('冰雾祭司'));
+ const {w:siege,wraith}=raiderArrival(day);
+ const control=deserializeWorld(serializeWorld(siege));
+ control.wildEntities=control.wildEntities.filter(e=>e.id!==wraith.id);
+ initializeHeat(siege);initializeHeat(control);
+ const current=heatAt(siege,wraith.x,wraith.y),uninfluenced=heatAt(control,wraith.x,wraith.y);
+ assert.ok(current+4<uninfluenced,`Day ${day}: ${current} vs ${uninfluenced}`);
+ stepWorld(siege,10);
+ assert.ok(siege.wildEntities.some(e=>e.defId==='mist_priest'));
+ const priest=siege.wildEntities.find(e=>e.defId==='mist_priest')!;
+ Object.assign(priest,{x:25.5,y:22.7});
+ stepWorld(siege,180);
+ assert.ok(siege.wildEntities.some(e=>e.id.includes('_summon_')));
+ assert.ok(serializeWorld(deserializeWorld(serializeWorld(siege))));
+}
+console.log('[sim-smoke:P2-31] OK: day 5 & 10 actual wave profiles, controlled local thermal drop and live priest reinforcements verified');

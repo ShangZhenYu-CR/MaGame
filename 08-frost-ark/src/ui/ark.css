@@ -436,3 +436,6 @@ button[aria-disabled=true]{opacity:.62}
 .latte-profile progress,.latte-profile small{display:block;max-width:100%;margin-top:3px}
 .latte-profile small{color:#bad3de;line-height:1.45}
 #latte-outfits button[aria-pressed=true]{color:#f1d7a6;border-color:#c19b68}
+
+#raid-preview{display:block;white-space:pre-line;line-height:1.55;color:#d2e2eb;font-size:11px;margin-top:4px;}
+@media(min-width:821px){#raid-alert[data-phase=warning]:not([hidden])~#island-guardian{top:208px}}

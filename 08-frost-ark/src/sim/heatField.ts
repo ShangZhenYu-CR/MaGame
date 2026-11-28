@@ -110,6 +110,11 @@ export function solveHeat(w:WorldState):void{
     if(d?.insulation&&!doorOpen(b)){const i=b.gy*size+b.gx;insulation[i]=Math.max(insulation[i],d.insulation);}
   }
   const sources=emitters(w);
+  const sinks=w.wildEntities.filter(e=>e.kind==='raider'&&e.defId==='heatwraith'&&e.hp>0&&isDeck(w,Math.floor(e.x),Math.floor(e.y)));
+  // A wraith is a moving local heat sink, not a cosmetic global weather modifier.
+  const warmed=sinks.length?sources.filter(e=>e.kind!=='beast'&&e.power>0):[];
+  const siphons=sinks.filter(e=>warmed.some(source=>Math.hypot(e.x-source.x,e.y-source.y)<Math.min(source.radius,3.4)));
+
   const next=new Array<number>(size*size).fill(w.ambientTemp);
   const wallAt=(x:number,y:number)=>x>=0&&y>=0&&x<size&&y<size?insulation[y*size+x]:0;
   for(let i=0;i<decks.length;i++){
@@ -120,6 +125,7 @@ export function solveHeat(w:WorldState):void{
       const d=Math.hypot(x+.5-e.x,y+.5-e.y);
       radiation+=e.power*(e.kind==='hearth_core'?1.62:1)*Math.pow(Math.max(0,1-d/e.radius),1.65);
     }
+    for(const e of siphons)radiation-=24*Math.pow(Math.max(0,1-Math.hypot(x+.5-e.x,y+.5-e.y)/3.2),1.35);
     for(const a of offsets){
       const xx=x+a.x, yy=y+a.y;
       const inside=isDeck(w,xx,yy);

@@ -1,3 +1,4 @@
+import { whaleIced } from './whale-sea';
 import { eventClimate } from './sky-events';
 import { caveTemperature } from './cave';
 import { fieldLandmarks } from './landmarks';
@@ -125,6 +126,7 @@ export function solveHeat(w:WorldState):void{
       const d=Math.hypot(x+.5-e.x,y+.5-e.y);
       radiation+=e.power*(e.kind==='hearth_core'?1.62:1)*Math.pow(Math.max(0,1-d/e.radius),1.65);
     }
+    if(whaleIced(w,x,y))radiation-=60;
     for(const e of siphons)radiation-=24*Math.pow(Math.max(0,1-Math.hypot(x+.5-e.x,y+.5-e.y)/3.2),1.35);
     for(const a of offsets){
       const xx=x+a.x, yy=y+a.y;
@@ -139,7 +141,7 @@ export function solveHeat(w:WorldState):void{
       +radiation*.035*shield,w.ambientTemp,85);
   }
   w.ark.heatGrid=next;
-  for(const b of buildings)b.frozen=heatAt(w,b.gx+.5,b.gy+.5)<-20;
+  for(const b of buildings)b.frozen=whaleIced(w,b.gx,b.gy)||heatAt(w,b.gx+.5,b.gy+.5)<-20;
 }
 
 export function initializeHeat(w:WorldState):void{

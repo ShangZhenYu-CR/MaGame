@@ -641,6 +641,9 @@ addEventListener('keydown',e=>{
     else if(mode!=='hook')choose('hook');
     else if(!beasts.clearTarget())cancelCharge(w);
   } else if(k==='e')useNearby();
+  else if((k==='c'||k==='p')&&latteCare.hidden&&panel.hidden&&locker.hidden&&!industry.stationOpen()&&!industry.catalogOpen()&&!beasts.open()){
+    if(finale.seaAction(k==='c'?'volley':'repair'))e.preventDefault();
+  }
   else if(k==='n'){e.preventDefault();toggleChart();}
   else if(k==='b')toggleCatalog();
   else if(k==='v')toggleBeastRoster();

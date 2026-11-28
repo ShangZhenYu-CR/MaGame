@@ -1,7 +1,7 @@
 import beasts from '../data/beasts.json';
 import buildings from '../data/buildings.json';
 import { itemNames } from '../sim/ark';
-import { attackWhale, continueEndless, finaleStatus, forgeSolarArk, startWhale } from '../sim/finale';
+import { attackWhale, continueEndless, finaleStatus, forgeSolarArk, repairSeaHearth,startWhale,volleyWhale } from '../sim/finale';
 import type { WorldState } from '../sim/types';
 
 const skills:Record<string,string> = {
@@ -37,6 +37,8 @@ export function finaleUi({state,say,prepare,sound,icon}:Wiring){
       <p id="whale-guidance"></p>
       <button type="button" id="whale-start">挑战永冬霜鲸</button>
       <button type="button" id="whale-attack"><kbd>F</kbd> 反击霜鲸</button>
+      <button type="button" id="whale-volley" hidden><kbd>C</kbd> 炮台齐射</button>
+      <button type="button" id="whale-repair" hidden><kbd>P</kbd> 抢修主炉</button>
     </aside>
     <section id="victory-panel" class="finale-card victory-card" hidden aria-labelledby="victory-title">
       <small>极光天穹</small><h2 id="victory-title">永冬散去</h2>
@@ -104,6 +106,14 @@ export function finaleUi({state,say,prepare,sound,icon}:Wiring){
   forge.onclick=()=>command(forgeSolarArk,'太阳方舟点燃。极光天穹已开放。','solar');
   start.onclick=()=>command(startWhale,'霜鲸苏醒。先避开地上的冰圈。','whale');
   strike.onclick=()=>strikeWhale();
+  function seaAction(action:'volley'|'repair'){
+    if(!finaleStatus(state()).sea)return false;
+    if(action==='volley')command(volleyWhale,'船载炮台齐射，击中冰甲裂口。','hit');
+    else command(repairSeaHearth,'主炉已抢修。','solar');
+    return true;
+  }
+  node('whale-volley').onclick=()=>seaAction('volley');
+  node('whale-repair').onclick=()=>seaAction('repair');
   node('continue-endless').onclick=()=>command(continueEndless,'已进入无尽云海，可以继续远航和建造。','solar');
   node('frost-guide-close').onclick=()=>{if(liveHint)hints.add(liveHint);guide.hidden=true;};
 
@@ -118,12 +128,19 @@ export function finaleUi({state,say,prepare,sound,icon}:Wiring){
     start.hidden=f.mode!=='ready';
     strike.hidden=!b;
     health.hidden=!b;
+    node('whale-volley').hidden=!f.sea;
+    node('whale-repair').hidden=!f.sea;
+    whale.dataset.waters=f.sea?'sea':'coast';
     if(b&&!whale.hidden){
       health.max=b.maxHp;health.value=b.hp;
       whale.dataset.phase=String(b.phase+1);
       whale.dataset.vulnerable=String(b.open);
       text('whale-phase',`阶段 ${bead(b.phase+1)}/03 · ${b.attackName}`);
-      text('whale-guidance',b.warning?'冰面正在发亮，移出预警圈。':b.open?'冰甲裂开，现在按 F 反击。':'观察冰面，等霜鲸出招后反击。');
+      whale.dataset.whaleStrike=b.warning?.style??'';
+      text('whale-guidance',f.sea?
+        b.warning?(b.warning.style==='ram'?'船舷受冲撞预警，离开标记。':b.warning.style==='breath'?'冰封吐息瞄准甲板，翻滚离开。':'陨冰将落下，跳出落点。'):
+          b.open?'冰甲裂开！炮台齐射或靠近船舷反击。':'霜鲸正在云海游弋，准备躲开下一招。':
+        b.warning?'冰面正在发亮，移出预警圈。':b.open?'冰甲裂开，现在按 F 反击。':'观察冰面，等霜鲸出招后反击。');
       if(b.warning&&b.warning.until!==warnAt){warnAt=b.warning.until;sound('whale');}
     }else if(!whale.hidden){
       text('whale-phase','极光冰岸');
@@ -151,5 +168,5 @@ export function finaleUi({state,say,prepare,sound,icon}:Wiring){
     if(next&&!guide.hidden)text('frost-guide-copy',texts[next]);
   }
   return {update, open:()=>!codex.hidden, blocking:()=>!victory.hidden, showCodex,
-    toggle:()=>showCodex(codex.hidden), strikeWhale, arena:()=>{const f=finaleStatus(state());return f.atAurora&&(f.mode==='battle'||f.mode==='cleared');}, reset:()=>{showCodex(false);priorMode='';}};
+    toggle:()=>showCodex(codex.hidden), strikeWhale,seaAction, arena:()=>{const f=finaleStatus(state());return f.atAurora&&(f.mode==='battle'||f.mode==='cleared');}, reset:()=>{showCodex(false);priorMode='';}};
 }

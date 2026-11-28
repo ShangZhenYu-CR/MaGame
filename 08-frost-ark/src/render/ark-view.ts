@@ -1,3 +1,5 @@
+import { seaWhale,whaleBounds } from '../sim/whale-sea';
+import { paintSeaCombat,paintSeaWhale } from './whale-view';
 import { guardianLoot } from '../sim/guardians-p2';
 import { paintGuardianEffects } from './guardian-view';
 import { paintDefenseEffects } from './defense-view';
@@ -173,6 +175,13 @@ export class ArkView {
       yFraming+=landWeight*.064;
       }
     }
+    const sea=seaWhale(w);
+    if(sea){
+      const {x0,x1,y0,y1}=whaleBounds(w),sx=(x0+x1)/2,sy=(y0+y1)/2;
+      if(!this.userScale)this.scale=clamp(Math.round(Math.min(width/(x1-x0+12),height/(y1-y0+10.2))),44,56);
+      cx=sx+Math.cos(sea.angle)*1.15+(w.player.x-sx)*.26;
+      cy=sy+Math.sin(sea.angle)*1.48+(w.player.y-sy)*.32;yFraming=.50;
+    }
     if(cave){
       if(!this.userScale)this.scale=Math.min(this.scale,Math.round(width/(CAVE_SIZE.x+1)));
       cx=(CAVE_OFFSET.x+CAVE_SIZE.x/2)*.78+w.player.x*.22;
@@ -243,6 +252,10 @@ export class ArkView {
     });
     paintWindZone(c,this.art,w);
     paintSkyEvent(c,this.art,w,project,s);
+    const finale=finaleStatus(w), whale=finale.atAurora?finale.whale:null;
+    if(finale.sea&&whale)paintSeaWhale(c,this.art,w,whale,project,s);
+    const where=finale.sea&&whale?`${whale.x.toFixed(2)},${whale.y.toFixed(2)}`:'';
+    if(this.canvas.dataset.seaWhale!==where)this.canvas.dataset.seaWhale=where;
     // Free-floating scrap belongs to the lower air lane. Hull silhouettes can
     // occlude it; deck drops only enter the foreground after a grab/placement.
     const pl=w.player,g=pl.grapple;
@@ -332,17 +345,17 @@ export class ArkView {
         if(island.tiles[i])actors.push({x,y,art:'aurora-crystal',width:1.25,height:1.26,shadow:.36});
       }
     }
-    const finale=finaleStatus(w), whale=finale.atAurora?finale.whale:null;
     if(whale){
-      actors.push({id:'whale',x:whale.x,y:whale.y,art:whale.art,width:4.0,height:3.64,shadow:1.27,
+      if(!finale.sea)actors.push({id:'whale',x:whale.x,y:whale.y,art:whale.art,width:4.0,height:3.64,shadow:1.27,
         float:s*(.35+.10*Math.sin(w.tick*.085)),rotation:.017*Math.sin(w.tick*.042)});
       if(whale.warning){
         const {warning,radius}=whale;
         for(const [spot,r] of [[warning,radius],[warning.echo,radius*.87]] as const){
           if(!spot)continue;
           const at=project(spot.x,spot.y), pulse=.26+.06*Math.sin(w.tick*.43);
-          ovalGlow(c,at.x,at.y,s*r,s*r,`rgba(235,162,100,${pulse})`,'rgba(242,134,66,.02)');
-          c.save();c.strokeStyle='rgba(255,207,155,.86)';c.lineWidth=2.4;
+          const icy=warning.style==='breath';
+          ovalGlow(c,at.x,at.y,s*r,s*r,icy?`rgba(154,213,240,${pulse})`:`rgba(235,162,100,${pulse})`,'rgba(242,134,66,.02)');
+          c.save();c.strokeStyle=icy?'rgba(168,224,244,.91)':'rgba(255,207,155,.86)';c.lineWidth=2.4;
           c.setLineDash([7,5]);c.lineDashOffset=-w.tick*.62;c.beginPath();c.arc(at.x,at.y,s*r,0,Math.PI*2);c.stroke();c.restore();
         }
       }
@@ -508,6 +521,8 @@ export class ArkView {
     if(this.canvas.dataset.indoorTiles!==cellCount)this.canvas.dataset.indoorTiles=cellCount;
     this.weather.paint(c,w,this.art.image('frost-frame'),snowMask);
     paintM5CombatEffects(c,w,project,s);
+    const salvo=String(paintSeaCombat(c,w,project,s));
+    if(this.canvas.dataset.seaSalvo!==salvo)this.canvas.dataset.seaSalvo=salvo;
     const defense=paintDefenseEffects(c,w,project,s);
     if(this.canvas.dataset.defenseFx!==defense)this.canvas.dataset.defenseFx=defense;
     paintCompanionBurst(c,w,project,s);

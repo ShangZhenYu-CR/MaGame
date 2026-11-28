@@ -6,7 +6,7 @@ import { buildingAt, isDeck } from './ark';
 import { ensureNavigationState, getNavigation } from './m3-state';
 import { beastCompanions, crewCruiseMultiplier } from './beasts';
 import { nextRng } from './rng';
-import { canReachAurora } from './finale';
+import { canReachAurora,whaleBattleActive } from './finale';
 import { TICK_RATE, type IslandNode, type Vec2, type WorldState } from './types';
 
 export const DISCOVERY_RADIUS=7;
@@ -75,6 +75,7 @@ export function navigationPanel(w:WorldState){
 }
 
 export function toggleCruise(w:WorldState):string|null{
+  if(whaleBattleActive(w))return '先击退霜鲸才能恢复航行。';
   if(!nearHelm(w))return '靠近舵轮后按 E 操作';
   ensureNavigation(w);
   const nav=ensureNavigationState(w);

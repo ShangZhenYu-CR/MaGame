@@ -1511,3 +1511,47 @@ for(const info of guardians){
  assert.equal(craftGear(aged,info.gear),null);
 }
 console.log('[sim-smoke:P2-32] OK: both two-skill patterns, walkable frost path, overheat armor window, real unique seed and atomic blueprint unlocking after reload');
+
+import { finaleStatus,repairSeaHearth,strikeWhaleWithWeapon,volleyWhale } from '../src/sim/finale';
+import { cannonEffects,seaWhale,whaleIced } from '../src/sim/whale-sea';
+import { seaWhaleFixture } from './p2-sea-whale-fixture';
+let seaTest=seaWhaleFixture();
+assert.equal(toggleCruise(seaTest),null);
+for(let j=0;j<40&&!finaleStatus(seaTest).sea;j++)stepWorld(seaTest);
+assert.ok(finaleStatus(seaTest).sea&&!seaTest.sky.cruising&&!seaTest.activeIsland);
+const startOrbit=finaleStatus(seaTest).whale!;
+stepWorld(seaTest,21);
+const orbit=finaleStatus(seaTest).whale!;
+assert.ok(Math.hypot(orbit.x-startOrbit.x,orbit.y-startOrbit.y)>.9);
+assert.ok(!isDeck(seaTest,Math.floor(orbit.x),Math.floor(orbit.y)));
+assert.match(volleyWhale(seaTest)!,/冰甲/);
+const recorded:string[]=[];
+for(let phase=0;phase<3;phase++){
+ Object.assign(seaTest.player,{x:24.5,y:25.64,hp:100,warmth:85});
+ for(let j=0;j<400&&!finaleStatus(seaTest).whale?.warning;j++)stepWorld(seaTest);
+ const marked=finaleStatus(seaTest).whale!.warning!;
+ assert.ok(marked.style);recorded.push(marked.style);
+ if(phase===1){
+  seaTest=deserializeWorld(serializeWorld(seaTest));
+  assert.equal(finaleStatus(seaTest).whale?.warning?.style,'breath');
+ }
+ stepWorld(seaTest,marked.until-seaTest.tick+1);
+ if(phase===1){
+   const hearth=primaryHearth(seaTest)!;
+   assert.ok(whaleIced(seaTest,hearth.gx,hearth.gy));
+   const hp=hearth.hp;assert.equal(repairSeaHearth(seaTest),null);assert.ok(hearth.hp>hp);
+   assert.equal(whaleIced(seaTest,hearth.gx,hearth.gy),false);
+ }
+ const ammo=countItem(seaTest,'frost_iron_scrap');
+ const before=finaleStatus(seaTest).whale!.hp;
+ assert.equal(volleyWhale(seaTest),null);
+ assert.ok(countItem(seaTest,'frost_iron_scrap')<ammo&&cannonEffects(seaTest).length>0);
+ if(finaleStatus(seaTest).whale?.phase===phase){
+  assert.ok(finaleStatus(seaTest).whale!.hp<before);
+  assert.ok(strikeWhaleWithWeapon(seaTest,180,'fire'));
+ }
+}
+assert.deepEqual(recorded,['ram','breath','meteors']);
+assert.equal(finaleStatus(seaTest).mode,'cleared');
+assert.equal(seaWhale(seaTest),undefined);
+console.log('[sim-smoke:P2-33] OK: true aurora entry and orbit, three strike patterns, shell gating, real ammo volley, phase-2 archive and repair');

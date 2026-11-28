@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "assets": {
+    "cover-frost-ark": {
+      "file": "cover-frost-ark.webp",
+      "width": 1664,
+      "height": 936,
+      "anchorX": 832,
+      "anchorY": 468,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        0,
+        0,
+        1664,
+        936
+      ],
+      "bytes": 151048
+    }
+  }
+}

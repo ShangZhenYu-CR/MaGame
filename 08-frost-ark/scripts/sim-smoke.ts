@@ -1702,3 +1702,19 @@ assert.ok(coldGiant.ark.heatGrid.some((v,i)=>coldGiant.ark.decks[i]&&v>=25));
 assert.ok(coldGiant.ark.heatGrid.some((v,i)=>coldGiant.ark.decks[i]&&v<=-20));
 assert.ok(coldGiant.ark.heatGrid.every(Number.isFinite));
 console.log('[sim-smoke:P2-41] OK: 576 deck tiles, 50 buildings, 12 beasts, deterministic 3600-tick whiteout and bounded save');
+
+// P2-42: published entry retains the user's existing avatar paths, and
+// the cover and opt-in benchmark stay inside the game directory.
+import { readFileSync as readRelease } from 'node:fs';
+const releaseRead=(name:string)=>readRelease(new URL('../'+name,import.meta.url));
+const webpCover=releaseRead('cover/cover-frost-ark.webp');
+assert.equal(webpCover.toString('ascii',0,4),'RIFF');
+assert.equal(webpCover.toString('ascii',8,12),'WEBP');
+assert.ok(webpCover.length<=200_000);
+assert.ok(releaseRead('cover/index.html').toString().includes('../index.html'));
+assert.ok(releaseRead('benchmark.html').toString().includes('index.html#benchmark'));
+const releaseBuild=releaseRead('index.html').toString();
+assert.ok(releaseBuild.includes('id="bench-world"'));
+assert.match(releaseBuild,/\.\.\/assets\/character\/head-\${[^}]+}\.png/);
+for(let i=0;i<4;i++)assert.equal(releaseRead('../assets/character/head-'+i+'.png').toString('hex',0,8),'89504e470d0a1a0a');
+console.log('[sim-smoke:P2-42] OK: compact cover, scoped links, benchmark fixture and four unchanged relative portrait paths');

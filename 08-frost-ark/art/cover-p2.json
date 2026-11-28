@@ -1,0 +1,18 @@
+{
+  "budgetBytes": 180000,
+  "assets": [{
+    "id": "cover-frost-ark",
+    "source": "p242-cover.png",
+    "size": [1664, 936],
+    "key": "none",
+    "fit": "cover",
+    "format": "webp",
+    "targetAnchor": [0.5, 0.5],
+    "maxBytes": 180000
+  }],
+  "prompts": {
+    "p242-cover": {
+      "text": "Widescreen hand-painted key art. Original Ma Nan design for buzz cut, charcoal hood and A emblem; authentic ark for blue clouds, ice-stone timber hull, orange solar hearth. Ma Nan and ginger Latte on deck foreground; huge frost whale arcs past the warm ark. Leave upper-left sky clear for Chinese lettering added by the preview page. No baked letters, frame or watermarks."
+    }
+  }
+}

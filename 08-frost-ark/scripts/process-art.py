@@ -267,7 +267,7 @@ def build(config_path, source_dir, output_dir, review_path):
             source = (source_dir / asset["source"]).resolve()
             if not source.is_relative_to(source_dir):
                 raise ValueError("source is outside --source-dir")
-            size = integers(asset["size"], 2, "size", lo=1, hi=1024)
+            size = integers(asset["size"], 2, "size", lo=1, hi=2048 if asset_id.startswith("cover-") and asset.get("key") == "none" else 1024)
             fmt = asset.get("format", "png")
             if fmt not in {"png", "webp"}:
                 raise ValueError("format must be png or webp")

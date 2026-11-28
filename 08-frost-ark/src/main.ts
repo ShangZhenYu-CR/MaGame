@@ -1,3 +1,4 @@
+import { whaleBattleActive } from './sim/finale';
 import { careForLatte,latteBoon,latteNear,latteProfile,outfitLatte,outfits,outfitsAt } from './sim/latte-growth';
 import { nearBondBeast,petBond } from './sim/beast-bond';
 import { castBeastSkill,companionSkillStatus } from './sim/beast-skills';
@@ -92,6 +93,28 @@ function paintLatte(){
   if(b.getAttribute('aria-pressed')!==String(p.outfit===style))b.setAttribute('aria-pressed',String(p.outfit===style));
  }
 }
+const mixPanel=el('audio-mix');
+const volMusic=el<HTMLInputElement>('music-volume'),volFx=el<HTMLInputElement>('effects-volume');
+const muteMusic=el<HTMLInputElement>('music-mute'),muteFx=el<HTMLInputElement>('effects-mute');
+function paintMix(){
+ const mix=audio.mix();
+ volMusic.value=String(Math.round(mix.music*100));volFx.value=String(Math.round(mix.effects*100));
+ muteMusic.checked=mix.muteMusic;muteFx.checked=mix.muteEffects;
+ el('music-volume-value').textContent=volMusic.value+'%';
+ el('effects-volume-value').textContent=volFx.value+'%';
+}
+function showAudio(open:boolean){
+ if(open){closeOtherPanels('audio');chart.hide(false);keys.clear();cancelCharge(w);audio.unlock();paintMix();}
+ mixPanel.hidden=!open;el('audio-mix-toggle').setAttribute('aria-expanded',String(open));
+}
+el('audio-mix-toggle').onclick=()=>showAudio(mixPanel.hidden);
+el('audio-mix-close').onclick=()=>showAudio(false);
+volMusic.oninput=()=>{audio.configure({music:+volMusic.value/100});paintMix();};
+volFx.oninput=()=>{audio.configure({effects:+volFx.value/100});paintMix();};
+muteMusic.onchange=()=>audio.configure({muteMusic:muteMusic.checked});
+muteFx.onchange=()=>audio.configure({muteEffects:muteFx.checked});
+let weatherAudio='';
+const airlockAudio=new WeakMap<WorldState,Map<string,boolean>>();
 const sectorPanel=document.querySelector<HTMLElement>('.sector')!,wildPanel=el('wild-encounter');
 const panelEdges=new ResizeObserver(entries=>{
  for(const {target} of entries){
@@ -223,7 +246,7 @@ function paintCompanionAbility(hide:boolean):void{
  companionButton.disabled=!!s.wait||!s.near;
  companionButton.dataset.ready=String(!s.wait&&s.near);
 }
-function finishAction(issue:string|null,success:string,event?:'craft'|'undo'|'dismantle'|'place'|'hit'):void{
+function finishAction(issue:string|null,success:string,event?:'craft'|'undo'|'dismantle'|'place'|'hit'|'door'):void{
   tell(issue??success);
   if(issue)return;
   if(event)audio.play(event);
@@ -293,7 +316,7 @@ function useNearby():void{
       finishAction(petBond(w,action.id),'抚摸了'+(friend?.name??'云兽')+'，羁绊提升。','place');break;
     }
     case 'beasts':toggleBeastRoster(true);break;
-    case 'door':finishAction(operateWindDoor(w,action.id),action.open?'防风门已关上。':'防风门已打开。');break;
+    case 'door':finishAction(operateWindDoor(w,action.id),action.open?'防风门已关上。':'防风门已打开。','door');break;
     case 'station':openIndustry(action.id);break;
     case 'storage':toggleStorage(true);break;
   }
@@ -301,9 +324,10 @@ function useNearby():void{
 function openIndustry(id:string):void{
   closeOtherPanels('industry');cancelCharge(w);keys.clear();industry.showStation(id);
 }
-function closeOtherPanels(except:'bag'|'locker'|'catalog'|'industry'|'beasts'|'latte'):void{
+function closeOtherPanels(except:'bag'|'locker'|'catalog'|'industry'|'beasts'|'latte'|'audio'):void{
   cancelFishing(w);skyEvents.close();
   if(except!=='latte')showLatte(false);
+  if(except!=='audio')showAudio(false);
   if(except!=='bag')toggleBag(false);
   if(except!=='locker')locker.hidden=true;
   if(except!=='catalog')industry.showCatalog(false);
@@ -529,7 +553,7 @@ function saveNow():Promise<void> {
 }
 function safeWorld(next:WorldState):void {
   finale.reset();view.juice.reset();cancelFishing(w);skyEvents.close();
-  expedition.cancel();chart.hide(false);beasts.show(false);beasts.resetTarget();showLatte(false);w=next;toggleStorage(false);industry.showStation(null);industry.showCatalog(false);lockerSignature='';cancelCharge(w);
+  expedition.cancel();chart.hide(false);beasts.show(false);beasts.resetTarget();showLatte(false);showAudio(false);w=next;toggleStorage(false);industry.showStation(null);industry.showCatalog(false);lockerSignature='';cancelCharge(w);
   caught=null;keys.clear();messageUntil=0;message='';stackSignature='';
   if(mode==='weapon'&&!w.player.weapon||mode==='tool'&&!heldTool(w))choose('hook');
   view.position(w);fillBag();
@@ -557,7 +581,7 @@ function warmthAction(kind:'fuel'|'upgrade'|'drop'|'pickup'):void {
   const reason=kind==='fuel'?addFuel(w):kind==='upgrade'?upgradeHearth(w):
     kind==='drop'?(dropSupply(w)?null:'背包里没有浮木板。'):(manuallyRecover(w)?null:'附近没有可捡的掉落物。');
   const result={fuel:'已给余烬主炉添柴。',upgrade:primaryHearth(w)?.level===3?'硫磺高压炉升阶完成：暖圈扩大，浮力 +24。':'主炉升至 Lv.2，拿铁会捡拾暖区的掉落物。',drop:'放下了浮木板 ×1，可按 F 拾回。',pickup:'已捡回地上的物品。'};
-  tell(reason??result[kind]);if(!reason)void saveNow();
+  tell(reason??result[kind]);if(!reason){if(kind==='fuel')audio.play('fuel');void saveNow();}
 }
 el('fuel-hearth').onclick=()=>warmthAction('fuel');
 el('upgrade-hearth').onclick=()=>warmthAction('upgrade');
@@ -641,7 +665,8 @@ addEventListener('keydown',e=>{
   if(e.repeat)return;
   if(k==='escape'){
     expedition.cancel();industry.closeTip();
-    if(!latteCare.hidden)showLatte(false);
+    if(!mixPanel.hidden)showAudio(false);
+    else if(!latteCare.hidden)showLatte(false);
     else if(beasts.open()){if(!beasts.closeRename())toggleBeastRoster(false);}
     else if(industry.stationOpen())industry.showStation(null);
     else if(industry.catalogOpen())toggleCatalog(false);
@@ -660,6 +685,7 @@ addEventListener('keydown',e=>{
   else if(k==='x'){toggleCatalog(false);choose(mode==='dismantle'?'hook':'dismantle');}
   else if(k==='z')industry.undoAction();
   else if(k==='m')toggleMute();
+  else if(k==='k'){e.preventDefault();showAudio(mixPanel.hidden);}
   else if(k==='q')choose('hook');
   else if(k==='t')toggleWeapon();
   else if(/^[1-9]$/.test(k)){e.preventDefault();quickbar.run(Number(k)-1);}
@@ -685,7 +711,7 @@ canvas.addEventListener('pointermove',e=>{
 });
 canvas.addEventListener('pointerleave',()=>{pointer=null;});
 canvas.addEventListener('pointerdown',e=>{
-  if(!active||!latteCare.hidden||incapacitated(w)||rolling(w)||skyEvents.open()||e.button!==0||fishingPanel(w)||chart.open()||finale.open()||finale.blocking())return;
+  if(!active||!mixPanel.hidden||!latteCare.hidden||incapacitated(w)||rolling(w)||skyEvents.open()||e.button!==0||fishingPanel(w)||chart.open()||finale.open()||finale.blocking())return;
   pointer={x:e.clientX,y:e.clientY};
   const at=view.world(e.clientX,e.clientY);
   const x=Math.floor(at.x),y=Math.floor(at.y);
@@ -727,6 +753,15 @@ function simulation():void {
   const wasDown=incapacitated(w),beastCount=w.beasts.length;
   if(mode==='weapon'&&!w.player.weapon)choose('hook');
   stepWorld(w,1,{x:Number(keys.has('d'))-Number(keys.has('a')),y:Number(keys.has('s'))-Number(keys.has('w'))},keys.has('shift')&&expedition.area()==='island'?.53:1);
+  if(w.tick%9===0&&!rolling(w)&&(w.player.vx||w.player.vy))audio.play(expedition.area()==='ark'||expedition.area()==='gangway'?'step-wood':'step-snow');
+  if(w.tick%570===0&&w.beasts.some(b=>b.hp>0&&Math.hypot(b.x-w.player.x,b.y-w.player.y)<=3))audio.play('beast');
+  if(w.tick%3===0){
+    const old=airlockAudio.get(w)??new Map<string,boolean>();airlockAudio.set(w,old);
+    for(const door of w.ark.buildings)if(door.defId==='frost_airlock'){
+      const last=old.get(door.id),open=doorOpen(door);old.set(door.id,open);
+      if(last!==undefined&&last!==open&&Math.hypot(w.player.x-door.gx-.5,w.player.y-door.gy-.5)<=3.1)audio.play('door');
+    }
+  }
   if(w.beasts.length>beastCount&&w.beasts.at(-1)?.id.startsWith('born_')){
     tell('孵化完成！'+w.beasts.at(-1)!.name+'加入方舟。');audio.play('craft');void saveNow();
   }
@@ -788,11 +823,18 @@ function frame(now:number):void {
   const h=primaryHearth(w), local=Math.round(heatAt(w,w.player.x,w.player.y));
   if(now-lastAmbient>=180){
     lastAmbient=now;
+    const track=whaleBattleActive(w)||w.wildEntities.some(v=>v.hp>0&&(v.kind==='boss'||v.kind==='raider')&&Math.hypot(v.x-w.player.x,v.y-w.player.y)<8)?'battle':w.weather!=='clear'?'blizzard':'day';
+    if(weatherAudio&&weatherAudio!==w.weather&&w.weather==='whiteout')audio.play('thunder');
+    weatherAudio=w.weather;
     audio.update({wind:w.weather==='whiteout'?.96:w.weather==='snow'?.72:.19,
-      fire:h&&h.fuel>0?Math.min(1,Math.max(0,(local+8)/44)):0});
+      fire:h&&h.fuel>0?Math.min(1,Math.max(0,(local+8)/44)):0,scene:track});
+    const d=audio.diagnostics();
+    canvas.dataset.audioRunning=String(d.running);canvas.dataset.audioTrack=d.scene;
+    canvas.dataset.audioProof=JSON.stringify(d);
+    if(!mixPanel.hidden)el('audio-mix-scene').textContent='正在播放 · '+({day:'云海拨弦',blizzard:'夜风与低弦',battle:'战斗鼓点'}[track]);
   }
   industry.update();chart.paint(false,now);
-  const overlay=down||!latteCare.hidden||skyEvents.open()||chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||beasts.open();
+  const overlay=down||!mixPanel.hidden||!latteCare.hidden||skyEvents.open()||chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||beasts.open();
   radar.update(w,!overlay&&!w.activeIsland&&!finale.open()&&!finale.blocking());
   const context=primaryInteraction();
   const here=expedition.update(now,overlay||finale.arena()||context.kind==='fishing'||context.kind==='trader',context.kind==='expedition'||context.kind==='pet',
@@ -805,7 +847,7 @@ function frame(now:number):void {
   paintCompanionAbility(overlay);
   skyEvents.frame(down||finale.arena(),context.kind==='trader');
   toolUi.update(here);
-  finale.update(chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||finale.open());
+  finale.update(!mixPanel.hidden||chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||finale.open());
   const region=regions.get(voyageBiome(w))??'碎云浅海';
   if(el('sector-name').textContent!==region)el('sector-name').textContent=region;
   setVital(0,w.player.warmth,w.player.maxWarmth);

@@ -149,6 +149,16 @@
   <section id="m5-attack-prompt" class="m5-attack-prompt" hidden>
     <strong id="m5-target-name"></strong><button type="button" id="m5-attack"><kbd>F</kbd> 反击</button>
   </section>
+  <aside id="audio-mix" class="audio-mix" aria-labelledby="audio-mix-title" hidden>
+    <div class="panel-head"><h2 id="audio-mix-title">声音设置</h2><button type="button" id="audio-mix-close">关闭</button></div>
+    <label for="music-volume">背景音乐 <output id="music-volume-value"></output></label>
+    <input type="range" id="music-volume" min="0" max="100" step="1">
+    <label for="music-mute"><input type="checkbox" id="music-mute"> 静音背景音乐</label>
+    <label for="effects-volume">环境与音效 <output id="effects-volume-value"></output></label>
+    <input type="range" id="effects-volume" min="0" max="100" step="1">
+    <label for="effects-mute"><input type="checkbox" id="effects-mute"> 静音环境与音效</label>
+    <p id="audio-mix-scene" class="panel-intro"></p>
+  </aside>
   <aside id="latte-care" class="wild-encounter latte-care" aria-labelledby="latte-care-title" hidden>
     <div class="panel-head"><div><div class="eyebrow">HEARTH COMPANION</div><h2 id="latte-care-title">炉边的拿铁</h2></div><button id="latte-close" type="button">关闭</button></div>
     <div class="latte-profile"><img alt="当前拿铁装扮" id="latte-dress-preview"><div><strong id="latte-level"></strong><progress id="latte-exp" max="12" value="0" aria-label="拿铁成长"></progress><small id="latte-skill"></small></div></div>
@@ -174,6 +184,7 @@
     <button type="button" id="dismantle-mode" aria-pressed="false" data-tip="点击一处建筑或可拆甲板；拆除后可在 4 秒内撤销"><kbd>X</kbd> 拆除</button>
     <button type="button" id="sky-map-toggle" aria-expanded="false" aria-controls="sky-map" data-tip="打开航图，检查风区、可用岛屿与当前航向"><kbd>N</kbd> 航图</button>
     <button type="button" id="beast-roster-toggle" aria-expanded="false" aria-controls="beast-roster" data-tip="查看云兽的饥饿、体温和分工"><kbd>V</kbd> 云兽</button>
+    <button type="button" id="audio-mix-toggle" aria-controls="audio-mix" aria-expanded="false"><kbd>K</kbd> 调音</button>
     <button type="button" id="audio-toggle" aria-pressed="false" data-tip="开关炉火、风雪和施工音效"><kbd>M</kbd> 音效开</button>
   </div>
   <div id="expedition-context" class="expedition-context" hidden>

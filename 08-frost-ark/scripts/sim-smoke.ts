@@ -1605,3 +1605,12 @@ const falseCodex=JSON.parse(serializeWorld(collected));
 falseCodex.codexP2.push('not-a-codex-entry');
 assert.throws(()=>deserializeWorld(JSON.stringify(falseCodex)),/图鉴/);
 console.log('[sim-smoke:P2-35] OK: 5 illustrated index tabs, all 139 registered asset IDs, monotone discoveries and validated save');
+
+import { scoreScenes,scoreStep } from '../src/audio/score';
+const sonic=scoreScenes.map(k=>scoreStep(k,0));
+assert.deepEqual(sonic.map(r=>r.voice),['pluck','bow','pulse']);
+assert.ok(sonic[2].pulse<sonic[0].pulse&&sonic[0].pulse<sonic[1].pulse);
+for(const scene of scoreScenes)for(let i=0;i<100;i++){
+ const cue=scoreStep(scene,i);assert.ok(cue.freq>=55&&cue.freq<=550&&cue.pulse>.2);
+}
+console.log('[sim-smoke:P2-36] OK: three distinct score voices with bounded notes and beat speeds');

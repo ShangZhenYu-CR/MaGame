@@ -439,3 +439,10 @@ button[aria-disabled=true]{opacity:.62}
 
 #raid-preview{display:block;white-space:pre-line;line-height:1.55;color:#d2e2eb;font-size:11px;margin-top:4px;}
 @media(min-width:821px){#raid-alert[data-phase=warning]:not([hidden])~#island-guardian{top:208px}}
+
+.audio-mix{position:absolute;z-index:9;left:20px;bottom:154px;width:min(275px,calc(100vw - 40px));padding:12px 14px;background:#142737f5;border:1px solid #6e8da0;border-radius:7px}
+.audio-mix .panel-head{display:flex;justify-content:space-between;gap:6px;align-items:center}
+.audio-mix h2{font-size:15px;margin:6px 0 9px}
+.audio-mix label{display:flex;gap:6px;margin-top:7px;color:#c2d9e5;font-size:12px}
+.audio-mix input[type=range]{width:100%;accent-color:#d9a678}.audio-mix output{margin-left:auto}
+.audio-mix p{margin:8px 0 0}

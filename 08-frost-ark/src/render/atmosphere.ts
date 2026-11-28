@@ -8,36 +8,54 @@ const fract=(n:number)=>n-Math.floor(n);
 const seeded=(n:number)=>fract(Math.sin(n*78.233+17.17)*43758.5453);
 const wrap=(v:number,d:number)=>((v%d)+d)%d;
 
-let skyRaster:HTMLCanvasElement|undefined;
+let skyRaster:HTMLCanvasElement|undefined,skyKey='';
+let skyBase:HTMLCanvasElement|undefined,airPlate:HTMLCanvasElement|undefined,baseKey='';
+const cloudBands=[
+  {y:-.25,h:.72,wid:.96,speed:.022,shift:.026,opacity:.93},
+  {y:.14,h:.72,wid:1.31,speed:.075,shift:.064,opacity:.68},
+  {y:.59,h:.63,wid:1.56,speed:.174,shift:.11,opacity:.46},
+];
 // The cloud plate contains only broad soft forms. Composite it as one smaller,
 // opaque pass; keep the playable scenery and foreground at output resolution.
 export function cloudscape(target:CanvasRenderingContext2D,clouds:HTMLImageElement,w:WorldState,origin:Vec2):void{
   const layer=skyRaster??(skyRaster=document.createElement('canvas'));
   const {width,height}=target.canvas,W=Math.ceil(width/2),H=Math.ceil(height/2);
-  if(layer.width!==W||layer.height!==H){layer.width=W;layer.height=H;}
+  if(layer.width!==W||layer.height!==H){layer.width=W;layer.height=H;skyKey='';}
+  const tag=[Math.floor(w.tick/3),w.timeOfDay>=.74,Math.round(origin.x/4),Math.round(origin.y/4)].join(':');
+  if(skyKey===tag){target.drawImage(layer,0,0,width,height);return;}
+  skyKey=tag;
   const c=layer.getContext('2d',{alpha:false})!;
   const t=w.tick*.5, night=partOfDay(w.timeOfDay)==='暴雪夜';
-  const sky=c.createLinearGradient(0,0,0,H);
-  sky.addColorStop(0,night?'#2c5263':'#436878');
-  sky.addColorStop(.43,night?'#5a7a8b':'#839fae');
-  sky.addColorStop(1,night?P.skyDeep:'#304d61');
-  c.fillStyle=sky;c.fillRect(0,0,W,H);
+  const base=skyBase??(skyBase=document.createElement('canvas'));
+  const air=airPlate??(airPlate=document.createElement('canvas'));
+  const staticKey=W+':'+H+':'+night;
+  if(baseKey!==staticKey){
+    baseKey=staticKey;
+    base.width=W;base.height=H;
+    // Air tint varies only vertically, so its exact gradient needs one column.
+    air.width=1;air.height=H;
+    const bg=base.getContext('2d',{alpha:false})!;
+    const sky=bg.createLinearGradient(0,0,0,H);
+    sky.addColorStop(0,night?'#2c5263':'#436878');
+    sky.addColorStop(.43,night?'#5a7a8b':'#839fae');
+    sky.addColorStop(1,night?P.skyDeep:'#304d61');
+    bg.fillStyle=sky;bg.fillRect(0,0,W,H);
+    if(night)for(let i=0;i<15;i++){
+      const x=seeded(i+308)*W-H*.1,y=(.17+seeded(i+61)*.13)*H,r=(.026+seeded(i+209)*.051)*H;
+      bg.fillStyle=i%2?'rgba(14,40,55,.35)':'rgba(67,98,113,.48)';
+      bg.beginPath();bg.moveTo(x-r,y+r*.42);bg.lineTo(x-r*.26,y-r*.56);bg.lineTo(x+r*.12,y-r);
+      bg.lineTo(x+r*.56,y-r*.61);bg.lineTo(x+r,y+r*.20);bg.lineTo(x+r*.19,y+r*.71);bg.closePath();bg.fill();
+    }
+    const a=air.getContext('2d')!,fade=a.createLinearGradient(0,0,0,H);
+    fade.addColorStop(0,night?'rgba(15,49,68,.36)':'rgba(26,59,77,.34)');
+    fade.addColorStop(.4,'rgba(112,159,181,0)');
+    fade.addColorStop(.73,'rgba(44,82,105,.1)');
+    fade.addColorStop(1,night?'rgba(6,24,40,.49)':'rgba(12,38,62,.36)');
+    a.fillStyle=fade;a.fillRect(0,0,1,H);
+  }
+  c.drawImage(base,0,0);
   c.save();
   const baseW=Math.max(340,W*1.06);
-  // Wide horizontally repeating sheets. Taper each band's upper/lower edges into the sky.
-  const cloudBands=[
-    {y:-.25, h:.72, wid:.96, speed:.022, shift:.026, opacity:.93},
-    {y:.14, h:.72, wid:1.31, speed:.075, shift:.064, opacity:.68},
-    {y:.59, h:.63, wid:1.56, speed:.174, shift:.11, opacity:.46},
-  ];
-  if(night){
-    for(let i=0;i<15;i++){
-      const x=seeded(i+308)*W-H*.1, y=(.17+seeded(i+61)*.13)*H, s=(.026+seeded(i+209)*.051)*H;
-      c.fillStyle=i%2?'rgba(14,40,55,.35)':'rgba(67,98,113,.48)';
-      c.beginPath(); c.moveTo(x-s,y+s*.42);c.lineTo(x-s*.26,y-s*.56);c.lineTo(x+s*.12,y-s);
-      c.lineTo(x+s*.56,y-s*.61);c.lineTo(x+s,y+s*.20);c.lineTo(x+s*.19,y+s*.71);c.closePath();c.fill();
-    }
-  }
   for(const [i,b] of cloudBands.entries()){
     const imW=baseW*b.wid, h=H*b.h;
     const x=-wrap(t*b.speed+origin.x*b.shift*.5+i*86.5,imW*2);
@@ -86,12 +104,7 @@ export function cloudscape(target:CanvasRenderingContext2D,clouds:HTMLImageEleme
     }
   }
   c.restore();
-  const air=c.createLinearGradient(0,0,0,H);
-  air.addColorStop(0,night?'rgba(15,49,68,.36)':'rgba(26,59,77,.34)');
-  air.addColorStop(.4,'rgba(112,159,181,0)');
-  air.addColorStop(.73,'rgba(44,82,105,.1)');
-  air.addColorStop(1,night?'rgba(6,24,40,.49)':'rgba(12,38,62,.36)');
-  c.fillStyle=air;c.fillRect(0,0,W,H);
+  c.drawImage(air,0,0,W,H);
   target.save();target.imageSmoothingQuality='low';
   target.drawImage(layer,0,0,width,height);target.restore();
 }
@@ -108,67 +121,83 @@ function bandCanvas(index:number,w:number,h:number):HTMLCanvasElement {
 const glowAtlas=new Map<string,HTMLCanvasElement>();
 export function ovalGlow(c:CanvasRenderingContext2D,x:number,y:number,rx:number,ry:number,color:string,outer='rgba(12,30,45,0)'):void {
   if(!(rx>0&&ry>0))return;
-  const key=color+'|'+outer;
+  // Dynamic opacity is applied at composition, not baked into an endless
+  // stream of identical gradients. Preserve exact colour stops and alpha.
+  const parts=/^rgba\(([^,]+),([^,]+),([^,]+),([^,]+)\)$/.exec(color);
+  const clear=/^rgba\(([^,]+),([^,]+),([^,]+),0\)$/.test(outer);
+  const alpha=parts&&clear?Math.min(1,Math.max(0,Number(parts[4]))):1;
+  if(alpha<=0)return;
+  const primary=parts&&clear?`rgba(${parts[1]},${parts[2]},${parts[3]},1)`:color;
+  const key=primary+'|'+outer;
   let patch=glowAtlas.get(key);
   if(!patch){
     patch=document.createElement('canvas');patch.width=patch.height=96;
     const layer=patch.getContext('2d')!,g=layer.createRadialGradient(48,48,0,48,48,48);
-    g.addColorStop(0,color);g.addColorStop(.42,color);g.addColorStop(1,outer);
+    g.addColorStop(0,primary);g.addColorStop(.42,primary);g.addColorStop(1,outer);
     layer.fillStyle=g;layer.fillRect(0,0,96,96);
     if(glowAtlas.size>=96)glowAtlas.delete(glowAtlas.keys().next().value!);
     glowAtlas.set(key,patch);
   }
-  c.drawImage(patch,x-rx,y-ry,rx*2,ry*2);
+  const prior=c.globalAlpha; if(alpha!==1)c.globalAlpha=prior*alpha;
+  c.drawImage(patch,x-rx,y-ry,rx*2,ry*2); if(alpha!==1)c.globalAlpha=prior;
 }
 
 const snow=Array.from({length:360},(_,i)=>({u:seeded(i*5+1000),v:seeded(i*5+2000),s:seeded(i*5+3000)}));
+const wisps:HTMLCanvasElement[]=[];
+function snowWisp(bin:number):HTMLCanvasElement{
+ const p=wisps[bin];if(p)return p;
+ const plate=document.createElement('canvas');plate.width=plate.height=63;
+ const c=plate.getContext('2d')!,r=8+bin/7*17;
+ c.translate(31.5,31.5);c.rotate(.663);
+ ovalGlow(c,0,0,r,r*.41,'rgba(186,215,231,.46)','rgba(186,215,231,0)');
+ return wisps[bin]=plate;
+}
 function paintSnow(c:CanvasRenderingContext2D,w:WorldState,W:number,H:number):void{
-  const t=w.tick;
-  const depth=w.weather==='whiteout'?1.65:1;
-  const drift=1+w.sky.windX*.18;
-  const margin=55, dx=.788,dy=.616;
-  c.save();
-  for(const layer of [0,1,2]){
-    const n=Math.min(snow.length,Math.round([244,116,27][layer]*depth));
-    const velocity=[.47,2.04,4.50][layer]*depth*drift;
-    for(let i=0;i<n;i++){
-      const p=snow[(i+layer*31)%snow.length], phase=t*velocity*(.70+p.s*.77);
-      const x=wrap(p.u*(W+2*margin)+phase*dx,W+2*margin)-margin;
-      const y=wrap(p.v*(H+2*margin)+phase*dy,H+2*margin)-margin;
-      if(layer===0){
-        c.globalAlpha=.19+p.s*.33;c.fillStyle=P.snowHighlight;
-        c.beginPath();c.arc(x,y,.48+p.s*.85,0,tau);c.fill();
-      }else if(layer===1){
-        const length=7+p.s*15*depth;
-        c.strokeStyle=P.snowHighlight;c.globalAlpha=.13+p.s*.33;
-        c.lineWidth=.55+p.s*.8;c.lineCap='round';
-        c.beginPath();c.moveTo(x,y);c.lineTo(x-dx*length,y-dy*length);c.stroke();
-      }else{
-        const r=8+p.s*17;
-        c.globalAlpha=.16+p.s*.24;
-        c.save();c.translate(x,y);c.rotate(.663);ovalGlow(c,0,0,r,r*.41,'rgba(186,215,231,.46)','rgba(186,215,231,0)');c.restore();
-      }
-    }
+ const storm=w.weather==='whiteout',depth=storm?1.65:1;
+ const dx=.788,dy=.616,drift=1+w.sky.windX*.18,margin=55,width=W+2*margin,height=H+2*margin;
+ const old=c.globalAlpha;
+ const density=[244,116,27],speedScale=[.47,2.04,4.50],opacity=[.19,.13,.16];
+ c.fillStyle=P.snowHighlight;c.strokeStyle=P.snowHighlight;c.lineCap='round';
+ for(let layer=0;layer<3;layer++){
+  const n=Math.min(snow.length,Math.round(density[layer]*depth));
+  const speed=speedScale[layer]*depth*drift;
+  // Two depth layers share eight opacity/width batches. The nearest layer
+  // still uses the same feathered sprite, count, motion, and independent alpha.
+  const batches=layer<2?Array.from({length:8},()=>new Path2D()):null;
+  for(let i=0;i<n;i++){
+   const f=snow[(i+layer*31)%snow.length],step=w.tick*speed*(.7+f.s*.77);
+   const x=wrap(f.u*width+step*dx,width)-margin,y=wrap(f.v*height+step*dy,height)-margin;
+   const bin=Math.round(f.s*7),q=bin/7,extent=layer===0?2:layer===1?18:31.5;
+   if(x+extent<0||x-extent>W||y+extent<0||y-extent>H)continue;
+   if(!batches){c.globalAlpha=old*(opacity[layer]+f.s*.24);c.drawImage(snowWisp(bin),x-31.5,y-31.5);continue;}
+   const path=batches[bin];
+   if(layer===0){const r=.48+q*.85;path.moveTo(x+r,y);path.arc(x,y,r,0,tau);}
+   else{
+    const l=7+q*15*depth;
+    path.moveTo(x+l*.394,y+l*.308);path.lineTo(x-l*.394,y-l*.308);
+   }
   }
-  c.restore();
+  if(batches)for(let bin=0;bin<8;bin++){
+   const q=bin/7;c.globalAlpha=old*(opacity[layer]+q*.33);
+   if(layer===0)c.fill(batches[bin]);
+   else{c.lineWidth=.55+q*.8;c.stroke(batches[bin]);}
+  }
+ }
+ c.globalAlpha=old;
 }
 
 export class WeatherFinish {
   private warmPulse=0;
   private frozen=0;
   private lastTick=-1;
-  private particles=document.createElement('canvas');
+  private world?:WorldState;
 
   paint(c:CanvasRenderingContext2D,w:WorldState,frostFrame:HTMLImageElement,openAir?:Path2D):void{
     const {width:W,height:H}=c.canvas;
+    if(this.world!==w){this.lastTick=-1;this.warmPulse=0;this.frozen=0;this.world=w;}
     if(w.weather!=='clear'){
-      const snow=this.particles,sw=Math.ceil(W*.75),sh=Math.ceil(H*.75);
-      if(snow.width!==sw||snow.height!==sh){snow.width=sw;snow.height=sh;}
-      const layer=snow.getContext('2d')!;
-      layer.setTransform(1,0,0,1,0,0);layer.clearRect(0,0,sw,sh);
-      layer.scale(sw/W,sh/H);paintSnow(layer,w,W,H);
       c.save();if(openAir)c.clip(openAir,'evenodd');
-      c.imageSmoothingQuality='low';c.drawImage(snow,0,0,W,H);c.restore();
+      paintSnow(c,w,W,H);c.restore();
     }
     const cold=clamp((45-w.player.warmth)/45);
     if(w.tick!==this.lastTick){

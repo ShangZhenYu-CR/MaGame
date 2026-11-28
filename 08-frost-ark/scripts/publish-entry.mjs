@@ -1,4 +1,5 @@
 import { readFileSync, writeFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { resolve } from 'node:path';
 
 const root = process.cwd();
@@ -24,6 +25,9 @@ if (scriptCount !== 1 || styleCount !== 1) throw new Error('Expected one bundled
 const runtime = html.match(/<script>[\s\S]*?<\/script>/)?.[0];
 if (!runtime) throw new Error('Bundled runtime missing');
 html = html.replace(runtime, '').replace(/^ +$/gm,'').replace('</body>', () => runtime + '\n</body>');
+const scenario=execFileSync(process.execPath,['--import','tsx','scripts/p2-bench-fixture-json.ts'],{encoding:'utf8'});
+const scenarioNode='<script id="bench-world" type="application/json">'+scenario.replace(/</g,'\\u003c')+'</script>';
+html=html.replace(runtime,()=>scenarioNode+'\n'+runtime);
 writeFileSync(resolve(root, 'index.html'), html);
 
 // A dist entry has the same page-relative portrait path as the project entry.

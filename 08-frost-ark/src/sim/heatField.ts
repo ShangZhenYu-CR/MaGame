@@ -1,7 +1,7 @@
 import { markChapter } from './journal';
 import { challenge,daySpeed } from './challenge';
 import { endlessTemperature,hasAncientWhiteout } from './endless';
-import { whaleIced } from './whale-sea';
+import { seaWhale } from './whale-sea';
 import { eventClimate } from './sky-events';
 import { caveTemperature } from './cave';
 import { fieldLandmarks } from './landmarks';
@@ -106,9 +106,28 @@ export function advanceClimate(w:WorldState):void{
   if(hearth&&hearth.fuel>0)hearth.fuel=Math.max(0,hearth.fuel-(whiteout?(hearth.level>=3?.034:.05):part==='暴雪夜'?.023:.013));
 }
 
+const fixedRadial=new Map<number,ReadonlyArray<readonly[number,number,number]>>();
+const stationaryOffsets=(radius:number)=>{
+  let stencil=fixedRadial.get(radius);
+  if(stencil)return stencil;
+  const entries:[number,number,number][]=[],n=Math.ceil(radius),r=radius*radius;
+  for(let dy=-n;dy<=n;dy++)for(let dx=-n;dx<=n;dx++){
+    if(dx*dx+dy*dy<r)entries.push([dx,dy,Math.pow(1-Math.hypot(dx,dy)/radius,1.65)]);
+  }
+  if(fixedRadial.size>=32)fixedRadial.delete(fixedRadial.keys().next().value!);
+  fixedRadial.set(radius,entries);return entries;
+};
+const heatScratch=new WeakMap<WorldState,{insulation:Float32Array;radiance:Float64Array}>();
 export function solveHeat(w:WorldState):void{
   const {size,decks,heatGrid,buildings}=w.ark;
-  const insulation=new Float32Array(size*size),sealed=indoor(w).inside;
+  const length=size*size;
+  let buffers=heatScratch.get(w);
+  if(!buffers||buffers.insulation.length!==length){
+    buffers={insulation:new Float32Array(length),radiance:new Float64Array(length)};
+    heatScratch.set(w,buffers);
+  }
+  const {insulation,radiance}=buffers,sealed=indoor(w).inside,ice=seaWhale(w)?.ice;
+  insulation.fill(0);radiance.fill(0);
   for(const b of buildings){
     const d=definitions.get(b.defId);
     if(d?.insulation&&!doorOpen(b)){const i=b.gy*size+b.gx;insulation[i]=Math.max(insulation[i],d.insulation);}
@@ -119,24 +138,44 @@ export function solveHeat(w:WorldState):void{
   const warmed=sinks.length?sources.filter(e=>e.kind!=='beast'&&e.power>0):[];
   const siphons=sinks.filter(e=>warmed.some(source=>Math.hypot(e.x-source.x,e.y-source.y)<Math.min(source.radius,3.4)));
 
+  // Splat each source only across the tiles it can influence. Per-tile
+  // accumulation order and the exact radial falloff remain unchanged.
+  for(const e of sources){
+    const a=Math.max(0,Math.floor(e.x-e.radius)),b=Math.min(size-1,Math.ceil(e.x+e.radius));
+    const c=Math.max(0,Math.floor(e.y-e.radius)),d=Math.min(size-1,Math.ceil(e.y+e.radius));
+    const power=e.power*(e.kind==='hearth_core'?1.62:1),r=e.radius*e.radius;
+    const mx=e.x-.5,my=e.y-.5;
+    if(Number.isInteger(mx)&&Number.isInteger(my)){
+      for(const [ox,oy,gain] of stationaryOffsets(e.radius)){
+        const x=mx+ox,y=my+oy;
+        if(x>=0&&x<size&&y>=0&&y<size&&decks[y*size+x])radiance[y*size+x]+=power*gain;
+      }
+      continue;
+    }
+    for(let y=c;y<=d;y++)for(let x=a;x<=b;x++){
+      const i=y*size+x;if(!decks[i])continue;
+      const dx=x+.5-e.x,dy=y+.5-e.y,k=dx*dx+dy*dy;
+      if(k>=r)continue;
+      radiance[i]+=power*Math.pow(1-Math.hypot(dx,dy)/e.radius,1.65);
+    }
+  }
   const next=new Array<number>(size*size).fill(w.ambientTemp);
-  const wallAt=(x:number,y:number)=>x>=0&&y>=0&&x<size&&y<size?insulation[y*size+x]:0;
   for(let i=0;i<decks.length;i++){
     if(!decks[i])continue;
     const x=i%size,y=Math.floor(i/size);
-    let radiation=0,flow=0,shield=insulation[i];
-    for(const e of sources){
-      const d=Math.hypot(x+.5-e.x,y+.5-e.y);
-      radiation+=e.power*(e.kind==='hearth_core'?1.62:1)*Math.pow(Math.max(0,1-d/e.radius),1.65);
+    let radiation=radiance[i],flow=0,shield=insulation[i];
+    if((ice?.[i]??0)>w.tick)radiation-=60;
+    for(const e of siphons){
+      const dx=x+.5-e.x,dy=y+.5-e.y;
+      if(Math.abs(dx)<3.2&&Math.abs(dy)<3.2)
+        radiation-=24*Math.pow(Math.max(0,1-Math.hypot(dx,dy)/3.2),1.35);
     }
-    if(whaleIced(w,x,y))radiation-=60;
-    for(const e of siphons)radiation-=24*Math.pow(Math.max(0,1-Math.hypot(x+.5-e.x,y+.5-e.y)/3.2),1.35);
     for(const a of offsets){
-      const xx=x+a.x, yy=y+a.y;
-      const inside=isDeck(w,xx,yy);
-      const other=inside?heatGrid[yy*size+xx]:w.ambientTemp;
-      const resistance=Math.max(insulation[i],wallAt(xx,yy));
-      if(inside)shield=Math.max(shield,wallAt(xx,yy)*.72);
+      const xx=x+a.x,yy=y+a.y,at=xx>=0&&yy>=0&&xx<size&&yy<size?yy*size+xx:-1;
+      const inside=at>=0&&!!decks[at], barrier=at>=0?insulation[at]:0;
+      const other=inside?heatGrid[at]:w.ambientTemp;
+      const resistance=Math.max(insulation[i],barrier);
+      if(inside)shield=Math.max(shield,barrier*.72);
       flow+=(other-heatGrid[i])*(inside?.12:.058)*(1-resistance);
     }
     // Flux to neighbours and exposed air, then gradual convergence to radiant sources.
@@ -144,7 +183,7 @@ export function solveHeat(w:WorldState):void{
       +radiation*.035*shield,w.ambientTemp,85);
   }
   w.ark.heatGrid=next;
-  for(const b of buildings)b.frozen=whaleIced(w,b.gx,b.gy)||heatAt(w,b.gx+.5,b.gy+.5)<-20;
+  for(const b of buildings)b.frozen=(ice?.[b.gy*size+b.gx]??0)>w.tick||heatAt(w,b.gx+.5,b.gy+.5)<-20;
 }
 
 export function initializeHeat(w:WorldState):void{

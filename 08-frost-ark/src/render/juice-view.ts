@@ -24,6 +24,7 @@ export class JuiceView{
   }
   if(this.current.length>28)this.current.splice(0,this.current.length-28);
  }
+ animating(now:number){return now<this.until||this.current.some(e=>now-e.at<860);}
  stopShake(){this.shaken=this.until=0;}
  shake(now:number):Vec2{
   if(now>=this.until)return {x:0,y:0};

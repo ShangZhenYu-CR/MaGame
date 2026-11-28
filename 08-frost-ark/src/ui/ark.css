@@ -476,3 +476,16 @@ button[aria-disabled=true]{opacity:.62}
 #journal-list li[data-complete=true] span{color:#e4af72}
 #journal-list button{margin:3px 0 1px;min-height:28px}
 #journal-toggle span{color:#d6bb96;font-size:10px}
+
+/* Keep utility buttons on their own left rail as the list grows. The
+   centered item dock keeps a protected lane at desktop widths. */
+@media(min-width:1100px){
+  .m2-tools{max-width:calc(50vw - 378px);flex-wrap:wrap;align-content:flex-end}
+  #frost-guide{left:auto;right:24px;bottom:51px;max-width:min(300px,calc(50vw - 390px))}
+}
+
+.ship-benchmark{position:absolute;right:24px;bottom:126px;z-index:7;width:min(350px,calc(100vw - 40px));padding:12px 14px;background:#142737f5;color:#dcebf5;border:1px solid #8198ab;border-radius:7px;font-size:12px}
+.ship-benchmark strong{color:var(--amber);font-size:14px}
+.ship-benchmark p,.ship-benchmark output{display:block;margin-top:6px}
+.ship-benchmark div{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:8px}
+.ship-benchmark a{color:#bedcea}

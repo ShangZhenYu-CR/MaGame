@@ -111,6 +111,8 @@ export class ArkView {
   private ctx:CanvasRenderingContext2D;
   private scale=60;
   private userScale:number|undefined;
+  private cameraCounter=0;
+  cameraVersion(){return this.cameraCounter;}
   private origin:Vec2={x:0,y:0};
   private art=new ArtLibrary(required);
   private lightmap=new Lightmap();
@@ -122,12 +124,16 @@ export class ArkView {
   private hullSignature='';
   private deckLayer?:HTMLCanvasElement;
   private deckFinishKey='';
+  private deckChunks=new Map<string,{layer:HTMLCanvasElement;key:string}>();
+  private frostChunks=new Map<string,{layer:HTMLCanvasElement;key:string}>();
+  private paintedChunks=0;
+  private flamePlates=new Map<string,{tick:number;canvas:HTMLCanvasElement}>();
   private loaded=false;
   private loadError='';
   readonly ready:Promise<void> = this.art.ready;
 
   constructor(private canvas:HTMLCanvasElement) {
-    this.ctx=canvas.getContext('2d')!;
+    this.ctx=canvas.getContext('2d',{alpha:false})!;
     this.ready.then(()=>{this.loaded=true;},err=>{this.loadError=err instanceof Error?err.message:String(err);});
     canvas.addEventListener('wheel',e=>{
       if(e.ctrlKey || e.metaKey)return;
@@ -137,10 +143,16 @@ export class ArkView {
   }
 
   zoom(deltaY:number):void{
-    if(deltaY)this.userScale=clamp(this.scale-Math.sign(deltaY)*4,44,80);
+    if(deltaY){this.userScale=clamp(this.scale-Math.sign(deltaY)*4,32,80);this.cameraCounter++;}
+  }
+
+  frameBenchmark(w:WorldState):void{
+    this.userScale=Math.min(32,Math.max(14,Math.floor(Math.min(this.canvas.width/25,this.canvas.height/28))));
+    this.cameraCounter++;this.position(w);
   }
 
   resize(w:WorldState):void {
+    this.cameraCounter++;
     this.canvas.width=Math.max(1,this.canvas.clientWidth);
     this.canvas.height=Math.max(1,this.canvas.clientHeight);
     this.position(w);
@@ -154,7 +166,7 @@ export class ArkView {
     let cx=center+Math.sign(w.player.x-center)*Math.max(0,Math.abs(w.player.x-center)-deadzoneX);
     let cy=center+Math.sign(w.player.y-center)*Math.max(0,Math.abs(w.player.y-center)-deadzoneY);
     const cave=activeCave(w),island=cave?null:dockedIsland(w);
-    let yFraming=.414;
+    let yFraming=this.scale<44?.50:.414;
     if(island){
       const bounds=islandCameraExtent(island);
       const connection=gangwayGeometry(w);
@@ -469,9 +481,7 @@ export class ArkView {
     for(const actor of actors){
       const p=project(actor.x,actor.y);
       const glow=this.juice.flash(actor.id,now);
-      if(glow){c.save();c.filter='brightness(2.55) saturate(.15)';}
-      this.art.paint(c,actor.art,p.x,p.y-(actor.float??0)-this.juice.bounce(actor.id,now)*s,s,actor);
-      if(glow)c.restore();
+      this.art.paint(c,actor.art,p.x,p.y-(actor.float??0)-this.juice.bounce(actor.id,now)*s,s,glow?{...actor,flash:true}:actor);
       if(actor.turret&&actor.id)aims.push(actor.id+':'+this.living.turret(c,this.art,w,actor.id,actor.turret,p,actor,s));
       if(actor.flue)paintFlue(c,p,w,s,actor.fire==='forge',actor.x);
       if(actor.steam)jets.push(p);
@@ -573,7 +583,7 @@ export class ArkView {
         c.restore();
       }
     }
-    this.canvas.dataset.beastMoods=moodMarks.join(',');
+    const moods=moodMarks.join(',');if(this.canvas.dataset.beastMoods!==moods)this.canvas.dataset.beastMoods=moods;
     paintElementSigns(c,this.art,actors,w,project,s);
     this.juice.paint(c,project,s,now);
     // Aiming is a control cue, not world geometry. Keep it above night tint,
@@ -604,32 +614,69 @@ export class ArkView {
     ovalGlow(c,p.x+s*.17,p.y+s*.79,b.w*.66,b.d*.26,'rgba(12,31,46,.48)');
     this.lowClouds(c,b,w.tick,false);
 
-    // Static hull and stains are recomposed only when geometry or a visible
-    // frost band changes. One reusable texture replaces hundreds of tile
-    // draws and per-cell gradients every frame on a large ship.
-    let frosting='';
-    const prepared:Cell[]=[];
-    for(let i=0;i<w.ark.decks.length;i++){
-      if(!w.ark.decks[i])continue;
-      const level=Math.round(clamp((8-(w.ark.heatGrid[i]??w.ambientTemp)-(thawed?.has(i)?9:0))/28)*14);
-      const floor=floors.has(i);
-      frosting+=(level+(floor?16:0)).toString(32);
-      const x=i%w.ark.size,y=Math.floor(i/w.ark.size),mask=hull.edges[i];
-      prepared.push({x,y,hash:hash(x,y),iron:w.ark.decks[i]===2,insulated:floor,temperature:8-level*2,
-        left:!!(mask&HULL_WEST),right:!!(mask&HULL_EAST),front:!!(mask&HULL_SOUTH),back:!!(mask&HULL_NORTH)});
-    }
-    const x0=minX-1,y0=minY-1,finish=this.hullSignature+'|'+s+'|'+frosting;
+    // The rim remains authored and is rebuilt only when topology or zoom
+    // changes. Adjacent static floor chunks and frost overlays are separate:
+    // a heating change in one room is no reason to redraw the entire hull.
+    const x0=minX-1,y0=minY-1,finish=this.hullSignature+'|'+s;
     const layer=this.deckLayer??(this.deckLayer=document.createElement('canvas'));
     if(finish!==this.deckFinishKey){
-      this.deckFinishKey=finish;
+      this.deckFinishKey=finish;this.deckChunks.clear();this.frostChunks.clear();
       const width=(maxX-x0+1)*s,height=(maxY-y0+3)*s;
       if(layer.width!==width||layer.height!==height){layer.width=width;layer.height=height;}
       const ctx=layer.getContext('2d')!;
-      ctx.clearRect(0,0,width,height);ctx.imageSmoothingEnabled=true;
-      this.paintDeckLayer(ctx,prepared,w,hull,(x,y)=>({x:(x-x0)*s,y:(y-y0)*s}));
+      ctx.clearRect(0,0,width,height);
+      const rim:Cell[]=[];
+      for(let y=minY;y<maxY;y++)for(let x=minX;x<maxX;x++){
+        const i=y*w.ark.size+x,mask=hull.edges[i];
+        if(!w.ark.decks[i]||!mask)continue;
+        rim.push({x,y,hash:hash(x,y),iron:false,insulated:false,temperature:0,left:!!(mask&HULL_WEST),
+          right:!!(mask&HULL_EAST),front:!!(mask&HULL_SOUTH),back:!!(mask&HULL_NORTH)});
+      }
+      this.paintDeckLayer(ctx,rim,w,hull,(x,y)=>({x:(x-x0)*s,y:(y-y0)*s}));
     }
     const corner=this.screen(x0,y0);
     c.drawImage(layer,corner.x,corner.y);
+    const bounds=this.worldBounds(),chunk=6;
+    let painted=0;
+    const get=(map:Map<string,{layer:HTMLCanvasElement;key:string}>,id:string,key:string)=>{
+      let e=map.get(id);
+      if(!e){const layer=document.createElement('canvas');layer.width=layer.height=chunk*s;
+        e={layer,key:''};map.set(id,e);}
+      return {e,changed:e.key!==key};
+    };
+    for(let cy=Math.floor(Math.max(minY,bounds.top)/chunk)*chunk;cy<Math.min(maxY,bounds.bottom+1);cy+=chunk)
+      for(let cx=Math.floor(Math.max(minX,bounds.left)/chunk)*chunk;cx<Math.min(maxX,bounds.right+1);cx+=chunk){
+        const corner=this.screen(cx,cy);
+        if(corner.x>c.canvas.width||corner.y>c.canvas.height||corner.x+chunk*s<0||corner.y+chunk*s<0)continue;
+        const coords=cx+':'+cy,parts:Cell[]=[];
+        let floorKey='',iceKey='';
+        for(let y=cy;y<cy+chunk&&y<w.ark.size;y++)for(let x=cx;x<cx+chunk&&x<w.ark.size;x++){
+          const i=y*w.ark.size+x;
+          if(!w.ark.decks[i])continue;
+          const mask=hull.edges[i],floor=floors.has(i);
+          const level=Math.round(clamp((8-(w.ark.heatGrid[i]??w.ambientTemp)-(thawed?.has(i)?9:0))/28)*14);
+          floorKey+=floor?'i':'w';iceKey+=level.toString(16);
+          parts.push({x,y,hash:hash(x,y),iron:w.ark.decks[i]===2,insulated:floor,temperature:8-level*2,
+            left:!!(mask&HULL_WEST),right:!!(mask&HULL_EAST),front:!!(mask&HULL_SOUTH),back:!!(mask&HULL_NORTH)});
+        }
+        if(!parts.length)continue;
+        const base=get(this.deckChunks,coords,floorKey),overlay=get(this.frostChunks,coords,iceKey);
+        if(base.changed){
+          const d=base.e.layer.getContext('2d')!;d.clearRect(0,0,chunk*s,chunk*s);
+          for(const tile of parts)this.paintFloor(d,tile,{x:(tile.x-cx)*s,y:(tile.y-cy)*s});
+          base.e.key=floorKey;
+        }
+        if(overlay.changed||base.changed){
+          const d=overlay.e.layer.getContext('2d')!;d.clearRect(0,0,chunk*s,chunk*s);
+          d.drawImage(base.e.layer,0,0);
+          for(const tile of parts)this.frost(d,tile,{x:(tile.x-cx)*s,y:(tile.y-cy)*s});
+          overlay.e.key=iceKey;
+        }
+        c.drawImage(overlay.e.layer,corner.x,corner.y);
+        painted++;
+      }
+    this.paintedChunks=painted;
+    if(this.canvas.dataset.deckChunks!==String(painted))this.canvas.dataset.deckChunks=String(painted);
     return b;
   }
 
@@ -664,20 +711,18 @@ export class ArkView {
         c.restore();
       }
     }
-    for(const t of cells){
-      const p=project(t.x,t.y);
-      const id=t.insulated?'floor-insulated':t.iron?ironDeck:deckIds[t.hash%4];
-      this.art.paintTile(c,id,p.x,p.y,s,s);
-      this.frost(c,t,p);
-      for(const side of [t.left?-1:0,t.right?1:0]){
-        if(!side)continue;
-        c.save();
-        c.translate(p.x+(side<0?.052:.948)*s,p.y+s*.5);
-        c.rotate(Math.PI/2);
-        c.filter='brightness(1.23) saturate(.85)';
-        this.art.paintTile(c,id,-s*.5,-s*.052,s,s*.104);
-        c.restore();
-      }
+  }
+  private paintFloor(c:CanvasRenderingContext2D,t:Cell,p:Vec2):void{
+    const s=this.scale,id=t.insulated?'floor-insulated':t.iron?ironDeck:deckIds[t.hash%4];
+    this.art.paintTile(c,id,p.x,p.y,s,s);
+    for(const side of [t.left?-1:0,t.right?1:0]){
+      if(!side)continue;
+      c.save();
+      c.translate(p.x+(side<0?.052:.948)*s,p.y+s*.5);
+      c.rotate(Math.PI/2);
+      c.filter='brightness(1.23) saturate(.85)';
+      this.art.paintTile(c,id,-s*.5,-s*.052,s,s*.104);
+      c.restore();
     }
   }
 
@@ -739,13 +784,13 @@ export class ArkView {
     const center=w.ark.size/2;
     const hasGhost=(x:number,y:number)=>!!ghost&&ghost.x===x&&ghost.y===y&&ghost.ok&&
       (!ghost.defId||ghost.defId==='wood_deck')&&!ghost.torch&&!ghost.wall;
-    const hasNet=(x:number,y:number)=>w.ark.buildings.some(b=>b.defId==='catch_net'&&b.gx===x&&b.gy===y);
+    const nets=new Set(w.ark.buildings.filter(b=>b.defId==='catch_net').map(b=>b.gy*w.ark.size+b.gx));
     const isLaunchPort=(x:number,y:number,side:string)=>
       (side==='north'&&x===center&&y===center-3)||(side==='south'&&x===center&&y===center+3)||
       (side==='west'&&x===center-3&&y===center-1)||(side==='east'&&x===center+3&&y===center-1);
     for(const t of cells){
       const {x,y}=t;
-      if(hasNet(x,y))continue;
+      if(!(t.left||t.right||t.front||t.back)||nets.has(y*w.ark.size+x))continue;
       const bridgeExit=(side:string)=>gangway?.deployed&&gangway.side===side&&gangway.gx===x&&gangway.gy===y;
       const bowGap=isLaunchPort(x,y,'north'),sternGap=isLaunchPort(x,y,'south');
       if(t.back&&!hasGhost(x,y-1)){
@@ -839,11 +884,49 @@ export class ArkView {
     const sourceV=hearth?(actor.hearthLevel===3?.84:.79):actor.fire==='forge'?.74:actor.fire==='relay'?.53:actor.fire==='stove'?.69:.17;
     const anchor=this.art.offset(actor.art,hearth?.48:actor.fire==='stove'?.58:.50,sourceV,s*actor.width!,s*actor.height!);
     const x=p.x+anchor.x,y=p.y+anchor.y;
-    const r=s*(hearth?.30:actor.fire==='stove'?.09:.14),up=r*(1.12+Math.sin(tick*.29)*.16+Math.sin(tick*.73)*.07);
+    const r=s*(hearth?.30:actor.fire==='stove'?.09:.14);
+    // The same authored flame geometry and sparks share one raster per
+    // radius and simulation tick. Screen blending is associative for this
+    // translucent light, so a single draw retains every original particle.
+    const key=r+':'+Number(hearth);
+    let fire=this.flamePlates.get(key);
+    if(!fire){
+      const canvas=document.createElement('canvas'), extent=Math.ceil(r*5+6)*2;
+      canvas.width=canvas.height=extent;
+      fire={tick:-1,canvas};
+      if(this.flamePlates.size>=36)this.flamePlates.delete(this.flamePlates.keys().next().value!);
+      this.flamePlates.set(key,fire);
+    }
+    const mid=fire.canvas.width/2;
+    if(fire.tick!==tick){
+      fire.tick=tick;
+      const layer=fire.canvas.getContext('2d')!;
+      layer.clearRect(0,0,fire.canvas.width,fire.canvas.height);
+      this.paintFlame(layer,mid,mid,r,tick);
+      this.paintSparks(layer,mid,mid,r,tick,hearth?17:8,hearth?3.36:3.0);
+    }
+    c.save();c.globalCompositeOperation='screen';
+    c.drawImage(fire.canvas,x-mid,y-mid);
+    c.restore();
+    if(hearth){
+      const leveled=actor.hearthLevel===2,pressurized=actor.hearthLevel===3;
+      const chimney=this.art.offset(actor.art,pressurized?.87:leveled?.79:.80,pressurized?.095:.035,s*actor.width!,s*actor.height!);
+      const chimneyX=p.x+chimney.x,chimneyY=p.y+chimney.y;
+      this.paintSparks(c,chimneyX,chimneyY,r*.73,tick+37,7,2.8);
+      for(let i=0;i<6;i++){
+        const f=(tick*.013+i/6)%1;
+        ovalGlow(c,chimneyX+s*(f*.37+Math.sin(f*6+tick*.03)*.12),chimneyY-s*f*.75,
+          s*(.12+f*.22),s*(.078+f*.14),`rgba(144,170,177,${.23*(1-f)})`,'rgba(144,170,177,0)');
+      }
+    }
+  }
+
+  private paintFlame(c:CanvasRenderingContext2D,x:number,y:number,r:number,tick:number):void{
+    const up=r*(1.12+Math.sin(tick*.29)*.16+Math.sin(tick*.73)*.07);
     c.save();
     c.globalCompositeOperation='screen';
     ovalGlow(c,x,y,r*1.45,r*1.07,'rgba(230,105,44,.54)','rgba(230,105,44,0)');
-    let g=c.createLinearGradient(x,y-up,x,y+r*.50);
+    const g=c.createLinearGradient(x,y-up,x,y+r*.50);
     g.addColorStop(0,'rgba(242,133,51,0)');g.addColorStop(.33,'rgba(232,99,39,.74)');
     g.addColorStop(.72,'rgba(255,172,65,.88)');g.addColorStop(1,'rgba(255,229,154,.94)');
     c.fillStyle=g;
@@ -856,18 +939,6 @@ export class ArkView {
       c.closePath();c.fill();
     }
     c.restore();
-    this.paintSparks(c,x,y,r,tick,hearth?17:8,hearth?3.36:3.0);
-    if(hearth){
-      const leveled=actor.hearthLevel===2,pressurized=actor.hearthLevel===3;
-      const chimney=this.art.offset(actor.art,pressurized?.87:leveled?.79:.80,pressurized?.095:.035,s*actor.width!,s*actor.height!);
-      const chimneyX=p.x+chimney.x,chimneyY=p.y+chimney.y;
-      this.paintSparks(c,chimneyX,chimneyY,r*.73,tick+37,7,2.8);
-      for(let i=0;i<6;i++){
-        const f=(tick*.013+i/6)%1;
-        ovalGlow(c,chimneyX+s*(f*.37+Math.sin(f*6+tick*.03)*.12),chimneyY-s*f*.75,
-          s*(.12+f*.22),s*(.078+f*.14),`rgba(144,170,177,${.23*(1-f)})`,'rgba(144,170,177,0)');
-      }
-    }
   }
 
   private paintSparks(c:CanvasRenderingContext2D,x:number,y:number,r:number,tick:number,n:number,rise:number):void{

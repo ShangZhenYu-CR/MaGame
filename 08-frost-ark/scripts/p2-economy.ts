@@ -1,3 +1,5 @@
+import { attackWhale,finaleStatus,forgeSolarArk,repairSeaHearth,volleyWhale } from '../src/sim/finale';
+import { startRoll } from '../src/sim/roll';
 import assert from 'node:assert/strict';
 import { build,countItem } from '../src/sim/ark';
 import { fire,startCharge,aim } from '../src/sim/cloud';
@@ -9,19 +11,19 @@ import { collectIndustry,industryPanel,startIndustry,unlockTech } from '../src/s
 import { deserializeWorld,serializeWorld } from '../src/sim/save';
 import { helmPoint,setDestination,toggleCruise } from '../src/sim/sky-map';
 import { craftTool,harvestIslandResource,repairTool,toolStatus } from '../src/sim/tools';
-import { attackM5 } from '../src/sim/m5';
+import { attackM5,m5Status } from '../src/sim/m5';
 import { vec } from './p2-walk-helper';
 import { createInitialWorld,stepWorld } from '../src/sim/world';
 import type { Vec2 } from '../src/sim/types';
 
-export function playEconomy(seed=202608){
+export function playEconomy(seed=202608,campaign=false){
  let w=createInitialWorld(seed), refuels=0, meals=0, catches=0, falls=0, previousHP=w.player.hp;
  const days:object[]=[];
  const count=(id:string)=>countItem(w,id);
  const fuelItems=()=>count('driftwood')+count('coal_chunk')+count('sulfur_ore');
  function support(){
   const p=w.player, meal=quickMeal(w);
-  if(meal&&p.hp>0&&(p.hunger<60||w.activeIsland&&p.warmth<52)&&!eatMeal(w,meal))meals++;
+  if(meal&&p.hp>0&&(p.hunger<60||w.activeIsland&&p.warmth<52||campaign&&p.hp<56)&&!eatMeal(w,meal))meals++;
   if(w.weather==='whiteout'&&w.wildEntities.some(e=>e.kind==='raider'&&Math.hypot(e.x-p.x,e.y-p.y)<=2.05))attackM5(w);
   if(primaryHearth(w)!.fuel<38&&hearthNear(w)&&fuelItems()>0&&!addFuel(w))refuels++;
  }
@@ -131,6 +133,78 @@ export function playEconomy(seed=202608){
  assert.equal(w.day,11,'complete Day 1 through Day 10');
  assert.ok(catches>3&&meals>=5&&refuels>=10,'sustained natural food and fuel loops');
  assert.ok(!falls,'living economy plan does not require dying to supply food or fuel');
+ if(campaign){
+  const fullStart=w.tick;
+  function topUp(){
+   warm();
+   catchOne('raw_root',9);catchOne('coal_chunk',9);catchOne('driftwood',9);
+   while(count('baked_root')<10){
+    if(count('raw_root')<2)catchOne('raw_root',7);
+    job(stove,'cook_baked_root',{x:22.6,y:25.72});
+   }
+   while(primaryHearth(w)!.fuel<200&&fuelItems()>0&&!addFuel(w))refuels++;
+  }
+  function dock(id:string){
+   const h=helmPoint(w);go(h.x,h.y);
+   assert.equal(setDestination(w,id),null,id);
+   assert.equal(toggleCruise(w),null,id);
+   for(let n=0;n<220&&w.ark.anchoredIslandId!==id;n++)step(22);
+   assert.equal(w.ark.anchoredIslandId,id);
+   const b=gangwayGeometry(w)!;
+   go(b.x-.54,b.y+.5);assert.equal(toggleGangway(w),null);
+   go(b.x+b.width+1.55,b.y+.5);return b;
+  }
+  for(const node of ['frostpine_gate','sulfur_reach','sulfur_furnace','permafrost_ruins']){
+   const prev=w.skyheartCores;
+   topUp();
+   const b=dock(node);
+   console.log('[campaign] landed '+node+' day '+w.day+' tick '+w.tick);
+   if(node==='frostpine_gate'||node==='sulfur_reach'){
+    const land=w.activeIsland!;
+    go(land.offsetX+24.35,land.offsetY+32.5);
+    const guard=()=>m5Status(w).bosses.find(e=>e.id==='boss_'+node);
+    for(let n=0;n<100&&w.skyheartCores===prev;n++){
+     const g=guard();
+     if(g&&Math.hypot(g.x-w.player.x,g.y-w.player.y)>1.85)go(g.x-.65,g.y);
+     if(g&&Math.hypot(g.x-w.player.x,g.y-w.player.y)<.2)startRoll(w,{x:0,y:1});
+     attackM5(w);step(17);
+    }
+   }else{
+    const cache=islandNodes(w).find(n=>n.key==='chest_2068')!;
+    assert.ok(cache&&islandNodeRemaining(w,cache)>0,node);
+    go(cache.x-.65,cache.y);
+    assert.ok(harvestIslandResource(w,cache).ok,node+' chest');
+   }
+   assert.equal(w.skyheartCores,prev+1,'actual fire seed: '+node);
+   console.log('[campaign] acquired '+w.skyheartCores+'/4 seeds, player '+w.player.hp.toFixed(1)+' hp');
+   go(b.x-.54,b.y+.5);assert.equal(toggleGangway(w),null);
+   warm();
+   w=deserializeWorld(serializeWorld(w));
+  }
+  topUp();assert.equal(forgeSolarArk(w),null);
+  assert.equal(primaryHearth(w)!.level,4);
+  catchOne('frost_iron_scrap',39);catchOne('driftwood',12);
+  const wheel=helmPoint(w);go(wheel.x,wheel.y);
+  assert.equal(setDestination(w,'aurora_vault'),null);assert.equal(toggleCruise(w),null);
+  for(let i=0;i<190&&!finaleStatus(w).sea&&!w.bossDefeated;i++)step(18);
+  assert.ok(finaleStatus(w).sea,'natural access to the aurora sea arena');
+  warm();
+  let phase=0;
+  for(let n=0;n<420&&!w.bossDefeated;n++){
+   let f=finaleStatus(w);
+   if(f.whale&&f.whale.phase!==phase){phase=f.whale.phase;console.log('[campaign] frost-whale phase '+(phase+1));w=deserializeWorld(serializeWorld(w));f=finaleStatus(w);}
+   if(f.whale?.warning&&f.whale.warning.until-w.tick<10)startRoll(w,{x:1,y:0});
+   if(f.whale?.open){volleyWhale(w);attackWhale(w);}
+   if(primaryHearth(w)!.hp<primaryHearth(w)!.maxHp-53)repairSeaHearth(w);
+   if(hearthNear(w,2.8)&&primaryHearth(w)!.fuel<95)addFuel(w);
+   step(13);
+   if(n%12===11&&Math.hypot(w.player.x-24.5,w.player.y-25.4)>1)warm();
+  }
+  assert.ok(w.bossDefeated,'natural fuel, actual paid cannon and recovery finish all phases');
+  assert.equal(w.skyheartCores,4);
+  assert.equal(falls,0);
+  return {seed,campaign:true,fullStart,finish:w.tick,day:w.day,seeds:w.skyheartCores,whale:w.bossDefeated,catches,meals,refuels,falls};
+ }
  return {seed,catches,meals,refuels,falls,days,final:{day:w.day,tick:w.tick,hunger:w.player.hunger,hp:w.player.hp,level:primaryHearth(w)!.level}};
 }
-console.log('[p2-economy] '+JSON.stringify(playEconomy(Number(process.argv[2])||202608)));
+console.log('[p2-economy] '+JSON.stringify(playEconomy(Number(process.argv[2])||202608,process.argv.includes('--campaign'))));

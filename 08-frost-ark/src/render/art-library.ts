@@ -74,20 +74,35 @@ export class ArtLibrary {
     if(this.tones.size>=32)this.tones.delete(this.tones.keys().next().value!);
     this.tones.set(key,layer);return layer;
   }
+  private readonly sizes=new Map<string,HTMLCanvasElement>();
+  private scaled(id:string,source:CanvasImageSource,w:number,h:number,flash=false){
+    const ww=Math.max(1,Math.round(w)),hh=Math.max(1,Math.round(h));
+    if(!flash&&(ww<12||hh<12||ww>244||hh>244))return source;
+    const key=id+':'+ww+':'+hh+(flash?':flash':'');
+    const prior=this.sizes.get(key);if(prior)return prior;
+    const raster=document.createElement('canvas');raster.width=ww;raster.height=hh;
+    const ctx=raster.getContext('2d')!;ctx.imageSmoothingQuality='medium';
+    if(flash)ctx.filter='brightness(2.55) saturate(.15)';
+    ctx.drawImage(source,0,0,ww,hh);
+    if(this.sizes.size>=144)this.sizes.delete(this.sizes.keys().next().value!);
+    this.sizes.set(key,raster);return raster;
+  }
   /** Position using the authored ground anchor. Overrides are in tile units. */
   paint(c:CanvasRenderingContext2D, id:string, x:number, y:number, tile:number,
-        {width, height, rotation=0, scale=1, flip=false,tint}: {
-          width?:number; height?:number; rotation?:number; scale?:number; flip?:boolean;tint?:'aurora'|'ember';
+        {width, height, rotation=0, scale=1, flip=false,tint,flash=false}: {
+          width?:number; height?:number; rotation?:number; scale?:number; flip?:boolean;tint?:'aurora'|'ember';flash?:boolean;
         }={}):void {
     const entry=this.images.get(id);
     if(!entry) throw new Error(`美术资产未载入：${id}`);
     const {image, asset}=entry;
     const w=(width??asset.tileW)*tile*scale, h=(height??asset.tileH)*tile*scale;
-    c.save();
-    c.translate(x,y);
-    if(rotation) c.rotate(rotation);
-    if(flip) c.scale(-1,1);
-    c.drawImage(tint?this.recolor(id,image,tint):image,-asset.anchorX/asset.width*w,-asset.anchorY/asset.height*h,w,h);
-    c.restore();
+    const ax=asset.anchorX/asset.width*w,ay=asset.anchorY/asset.height*h;
+    const imageSource=tint?this.recolor(id,image,tint):image;
+    const raster=this.scaled(id+(tint??''),imageSource,w,h,flash);
+    if(!rotation&&!flip){c.drawImage(raster,x-ax,y-ay,w,h);return;}
+    c.save();c.translate(x,y);
+    if(rotation)c.rotate(rotation);
+    if(flip)c.scale(-1,1);
+    c.drawImage(raster,-ax,-ay,w,h);c.restore();
   }
 }

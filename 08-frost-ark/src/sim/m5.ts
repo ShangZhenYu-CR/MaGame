@@ -194,11 +194,18 @@ function stepEnemy(w:WorldState,e:WildEntity,s:M5State){
     if(!w.wildEntities.some(v=>v.id===mob))add(w,'frostpack_wolf',mob,'boss',pos);
   })){clock.strike=0;return;}
   const building=(id:string)=>w.ark.buildings.find(b=>b.id===id&&b.hp>0);
-  const heat=e.defId==='heatwraith'?w.ark.buildings.filter(b=>b.hp>1&&(b.defId==='hearth_core'||b.defId==='ward_searchlight'||b.defId==='heat_relay'||b.defId==='torch_post')&&
-    (b.defId!=='hearth_core'||b.fuel>0)).sort((a,b)=>length(e,center(a))-length(e,center(b)))[0]:undefined;
+  let heat:string|undefined,nearest:string|undefined,heatDist=Infinity,dist=Infinity;
+  if(!clock.strike&&e.kind==='raider')for(const b of w.ark.buildings){
+    if(b.hp<=0)continue;
+    const dx=b.gx+.5-e.x,dy=b.gy+.5-e.y,d2=dx*dx+dy*dy;
+    if(d2<dist){dist=d2;nearest=b.id;}
+    if(e.defId==='heatwraith'&&d2<heatDist&&b.hp>1&&
+      (b.defId==='ward_searchlight'||b.defId==='heat_relay'||b.defId==='torch_post'||b.defId==='hearth_core'&&b.fuel>0)){
+      heat=b.id;heatDist=d2;
+    }
+  }
   const belongsToPlayer=(e.defId==='frostspike_bat'||e.defId==='mist_priest')?d.range+.5:2.4;
-  const candidate=heat?heat.id:e.kind==='boss'||(w.player.hp>0&&onDeck(w,w.player)&&!indoorsAt(w,w.player)&&length(e,w.player)<belongsToPlayer)?'player':
-    w.ark.buildings.filter(b=>b.hp>0).sort((a,b)=>length(e,center(a))-length(e,center(b)))[0]?.id??'';
+  const candidate=heat??(e.kind==='boss'||(w.player.hp>0&&onDeck(w,w.player)&&!indoorsAt(w,w.player)&&length(e,w.player)<belongsToPlayer)?'player':nearest??'');
   const target=clock.strike?clock.target:candidate;
   const obj=target==='player'?null:building(target);
   const pos=target==='player'?w.player:obj?center(obj):null;

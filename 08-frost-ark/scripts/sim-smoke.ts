@@ -1687,3 +1687,18 @@ merits.day=11;merits.weather='clear';stepAchievements(merits);
 assert.equal(liveLife(merits).cleanStorms,1);
 assert.ok(achievementView(merits).rows.find(v=>v.id==='storm')?.unlocked);
 console.log('[sim-smoke:P2-40] OK: 24 registered medals, real refuel/build/dodge, one-time queue, historical stats and damage-sensitive cold wave');
+
+// P2-41: the test vessel carries the same load through each simulated cold wave.
+import { giantFixture } from './p2-giant-fixture';
+const coldGiant=giantFixture(),coldDuplicate=deserializeWorld(serializeWorld(coldGiant));
+assert.equal(coldGiant.ark.decks.filter(Boolean).length,576);
+assert.equal(coldGiant.ark.buildings.length,50);
+assert.equal(coldGiant.beasts.length,12);
+stepWorld(coldGiant,3600);stepWorld(coldDuplicate,3600);
+const giantArchive=serializeWorld(coldGiant);
+assert.equal(serializeWorld(coldDuplicate),giantArchive);
+assert.ok(Buffer.byteLength(giantArchive)<350000);
+assert.ok(coldGiant.ark.heatGrid.some((v,i)=>coldGiant.ark.decks[i]&&v>=25));
+assert.ok(coldGiant.ark.heatGrid.some((v,i)=>coldGiant.ark.decks[i]&&v<=-20));
+assert.ok(coldGiant.ark.heatGrid.every(Number.isFinite));
+console.log('[sim-smoke:P2-41] OK: 576 deck tiles, 50 buildings, 12 beasts, deterministic 3600-tick whiteout and bounded save');

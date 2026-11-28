@@ -1,3 +1,5 @@
+import { benchmarkMode,setupShipBenchmark } from './ui/ship-benchmark';
+import { perfDraw,perfStep,resetPerf } from './render/performance';
 import { achievementsUi } from './ui/achievements-ui';
 import { journalUi } from './ui/journal-ui';
 import { configureVoyage,daySpeed,difficultyIds,difficultyNames,difficultyOf,type DaySpeed,type Difficulty } from './sim/challenge';
@@ -622,7 +624,7 @@ function updateFoodHud():void{
   }
 }
 function saveNow():Promise<void> {
-  if(!db||!active)return Promise.resolve();
+  if(benchmarkMode||!db||!active)return Promise.resolve();
   const archive=db,snapshot=structuredClone(w),slot=currentSlot,untouched=provisional;
   saveQueue=saveQueue.then(()=>storeWorld(archive,snapshot,slot,untouched)).then(()=>{
     if(save.dataset.error==='true') delete save.dataset.error;
@@ -633,7 +635,7 @@ function saveNow():Promise<void> {
   return saveQueue;
 }
 function safeWorld(next:WorldState):void {
-  closeTitle();medals.show(false);journal.reset();finale.reset();view.juice.reset();cancelFishing(w);skyEvents.close();
+  closeTitle();resetPerf();medals.show(false);journal.reset();finale.reset();view.juice.reset();cancelFishing(w);skyEvents.close();
   expedition.cancel();chart.hide(false);beasts.show(false);beasts.resetTarget();showLatte(false);showAudio(false);w=next;toggleStorage(false);industry.showStation(null);industry.showCatalog(false);lockerSignature='';cancelCharge(w);
   caught=null;keys.clear();messageUntil=0;message='';stackSignature='';
   if(mode==='weapon'&&!w.player.weapon||mode==='tool'&&!heldTool(w))choose('hook');
@@ -852,7 +854,7 @@ function simulation():void {
   const pending=w.latte.autoLootUnlocked&&w.sky.debris.filter(isDeckDrop).length;
   const wasDown=incapacitated(w),beastCount=w.beasts.length;
   if(mode==='weapon'&&!w.player.weapon)choose('hook');
-  stepWorld(w,1,{x:Number(keys.has('d'))-Number(keys.has('a')),y:Number(keys.has('s'))-Number(keys.has('w'))},keys.has('shift')&&expedition.area()==='island'?.53:1);
+  perfStep(()=>stepWorld(w,1,{x:Number(keys.has('d'))-Number(keys.has('a')),y:Number(keys.has('s'))-Number(keys.has('w'))},keys.has('shift')&&expedition.area()==='island'?.53:1));
   if(w.tick%9===0&&!rolling(w)&&(w.player.vx||w.player.vy))audio.play(expedition.area()==='ark'||expedition.area()==='gangway'?'step-wood':'step-snow');
   if(w.tick%570===0&&w.beasts.some(b=>b.hp>0&&Math.hypot(b.x-w.player.x,b.y-w.player.y)<=3))audio.play('beast');
   if(w.tick%3===0){
@@ -893,6 +895,8 @@ function simulation():void {
   }
   if(w.tick%90===0)void saveNow();
 }
+let lastDrawWorld:WorldState|null=null,lastDrawTick=-1,lastPointerRef:{x:number;y:number}|null=null,lastDrawMode='',lastDrawZoom=0;
+let lastHud=-1;
 function frame(now:number):void {
   collectJuice(now);
   elapsed+=Math.min(100,Math.max(0,now-Math.max(last,view.juice.freezeUntil)));last=now;
@@ -901,6 +905,8 @@ function frame(now:number):void {
     elapsed-=1000/TICK_RATE;
     collectJuice(now);
   }
+  if(lastHud<0||now-lastHud>=28||w!==lastDrawWorld){
+  lastHud=now;
   if(canvas.dataset.hitstop!==String(now<view.juice.freezeUntil))canvas.dataset.hitstop=String(now<view.juice.freezeUntil);
   const down=incapacitated(w), shield=rescueShield(w), rescue=el('rescue-status');
   rescue.hidden=!down&&!shield;
@@ -992,15 +998,38 @@ function frame(now:number):void {
   if(hint.textContent!==interactionHint)hint.textContent=interactionHint;
   meter.hidden=!g.charging;bar.style.width=(g.charge*100)+'%';
   note.hidden=mode==='hook'||mode==='weapon'||mode==='tool'||!pointer||here!=='ark';
-  const locked=mode==='weapon'&&pointer&&!overlay&&!finale.open()&&!finale.blocking()?weaponHover(w,view.world(pointer.x,pointer.y)):null;
-  view.draw(w,ghostAt(),now,locked);
   if(!panel.hidden)fillBag();
   if(!locker.hidden)fillLocker();
+  }
+  perfDraw(canvas,()=>{
+    const valid=canvas.dataset.artReady==='true';
+    const tuning=view.cameraVersion();
+    if(valid&&lastDrawWorld===w&&lastDrawTick===w.tick&&lastPointerRef===pointer&&lastDrawMode===mode&&lastDrawZoom===tuning&&!view.juice.animating(now))return;
+    lastDrawWorld=w;lastDrawTick=w.tick;lastPointerRef=pointer;lastDrawMode=mode;lastDrawZoom=tuning;
+    const blocked=chart.open()||!panel.hidden||!locker.hidden||industry.catalogOpen()||finale.open()||finale.blocking();
+    const aim=mode==='weapon'&&pointer&&!blocked?weaponHover(w,view.world(pointer.x,pointer.y)):null;
+    view.draw(w,ghostAt(),now,aim);
+  },()=>({tick:w.tick,wave:Number(el('raid-alert').dataset.wave),deck:w.ark.decks.filter(Boolean).length,
+    buildings:w.ark.buildings.length,beasts:w.beasts.length,chunks:Number(canvas.dataset.deckChunks)}));
   requestAnimationFrame(frame);
 }
 let last=performance.now(),elapsed=0;
 canvas.dataset.mode=mode;view.resize(w);requestAnimationFrame(frame);
 async function restore():Promise<void> {
+  if(benchmarkMode){
+    provisional=false;
+    save.textContent='压测沙盒 · 不写入正式存档';
+    setupShipBenchmark(canvas,{
+      start(raw){
+        const scenario=deserializeWorld(raw);
+        safeWorld(scenario);view.frameBenchmark(w);audio.unlock();active=true;
+        last=performance.now();elapsed=0;return w;
+      },
+      active(value){active=value;keys.clear();},
+      wave:()=>Number(el('raid-alert').dataset.wave)||0,
+    });
+    return;
+  }
   try {
     db=await openArchive();
     const previous=await savedWorld(db,currentSlot);slotsInfo=await slotOverview(db);

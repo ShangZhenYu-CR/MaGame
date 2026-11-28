@@ -1,3 +1,4 @@
+import { trackTurret } from './turret-aim';
 import { ancientDue,ancientValid,defeatAncient,depthOf,hasAncientWhiteout,isBountyEnemy,syncAncient } from './endless';
 import { awardGuardian,clearGuardianStage,guardianHitScale,guardianTell,stepGuardian } from './guardians-p2';
 import { defenseSlow,raiderConcealed,stepDefenses } from './defenses-p2';
@@ -166,10 +167,12 @@ function stepTurrets(w:WorldState,s:M5State){
   if(!enemies.length)return;
   for(const b of w.ark.buildings){
     const def=specs.turrets[b.defId as keyof typeof specs.turrets];
-    if(!def||b.hp<=1||heatAt(w,b.gx+.5,b.gy+.5)<def.heatFloor||(s.turretClocks[b.id]??0)>w.tick)continue;
+    if(!def||b.hp<=1||heatAt(w,b.gx+.5,b.gy+.5)<def.heatFloor)continue;
     const from=center(b);
     const target=enemies.filter(e=>e.hp>0&&!raiderConcealed(w,e)&&length(from,e)<=def.range).sort((a,c)=>length(from,a)-length(from,c))[0];
     if(!target)continue;
+    trackTurret(w,b.id,target);
+    if((s.turretClocks[b.id]??0)>w.tick)continue;
     const fire=b.defId==='fire_oil_turret';
     hurt(w,target,def.damage,fire,0,fire?'fire':'ice');
     if(fire)for(const nearby of enemies)if(nearby!==target&&nearby.hp>0&&length(target,nearby)<1.3)hurt(w,nearby,Math.floor(def.damage/2),true,0,'fire');

@@ -103,6 +103,15 @@
     },
     "p232-blueprints": {
       "text": "Four reward tokens drawn at 40° on magenta: two wolf/ash parchment blueprints; white wolf amulet; coal-colored volcanic scale bracer."
+    },
+    "p237-heads": {
+      "text": "Individually hand-painted 40° Frost Ark animation layers and impressions. Broad isolated magenta matte, graphite and wood, desaturated ice and amber accents, no letters."
+    },
+    "p237-bases": {
+      "text": "Individually hand-painted 40° Frost Ark animation layers and impressions. Broad isolated magenta matte, graphite and wood, desaturated ice and amber accents, no letters."
+    },
+    "p237-prints": {
+      "text": "Individually hand-painted 40° Frost Ark animation layers and impressions. Broad isolated magenta matte, graphite and wood, desaturated ice and amber accents, no letters."
     }
   },
   "assets": [
@@ -7486,6 +7495,286 @@
       "tileW": 1.1,
       "tileH": 0.95,
       "maxBytes": 18000
+    },
+    {
+      "id": "turret-arrow-head",
+      "source": "p237-heads.png",
+      "crop": [
+        18,
+        18,
+        494,
+        494
+      ],
+      "size": [
+        96,
+        96
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.53
+      ],
+      "targetAnchor": [
+        0.5,
+        0.53
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9300
+    },
+    {
+      "id": "turret-oil-head",
+      "source": "p237-heads.png",
+      "crop": [
+        530,
+        18,
+        1006,
+        494
+      ],
+      "size": [
+        96,
+        96
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.53
+      ],
+      "targetAnchor": [
+        0.5,
+        0.53
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9300
+    },
+    {
+      "id": "turret-mortar-head",
+      "source": "p237-heads.png",
+      "crop": [
+        1042,
+        18,
+        1518,
+        494
+      ],
+      "size": [
+        96,
+        96
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.53
+      ],
+      "targetAnchor": [
+        0.5,
+        0.53
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9300
+    },
+    {
+      "id": "turret-arrow-base",
+      "source": "p237-bases.png",
+      "crop": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.92
+      ],
+      "targetAnchor": [
+        0.5,
+        0.92
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9300
+    },
+    {
+      "id": "turret-oil-base",
+      "source": "p237-bases.png",
+      "crop": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.92
+      ],
+      "targetAnchor": [
+        0.5,
+        0.92
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9300
+    },
+    {
+      "id": "turret-mortar-base",
+      "source": "p237-bases.png",
+      "crop": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.92
+      ],
+      "targetAnchor": [
+        0.5,
+        0.92
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9300
+    },
+    {
+      "id": "building-greenhouse-seedling",
+      "source": "p237-bases.png",
+      "crop": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "size": [
+        160,
+        160
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.92
+      ],
+      "targetAnchor": [
+        0.5,
+        0.92
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 22000
+    },
+    {
+      "id": "building-greenhouse-ripe",
+      "source": "p237-bases.png",
+      "crop": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "size": [
+        160,
+        160
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.92
+      ],
+      "targetAnchor": [
+        0.5,
+        0.92
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 22000
+    },
+    {
+      "id": "snow-print-boot",
+      "source": "p237-prints.png",
+      "crop": [
+        0,
+        0,
+        887,
+        887
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9300
+    },
+    {
+      "id": "snow-print-hoof",
+      "source": "p237-prints.png",
+      "crop": [
+        887,
+        0,
+        1774,
+        887
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9300
     }
   ],
   "batchReferences": [

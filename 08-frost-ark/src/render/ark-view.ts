@@ -1,3 +1,4 @@
+import { LivingView,LIVING_ART,paintFlue,rotating,type Rotator } from './living-view';
 import { seaWhale,whaleBounds } from '../sim/whale-sea';
 import { paintSeaCombat,paintSeaWhale } from './whale-view';
 import { guardianLoot } from '../sim/guardians-p2';
@@ -87,7 +88,7 @@ const buildingVisuals:Readonly<Record<string,BuildingVisual>>={
   buoyancy_core:{art:'building-buoyancy-core',width:1.20,height:1.38,shadow:.50},
 };
 const ironDeck='building-iron-deck';
-const required=[
+const required=[...LIVING_ART,
   ...deckIds,'boss-frost-whale-1','boss-frost-whale-2','boss-frost-whale-3','solar-hearth','aurora-crystal','manan-south','manan-north','manan-west','manan-east','latte-sleep','latte-alert','latte-walk','latte-walk-alt',
   'hearth-1','hearth-2','hearth-3','rail','corner','rock','icicles',ironDeck,...Object.values(buildingVisuals).map(v=>v.art),
   ...outfits.filter(o=>o!=='classic').flatMap(o=>['sleep','alert','walk','walk-alt'].map(p=>'latte-'+o+'-'+p)),
@@ -97,7 +98,7 @@ const required=[
 interface Cell { x:number; y:number; hash:number; iron:boolean; insulated:boolean; temperature:number; left:boolean; right:boolean; front:boolean; back:boolean }
 interface Actor {
   id?:string;x:number;y:number;art:string;shadow:number;
-  tint?:Variant;steam?:boolean;width?:number;height?:number;rotation?:number;scale?:number;flip?:boolean;float?:number;fire?:'hearth'|'torch'|'forge'|'stove'|'relay';hearthLevel?:number;
+  turret?:Rotator;flue?:boolean;tint?:Variant;steam?:boolean;width?:number;height?:number;rotation?:number;scale?:number;flip?:boolean;float?:number;fire?:'hearth'|'torch'|'forge'|'stove'|'relay';hearthLevel?:number;
 }
 function dataHull(canvas:HTMLCanvasElement,hull:HullProfile):void{
   canvas.dataset.hullCones=String(hull.cones.reduce((n,x)=>n+x,0));
@@ -114,6 +115,7 @@ export class ArkView {
   private art=new ArtLibrary(required);
   private lightmap=new Lightmap();
   private beastScene=new BeastScene();
+  private living=new LivingView();
   private weather=new WeatherFinish();
   readonly juice=new JuiceView();
   private hull:HullProfile|null=null;
@@ -293,6 +295,8 @@ export class ArkView {
       c.restore();
     }
     if(island)paintIsland(c,this.art,island,project,s,w.tick);
+    const prints=this.living.prints(c,this.art,w,project,s),printsText=prints.boot+'/'+prints.hoof;
+    if(this.canvas.dataset.snowTrails!==printsText)this.canvas.dataset.snowTrails=printsText;
     const b=this.deckStructure(c,cells,w,hull,surface,thawed);
     const hotPipes=heatedPipes(w),allPipes=w.ark.buildings.filter(b=>b.defId==='heat_pipe');
     const pipeLocations=new Set(allPipes.map(b=>b.gy*w.ark.size+b.gx));
@@ -379,6 +383,7 @@ export class ArkView {
     const fire=primaryHearth(w);
     const fireArt=fire?.level===4?'solar-hearth':fire?.level===3?'hearth-3':fire?.level===2?'hearth-2':'hearth-1';
     if(this.canvas.dataset.hearthArt!==fireArt)this.canvas.dataset.hearthArt=fireArt;
+    const jobs:string[]=[];
     for(const bld of w.ark.buildings){
       if(overlayKind(bld.defId)&&bld.defId!=='wall_lamp')continue;
       const {gx,gy}=bld;
@@ -390,15 +395,23 @@ export class ArkView {
       const visuals=buildingVisuals[bld.defId];
       if(!visuals)continue;
       const [spanX,spanY]=buildingDefs.get(bld.defId)?.size??[1,1];
-      const working=getIndustrySave(w)?.stations[bld.id]?.job;
+      const station=getIndustrySave(w)?.stations[bld.id],job=station?.job;
+      const working=job&&bld.hp>1&&!bld.frozen&&(!job.networkFuel||bld.fuel>0)&&job.progress<job.duration;
       const effect=bld.defId==='torch_post'?'torch':bld.defId==='heat_relay'?'relay':
         working?(bld.defId==='furnace'?'forge':bld.defId==='stove'?'stove':undefined):undefined;
-      const doorArt=doorOpen(bld)?visuals.art+'-open':visuals.art;
+      const turning=rotating[bld.defId as keyof typeof rotating];
+      const crop=bld.defId==='greenhouse'?(station?.output.length||job&&job.progress/job.duration>=.64?'ripe':job?'seedling':''):null;
+      const design=turning?'turret-'+turning.key+'-base':crop?'building-greenhouse-'+crop:visuals.art;
+      const doorArt=doorOpen(bld)?design+'-open':design;
+      if(crop)jobs.push(crop);
+      if(effect==='forge'||effect==='stove')jobs.push(effect);
       const r=w.sky.cruising&&bld.hp>1&&bld.defId==='wind_sail'?.032*Math.sin(w.tick*.31+gx):undefined;
-      actors.push({...visuals,art:doorArt,id:bld.id,rotation:r,steam:w.sky.cruising&&bld.defId==='steam_thruster'&&bld.hp>1,x:gx+spanX*.5,y:gy+(GROUND_FOOTPRINTS[bld.defId]?.anchorY??spanY*.80),fire:effect});
+      actors.push({...visuals,art:doorArt,id:bld.id,turret:turning,height:turning?.baseH??visuals.height,flue:effect==='forge'||effect==='stove',rotation:r,steam:w.sky.cruising&&bld.defId==='steam_thruster'&&bld.hp>1,x:gx+spanX*.5,y:gy+(GROUND_FOOTPRINTS[bld.defId]?.anchorY??spanY*.80),fire:effect});
       if(bld.defId==='incubator'&&incubatorOccupied(w,bld.id))
         actors.push({x:gx+.50,y:gy+.94,art:'icon-cloud-egg',width:.39,height:.42,shadow:0,float:s*.33});
     }
+    const runs=jobs.join(',');
+    if(this.canvas.dataset.livingJobs!==runs)this.canvas.dataset.livingJobs=runs;
     const latte=w.latte;
     const perch=catPerch(w);
     const perched=perch&&latte.mood==='cozy'&&Math.hypot(latte.x-perch.gx-.52,latte.y-perch.gy-.59)<.23;
@@ -450,7 +463,7 @@ export class ArkView {
 
     const speed=w.sky.cruising?cruiseSpeed(w):0,navSpeed=speed.toFixed(2);
     if(this.canvas.dataset.cruiseSpeed!==navSpeed)this.canvas.dataset.cruiseSpeed=navSpeed;
-    const jets:Vec2[]=[];
+    const jets:Vec2[]=[],aims:string[]=[];
     // L3: Ground-point based depth ordering (including foreground edge fittings).
     actors.sort((a,b)=>a.y-b.y);
     for(const actor of actors){
@@ -459,10 +472,13 @@ export class ArkView {
       if(glow){c.save();c.filter='brightness(2.55) saturate(.15)';}
       this.art.paint(c,actor.art,p.x,p.y-(actor.float??0)-this.juice.bounce(actor.id,now)*s,s,actor);
       if(glow)c.restore();
+      if(actor.turret&&actor.id)aims.push(actor.id+':'+this.living.turret(c,this.art,w,actor.id,actor.turret,p,actor,s));
+      if(actor.flue)paintFlue(c,p,w,s,actor.fire==='forge',actor.x);
       if(actor.steam)jets.push(p);
       if(actor.fire)this.paintFire(c,actor,p,w.tick);
       paintElementAura(c,w,actor,p,s);
     }
+    const aimText=aims.join(',');if(this.canvas.dataset.turretAims!==aimText)this.canvas.dataset.turretAims=aimText;
     for(const p of jets){
       c.save();c.globalCompositeOperation='screen';
       const lead=w.sky.headingX;

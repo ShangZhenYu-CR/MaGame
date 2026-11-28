@@ -1614,3 +1614,19 @@ for(const scene of scoreScenes)for(let i=0;i<100;i++){
  const cue=scoreStep(scene,i);assert.ok(cue.freq>=55&&cue.freq<=550&&cue.pulse>.2);
 }
 console.log('[sim-smoke:P2-36] OK: three distinct score voices with bounded notes and beat speeds');
+
+import { turretAim } from '../src/sim/turret-aim';
+import { LIVING_ART } from '../src/render/living-view';
+import { motionRaid,motionWorkshop } from './p2-motion-fixture';
+for(const asset of LIVING_ART)assert.ok(Object.hasOwn(artManifest.assets,asset),asset);
+const movingShop=motionWorkshop(true);
+const jobsBefore=getIndustrySave(movingShop)!.stations;
+assert.equal(jobsBefore['greenhouse_21_24'].job?.progress,0);
+stepWorld(movingShop,480);
+assert.ok((jobsBefore['greenhouse_21_24'].job?.progress??720)>160);
+assert.ok(jobsBefore['stove_25_24'].output.some(s=>s.itemId==='baked_root'));
+assert.ok(jobsBefore['furnace_23_26'].output.some(s=>s.itemId==='frost_iron_ingot'));
+const cannonAim=motionRaid();
+stepM5(cannonAim);
+assert.ok(turretAim(cannonAim,'frost_turret_24_21'));
+console.log('[sim-smoke:P2-37] OK: sprites resolve, industry advances against actual recipe time, real target supplies turning pose');

@@ -1,3 +1,4 @@
+import { trackTurret } from './turret-aim';
 import { buildingDefs,inventoryChange,isDeck } from './ark';
 import { damagePlayer,incapacitated } from './rescue';
 import type { Vec2,WorldState } from './types';
@@ -95,6 +96,7 @@ export function fireSeaCannons(w:WorldState,b:Wake,sea:SeaWhale):{issue:string|n
  let damage=0;const shots:Shot[]=[];
  for(const c of cannons){
   if(!inventoryChange(w,[{itemId:'frost_iron_scrap',count:1}],[]))break;
+  trackTurret(w,c.id,b);
   shots.push({from:{x:c.gx+.5,y:c.gy+.70},to:at(b),until:w.tick+27});
   damage+=c.defId==='oil_mortar'?43:c.defId==='fire_oil_turret'?35:27;
  }

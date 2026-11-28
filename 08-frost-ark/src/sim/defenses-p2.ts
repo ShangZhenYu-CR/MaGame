@@ -1,3 +1,4 @@
+import { trackTurret } from './turret-aim';
 import { heatAt } from './heatField';
 import { envelope } from './rooms';
 import { takeNetworkStorage } from './storage-box';
@@ -68,7 +69,7 @@ export function stepDefenses(w:WorldState,clock:Record<string,number>,enemies:Wi
   for(const id of marked)if(!enemies.some(e=>e.id===id))marked.delete(id);
  }
  for(const b of buildings){
-  if((clock[b.id]??0)>w.tick||b.defId==='ward_searchlight')continue;
+  if(((clock[b.id]??0)>w.tick&&b.defId!=='oil_mortar')||b.defId==='ward_searchlight')continue;
   const from=center(b);
   if(b.defId==='ice_barricade'){
    const nearby=enemies.filter(e=>e.hp>0&&gap(from,e)<=BARRIER_RANGE);
@@ -80,6 +81,7 @@ export function stepDefenses(w:WorldState,clock:Record<string,number>,enemies:Wi
    const target=enemies.filter(e=>e.hp>0&&!raiderConcealed(w,e)&&gap(from,e)>=1.2&&gap(from,e)<=MORTAR_RANGE)
     .sort((a,z)=>enemies.filter(e=>e.hp>0&&gap(z,e)<=BLAST).length-enemies.filter(e=>e.hp>0&&gap(a,e)<=BLAST).length||gap(from,a)-gap(from,z))[0];
    if(!target)continue;
+   trackTurret(w,b.id,target);if((clock[b.id]??0)>w.tick)continue;
    const to={x:target.x,y:target.y};
    ((w as Archive).defensesP2??=[]).push({from,to,launched:w.tick,land:w.tick+HANG,source:b.id});
    flash(w,'launch',from,17);clock[b.id]=w.tick+103;

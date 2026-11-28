@@ -5280,6 +5280,166 @@
         138
       ],
       "bytes": 8702
+    },
+    "turret-arrow-head": {
+      "file": "turret-arrow-head.png",
+      "width": 96,
+      "height": 96,
+      "anchorX": 48,
+      "anchorY": 51,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        17,
+        94,
+        82
+      ],
+      "bytes": 3908
+    },
+    "turret-oil-head": {
+      "file": "turret-oil-head.png",
+      "width": 96,
+      "height": 96,
+      "anchorX": 48,
+      "anchorY": 51,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        14,
+        94,
+        83
+      ],
+      "bytes": 4389
+    },
+    "turret-mortar-head": {
+      "file": "turret-mortar-head.png",
+      "width": 96,
+      "height": 96,
+      "anchorX": 48,
+      "anchorY": 51,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        10,
+        94,
+        87
+      ],
+      "bytes": 3883
+    },
+    "turret-arrow-base": {
+      "file": "turret-arrow-base.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 118,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        34,
+        126,
+        125
+      ],
+      "bytes": 6542
+    },
+    "turret-oil-base": {
+      "file": "turret-oil-base.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 118,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        19,
+        26,
+        109,
+        126
+      ],
+      "bytes": 5692
+    },
+    "turret-mortar-base": {
+      "file": "turret-mortar-base.png",
+      "width": 128,
+      "height": 128,
+      "anchorX": 64,
+      "anchorY": 118,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        12,
+        26,
+        117,
+        126
+      ],
+      "bytes": 6003
+    },
+    "building-greenhouse-seedling": {
+      "file": "building-greenhouse-seedling.png",
+      "width": 160,
+      "height": 160,
+      "anchorX": 80,
+      "anchorY": 147,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        13,
+        20,
+        147,
+        158
+      ],
+      "bytes": 9892
+    },
+    "building-greenhouse-ripe": {
+      "file": "building-greenhouse-ripe.png",
+      "width": 160,
+      "height": 160,
+      "anchorX": 80,
+      "anchorY": 147,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        13,
+        20,
+        147,
+        158
+      ],
+      "bytes": 10633
+    },
+    "snow-print-boot": {
+      "file": "snow-print-boot.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        18,
+        2,
+        47,
+        62
+      ],
+      "bytes": 4484
+    },
+    "snow-print-hoof": {
+      "file": "snow-print-hoof.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        4,
+        2,
+        60,
+        62
+      ],
+      "bytes": 7529
     }
   }
 }

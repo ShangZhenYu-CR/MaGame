@@ -1,3 +1,4 @@
+import { runP2Motion } from "./p2-motion-e2e";
 import { runP2Audio } from "./p2-audio-e2e";
 import { runP2Codex } from "./p2-codex-e2e";
 import { runP2Endless } from "./p2-endless-e2e";
@@ -689,6 +690,7 @@ try {
   await runP2Endless(browser,baseUrl,outDir,errors);
   await runP2Codex(browser,baseUrl,outDir,errors);
   await runP2Audio(browser,baseUrl,outDir,errors);
+  await runP2Motion(browser,baseUrl,outDir,errors);
 
   if (errors.length > 0) {
     throw new Error(errors.join('\n'));

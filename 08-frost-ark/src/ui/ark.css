@@ -489,3 +489,9 @@ button[aria-disabled=true]{opacity:.62}
 .ship-benchmark p,.ship-benchmark output{display:block;margin-top:6px}
 .ship-benchmark div{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:8px}
 .ship-benchmark a{color:#bedcea}
+
+/* The expanded journal stays in the measured gap between the growing
+   portrait/status card and the two- or three-row desktop utility dock. */
+@media(min-width:1100px){
+ .voyage-journal{bottom:var(--journal-bottom,153px);max-height:min(268px,39vh,var(--journal-room,268px))}
+}

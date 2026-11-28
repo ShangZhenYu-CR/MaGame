@@ -130,6 +130,21 @@ const panelEdges=new ResizeObserver(entries=>{
  }
 });
 panelEdges.observe(sectorPanel);panelEdges.observe(wildPanel);
+const hudCard=el('hud-card'),toolRail=document.querySelector<HTMLElement>('.m2-tools')!;
+const journalRail=()=>{
+  if(innerWidth<1100)return;
+  const safeEnd=Math.min(innerHeight-153,Math.floor(toolRail.getBoundingClientRect().top)-10);
+  const safeStart=Math.ceil(hudCard.getBoundingClientRect().bottom)+10;
+  const apply=(name:string,value:string)=>{
+    if(document.body.style.getPropertyValue(name)!==value)document.body.style.setProperty(name,value);
+  };
+  apply('--journal-bottom',`${innerHeight-safeEnd}px`);
+  apply('--journal-room',`${Math.max(62,safeEnd-safeStart)}px`);
+};
+const journalEdges=new ResizeObserver(journalRail);
+journalEdges.observe(hudCard);journalEdges.observe(toolRail);
+addEventListener('resize',journalRail);
+
 let mood=0;
 const thermal=el('thermal-stats'), briefing=el('weather-status'), catStatus=el('latte-status');
 const stats=el('hud-stats'), hint=el('hint'), action=el('action'), save=el('save-label'), note=el('build-note');

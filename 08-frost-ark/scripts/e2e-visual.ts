@@ -1,3 +1,4 @@
+import { checkActiveOverlays } from './p2-final-overlay-probe';
 import { checkBenchmark } from "./p2-benchmark-entry-e2e";
 import { runP2Achievements } from "./p2-achievements-e2e";
 import { runP2Journal } from "./p2-journal-e2e";
@@ -699,6 +700,7 @@ try {
   await runP2Journal(browser,baseUrl,outDir,errors);
   await runP2Achievements(browser,baseUrl,outDir,errors);
   await checkBenchmark(browser,baseUrl,outDir,errors);
+  await checkActiveOverlays(browser,baseUrl,outDir,errors);
 
   if (errors.length > 0) {
     throw new Error(errors.join('\n'));

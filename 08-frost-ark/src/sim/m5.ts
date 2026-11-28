@@ -1,3 +1,4 @@
+import { defenseSlow,raiderConcealed,stepDefenses } from './defenses-p2';
 import { partnerCritical } from './beast-bond';
 import { beastAttackScale,gainBeastXp } from './beast-growth';
 import { traitStrike,traitWatchful } from './beast-traits';
@@ -74,7 +75,7 @@ function hurt(w:WorldState,e:WildEntity,damage:number,bypassArmor=false,penetrat
   const effect=element?resolveElement(w,e.id,damage,element):{damage,critical:false};
   const before=e.hp;
   e.hp=Math.max(0,e.hp-Math.max(1,effect.damage-(bypassArmor?0:Math.max(0,arm-penetration))));
-  emitJuice(w,dot?'burn':'hit',e,before-e.hp,{target:e.id,melt:effect.critical,critical:effect.critical||(!dot&&e.kind==='boss'&&!e.hp)});
+  emitJuice(w,dot?'burn':'hit',e,before-e.hp,{target:e.id,melt:effect.critical,critical:criticalOverride||effect.critical||(!dot&&e.kind==='boss'&&!e.hp)});
   if(e.hp||e.kind!=='boss'||!isOwned(e))return;
   const island=w.sky.islands.find(n=>n.id===w.activeIsland?.nodeId);
   if(!island||bossByIsland[island.id]!==e.defId)return;
@@ -148,7 +149,7 @@ function spawnWave(w:WorldState,s:M5State){
 function move(w:WorldState,e:WildEntity,p:Vec2,speed:number){
   const gap=length(e,p);
   if(gap<.08)return;
-  const k=Math.min(gap,speed*elementalSpeed(w,e.id)/TICK_RATE)/gap;
+  const k=Math.min(gap,speed*defenseSlow(w,e)*elementalSpeed(w,e.id)/TICK_RATE)/gap;
   const xx=e.x+(p.x-e.x)*k,yy=e.y+(p.y-e.y)*k;
   const pass=(x:number,y:number)=>e.kind==='boss'?areaAt(w,x,y)==='island':onDeck(w,{x,y})&&!w.ark.buildings.some(b=>envelope(b.defId)&&b.gx===Math.floor(x)&&b.gy===Math.floor(y));
   if(pass(xx,e.y))e.x=xx;
@@ -162,7 +163,7 @@ function stepTurrets(w:WorldState,s:M5State){
     const def=specs.turrets[b.defId as keyof typeof specs.turrets];
     if(!def||b.hp<=1||heatAt(w,b.gx+.5,b.gy+.5)<def.heatFloor||(s.turretClocks[b.id]??0)>w.tick)continue;
     const from=center(b);
-    const target=enemies.filter(e=>e.hp>0&&length(from,e)<=def.range).sort((a,c)=>length(from,a)-length(from,c))[0];
+    const target=enemies.filter(e=>e.hp>0&&!raiderConcealed(w,e)&&length(from,e)<=def.range).sort((a,c)=>length(from,a)-length(from,c))[0];
     if(!target)continue;
     const fire=b.defId==='fire_oil_turret';
     hurt(w,target,def.damage,fire,0,fire?'fire':'ice');
@@ -239,6 +240,8 @@ export function stepM5(w:WorldState):void{
     if(w.tick>=s.nextWave&&s.wave<specs.waves.length)spawnWave(w,s);
   }else resetEntities(w,e=>e.kind==='raider'&&!e.id.startsWith('skyraid_'));
   stepBoss(w,s);
+  const raiders=w.wildEntities.filter(e=>e.kind==='raider'&&isOwned(e)&&e.hp>0);
+  stepDefenses(w,s.turretClocks,raiders,(e,amount,element)=>hurt(w,e,amount,element==='fire',0,element));
   stepTurrets(w,s);
   stepCompanions(w);
   for(const e of w.wildEntities)

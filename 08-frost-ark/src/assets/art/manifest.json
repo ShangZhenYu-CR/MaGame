@@ -5024,6 +5024,134 @@
         91
       ],
       "bytes": 5100
+    },
+    "building-ice-barricade": {
+      "file": "building-ice-barricade.png",
+      "width": 144,
+      "height": 144,
+      "anchorX": 72,
+      "anchorY": 132,
+      "tileW": 1.12,
+      "tileH": 0.96,
+      "contentBox": [
+        2,
+        9,
+        142,
+        138
+      ],
+      "bytes": 8703
+    },
+    "building-ward-searchlight": {
+      "file": "building-ward-searchlight.png",
+      "width": 144,
+      "height": 144,
+      "anchorX": 72,
+      "anchorY": 132,
+      "tileW": 1.17,
+      "tileH": 1.38,
+      "contentBox": [
+        28,
+        2,
+        117,
+        139
+      ],
+      "bytes": 7467
+    },
+    "building-oil-mortar": {
+      "file": "building-oil-mortar.png",
+      "width": 144,
+      "height": 144,
+      "anchorX": 72,
+      "anchorY": 132,
+      "tileW": 1.25,
+      "tileH": 1.15,
+      "contentBox": [
+        14,
+        4,
+        142,
+        132
+      ],
+      "bytes": 8209
+    },
+    "building-auto-repairer": {
+      "file": "building-auto-repairer.png",
+      "width": 144,
+      "height": 144,
+      "anchorX": 72,
+      "anchorY": 132,
+      "tileW": 1.2,
+      "tileH": 1.16,
+      "contentBox": [
+        4,
+        2,
+        141,
+        139
+      ],
+      "bytes": 10146
+    },
+    "icon-ice-barricade": {
+      "file": "icon-ice-barricade.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        3,
+        2,
+        61,
+        62
+      ],
+      "bytes": 8167
+    },
+    "icon-ward-searchlight": {
+      "file": "icon-ward-searchlight.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        10,
+        2,
+        53,
+        62
+      ],
+      "bytes": 6739
+    },
+    "icon-oil-mortar": {
+      "file": "icon-oil-mortar.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        4,
+        2,
+        59,
+        62
+      ],
+      "bytes": 7877
+    },
+    "icon-auto-repairer": {
+      "file": "icon-auto-repairer.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        7,
+        2,
+        57,
+        62
+      ],
+      "bytes": 7129
     }
   }
 }

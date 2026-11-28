@@ -1,3 +1,4 @@
+import { raiderConcealed } from '../sim/defenses-p2';
 import combat from '../data/combat_m5.json';
 import { m5CombatEffects, m5Telegraph } from '../sim/m5';
 import type { Vec2, WorldState } from '../sim/types';
@@ -17,7 +18,7 @@ export type CombatActor=typeof hostileArt[HostileId]&{x:number;y:number;flip:boo
 export function m5Actors(w:WorldState):CombatActor[]{
   return w.wildEntities.flatMap(e=>{
     if(!(e.kind==='boss'||e.kind==='raider')||!Object.hasOwn(hostileArt,e.defId)||e.hp<=0)return [];
-    if(e.kind==='boss'&&!w.activeIsland)return [];
+    if(e.kind==='boss'&&!w.activeIsland||raiderConcealed(w,e))return [];
     const id=e.defId as HostileId;
     const def=combat.hostiles[id], charge=m5Telegraph(w,e.id);
     const motion=w.tick*.11+e.x*.9+e.y*.6;

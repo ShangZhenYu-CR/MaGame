@@ -36,7 +36,7 @@ export function combatM5Ui(h:Hooks){
    seeds.dataset.seeds=String(s.seeds);text(seeds,`天穹火种 ${s.seeds} / 4`);
    raid.dataset.phase=s.active?'active':s.warning?'warning':'clear';raid.dataset.wave=String(s.wave);
    raid.dataset.raiders=String(s.raidsRemaining);raid.hidden=overlay||(!s.active&&!s.warning);
-   const turretCount=w.ark.buildings.filter(b=>b.defId==='frost_turret'||b.defId==='fire_oil_turret').length;
+   const turretCount=w.ark.buildings.filter(b=>b.defId==='frost_turret'||b.defId==='fire_oil_turret'||b.defId==='oil_mortar').length;
    text(el('raid-title'),s.active?'大寒潮 · 方舟防线':'大寒潮预警');
    text(el('raid-detail'),s.active?
     `第 ${s.wave}/${specs.waves.length} 波 · 敌袭 ${s.raidsRemaining} · 防御塔 ${turretCount}`:

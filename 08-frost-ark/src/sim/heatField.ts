@@ -78,7 +78,7 @@ export function heatAt(w:WorldState,x:number,y:number):number{
 export function emitters(w:WorldState){
   return [...w.ark.buildings.flatMap(b=>{
     const d=definitions.get(b.defId);
-    if(!d||!d.heatOutput||!d.heatRadius||(b.defId==='hearth_core'&&b.fuel<=0))return [];
+    if((b.defId==='ward_searchlight'&&b.hp<=1)||!d||!d.heatOutput||!d.heatRadius||(b.defId==='hearth_core'&&b.fuel<=0))return [];
     if(b.defId==='furnace'||b.defId==='stove'){
       const job=getIndustrySave(w)?.stations[b.id]?.job;
       if(!job||job.progress>=job.duration||b.frozen||(job.networkFuel&&b.fuel<=0))return [];

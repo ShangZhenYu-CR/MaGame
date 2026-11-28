@@ -91,6 +91,12 @@
     },
     "p229-cape": {
       "text": "Hand-painted matching Latte ginger kitten in 40-degree 3/4 perspective; 2x2 atlas of sleeping, alert and two walk poses wearing a tiny solar ochre cape on pure magenta. Reference original Latte."
+    },
+    "p230-structures": {
+      "text": "Frost Ark hand-painted 40-degree 3/4 view dark walnut and graphite precision structures atlas; top-left ice barricade, top-right warm amber searchlight, bottom-left fire-oil lobber, bottom-right automatic repairer; pure magenta wide gutters, no lettering or in-image shadows."
+    },
+    "p230-icons": {
+      "text": "Frost Ark hand-painted 40-degree 3/4 view dark walnut and graphite precision icons atlas; top-left ice barricade, top-right warm amber searchlight, bottom-left fire-oil lobber, bottom-right automatic repairer; pure magenta wide gutters, no lettering or in-image shadows."
     }
   },
   "assets": [
@@ -7026,6 +7032,230 @@
       "tileW": 1,
       "tileH": 1,
       "maxBytes": 12500
+    },
+    {
+      "id": "building-ice-barricade",
+      "source": "p230-structures.png",
+      "crop": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "size": [
+        144,
+        144
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.95
+      ],
+      "targetAnchor": [
+        0.5,
+        0.92
+      ],
+      "tileW": 1.12,
+      "tileH": 0.96,
+      "maxBytes": 21500
+    },
+    {
+      "id": "building-ward-searchlight",
+      "source": "p230-structures.png",
+      "crop": [
+        627,
+        0,
+        1254,
+        627
+      ],
+      "size": [
+        144,
+        144
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.95
+      ],
+      "targetAnchor": [
+        0.5,
+        0.92
+      ],
+      "tileW": 1.17,
+      "tileH": 1.38,
+      "maxBytes": 21500
+    },
+    {
+      "id": "building-oil-mortar",
+      "source": "p230-structures.png",
+      "crop": [
+        0,
+        627,
+        627,
+        1254
+      ],
+      "size": [
+        144,
+        144
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.95
+      ],
+      "targetAnchor": [
+        0.5,
+        0.92
+      ],
+      "tileW": 1.25,
+      "tileH": 1.15,
+      "maxBytes": 21500
+    },
+    {
+      "id": "building-auto-repairer",
+      "source": "p230-structures.png",
+      "crop": [
+        627,
+        627,
+        1254,
+        1254
+      ],
+      "size": [
+        144,
+        144
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.95
+      ],
+      "targetAnchor": [
+        0.5,
+        0.92
+      ],
+      "tileW": 1.2,
+      "tileH": 1.16,
+      "maxBytes": 21500
+    },
+    {
+      "id": "icon-ice-barricade",
+      "source": "p230-icons.png",
+      "crop": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9500
+    },
+    {
+      "id": "icon-ward-searchlight",
+      "source": "p230-icons.png",
+      "crop": [
+        627,
+        0,
+        1254,
+        627
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9500
+    },
+    {
+      "id": "icon-oil-mortar",
+      "source": "p230-icons.png",
+      "crop": [
+        0,
+        627,
+        627,
+        1254
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9500
+    },
+    {
+      "id": "icon-auto-repairer",
+      "source": "p230-icons.png",
+      "crop": [
+        627,
+        627,
+        1254,
+        1254
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9500
     }
   ],
   "batchReferences": [

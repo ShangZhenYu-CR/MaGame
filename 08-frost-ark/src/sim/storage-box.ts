@@ -51,3 +51,12 @@ export function addNetworkStorage(w:WorldState,buildingId:string,packet:ItemStac
   if(current)current.count+=packet.count;else contents.push({...packet});
   (w as StorageSave).storageM0=contents;return true;
 }
+
+/** Consume stocked repair materials transactionally; never pull from the player's bag. */
+export function takeNetworkStorage(w:WorldState,buildingId:string,itemId:string,count:number):boolean{
+ if(buildingId!=='storage_main'||!Number.isSafeInteger(count)||count<1)return false;
+ const existing=storageContents(w),source=existing.find(s=>s.itemId===itemId);
+ if(!source||source.count<count)return false;
+ (w as StorageSave).storageM0=existing.map(s=>s===source?{...s,count:s.count-count}:s).filter(s=>s.count>0);
+ return true;
+}

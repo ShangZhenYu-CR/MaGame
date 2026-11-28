@@ -7,6 +7,10 @@ import { bindTooltips } from './tooltip';
 
 const el=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id)! as T;
 const descriptions:Partial<Record<BuildKind,string>>={
+ ice_barricade:'敌人走入冰刺区时减速并受伤，不影响队友。',
+ ward_searchlight:'灯光扩展寒潮视野、照破霜影潜行，并为近处补暖。',
+ oil_mortar:'中远距抛射油弹，短暂预警后打击落点附近的敌人。',
+ auto_repairer:'在储物箱 4 格内待命，消耗储备木板或冻铁，修补 3 格内受损防线。',
  incubator:'只在 20°C–45°C 生效，走近后按 E 放入云兽蛋。',
  fishing_spot:'放在开放舷边，停船后靠近按 E 下钩。',
  warm_cot:'暖室里安全过夜，恢复全部体力。',tea_table:'消耗一份净水，喝茶回温和回体力。',latte_climber:'给拿铁留一块安心休息的高台。',
@@ -53,7 +57,7 @@ export function createIndustryUi(cb:Callbacks){
  let activeStation:string|null=null,catalogKey='',stationKey='',liftKey='',routeKey='',repairKey='';
  const buttons=new Map<BuildKind,HTMLButtonElement>();
  const itemIcon=(id:string)=>cb.icon(id.replaceAll('_','-'))??cb.icon(materialIcons[id]??'');
- const lateBlueprints=new Set<string>(['beast_den','feed_trough','frost_turret','fire_oil_turret','wind_door','frost_airlock','fuel_hopper','steam_chute','wind_sail','steam_thruster','wind_vane','heat_pipe','insulated_floor','repair_station','warm_cot','tea_table','latte_climber','water_purifier','wall_lamp','incubator']);
+ const lateBlueprints=new Set<string>(['beast_den','feed_trough','frost_turret','fire_oil_turret','ice_barricade','ward_searchlight','oil_mortar','auto_repairer','wind_door','frost_airlock','fuel_hopper','steam_chute','wind_sail','steam_thruster','wind_vane','heat_pipe','insulated_floor','repair_station','warm_cot','tea_table','latte_climber','water_purifier','wall_lamp','incubator']);
  const categoryGroup=(kind:BuildKind)=>el(['workbench','furnace','stove','catch_net','sorter_arm','greenhouse','beast_den','feed_trough','fuel_hopper','steam_chute','repair_station','water_purifier','fishing_spot','incubator'].includes(kind)?'catalog-industry':'catalog-structure');
  for(const kind of buildKinds){
   const def=buildDefinitions[kind],[gw,gh]=def.size;

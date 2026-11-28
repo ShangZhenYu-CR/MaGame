@@ -1,3 +1,4 @@
+import { paintDefenseEffects } from './defense-view';
 import { latteBoon,latteProfile,latteTreasure,outfits } from '../sim/latte-growth';
 import { treasureCue } from './latte-view';
 import { beastMood } from '../sim/beast-bond';
@@ -71,6 +72,10 @@ const buildingVisuals:Readonly<Record<string,BuildingVisual>>={
   wind_door:{art:'building-wind-door',width:1.12,height:1.14,shadow:.45},
   frost_airlock:{art:'building-airlock',width:1.12,height:1.14,shadow:.47},
   warm_wall:{art:'building-insulated-wall',width:1.18,height:1.25,shadow:.55},
+  ice_barricade:{art:'building-ice-barricade',width:1.12,height:.96,shadow:.53},
+  ward_searchlight:{art:'building-ward-searchlight',width:1.17,height:1.38,shadow:.47},
+  oil_mortar:{art:'building-oil-mortar',width:1.25,height:1.15,shadow:.55},
+  auto_repairer:{art:'building-auto-repairer',width:1.2,height:1.16,shadow:.56},
   frost_turret:{art:'building-frost-arrow-turret',width:1.29,height:1.52,shadow:.59},
   fire_oil_turret:{art:'building-fire-oil-turret',width:1.33,height:1.53,shadow:.62},
   beast_den:{art:'building-beast-den',width:2.28,height:2.15,shadow:1.01},
@@ -496,6 +501,8 @@ export class ArkView {
     if(this.canvas.dataset.indoorTiles!==cellCount)this.canvas.dataset.indoorTiles=cellCount;
     this.weather.paint(c,w,this.art.image('frost-frame'),snowMask);
     paintM5CombatEffects(c,w,project,s);
+    const defense=paintDefenseEffects(c,w,project,s);
+    if(this.canvas.dataset.defenseFx!==defense)this.canvas.dataset.defenseFx=defense;
     paintCompanionBurst(c,w,project,s);
     if(latteBoon(w)){
       const who=project(pl.x,pl.y);

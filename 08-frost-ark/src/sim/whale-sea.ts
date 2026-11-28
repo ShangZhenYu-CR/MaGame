@@ -1,3 +1,4 @@
+import { stormDamage } from './life';
 import { trackTurret } from './turret-aim';
 import { buildingDefs,inventoryChange,isDeck } from './ark';
 import { damagePlayer,incapacitated } from './rescue';
@@ -69,7 +70,7 @@ export function applySeaStrike(w:WorldState,b:Wake,sea:SeaWhale,radius:number,da
   const q={x:building.gx+sx/2,y:building.gy+sy/2};
   if(!inZone(q))continue;
   const amount=v.style==='ram'?26:v.style==='breath'?13:31;
-  building.hp=Math.max(1,building.hp-amount);
+  if(building.hp>1)stormDamage(w);building.hp=Math.max(1,building.hp-amount);
   if(v.style==='breath'||v.style==='meteors'){
    const sh=sea.ice;
    for(let dy=0;dy<sy;dy++)for(let dx=0;dx<sx;dx++)sh[(building.gy+dy)*w.ark.size+building.gx+dx]=w.tick+(v.style==='breath'?245:150);

@@ -5440,6 +5440,390 @@
         62
       ],
       "bytes": 7529
+    },
+    "badge-spark": {
+      "file": "badge-spark.png",
+      "width": 72,
+      "height": 72,
+      "anchorX": 36,
+      "anchorY": 36,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        66,
+        70
+      ],
+      "bytes": 3622
+    },
+    "badge-hook": {
+      "file": "badge-hook.png",
+      "width": 72,
+      "height": 72,
+      "anchorX": 36,
+      "anchorY": 36,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        65,
+        70
+      ],
+      "bytes": 3462
+    },
+    "badge-deck": {
+      "file": "badge-deck.png",
+      "width": 72,
+      "height": 72,
+      "anchorX": 36,
+      "anchorY": 36,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        65,
+        70
+      ],
+      "bytes": 3434
+    },
+    "badge-refuge": {
+      "file": "badge-refuge.png",
+      "width": 72,
+      "height": 72,
+      "anchorX": 36,
+      "anchorY": 36,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        66,
+        70
+      ],
+      "bytes": 3607
+    },
+    "badge-flow": {
+      "file": "badge-flow.png",
+      "width": 72,
+      "height": 72,
+      "anchorX": 36,
+      "anchorY": 36,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        66,
+        70
+      ],
+      "bytes": 3496
+    },
+    "badge-meal": {
+      "file": "badge-meal.png",
+      "width": 72,
+      "height": 72,
+      "anchorX": 36,
+      "anchorY": 36,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        66,
+        70
+      ],
+      "bytes": 3593
+    },
+    "badge-coast": {
+      "file": "badge-coast.png",
+      "width": 72,
+      "height": 72,
+      "anchorX": 36,
+      "anchorY": 36,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        65,
+        70
+      ],
+      "bytes": 3464
+    },
+    "badge-cave": {
+      "file": "badge-cave.png",
+      "width": 72,
+      "height": 72,
+      "anchorX": 36,
+      "anchorY": 36,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        65,
+        70
+      ],
+      "bytes": 3451
+    },
+    "badge-winds": {
+      "file": "badge-winds.png",
+      "width": 72,
+      "height": 72,
+      "anchorX": 36,
+      "anchorY": 36,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        65,
+        70
+      ],
+      "bytes": 3578
+    },
+    "badge-armor": {
+      "file": "badge-armor.png",
+      "width": 72,
+      "height": 72,
+      "anchorX": 36,
+      "anchorY": 36,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        65,
+        70
+      ],
+      "bytes": 3525
+    },
+    "badge-arsenal": {
+      "file": "badge-arsenal.png",
+      "width": 72,
+      "height": 72,
+      "anchorX": 36,
+      "anchorY": 36,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        66,
+        70
+      ],
+      "bytes": 3367
+    },
+    "badge-roll": {
+      "file": "badge-roll.png",
+      "width": 72,
+      "height": 72,
+      "anchorX": 36,
+      "anchorY": 36,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        65,
+        70
+      ],
+      "bytes": 3265
+    },
+    "badge-partner": {
+      "file": "badge-partner.png",
+      "width": 72,
+      "height": 72,
+      "anchorX": 36,
+      "anchorY": 36,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        65,
+        70
+      ],
+      "bytes": 3584
+    },
+    "badge-crew": {
+      "file": "badge-crew.png",
+      "width": 72,
+      "height": 72,
+      "anchorX": 36,
+      "anchorY": 36,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        65,
+        70
+      ],
+      "bytes": 3480
+    },
+    "badge-alpha": {
+      "file": "badge-alpha.png",
+      "width": 72,
+      "height": 72,
+      "anchorX": 36,
+      "anchorY": 36,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        65,
+        70
+      ],
+      "bytes": 3566
+    },
+    "badge-egg": {
+      "file": "badge-egg.png",
+      "width": 72,
+      "height": 72,
+      "anchorX": 36,
+      "anchorY": 36,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        65,
+        70
+      ],
+      "bytes": 3578
+    },
+    "badge-aurora": {
+      "file": "badge-aurora.png",
+      "width": 72,
+      "height": 72,
+      "anchorX": 36,
+      "anchorY": 36,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        65,
+        70
+      ],
+      "bytes": 3370
+    },
+    "badge-latte": {
+      "file": "badge-latte.png",
+      "width": 72,
+      "height": 72,
+      "anchorX": 36,
+      "anchorY": 36,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        65,
+        70
+      ],
+      "bytes": 3662
+    },
+    "badge-storm": {
+      "file": "badge-storm.png",
+      "width": 72,
+      "height": 72,
+      "anchorX": 36,
+      "anchorY": 36,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        65,
+        70
+      ],
+      "bytes": 3532
+    },
+    "badge-seeds": {
+      "file": "badge-seeds.png",
+      "width": 72,
+      "height": 72,
+      "anchorX": 36,
+      "anchorY": 36,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        65,
+        70
+      ],
+      "bytes": 3736
+    },
+    "badge-solar": {
+      "file": "badge-solar.png",
+      "width": 72,
+      "height": 72,
+      "anchorX": 36,
+      "anchorY": 36,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        65,
+        70
+      ],
+      "bytes": 3756
+    },
+    "badge-whale": {
+      "file": "badge-whale.png",
+      "width": 72,
+      "height": 72,
+      "anchorX": 36,
+      "anchorY": 36,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        65,
+        70
+      ],
+      "bytes": 3477
+    },
+    "badge-bounty": {
+      "file": "badge-bounty.png",
+      "width": 72,
+      "height": 72,
+      "anchorX": 36,
+      "anchorY": 36,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        66,
+        70
+      ],
+      "bytes": 3637
+    },
+    "badge-giant": {
+      "file": "badge-giant.png",
+      "width": 72,
+      "height": 72,
+      "anchorX": 36,
+      "anchorY": 36,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        6,
+        2,
+        65,
+        70
+      ],
+      "bytes": 3368
     }
   }
 }

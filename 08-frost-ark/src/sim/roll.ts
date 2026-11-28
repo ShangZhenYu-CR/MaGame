@@ -1,3 +1,4 @@
+import { recordLife } from './life';
 import { roomComfort } from './home';
 import { TICK_RATE,type Vec2,type WorldState } from './types';
 
@@ -26,7 +27,7 @@ export function startRoll(w:WorldState,dir:Vec2):string|null{
  r.startedAt=w.tick;r.stamina-=ROLL_COST;r.restUntil=w.tick+ROLL_TICKS+REST_DELAY;
  p.grapple.charging=false;p.grapple.active=false;p.grapple.charge=0;p.grapple.caughtDebrisId=null;
  trails.set(w,[{x:p.x,y:p.y,tick:w.tick}]);
- return null;
+ recordLife(w,'rolls');return null;
 }
 
 export function rollMotion(w:WorldState,command:Vec2){

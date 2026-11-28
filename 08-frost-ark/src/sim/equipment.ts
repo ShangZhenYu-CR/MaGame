@@ -1,3 +1,4 @@
+import { recordEquipment } from './life';
 import { guardianBlueprint } from './guardians-p2';
 import items from '../data/equipment.json';
 import recipes from '../data/recipes.json';
@@ -35,7 +36,7 @@ export function equipGear(w:WorldState,id:string):string|null{
   const d=equipmentById.get(id);
   if(!d||!countItem(w,id))return '背包里没有这件装备。';
   const wearing=w.player.gear[d.slot]===id;
-  w.player.gear[d.slot]=wearing?null:id;return null;
+  w.player.gear[d.slot]=wearing?null:id;if(!wearing)recordEquipment(w,id);return null;
 }
 
 export function craftGear(w:WorldState,id:string):string|null{

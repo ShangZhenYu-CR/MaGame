@@ -1,3 +1,4 @@
+import { recordLife,stormDamage } from './life';
 import { daySpeed } from './challenge';
 import { trackTurret } from './turret-aim';
 import { ancientDue,ancientValid,defeatAncient,depthOf,hasAncientWhiteout,isBountyEnemy,syncAncient } from './endless';
@@ -82,6 +83,7 @@ function hurt(w:WorldState,e:WildEntity,damage:number,bypassArmor=false,penetrat
   const before=e.hp;
   e.hp=Math.max(0,e.hp-Math.max(1,effect.damage-(bypassArmor?0:Math.max(0,arm-penetration))));
   emitJuice(w,dot?'burn':'hit',e,before-e.hp,{target:e.id,melt:effect.critical,critical:criticalOverride||effect.critical||(!dot&&e.kind==='boss'&&!e.hp)});
+  if(before>0&&e.hp===0)recordLife(w,'foes');
   if(e.hp||e.kind!=='boss'||!isOwned(e))return;
   if(defeatAncient(w,e))return;
   const island=w.sky.islands.find(n=>n.id===w.activeIsland?.nodeId);
@@ -217,7 +219,7 @@ function stepEnemy(w:WorldState,e:WildEntity,s:M5State){
       }
       if(e.defId==='heatwraith'&&obj&&obj.fuel>0)obj.fuel=Math.max(0,obj.fuel-3);
       const power=isBountyEnemy(e)?Math.round(d.damage*(1.22+Math.min(.64,Math.sqrt(depthOf(w)-1)*.055))):d.damage;
-      if(obj)obj.hp=Math.max(1,obj.hp-power); // critical fixtures remain recoverable after a failed night
+      if(obj){if(obj.hp>1)stormDamage(w);obj.hp=Math.max(1,obj.hp-power);} // critical fixtures remain recoverable after a failed night
       else if((e.kind==='raider'&&indoorsAt(w,w.player))||!damagePlayer(w,power))return;
       flash(w,e,pos,e.defId==='frostspike_bat'?'iceBolt':e.defId==='heatwraith'?'siphon':'strike');
     }

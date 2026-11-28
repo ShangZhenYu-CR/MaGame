@@ -1,3 +1,4 @@
+import { recordLife } from './life';
 import beastData from '../data/beasts.json';
 import { inventoryChange,countItem,hasBuildingContact,isDeck } from './ark';
 import { beastBond } from './beast-bond';
@@ -101,6 +102,7 @@ export function stepBreeding(w:WorldState):void{
   w.beasts.push({id,defId:definition.id,name:stamp,x:bed.x,y:bed.y,
     hp:definition.maxHp,maxHp:definition.maxHp,warmth:72,hunger:90,role:'rest',denBuildingId:null,workCooldown:4*TICK_RATE});
   ensureFauna(w);inheritProfile(w,id,n.egg.profile);
+  recordLife(w,'hatched');if(n.egg.variant)recordLife(w,'variants');
   s.children[id]={variant:n.egg.variant,born:w.tick,parents:n.egg.parents};delete s.nests[b.id];
  }
 }

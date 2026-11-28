@@ -1,3 +1,4 @@
+import { recordLife,stormDamage } from './life';
 import { challenge } from './challenge';
 import { abandonCave } from './cave';
 import { emitJuice } from './juice';
@@ -17,6 +18,7 @@ export function damagePlayer(w: WorldState, amount: number, kind:'physical'|'col
   const gear=gearModifiers(w);
   const reduction=kind==='physical'?gear.guard:kind==='cold'?gear.cold*.5:0;
   const before=p.hp;p.hp=Math.max(0,p.hp-amount*(1-reduction)*(kind==='physical'?challenge(w).physical:1));
+  if(p.hp<before)stormDamage(w);
   if(kind==='physical'&&before-p.hp>=.5)emitJuice(w,'hurt',p,before-p.hp,{target:'player'});
   if (p.hp===0) begin(w);
   return true;
@@ -69,6 +71,6 @@ export function stepRescue(w: WorldState): void {
   const hearth=w.ark.buildings.find(b=>b.defId==='hearth_core');
   if(hearth&&hearth.fuel===0)hearth.fuel=14;
   p.hunger=Math.max(p.hunger,p.maxHunger*.08);
-  p.hp=Math.max(1,p.maxHp*.35);p.warmth=Math.max(p.warmth,p.maxWarmth*.60);
+  recordLife(w,'rescues');p.hp=Math.max(1,p.maxHp*.35);p.warmth=Math.max(p.warmth,p.maxWarmth*.60);
   p.rescue.startedAt=null;p.rescue.shieldUntil=w.tick+RESCUE_SHIELD_TICKS;
 }

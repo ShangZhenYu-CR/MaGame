@@ -1,3 +1,4 @@
+import { recordLife } from './life';
 import { inventoryChange,itemNames } from './ark';
 import { damagePlayer,incapacitated } from './rescue';
 import { nearHelm } from './sky-map';
@@ -62,7 +63,7 @@ export function tradeSky(w:WorldState,id:string):string|null{
  if(!offer)return '游商没开这个价。';
  if(e.trades.includes(id))return '本次会面该货已换完。';
  if(!inventoryChange(w,offer.cost,offer.give))return '交换品不足，或背包没有空间。';
- e.trades=[...e.trades,id];if(id==='chart'&&!w.unlockedTech.includes(EVENT_TECH))w.unlockedTech.push(EVENT_TECH);
+ recordLife(w,'trades');e.trades=[...e.trades,id];if(id==='chart'&&!w.unlockedTech.includes(EVENT_TECH))w.unlockedTech.push(EVENT_TECH);
  return null;
 }
 export function eventClimate(w:WorldState):number{

@@ -112,6 +112,9 @@
     },
     "p237-prints": {
       "text": "Individually hand-painted 40° Frost Ark animation layers and impressions. Broad isolated magenta matte, graphite and wood, desaturated ice and amber accents, no letters."
+    },
+    "p240-badges": {
+      "text": "24 clean hand-painted cold arctic survival copper/enamel hex achievement tokens, six across by four rows on pure magenta."
     }
   },
   "assets": [
@@ -7775,6 +7778,679 @@
       "tileW": 1,
       "tileH": 1,
       "maxBytes": 9300
+    },
+    {
+      "id": "badge-spark",
+      "source": "p240-badges.png",
+      "crop": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "size": [
+        72,
+        72
+      ],
+      "key": "magenta",
+      "keyClear": 42,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9200
+    },
+    {
+      "id": "badge-hook",
+      "source": "p240-badges.png",
+      "crop": [
+        256,
+        0,
+        512,
+        256
+      ],
+      "size": [
+        72,
+        72
+      ],
+      "key": "magenta",
+      "keyClear": 42,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9200
+    },
+    {
+      "id": "badge-deck",
+      "source": "p240-badges.png",
+      "crop": [
+        512,
+        0,
+        768,
+        256
+      ],
+      "size": [
+        72,
+        72
+      ],
+      "key": "magenta",
+      "keyClear": 42,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9200
+    },
+    {
+      "id": "badge-refuge",
+      "source": "p240-badges.png",
+      "crop": [
+        768,
+        0,
+        1024,
+        256
+      ],
+      "size": [
+        72,
+        72
+      ],
+      "key": "magenta",
+      "keyClear": 42,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9200
+    },
+    {
+      "id": "badge-flow",
+      "source": "p240-badges.png",
+      "crop": [
+        1024,
+        0,
+        1280,
+        256
+      ],
+      "size": [
+        72,
+        72
+      ],
+      "key": "magenta",
+      "keyClear": 42,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9200
+    },
+    {
+      "id": "badge-meal",
+      "source": "p240-badges.png",
+      "crop": [
+        1280,
+        0,
+        1536,
+        256
+      ],
+      "size": [
+        72,
+        72
+      ],
+      "key": "magenta",
+      "keyClear": 42,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9200
+    },
+    {
+      "id": "badge-coast",
+      "source": "p240-badges.png",
+      "crop": [
+        0,
+        256,
+        256,
+        512
+      ],
+      "size": [
+        72,
+        72
+      ],
+      "key": "magenta",
+      "keyClear": 42,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9200
+    },
+    {
+      "id": "badge-cave",
+      "source": "p240-badges.png",
+      "crop": [
+        256,
+        256,
+        512,
+        512
+      ],
+      "size": [
+        72,
+        72
+      ],
+      "key": "magenta",
+      "keyClear": 42,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9200
+    },
+    {
+      "id": "badge-winds",
+      "source": "p240-badges.png",
+      "crop": [
+        512,
+        256,
+        768,
+        512
+      ],
+      "size": [
+        72,
+        72
+      ],
+      "key": "magenta",
+      "keyClear": 42,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9200
+    },
+    {
+      "id": "badge-armor",
+      "source": "p240-badges.png",
+      "crop": [
+        768,
+        256,
+        1024,
+        512
+      ],
+      "size": [
+        72,
+        72
+      ],
+      "key": "magenta",
+      "keyClear": 42,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9200
+    },
+    {
+      "id": "badge-arsenal",
+      "source": "p240-badges.png",
+      "crop": [
+        1024,
+        256,
+        1280,
+        512
+      ],
+      "size": [
+        72,
+        72
+      ],
+      "key": "magenta",
+      "keyClear": 42,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9200
+    },
+    {
+      "id": "badge-roll",
+      "source": "p240-badges.png",
+      "crop": [
+        1280,
+        256,
+        1536,
+        512
+      ],
+      "size": [
+        72,
+        72
+      ],
+      "key": "magenta",
+      "keyClear": 42,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9200
+    },
+    {
+      "id": "badge-partner",
+      "source": "p240-badges.png",
+      "crop": [
+        0,
+        512,
+        256,
+        768
+      ],
+      "size": [
+        72,
+        72
+      ],
+      "key": "magenta",
+      "keyClear": 42,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9200
+    },
+    {
+      "id": "badge-crew",
+      "source": "p240-badges.png",
+      "crop": [
+        256,
+        512,
+        512,
+        768
+      ],
+      "size": [
+        72,
+        72
+      ],
+      "key": "magenta",
+      "keyClear": 42,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9200
+    },
+    {
+      "id": "badge-alpha",
+      "source": "p240-badges.png",
+      "crop": [
+        512,
+        512,
+        768,
+        768
+      ],
+      "size": [
+        72,
+        72
+      ],
+      "key": "magenta",
+      "keyClear": 42,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9200
+    },
+    {
+      "id": "badge-egg",
+      "source": "p240-badges.png",
+      "crop": [
+        768,
+        512,
+        1024,
+        768
+      ],
+      "size": [
+        72,
+        72
+      ],
+      "key": "magenta",
+      "keyClear": 42,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9200
+    },
+    {
+      "id": "badge-aurora",
+      "source": "p240-badges.png",
+      "crop": [
+        1024,
+        512,
+        1280,
+        768
+      ],
+      "size": [
+        72,
+        72
+      ],
+      "key": "magenta",
+      "keyClear": 42,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9200,
+      "gradePalette": "aurora-teal"
+    },
+    {
+      "id": "badge-latte",
+      "source": "p240-badges.png",
+      "crop": [
+        1280,
+        512,
+        1536,
+        768
+      ],
+      "size": [
+        72,
+        72
+      ],
+      "key": "magenta",
+      "keyClear": 42,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9200
+    },
+    {
+      "id": "badge-storm",
+      "source": "p240-badges.png",
+      "crop": [
+        0,
+        768,
+        256,
+        1024
+      ],
+      "size": [
+        72,
+        72
+      ],
+      "key": "magenta",
+      "keyClear": 42,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9200
+    },
+    {
+      "id": "badge-seeds",
+      "source": "p240-badges.png",
+      "crop": [
+        256,
+        768,
+        512,
+        1024
+      ],
+      "size": [
+        72,
+        72
+      ],
+      "key": "magenta",
+      "keyClear": 42,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9200
+    },
+    {
+      "id": "badge-solar",
+      "source": "p240-badges.png",
+      "crop": [
+        512,
+        768,
+        768,
+        1024
+      ],
+      "size": [
+        72,
+        72
+      ],
+      "key": "magenta",
+      "keyClear": 42,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9200
+    },
+    {
+      "id": "badge-whale",
+      "source": "p240-badges.png",
+      "crop": [
+        768,
+        768,
+        1024,
+        1024
+      ],
+      "size": [
+        72,
+        72
+      ],
+      "key": "magenta",
+      "keyClear": 42,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9200
+    },
+    {
+      "id": "badge-bounty",
+      "source": "p240-badges.png",
+      "crop": [
+        1024,
+        768,
+        1280,
+        1024
+      ],
+      "size": [
+        72,
+        72
+      ],
+      "key": "magenta",
+      "keyClear": 42,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9200
+    },
+    {
+      "id": "badge-giant",
+      "source": "p240-badges.png",
+      "crop": [
+        1280,
+        768,
+        1536,
+        1024
+      ],
+      "size": [
+        72,
+        72
+      ],
+      "key": "magenta",
+      "keyClear": 42,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9200
     }
   ],
   "batchReferences": [

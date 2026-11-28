@@ -1,3 +1,4 @@
+import { runP2Achievements } from "./p2-achievements-e2e";
 import { runP2Journal } from "./p2-journal-e2e";
 import { runP2Slots } from "./p2-slots-e2e";
 import { runP2Motion } from "./p2-motion-e2e";
@@ -695,6 +696,7 @@ try {
   await runP2Motion(browser,baseUrl,outDir,errors);
   await runP2Slots(browser,baseUrl,outDir,errors);
   await runP2Journal(browser,baseUrl,outDir,errors);
+  await runP2Achievements(browser,baseUrl,outDir,errors);
 
   if (errors.length > 0) {
     throw new Error(errors.join('\n'));

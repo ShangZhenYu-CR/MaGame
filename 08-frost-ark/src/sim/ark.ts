@@ -1,3 +1,4 @@
+import { recordLife } from './life';
 import { dockSide,docks } from './dock-direction';
 import { overlayKind,utilityAt } from './utilities';
 import { doorBlocksFeet,invalidateRoomTopology,isDoor } from './rooms';
@@ -183,13 +184,13 @@ export function buildIssue(w: WorldState, kind: BuildKind, x: number, y: number)
 export function build(w: WorldState, kind: BuildKind, x: number, y: number): boolean {
   if(buildIssue(w,kind,x,y)||!inventoryChange(w,buildCosts[kind],[]))return false;
   if(kind==='wood_deck'||kind==='iron_deck'){
-    if(!isDeck(w,x,y))w.ark.heatGrid[y*w.ark.size+x]=w.ambientTemp;
+    if(!isDeck(w,x,y)){w.ark.heatGrid[y*w.ark.size+x]=w.ambientTemp;recordLife(w,'decks');}
     w.ark.decks[y*w.ark.size+x]=kind==='wood_deck'?1:2;
   }else w.ark.buildings.push(makeBuilding(kind,x,y,`${kind}_${x}_${y}`));
   const [span]=buildingDefs.get(kind)?.size??[1,1];
   invalidateRoomTopology(w);
   emitJuice(w,'build',{x:x+span*.5,y:y+.78},0,{target:`${kind}_${x}_${y}`});
-  refreshBuoyancy(w);
+  refreshBuoyancy(w);recordLife(w,'built');
   return true;
 }
 

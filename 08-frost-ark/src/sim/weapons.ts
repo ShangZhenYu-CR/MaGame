@@ -1,3 +1,4 @@
+import { recordEquipment } from './life';
 import { activeCave,caveFloor,caveGuard,caveHurt,caveSight } from './cave';
 import rows from '../data/weapons.json';
 import recipes from '../data/recipes.json';
@@ -51,7 +52,7 @@ export function craftWeapon(w:WorldState,id:string):string|null{
 export function chooseWeapon(w:WorldState,id:string|null):string|null{
   if(incapacitated(w))return '昏迷时不能装备武器。';
   if(id!==null&&(!weaponById.has(id)||!countItem(w,id)))return '背包里没有这把武器。';
-  w.player.weapon=id;return null;
+  w.player.weapon=id;if(id)recordEquipment(w,id);return null;
 }
 
 interface Target extends Vec2 { enemy:WildEntity|null; cave?:true }

@@ -1,3 +1,4 @@
+import { validAchievements } from './achievements';
 import { validJournal } from './journal';
 import { validChallenge } from './challenge';
 import { validCodex } from './codex';
@@ -130,7 +131,7 @@ function validateFauna(p:Record<string,unknown>,ids:Set<string>):void{
 
 export function deserializeWorld(raw: string): WorldState {
   const p:unknown=JSON.parse(raw);
-  if(!record(p)||![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
+  if(!record(p)||![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,SAVE_VERSION].includes(Number(p.saveVersion))||typeof p.saveVersion!=='number')
     throw new Error('存档版本不受支持');
   if(p.saveVersion===1){
     if(record(p.player))p.player.rescue={startedAt:null,shieldUntil:0};
@@ -256,6 +257,7 @@ export function deserializeWorld(raw: string): WorldState {
     (world.ark.anchoredIslandId&&!canReachAurora(world,world.ark.anchoredIslandId))||
     (nav&&record(nav)&&typeof nav.targetId==='string'&&!canReachAurora(world,nav.targetId)))
     throw new Error('太阳方舟或终局存档不符合方舟格式');
+  if(!validAchievements(world))throw new Error('生涯成就存档不符合方舟格式');
   if(!validJournal(world))throw new Error('航海日志存档不符合方舟格式');
   if(!validChallenge(world))throw new Error('难度或昼夜倍率无效');
   if(!validCodex(world))throw new Error('方舟图鉴存档不符合风区格式');

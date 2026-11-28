@@ -1,3 +1,4 @@
+import { recordLife } from './life';
 import { buildingDefs,countItem,inventoryChange,itemStackLimits } from './ark';
 import { FUEL_MAX } from './heatField';
 import { ensureIndustrySave,getIndustrySave,type IndustryStation } from './m2-state';
@@ -85,6 +86,7 @@ const trace=(w:WorldState)=>{
  return t;
 };
 function moved(w:WorldState,path:BuildingInstance[],item:string){
+ recordLife(w,'deliveries');
  const t=trace(w);t.stats.delivered++;
  t.events.push({path:path.map(center),item,tick:w.tick});
  if(t.events.length>28)t.events.shift();

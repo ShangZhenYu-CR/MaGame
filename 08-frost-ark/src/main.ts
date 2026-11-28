@@ -1,3 +1,4 @@
+import { achievementsUi } from './ui/achievements-ui';
 import { journalUi } from './ui/journal-ui';
 import { configureVoyage,daySpeed,difficultyIds,difficultyNames,difficultyOf,type DaySpeed,type Difficulty } from './sim/challenge';
 import { whaleBattleActive } from './sim/finale';
@@ -255,6 +256,7 @@ const finale=finaleUi({state:()=>w,say:finishAction,sound:x=>audio.play(x),icon:
   prepare:()=>{keys.clear();cancelCharge(w);expedition.cancel();chart.hide();closeOtherPanels('catalog');industry.showCatalog(false);}});
 const beastSprites=import.meta.glob<string>('./assets/art/beast-*.png',{eager:true,query:'?inline',import:'default'});
 const beastArt=(id:string)=>beastSprites['./assets/art/beast-'+id+'.png'];
+const medals=achievementsUi({state:()=>w,prepare:()=>{closeOtherPanels('medals');chart.hide(false);finale.showCodex(false);keys.clear();cancelCharge(w);}});
 const journal=journalUi({state:()=>w,say:finishAction});
 const beasts=beastUi({state:()=>w,msg:finishAction,icon:iconPath,art:beastArt});
 const weaponUi=weaponsUi({state:()=>w,icon:iconPath,activate:activateWeapon,lower:lowerWeapon,toggle:toggleWeapon,changed:()=>fillBag(),say:finishAction});
@@ -333,7 +335,7 @@ function finishAction(issue:string|null,success:string,event?:'craft'|'undo'|'di
 type PrimaryInteraction={kind:'expedition'|'trader'|'fishing'|'feed'|'storage'|'beasts'|'close-storage'|'close-station'|'close-beasts'|'none'}|
   {kind:'station';id:string;label:string}|{kind:'door';id:string;open:boolean}|{kind:'pet';id:string};
 function primaryInteraction():PrimaryInteraction{
-  if(!latteCare.hidden)return {kind:'none'};
+  if(medals.open()||!latteCare.hidden)return {kind:'none'};
   if(beasts.open())return {kind:'close-beasts'};
   if(industry.stationOpen())return {kind:'close-station'};
   if(!locker.hidden)return {kind:'close-storage'};
@@ -402,9 +404,10 @@ function useNearby():void{
 function openIndustry(id:string):void{
   closeOtherPanels('industry');cancelCharge(w);keys.clear();industry.showStation(id);
 }
-function closeOtherPanels(except:'bag'|'locker'|'catalog'|'industry'|'beasts'|'latte'|'audio'):void{
+function closeOtherPanels(except:'bag'|'locker'|'catalog'|'industry'|'beasts'|'latte'|'audio'|'medals'):void{
   cancelFishing(w);skyEvents.close();
   if(except!=='latte')showLatte(false);
+  if(except!=='medals')medals.show(false);
   if(except!=='audio')showAudio(false);
   if(except!=='bag')toggleBag(false);
   if(except!=='locker')locker.hidden=true;
@@ -630,7 +633,7 @@ function saveNow():Promise<void> {
   return saveQueue;
 }
 function safeWorld(next:WorldState):void {
-  closeTitle();journal.reset();finale.reset();view.juice.reset();cancelFishing(w);skyEvents.close();
+  closeTitle();medals.show(false);journal.reset();finale.reset();view.juice.reset();cancelFishing(w);skyEvents.close();
   expedition.cancel();chart.hide(false);beasts.show(false);beasts.resetTarget();showLatte(false);showAudio(false);w=next;toggleStorage(false);industry.showStation(null);industry.showCatalog(false);lockerSignature='';cancelCharge(w);
   caught=null;keys.clear();messageUntil=0;message='';stackSignature='';
   if(mode==='weapon'&&!w.player.weapon||mode==='tool'&&!heldTool(w))choose('hook');
@@ -758,7 +761,8 @@ addEventListener('keydown',e=>{
   if(e.repeat)return;
   if(k==='escape'){
     expedition.cancel();industry.closeTip();
-    if(!mixPanel.hidden)showAudio(false);
+    if(medals.open())medals.show(false);
+    else if(!mixPanel.hidden)showAudio(false);
     else if(journal.open())journal.close();
     else if(!latteCare.hidden)showLatte(false);
     else if(beasts.open()){if(!beasts.closeRename())toggleBeastRoster(false);}
@@ -779,6 +783,7 @@ addEventListener('keydown',e=>{
   else if(k==='x'){toggleCatalog(false);choose(mode==='dismantle'?'hook':'dismantle');}
   else if(k==='z')industry.undoAction();
   else if(k==='m')toggleMute();
+  else if(k==='o'){e.preventDefault();medals.toggle();}
   else if(k==='l'){e.preventDefault();journal.toggle();}
   else if(k==='k'){e.preventDefault();showAudio(mixPanel.hidden);}
   else if(k==='q')choose('hook');
@@ -806,7 +811,7 @@ canvas.addEventListener('pointermove',e=>{
 });
 canvas.addEventListener('pointerleave',()=>{pointer=null;});
 canvas.addEventListener('pointerdown',e=>{
-  if(!active||switching||!titlePanel.hidden&&!provisional||!mixPanel.hidden||!latteCare.hidden||incapacitated(w)||rolling(w)||skyEvents.open()||e.button!==0||fishingPanel(w)||chart.open()||finale.open()||finale.blocking())return;
+  if(!active||switching||medals.open()||!titlePanel.hidden&&!provisional||!mixPanel.hidden||!latteCare.hidden||incapacitated(w)||rolling(w)||skyEvents.open()||e.button!==0||fishingPanel(w)||chart.open()||finale.open()||finale.blocking())return;
   pointer={x:e.clientX,y:e.clientY};
   const at=view.world(e.clientX,e.clientY);
   const x=Math.floor(at.x),y=Math.floor(at.y);
@@ -929,7 +934,7 @@ function frame(now:number):void {
     if(!mixPanel.hidden)el('audio-mix-scene').textContent='正在播放 · '+({day:'云海拨弦',blizzard:'夜风与低弦',battle:'战斗鼓点'}[track]);
   }
   industry.update();chart.paint(false,now);
-  const overlay=down||!titlePanel.hidden||!mixPanel.hidden||!latteCare.hidden||skyEvents.open()||chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||beasts.open();
+  const overlay=down||medals.open()||!titlePanel.hidden||!mixPanel.hidden||!latteCare.hidden||skyEvents.open()||chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||beasts.open();
   radar.update(w,!overlay&&!w.activeIsland&&!finale.open()&&!finale.blocking());
   const context=primaryInteraction();
   const here=expedition.update(now,overlay||finale.arena()||context.kind==='fishing'||context.kind==='trader',context.kind==='expedition'||context.kind==='pet',
@@ -943,7 +948,8 @@ function frame(now:number):void {
   skyEvents.frame(down||finale.arena(),context.kind==='trader');
   toolUi.update(here);
   journal.paint(overlay||finale.open()||finale.blocking());
-  finale.update(!mixPanel.hidden||chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||finale.open(),journal.open());
+  medals.frame(now,down||!titlePanel.hidden);
+  finale.update(medals.open()||!mixPanel.hidden||chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||finale.open(),journal.open());
   const region=regions.get(voyageBiome(w))??'碎云浅海';
   if(el('sector-name').textContent!==region)el('sector-name').textContent=region;
   setVital(0,w.player.warmth,w.player.maxWarmth);

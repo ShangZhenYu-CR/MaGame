@@ -1,3 +1,4 @@
+import { recordLife } from './life';
 import { challenge } from './challenge';
 import { emitJuice } from './juice';
 import items from '../data/items.json';
@@ -31,7 +32,7 @@ export function eatMeal(w:WorldState,id:MealId):string|null{
   p.hunger=Math.min(p.maxHunger,p.hunger+food.hunger);
   const before=p.warmth;p.warmth=Math.min(p.maxWarmth,p.warmth+food.warmth);
   if(p.warmth>before)emitJuice(w,'warmth',p,p.warmth-before,{target:'player'});
-  healPlayer(w,meal.recover);
+  healPlayer(w,meal.recover);recordLife(w,'meals');
   if(w.tick+meal.seconds*TICK_RATE>=p.diet.warmUntil){
     p.diet.warmUntil=w.tick+meal.seconds*TICK_RATE;p.diet.last=id;
   }

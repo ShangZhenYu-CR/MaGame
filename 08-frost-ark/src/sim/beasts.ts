@@ -1,3 +1,4 @@
+import { recordLife } from './life';
 import { alphaAttack,alphaMaxHp,eliteProfile,naturalAlpha,stepWildEcology,wildMind } from './wild-ecology';
 import { beastBond,beastMood,bondWorkScale,emitBeastMood } from './beast-bond';
 import { inheritedMorph } from './breeding';
@@ -129,6 +130,7 @@ export function tameBeast(w:WorldState,id:string):string|null{
   }
   w.wildEntities=w.wildEntities.filter(x=>x!==e);
   const role=w.beasts.filter(b=>b.role==='companion').length<MAX_COMPANIONS?'companion':'rest';
+  recordLife(w,'tamed');if(e.alpha)recordLife(w,'alphas');
   w.beasts.push({id:e.id,defId:e.defId,name:(e.alpha?'头领 ':'')+def.name,x:e.x,y:e.y,hp:Math.max(1,Math.min(def.maxHp,e.hp)),
     maxHp:def.maxHp,warmth:80,hunger:100,role,denBuildingId:null,workCooldown:3*TICK_RATE});
   if(e.alpha)inheritProfile(w,e.id,eliteProfile(w,e));

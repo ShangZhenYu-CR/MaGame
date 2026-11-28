@@ -1,3 +1,4 @@
+import { readLife } from './sim/life';
 import { benchmarkMode,setupShipBenchmark } from './ui/ship-benchmark';
 import { perfDraw,perfStep,resetPerf } from './render/performance';
 import { achievementsUi } from './ui/achievements-ui';
@@ -174,7 +175,7 @@ let db: IDBDatabase|null=null, active=false, switching=false, provisional=false,
 let currentSlot=previousSlot(),selectedSlot=currentSlot,slotsInfo:(SlotInfo|null)[]=[null,null,null],confirmSlot:Slot|null=null;
 const titlePanel=el('voyage-title'),optionsShake=el<HTMLInputElement>('settings-shake'),pace=el<HTMLSelectElement>('day-pace');
 const titleDifficulty=el<HTMLSelectElement>('voyage-difficulty'),titleSeed=el<HTMLInputElement>('voyage-seed');
-let titleReturn=false;
+let titleReturn=false,titleEpoch=0,saveRevision=0;
 const regionNames:Record<string,string>={cloud_shallows:'碎云浅海',frostpine_isles:'霜松群岛',sulfur_rift:'硫磺裂谷',aurora_zenith:'极光天穹'};
 function redrawSlots(){
  const menu=el('voyage-slots');menu.replaceChildren(...slots.map(id=>{
@@ -193,16 +194,21 @@ function redrawSlots(){
   '未填种子时随机生成。每个槽独立保存，JSON 可在背包导入与导出。';
 }
 async function openTitle(returnToSettings=false){
- titleReturn=returnToSettings;selectedSlot=currentSlot;confirmSlot=null;titleSeed.value='';titleDifficulty.value=difficultyOf(w);
- showAudio(false);titlePanel.hidden=false;keys.clear();cancelCharge(w);
+ const request=++titleEpoch;
+ let listed=slotsInfo;
  if(db){
   await saveQueue;
-  try{slotsInfo=await slotOverview(db);}catch{slotsInfo=[null,null,null];}
+  try{listed=await slotOverview(db);}catch{listed=[null,null,null];}
  }
+ if(request!==titleEpoch)return;
+ slotsInfo=listed;titleReturn=returnToSettings;selectedSlot=currentSlot;confirmSlot=null;
+ titleSeed.value='';titleDifficulty.value=difficultyOf(w);
+ showAudio(false);keys.clear();cancelCharge(w);
  redrawSlots();
+ titlePanel.hidden=false;
 }
 function closeTitle(returnToSettings=false){
- titlePanel.hidden=true;confirmSlot=null;
+ titleEpoch++;titlePanel.hidden=true;confirmSlot=null;
  if(returnToSettings&&titleReturn)showAudio(true);
  titleReturn=false;
 }
@@ -640,11 +646,14 @@ function updateFoodHud():void{
 }
 function saveNow():Promise<void> {
   if(benchmarkMode||!db||!active)return Promise.resolve();
-  const archive=db,snapshot=structuredClone(w),slot=currentSlot,untouched=provisional;
+  const archive=db,snapshot=structuredClone(w),slot=currentSlot,untouched=provisional,revision=++saveRevision;
+  if(save.dataset.saved==='true')save.dataset.saved='false';
   saveQueue=saveQueue.then(()=>storeWorld(archive,snapshot,slot,untouched)).then(()=>{
+    if(revision!==saveRevision)return;
     if(save.dataset.error==='true') delete save.dataset.error;
     save.textContent='槽 '+currentSlot+' · 本地自动存档 · 已保存';save.dataset.saved='true';save.dataset.slot=String(currentSlot);
   },()=>{
+    if(revision!==saveRevision)return;
     save.textContent='存档写入失败 · 可导出 JSON';save.dataset.error='true';delete save.dataset.saved;
   });
   return saveQueue;
@@ -869,7 +878,11 @@ function simulation():void {
   const pending=w.latte.autoLootUnlocked&&w.sky.debris.filter(isDeckDrop).length;
   const wasDown=incapacitated(w),beastCount=w.beasts.length;
   if(mode==='weapon'&&!w.player.weapon)choose('hook');
+  const priorMedals=readLife(w)?.shown.length??0;
   perfStep(()=>stepWorld(w,1,{x:Number(keys.has('d'))-Number(keys.has('a')),y:Number(keys.has('s'))-Number(keys.has('w'))},keys.has('shift')&&expedition.area()==='island'?.53:1));
+  // A newly earned badge is durable as soon as the UI announces it, not
+  // at the next periodic autosave. This also covers awards earned under menus.
+  if((readLife(w)?.shown.length??0)>priorMedals)void saveNow();
   if(w.tick%9===0&&!rolling(w)&&(w.player.vx||w.player.vy))audio.play(expedition.area()==='ark'||expedition.area()==='gangway'?'step-wood':'step-snow');
   if(w.tick%570===0&&w.beasts.some(b=>b.hp>0&&Math.hypot(b.x-w.player.x,b.y-w.player.y)<=3))audio.play('beast');
   if(w.tick%3===0){

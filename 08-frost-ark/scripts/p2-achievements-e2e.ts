@@ -45,6 +45,7 @@ export async function runP2Achievements(browser:Browser,url:string,dir:string,er
   const saved=achievementView(await exportWorld(p));
   assert.deepEqual(saved.rows.filter(x=>x.unlocked).map(x=>x.id),['spark','deck','roll']);
   assert.equal(saved.stats.find(([name])=>name==='新建甲板')?.[1],3);
+  await p.locator('#save-label[data-saved=true]').waitFor();
   await p.reload({waitUntil:'networkidle'});
   await p.keyboard.press('o');await wall.waitFor();
   assert.equal(await wall.locator('[data-earned=true]').count(),3);

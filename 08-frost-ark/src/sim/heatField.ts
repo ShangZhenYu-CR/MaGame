@@ -1,3 +1,4 @@
+import { challenge,daySpeed } from './challenge';
 import { endlessTemperature,hasAncientWhiteout } from './endless';
 import { whaleIced } from './whale-sea';
 import { eventClimate } from './sky-events';
@@ -91,7 +92,7 @@ export function emitters(w:WorldState){
 }
 
 export function advanceClimate(w:WorldState):void{
-  const next=w.timeOfDay+1/DAY_TICKS;
+  const next=w.timeOfDay+daySpeed(w)/DAY_TICKS;
   if(next>=1){w.day++;w.timeOfDay=next-1;}
   else w.timeOfDay=next;
   const part=partOfDay(w.timeOfDay);
@@ -99,7 +100,7 @@ export function advanceClimate(w:WorldState):void{
   w.weather=whiteout?'whiteout':part==='暴雪夜'?'snow':'clear';
   const t=w.timeOfDay;
   w.ambientTemp=whiteout?-55:part==='暴雪夜'?-22:part==='黄昏'?Math.round(-4-18*(t-.59)/.15):-4;
-  w.ambientTemp+=eventClimate(w)+endlessTemperature(w);
+  w.ambientTemp+=eventClimate(w)+endlessTemperature(w)+challenge(w).ambient;
   const hearth=primaryHearth(w);
   if(hearth&&hearth.fuel>0)hearth.fuel=Math.max(0,hearth.fuel-(whiteout?(hearth.level>=3?.034:.05):part==='暴雪夜'?.023:.013));
 }

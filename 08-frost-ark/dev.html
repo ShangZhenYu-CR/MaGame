@@ -149,15 +149,28 @@
   <section id="m5-attack-prompt" class="m5-attack-prompt" hidden>
     <strong id="m5-target-name"></strong><button type="button" id="m5-attack"><kbd>F</kbd> 反击</button>
   </section>
+  <section id="voyage-title" class="voyage-title" aria-labelledby="voyage-heading" hidden>
+    <div class="panel-head"><div><div class="eyebrow">FROST ARK ／ 航行档案</div><h2 id="voyage-heading">选择你的航程</h2></div><button type="button" id="voyage-close">返回游戏</button></div>
+    <div id="voyage-slots" aria-label="本地存档槽"></div>
+    <div class="voyage-fields">
+      <label for="voyage-difficulty">新航程难度<select id="voyage-difficulty"><option value="relaxed">休闲拾荒</option><option value="standard" selected>标准生存</option><option value="hardcore">极寒硬核</option></select></label>
+      <label for="voyage-seed">世界种子<input id="voyage-seed" type="text" inputmode="numeric" placeholder="留空随机" maxlength="11"></label>
+    </div>
+    <p id="voyage-prompt" class="panel-intro" aria-live="polite"></p>
+    <div class="voyage-commands"><button type="button" id="voyage-resume">载入所选槽</button><button type="button" id="voyage-start">开始新航程</button></div>
+  </section>
   <aside id="audio-mix" class="audio-mix" aria-labelledby="audio-mix-title" hidden>
-    <div class="panel-head"><h2 id="audio-mix-title">声音设置</h2><button type="button" id="audio-mix-close">关闭</button></div>
+    <div class="panel-head"><h2 id="audio-mix-title">系统设置</h2><button type="button" id="audio-mix-close">关闭</button></div>
     <label for="music-volume">背景音乐 <output id="music-volume-value"></output></label>
     <input type="range" id="music-volume" min="0" max="100" step="1">
     <label for="music-mute"><input type="checkbox" id="music-mute"> 静音背景音乐</label>
     <label for="effects-volume">环境与音效 <output id="effects-volume-value"></output></label>
     <input type="range" id="effects-volume" min="0" max="100" step="1">
     <label for="effects-mute"><input type="checkbox" id="effects-mute"> 静音环境与音效</label>
+    <label for="settings-shake"><input type="checkbox" id="settings-shake"> 暴击镜头震动</label>
+    <label for="day-pace">昼夜倍速 <select id="day-pace"><option value="0.75">0.75×</option><option value="1">1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label>
     <p id="audio-mix-scene" class="panel-intro"></p>
+    <button type="button" id="voyage-slot-toggle">管理三个存档槽</button>
   </aside>
   <aside id="latte-care" class="wild-encounter latte-care" aria-labelledby="latte-care-title" hidden>
     <div class="panel-head"><div><div class="eyebrow">HEARTH COMPANION</div><h2 id="latte-care-title">炉边的拿铁</h2></div><button id="latte-close" type="button">关闭</button></div>

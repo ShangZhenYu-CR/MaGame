@@ -1,3 +1,4 @@
+import { daySpeed } from './challenge';
 import { trackTurret } from './turret-aim';
 import { ancientDue,ancientValid,defeatAncient,depthOf,hasAncientWhiteout,isBountyEnemy,syncAncient } from './endless';
 import { awardGuardian,clearGuardianStage,guardianHitScale,guardianTell,stepGuardian } from './guardians-p2';
@@ -53,7 +54,7 @@ const raidPlan=(w:WorldState)=>specs.waves.map((wave,index)=>ancientDue(w)&&inde
 export function m5Status(w:WorldState){
   const s=get(w),active=w.weather==='whiteout', ancient=hasAncientWhiteout(w),warning=(w.day%5===0||ancientDue(w))&&!active&&w.timeOfDay>=.59;
   return { active, storm:active, warning,ancient,
-    untilTicks:warning?Math.ceil((.74-w.timeOfDay)*DAY_TICKS):0,
+    untilTicks:warning?Math.ceil((.74-w.timeOfDay)*DAY_TICKS/daySpeed(w)):0,
     wave:s?.raidDay===w.day?s.wave:0, plan:raidPlan(w).map(wave=>wave.map(id=>specs.hostiles[id as HostileId].name)),
     raidsRemaining:w.wildEntities.filter(e=>e.kind==='raider'&&isOwned(e)&&e.hp>0).length,
     seeds:w.skyheartCores,

@@ -1,3 +1,4 @@
+import { challenge } from './challenge';
 import { abandonCave } from './cave';
 import { emitJuice } from './juice';
 import { rollGuard } from './roll';
@@ -15,7 +16,7 @@ export function damagePlayer(w: WorldState, amount: number, kind:'physical'|'col
   const p=w.player;
   const gear=gearModifiers(w);
   const reduction=kind==='physical'?gear.guard:kind==='cold'?gear.cold*.5:0;
-  const before=p.hp;p.hp=Math.max(0,p.hp-amount*(1-reduction));
+  const before=p.hp;p.hp=Math.max(0,p.hp-amount*(1-reduction)*(kind==='physical'?challenge(w).physical:1));
   if(kind==='physical'&&before-p.hp>=.5)emitJuice(w,'hurt',p,before-p.hp,{target:'player'});
   if (p.hp===0) begin(w);
   return true;

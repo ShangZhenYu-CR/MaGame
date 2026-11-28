@@ -1,3 +1,4 @@
+import { configureVoyage,daySpeed,difficultyIds,difficultyNames,difficultyOf,type DaySpeed,type Difficulty } from './sim/challenge';
 import { whaleBattleActive } from './sim/finale';
 import { careForLatte,latteBoon,latteNear,latteProfile,outfitLatte,outfits,outfitsAt } from './sim/latte-growth';
 import { nearBondBeast,petBond } from './sim/beast-bond';
@@ -22,7 +23,7 @@ import { TICK_RATE, type WorldState } from './sim/types';
 import { incapacitated, RESCUE_TICKS, rescueShield } from './sim/rescue';
 import { eatMeal, isMeal, mealRemaining, quickMeal, type MealId } from './sim/food';
 import { createInitialWorld, stepWorld } from './sim/world';
-import { openArchive, savedWorld, storeWorld } from './ui/storage';
+import { openArchive, previousSlot, rememberSlot, savedWorld, slotOverview, slots, storeWorld,type Slot,type SlotInfo } from './ui/storage';
 import { createIndustryUi, itemList } from './ui/industry';
 import { dismantle, dismantleIssue, industryDistance, industryPanel, nearestIndustry } from './sim/industry';
 import { audio } from './audio/synth';
@@ -100,11 +101,12 @@ function paintMix(){
  const mix=audio.mix();
  volMusic.value=String(Math.round(mix.music*100));volFx.value=String(Math.round(mix.effects*100));
  muteMusic.checked=mix.muteMusic;muteFx.checked=mix.muteEffects;
+ optionsShake.checked=shakeOption.checked;pace.value=String(daySpeed(w));
  el('music-volume-value').textContent=volMusic.value+'%';
  el('effects-volume-value').textContent=volFx.value+'%';
 }
 function showAudio(open:boolean){
- if(open){closeOtherPanels('audio');chart.hide(false);keys.clear();cancelCharge(w);audio.unlock();paintMix();}
+ if(open){closeTitle();closeOtherPanels('audio');chart.hide(false);keys.clear();cancelCharge(w);audio.unlock();paintMix();}
  mixPanel.hidden=!open;el('audio-mix-toggle').setAttribute('aria-expanded',String(open));
 }
 el('audio-mix-toggle').onclick=()=>showAudio(mixPanel.hidden);
@@ -149,7 +151,81 @@ let lockerSignature='';
 type Mode = 'hook' | 'weapon' | 'tool' | 'dismantle' | BuildKind;
 const controls: Partial<Record<Mode,HTMLElement>>={ hook:el('hook'),wood_deck:el('build-deck'),torch_post:el('build-torch'),wind_wall:el('build-wall'),dismantle:el('dismantle-mode') };
 let mode: Mode='hook', w: WorldState=createInitialWorld(), pointer:{x:number;y:number}|null=null;
-let db: IDBDatabase|null=null, active=false, saveQueue=Promise.resolve();
+let db: IDBDatabase|null=null, active=false, switching=false, provisional=false, saveQueue=Promise.resolve();
+let currentSlot=previousSlot(),selectedSlot=currentSlot,slotsInfo:(SlotInfo|null)[]=[null,null,null],confirmSlot:Slot|null=null;
+const titlePanel=el('voyage-title'),optionsShake=el<HTMLInputElement>('settings-shake'),pace=el<HTMLSelectElement>('day-pace');
+const titleDifficulty=el<HTMLSelectElement>('voyage-difficulty'),titleSeed=el<HTMLInputElement>('voyage-seed');
+let titleReturn=false;
+const regionNames:Record<string,string>={cloud_shallows:'碎云浅海',frostpine_isles:'霜松群岛',sulfur_rift:'硫磺裂谷',aurora_zenith:'极光天穹'};
+function redrawSlots(){
+ const menu=el('voyage-slots');menu.replaceChildren(...slots.map(id=>{
+   const item=slotsInfo[id-1],b=document.createElement('button'),name=document.createElement('strong'),sub=document.createElement('small');
+   b.type='button';b.dataset.saveSlot=String(id);b.dataset.filled=String(!!item&&!item.provisional);
+   b.setAttribute('aria-pressed',String(selectedSlot===id));name.textContent='存档 '+id;
+   sub.textContent=item&&!item.provisional?`Day ${item.day} · ${regionNames[item.region]??item.region} · 火种 ${item.cores}/4 · ${difficultyNames[item.difficulty]}`:'空槽';
+   if(item&&!item.provisional&&item.modified>0)sub.append(document.createElement('br'),new Date(item.modified).toLocaleString());
+   b.append(name,sub);b.onclick=()=>{selectedSlot=id;confirmSlot=null;redrawSlots();};return b;
+ }));
+ const occupied=slotsInfo[selectedSlot-1],exists=!!occupied&&!occupied.provisional;
+ el<HTMLButtonElement>('voyage-resume').disabled=!exists||switching;
+ el<HTMLButtonElement>('voyage-start').disabled=switching;
+ el('voyage-start').textContent=confirmSlot===selectedSlot?'确认覆盖槽 '+selectedSlot:'开始新航程';
+ el('voyage-prompt').textContent=confirmSlot===selectedSlot?'这个槽已有存档。再按一次才覆盖，选择别槽可取消。':
+  '未填种子时随机生成。每个槽独立保存，JSON 可在背包导入与导出。';
+}
+async function openTitle(returnToSettings=false){
+ titleReturn=returnToSettings;selectedSlot=currentSlot;confirmSlot=null;titleSeed.value='';titleDifficulty.value=difficultyOf(w);
+ showAudio(false);titlePanel.hidden=false;keys.clear();cancelCharge(w);
+ if(db){
+  await saveQueue;
+  try{slotsInfo=await slotOverview(db);}catch{slotsInfo=[null,null,null];}
+ }
+ redrawSlots();
+}
+function closeTitle(returnToSettings=false){
+ titlePanel.hidden=true;confirmSlot=null;
+ if(returnToSettings&&titleReturn)showAudio(true);
+ titleReturn=false;
+}
+function defaultVoyage(){
+ if(titlePanel.hidden||!provisional||switching)return;
+ provisional=false;closeTitle();void saveNow();
+}
+async function selectVoyage(create:boolean){
+ if(switching||!active)return;
+ if(!db){el('voyage-prompt').textContent='本地存档不可用。可回到游戏并从背包导出 JSON。';return;}
+ const slot=selectedSlot;
+ const occupied=slotsInfo[slot-1];
+ if(create&&occupied&&!occupied.provisional&&confirmSlot!==slot){confirmSlot=slot;redrawSlots();return;}
+ const source=titleSeed.value.trim(),seed=source?Number(source):crypto.getRandomValues(new Uint32Array(1))[0]>>>1;
+ if(create&&(!Number.isInteger(seed)||seed<-2147483648||seed>2147483647)){
+  el('voyage-prompt').textContent='请填 32 位整数世界种子，或留空。';return;
+ }
+ const detail=titleDifficulty.value as Difficulty;
+ if(create&&!difficultyIds.includes(detail))return;
+ switching=true;redrawSlots();keys.clear();
+ try{
+  await saveQueue;
+  // Flush the latest old-slot state before selecting a different one.
+  if(!provisional&&slot!==currentSlot)await storeWorld(db,w,currentSlot);
+  const next=create?createInitialWorld(seed):await savedWorld(db,slot);
+  if(!next){el('voyage-prompt').textContent='这个槽还没有航程。';return;}
+  if(create)configureVoyage(next,detail);
+  currentSlot=slot;rememberSlot(slot);provisional=false;
+  safeWorld(next);closeTitle();await saveNow();
+  tell(create?'已开新航程：'+difficultyNames[detail]+'。':'已载入存档 '+slot+'。');
+ }catch{el('voyage-prompt').textContent='本地读取失败，未替换正在玩的航程。';}
+ finally{switching=false;if(!titlePanel.hidden){el<HTMLButtonElement>('voyage-start').disabled=false;el<HTMLButtonElement>('voyage-resume').disabled=!occupied||!!occupied.provisional;}}
+}
+el('voyage-slot-toggle').onclick=()=>{void openTitle(true);};
+el('voyage-close').onclick=()=>{if(provisional)defaultVoyage();else closeTitle(true);};
+el('voyage-start').onclick=()=>{void selectVoyage(true);};
+el('voyage-resume').onclick=()=>{void selectVoyage(false);};
+optionsShake.onchange=()=>{shakeOption.checked=optionsShake.checked;shakeOption.dispatchEvent(new Event('change'));};
+pace.onchange=()=>{
+ configureVoyage(w,difficultyOf(w),Number(pace.value) as DaySpeed);void saveNow();
+};
+
 let messageUntil=0, caught:string|null=null, catchName='', countAtCatch=0, catchLootId='';
 let stackSignature='', toolbarSignature='', message='', lastAmbient=0;
 const icons=import.meta.glob<string>('./assets/art/icon-*.png',{eager:true,query:'?inline',import:'default'});
@@ -541,18 +617,18 @@ function updateFoodHud():void{
   }
 }
 function saveNow():Promise<void> {
-  if(!db || !active) return Promise.resolve();
-  const archive=db, snapshot=structuredClone(w);
-  saveQueue=saveQueue.then(()=>storeWorld(archive,snapshot)).then(()=>{
+  if(!db||!active)return Promise.resolve();
+  const archive=db,snapshot=structuredClone(w),slot=currentSlot,untouched=provisional;
+  saveQueue=saveQueue.then(()=>storeWorld(archive,snapshot,slot,untouched)).then(()=>{
     if(save.dataset.error==='true') delete save.dataset.error;
-    save.textContent='本地自动存档 · 已保存'; save.dataset.saved='true';
+    save.textContent='槽 '+currentSlot+' · 本地自动存档 · 已保存';save.dataset.saved='true';save.dataset.slot=String(currentSlot);
   },()=>{
     save.textContent='存档写入失败 · 可导出 JSON';save.dataset.error='true';delete save.dataset.saved;
   });
   return saveQueue;
 }
 function safeWorld(next:WorldState):void {
-  finale.reset();view.juice.reset();cancelFishing(w);skyEvents.close();
+  closeTitle();finale.reset();view.juice.reset();cancelFishing(w);skyEvents.close();
   expedition.cancel();chart.hide(false);beasts.show(false);beasts.resetTarget();showLatte(false);showAudio(false);w=next;toggleStorage(false);industry.showStation(null);industry.showCatalog(false);lockerSignature='';cancelCharge(w);
   caught=null;keys.clear();messageUntil=0;message='';stackSignature='';
   if(mode==='weapon'&&!w.player.weapon||mode==='tool'&&!heldTool(w))choose('hook');
@@ -614,7 +690,7 @@ input.onchange=async()=>{
   try{
     if(file.size>2_000_000)throw new Error('文件大于 2 MB');
     const next=deserializeWorld(await file.text());
-    safeWorld(next);tell('已载入 JSON 存档。');await saveNow();
+    provisional=false;safeWorld(next);tell('已载入 JSON 存档。');await saveNow();
   }catch(e){tell('导入失败：'+(e instanceof Error?e.message:'文件无法读取'));}
 };
 addEventListener('resize',()=>view.resize(w));
@@ -622,10 +698,25 @@ addEventListener('blur',()=>{keys.clear();cancelFishing(w);cancelCharge(w);exped
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden){ keys.clear();cancelCharge(w);void saveNow(); }
 });
-addEventListener('pointerdown',()=>audio.unlock());
+addEventListener('pointerdown',e=>{audio.unlock();if(!(e.target instanceof Node)||!titlePanel.contains(e.target))defaultVoyage();});
+addEventListener('wheel',e=>{
+ if(!provisional||titlePanel.hidden||e.ctrlKey||e.metaKey)return;
+ const target=e.target;
+ if(target instanceof HTMLElement&&target.closest('input,select'))return;
+ defaultVoyage();
+ // The title is not a scroll view. A first zoom aimed over its static
+ // background enters the default voyage and retains that same zoom input.
+ if(target!==canvas){e.preventDefault();view.zoom(e.deltaY);}
+},{capture:true,passive:false});
 document.addEventListener('click',e=>{if(incapacitated(w)){e.preventDefault();e.stopImmediatePropagation();}},true);
 addEventListener('keydown',e=>{
   const k=e.key.toLowerCase();
+  if(switching)return;
+  if(!titlePanel.hidden){
+    if(e.key==='Escape'){e.preventDefault();if(provisional)defaultVoyage();else closeTitle(true);return;}
+    if(e.target instanceof Node&&titlePanel.contains(e.target))return;
+    if(provisional)defaultVoyage();else return;
+  }
   if(e.ctrlKey||e.metaKey||e.altKey||e.target===input)return;
   if((e.target instanceof HTMLSelectElement||e.target instanceof HTMLInputElement&&e.target.type==='text')&&k!=='escape')return;
   if(finale.blocking()||incapacitated(w))return;
@@ -711,7 +802,7 @@ canvas.addEventListener('pointermove',e=>{
 });
 canvas.addEventListener('pointerleave',()=>{pointer=null;});
 canvas.addEventListener('pointerdown',e=>{
-  if(!active||!mixPanel.hidden||!latteCare.hidden||incapacitated(w)||rolling(w)||skyEvents.open()||e.button!==0||fishingPanel(w)||chart.open()||finale.open()||finale.blocking())return;
+  if(!active||switching||!titlePanel.hidden&&!provisional||!mixPanel.hidden||!latteCare.hidden||incapacitated(w)||rolling(w)||skyEvents.open()||e.button!==0||fishingPanel(w)||chart.open()||finale.open()||finale.blocking())return;
   pointer={x:e.clientX,y:e.clientY};
   const at=view.world(e.clientX,e.clientY);
   const x=Math.floor(at.x),y=Math.floor(at.y);
@@ -797,7 +888,7 @@ function frame(now:number):void {
   collectJuice(now);
   elapsed+=Math.min(100,Math.max(0,now-Math.max(last,view.juice.freezeUntil)));last=now;
   while(now>=view.juice.freezeUntil&&elapsed>=1000/TICK_RATE){
-    if(active)simulation();
+    if(active&&!switching&&!provisional)simulation();
     elapsed-=1000/TICK_RATE;
     collectJuice(now);
   }
@@ -834,7 +925,7 @@ function frame(now:number):void {
     if(!mixPanel.hidden)el('audio-mix-scene').textContent='正在播放 · '+({day:'云海拨弦',blizzard:'夜风与低弦',battle:'战斗鼓点'}[track]);
   }
   industry.update();chart.paint(false,now);
-  const overlay=down||!mixPanel.hidden||!latteCare.hidden||skyEvents.open()||chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||beasts.open();
+  const overlay=down||!titlePanel.hidden||!mixPanel.hidden||!latteCare.hidden||skyEvents.open()||chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||beasts.open();
   radar.update(w,!overlay&&!w.activeIsland&&!finale.open()&&!finale.blocking());
   const context=primaryInteraction();
   const here=expedition.update(now,overlay||finale.arena()||context.kind==='fishing'||context.kind==='trader',context.kind==='expedition'||context.kind==='pet',
@@ -901,10 +992,11 @@ canvas.dataset.mode=mode;view.resize(w);requestAnimationFrame(frame);
 async function restore():Promise<void> {
   try {
     db=await openArchive();
-    const previous=await savedWorld(db);
+    const previous=await savedWorld(db,currentSlot);slotsInfo=await slotOverview(db);
     if(previous)safeWorld(previous);
-    active=true;
-    await saveNow();
+    provisional=!previous||slotsInfo[currentSlot-1]?.provisional===true;
+    active=true;await saveNow();
+    if(provisional)await openTitle();
   } catch {
     db?.close();db=null;active=true;
     save.textContent='存档不可用 · 可导出 JSON';save.dataset.error='true';

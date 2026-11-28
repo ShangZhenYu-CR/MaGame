@@ -1,3 +1,4 @@
+import { challenge } from './challenge';
 import { emitJuice } from './juice';
 import items from '../data/items.json';
 import { countItem, inventoryChange } from './ark';
@@ -43,6 +44,6 @@ export function stepHunger(w:WorldState):void{
   const threatened=w.wildEntities.some(e=>e.hostile&&e.hp>0&&Math.hypot(e.x-p.x,e.y-p.y)<=4)||
     whaleBattleActive(w);
   const cost=.042+(t<0?.05+Math.min(40,-t)*.0018:0)+(threatened?.085:0);
-  p.hunger=Math.max(0,p.hunger-cost);
+  p.hunger=Math.max(0,p.hunger-cost*challenge(w).hunger);
   if(p.hunger===0)damagePlayer(w,1.2,'hunger');
 }

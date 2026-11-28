@@ -1,3 +1,4 @@
+import { runP2Endless } from "./p2-endless-e2e";
 import { runP2SeaWhale } from "./p2-sea-whale-e2e";
 import { runP2Guardians } from "./p2-guardians-e2e";
 import { runP2Raiders } from "./p2-raiders-e2e";
@@ -683,6 +684,7 @@ try {
   await runP2Raiders(browser,baseUrl,outDir,errors);
   await runP2Guardians(browser,baseUrl,outDir,errors);
   await runP2SeaWhale(browser,baseUrl,outDir,errors);
+  await runP2Endless(browser,baseUrl,outDir,errors);
 
   if (errors.length > 0) {
     throw new Error(errors.join('\n'));

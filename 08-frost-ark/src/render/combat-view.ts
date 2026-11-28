@@ -1,3 +1,4 @@
+import { isBountyEnemy } from '../sim/endless';
 import { raiderConcealed } from '../sim/defenses-p2';
 import combat from '../data/combat_m5.json';
 import { m5CombatEffects, m5Telegraph } from '../sim/m5';
@@ -28,8 +29,8 @@ export function m5Actors(w:WorldState):CombatActor[]{
     const motion=w.tick*.11+e.x*.9+e.y*.6;
     return [{...hostileArt[id],id:e.id,x:e.x,y:e.y,telegraph:charge,reach:def.range,
       float:id==='frostspike_bat'?5+5*(1+Math.sin(motion*1.4)):id==='heatwraith'?3+3*(1+Math.sin(motion)):0,
-      hp:clamp(e.hp/Math.max(1,e.maxHp)),boss:e.kind==='boss'&&id!=='frostpack_wolf',name:def.name,flip:w.player.x>e.x,
-      scale:charge?1.035:1+Math.sin(motion)*.014,rotation:charge?Math.sin(w.tick*.46)*.021:0}];
+      hp:clamp(e.hp/Math.max(1,e.maxHp)),boss:e.kind==='boss'&&id!=='frostpack_wolf',name:(isBountyEnemy(e)?'远古':'')+def.name,flip:w.player.x>e.x,
+      scale:(isBountyEnemy(e)?1.22:1)*(charge?1.035:1+Math.sin(motion)*.014),rotation:charge?Math.sin(w.tick*.46)*.021:0}];
   });
 }
 

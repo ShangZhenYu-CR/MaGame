@@ -1,3 +1,4 @@
+import { stepEndless } from './endless';
 import { guardianWalkScale } from './guardians-p2';
 import { stepBreeding } from './breeding';
 import { stepSkyEvents } from './sky-events';
@@ -151,6 +152,7 @@ export function stepWorld(world: WorldState, ticks = 1, direction: Vec2 = {x: 0,
     stepSkyEvents(world);
     stepCloud(world);
     advanceClimate(world);
+    if(world.tick%30===0)stepEndless(world);
     stepHeat(world);
     stepLandmarks(world);
     stepCave(world);

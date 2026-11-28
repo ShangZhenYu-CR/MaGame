@@ -1,3 +1,4 @@
+import { stepEndless } from './endless';
 import { displayChartIslands,noteIslandVisit } from './expansion';
 import { eventWindDrag } from './sky-events';
 import { dockSide,docks } from './dock-direction';
@@ -140,6 +141,7 @@ export function stepNavigation(w:WorldState):void{
   }
   w.sky.headingX=dx/gap;w.sky.headingY=dy/gap;
   const speed=cruiseSpeed(w)/TICK_RATE;
+  stepEndless(w,Math.min(gap,speed));
   w.sky.x+=w.sky.headingX*Math.min(gap,speed);
   w.sky.y+=w.sky.headingY*Math.min(gap,speed);
   const eyes=(beastCompanions(w).some(b=>b.defId==='galehawk')?1.3:1)+sailingRig(w).vanes*.10;

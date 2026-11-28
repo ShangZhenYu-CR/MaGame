@@ -26,3 +26,14 @@
 @media(max-width:700px){.m2-tools{max-width:calc(100vw - 20px);flex-wrap:wrap}.codex-card{top:108px}.frost-guide{bottom:142px}}
 
 #forge-solar img{width:19px;height:19px;object-fit:contain;vertical-align:middle;margin-right:3px}
+
+.deep-voyage{top:218px;right:24px;width:min(260px,calc(100vw - 36px));font-size:12px}
+.deep-voyage strong,.deep-voyage span{display:block}
+.deep-voyage strong{font-size:15px}.deep-voyage p{margin:4px 0;color:#a9c6d8;line-height:1.48}
+.deep-voyage #deep-job{padding-top:6px;border-top:1px solid rgba(152,182,206,.29)}
+
+body:has(#wild-encounter:not([hidden])) .deep-voyage{top:410px}
+body:has(#heat-radar:not([hidden])) .deep-voyage{top:365px}
+@media(max-height:630px){
+ body:has(#wild-encounter:not([hidden])) .deep-voyage{top:152px;right:auto;left:18px}
+}

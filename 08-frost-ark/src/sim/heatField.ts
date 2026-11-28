@@ -1,3 +1,4 @@
+import { endlessTemperature,hasAncientWhiteout } from './endless';
 import { whaleIced } from './whale-sea';
 import { eventClimate } from './sky-events';
 import { caveTemperature } from './cave';
@@ -94,11 +95,11 @@ export function advanceClimate(w:WorldState):void{
   if(next>=1){w.day++;w.timeOfDay=next-1;}
   else w.timeOfDay=next;
   const part=partOfDay(w.timeOfDay);
-  const whiteout=w.day%5===0&&part==='暴雪夜';
+  const whiteout=(w.day%5===0&&part==='暴雪夜')||hasAncientWhiteout(w);
   w.weather=whiteout?'whiteout':part==='暴雪夜'?'snow':'clear';
   const t=w.timeOfDay;
   w.ambientTemp=whiteout?-55:part==='暴雪夜'?-22:part==='黄昏'?Math.round(-4-18*(t-.59)/.15):-4;
-  w.ambientTemp+=eventClimate(w);
+  w.ambientTemp+=eventClimate(w)+endlessTemperature(w);
   const hearth=primaryHearth(w);
   if(hearth&&hearth.fuel>0)hearth.fuel=Math.max(0,hearth.fuel-(whiteout?(hearth.level>=3?.034:.05):part==='暴雪夜'?.023:.013));
 }

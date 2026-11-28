@@ -1,3 +1,4 @@
+import { stepEndless } from './endless';
 import { applySeaStrike,fireSeaCannons,orbitWhale,prepareSeaStrike,thawWhaleIce,validSeaWhale,type SeaWarning,type SeaWhale } from './whale-sea';
 import { caveActive } from './cave';
 import { burnDamage,frozen,resolveElement,type Element } from './elements';
@@ -158,7 +159,7 @@ export function stepFinale(w:WorldState):void{
 export function continueEndless(w:WorldState):string|null{
   const f=get(w);
   if(!f||f.mode!=='cleared'||!w.bossDefeated)return '击败永冬霜鲸后开启。';
-  f.mode='endless';
+  f.mode='endless';stepEndless(w);
   return null;
 }
 

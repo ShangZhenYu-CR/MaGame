@@ -1,3 +1,4 @@
+import { ancientDue,ancientValid,defeatAncient,depthOf,hasAncientWhiteout,isBountyEnemy,syncAncient } from './endless';
 import { awardGuardian,clearGuardianStage,guardianHitScale,guardianTell,stepGuardian } from './guardians-p2';
 import { defenseSlow,raiderConcealed,stepDefenses } from './defenses-p2';
 import { partnerCritical } from './beast-bond';
@@ -47,10 +48,10 @@ const flash = (w:WorldState,from:Vec2,to:Vec2,kind:M5Effect['kind'])=>{
 };
 export const m5CombatEffects=(w:WorldState):readonly M5Effect[]=>(effects.get(w)??[]).filter(e=>e.expires>w.tick);
 
-const raidPlan=(w:WorldState)=>specs.waves.map((wave,index)=>w.day>=10&&index===2?['mist_priest','heatwraith','frostspike_bat']:wave);
+const raidPlan=(w:WorldState)=>specs.waves.map((wave,index)=>ancientDue(w)&&index===0?['frostspike_bat','heatwraith','froststalker']:w.day>=10&&index===2?['mist_priest','heatwraith','frostspike_bat']:wave);
 export function m5Status(w:WorldState){
-  const s=get(w),active=w.weather==='whiteout', warning=w.day%5===0&&!active&&w.timeOfDay>=.59;
-  return { active, storm:active, warning,
+  const s=get(w),active=w.weather==='whiteout', ancient=hasAncientWhiteout(w),warning=(w.day%5===0||ancientDue(w))&&!active&&w.timeOfDay>=.59;
+  return { active, storm:active, warning,ancient,
     untilTicks:warning?Math.ceil((.74-w.timeOfDay)*DAY_TICKS):0,
     wave:s?.raidDay===w.day?s.wave:0, plan:raidPlan(w).map(wave=>wave.map(id=>specs.hostiles[id as HostileId].name)),
     raidsRemaining:w.wildEntities.filter(e=>e.kind==='raider'&&isOwned(e)&&e.hp>0).length,
@@ -80,6 +81,7 @@ function hurt(w:WorldState,e:WildEntity,damage:number,bypassArmor=false,penetrat
   e.hp=Math.max(0,e.hp-Math.max(1,effect.damage-(bypassArmor?0:Math.max(0,arm-penetration))));
   emitJuice(w,dot?'burn':'hit',e,before-e.hp,{target:e.id,melt:effect.critical,critical:criticalOverride||effect.critical||(!dot&&e.kind==='boss'&&!e.hp)});
   if(e.hp||e.kind!=='boss'||!isOwned(e))return;
+  if(defeatAncient(w,e))return;
   const island=w.sky.islands.find(n=>n.id===w.activeIsland?.nodeId);
   if(!island||bossByIsland[island.id]!==e.defId)return;
   island.bossDefeated=true;
@@ -210,8 +212,9 @@ function stepEnemy(w:WorldState,e:WildEntity,s:M5State){
         }
       }
       if(e.defId==='heatwraith'&&obj&&obj.fuel>0)obj.fuel=Math.max(0,obj.fuel-3);
-      if(obj)obj.hp=Math.max(1,obj.hp-d.damage); // critical fixtures remain recoverable after a failed night
-      else if((e.kind==='raider'&&indoorsAt(w,w.player))||!damagePlayer(w,d.damage))return;
+      const power=isBountyEnemy(e)?Math.round(d.damage*(1.22+Math.min(.64,Math.sqrt(depthOf(w)-1)*.055))):d.damage;
+      if(obj)obj.hp=Math.max(1,obj.hp-power); // critical fixtures remain recoverable after a failed night
+      else if((e.kind==='raider'&&indoorsAt(w,w.player))||!damagePlayer(w,power))return;
       flash(w,e,pos,e.defId==='frostspike_bat'?'iceBolt':e.defId==='heatwraith'?'siphon':'strike');
     }
     return;
@@ -260,7 +263,7 @@ export function stepM5(w:WorldState):void{
     if(s.raidDay!==w.day){resetEntities(w,e=>e.kind==='raider'&&!e.id.startsWith('skyraid_'));s.raidDay=w.day;s.wave=0;s.nextWave=w.tick;}
     if(w.tick>=s.nextWave&&s.wave<specs.waves.length)spawnWave(w,s);
   }else resetEntities(w,e=>e.kind==='raider'&&!e.id.startsWith('skyraid_'));
-  stepBoss(w,s);
+  stepBoss(w,s);syncAncient(w);
   const raiders=w.wildEntities.filter(e=>e.kind==='raider'&&isOwned(e)&&e.hp>0);
   stepDefenses(w,s.turretClocks,raiders,(e,amount,element)=>hurt(w,e,amount,element==='fire',0,element));
   stepTurrets(w,s);
@@ -291,5 +294,5 @@ export function verifyM5(w:WorldState):boolean{
   const enemies=w.wildEntities.filter(isOwned);
   return enemies.length<=16&&new Set(enemies.map(e=>e.id)).size===enemies.length&&enemies.every(e=>
     typeof e.id==='string'&&e.id.length<=96&&Number.isFinite(e.x)&&Number.isFinite(e.y)&&
-    Number.isFinite(e.hp)&&e.hp>=0&&e.hp<=e.maxHp&&e.maxHp===specs.hostiles[e.defId as HostileId].hp);
+    Number.isFinite(e.hp)&&e.hp>=0&&e.hp<=e.maxHp&&(isBountyEnemy(e)?ancientValid(w,e):e.maxHp===specs.hostiles[e.defId as HostileId].hp));
 }

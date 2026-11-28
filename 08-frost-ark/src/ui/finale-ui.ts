@@ -1,3 +1,4 @@
+import { endlessView,reclaimBounty } from '../sim/endless';
 import beasts from '../data/beasts.json';
 import buildings from '../data/buildings.json';
 import { itemNames } from '../sim/ark';
@@ -46,6 +47,11 @@ export function finaleUi({state,say,prepare,sound,icon}:Wiring){
       <dl id="victory-totals"></dl>
       <button type="button" id="continue-endless">继续 · 无尽云海</button>
     </section>
+    <aside id="deep-voyage" class="finale-card deep-voyage" hidden aria-label="无尽深空">
+      <strong id="deep-heading">无尽深空</strong><span id="deep-grade"></span>
+      <p id="deep-weather"></p>
+      <div id="deep-job"><b id="deep-target"></b><p id="deep-reward"></p><button id="deep-action" type="button">接下悬赏</button></div>
+    </aside>
     <aside id="frost-guide" class="frost-guide" hidden>
       <span id="frost-guide-copy"></span>
       <button id="frost-guide-close" type="button" aria-label="关闭新手提示">×</button>
@@ -57,6 +63,7 @@ export function finaleUi({state,say,prepare,sound,icon}:Wiring){
   const whale=node('whale-context'), start=node<HTMLButtonElement>('whale-start');
   const strike=node<HTMLButtonElement>('whale-attack'), health=node<HTMLMeterElement>('whale-health');
   const victory=node('victory-panel'), guide=node('frost-guide');
+  const deep=node('deep-voyage'),jobAction=node<HTMLButtonElement>('deep-action');
   const forge=document.createElement('button');
   forge.id='forge-solar';forge.type='button';forge.hidden=true;
   const label=document.createElement('span');label.textContent='铸成太阳方舟';
@@ -115,6 +122,11 @@ export function finaleUi({state,say,prepare,sound,icon}:Wiring){
   node('whale-volley').onclick=()=>seaAction('volley');
   node('whale-repair').onclick=()=>seaAction('repair');
   node('continue-endless').onclick=()=>command(continueEndless,'已进入无尽云海，可以继续远航和建造。','solar');
+  jobAction.onclick=()=>{
+    const job=reclaimBounty(state());
+    say(job.issue,job.claimed?'悬赏奖励已入背包，巨舰评分提升。':'已接悬赏，到目标浮岛沿跳板寻找古兽。');
+    if(!job.issue)sound(job.claimed?'victory':'solar');
+  };
   node('frost-guide-close').onclick=()=>{if(liveHint)hints.add(liveHint);guide.hidden=true;};
 
   function update(covered:boolean){
@@ -157,6 +169,22 @@ export function finaleUi({state,say,prepare,sound,icon}:Wiring){
           const dt=document.createElement('dt'),dd=document.createElement('dd');
           dt.textContent=String(k);dd.textContent=String(v);return [dt,dd];
         }));
+      }
+    }
+    const deepState=f.mode==='endless'?endlessView(w):null;
+    deep.hidden=covered||!deepState;
+    if(deepState){
+      const {job}=deepState;
+      deep.dataset.depth=String(deepState.depth);deep.dataset.score=String(deepState.points);
+      deep.dataset.bounty=job?.phase??'';
+      text('deep-heading','无尽深空 · Depth '+deepState.depth);
+      text('deep-grade',deepState.grade+' · '+deepState.points+' 分');
+      text('deep-weather',deepState.ancient?'远古极寒潮进行中':`距下轮远古极寒潮 ${deepState.nextAncient} 天`);
+      node('deep-job').hidden=!job;
+      if(job){
+        text('deep-target',job.name+' · '+job.zone);
+        text('deep-reward',job.phase==='active'?'登岛后沿跳板向岛内寻找':job.reward.map(r=>(itemNames.get(r.itemId)??r.itemId)+' ×'+r.count).join(' · '));
+        jobAction.hidden=job.phase==='active';text('deep-action',job.phase==='reward'?'领取悬赏':'接下悬赏');
       }
     }
     priorMode=f.mode;

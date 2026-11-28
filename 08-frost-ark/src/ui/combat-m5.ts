@@ -1,3 +1,4 @@
+import { isBountyEnemy } from '../sim/endless';
 import { guardianTell } from '../sim/guardians-p2';
 import { attackM5, m5Status, m5Telegraph } from '../sim/m5';
 import { areaAt } from '../sim/island';
@@ -38,7 +39,7 @@ export function combatM5Ui(h:Hooks){
    raid.dataset.phase=s.active?'active':s.warning?'warning':'clear';raid.dataset.wave=String(s.wave);
    raid.dataset.raiders=String(s.raidsRemaining);raid.hidden=overlay||(!s.active&&!s.warning);
    const turretCount=w.ark.buildings.filter(b=>b.defId==='frost_turret'||b.defId==='fire_oil_turret'||b.defId==='oil_mortar').length;
-   text(el('raid-title'),s.active?'大寒潮 · 方舟防线':'大寒潮预警');
+   text(el('raid-title'),s.active?(s.ancient?'远古极寒潮 · 方舟防线':'大寒潮 · 方舟防线'):'大寒潮预警');
    text(el('raid-detail'),s.active?
     `第 ${s.wave}/${specs.waves.length} 波 · 敌袭 ${s.raidsRemaining} · 防御塔 ${turretCount}`:
     `距降温约 ${Math.ceil(s.untilTicks/TICK_RATE)} 秒 · 添柴、布置防霜箭塔或火油炮台`);
@@ -51,7 +52,7 @@ export function combatM5Ui(h:Hooks){
    boss.dataset.guardian=guardian?.defId??'';
    if(guardian){
     const windup=m5Telegraph(w,guardian.id);boss.dataset.telegraph=String(windup);
-    text(el('guardian-name'),names.get(guardian.defId)??'浮岛守卫');
+    text(el('guardian-name'),(isBountyEnemy(guardian)?'远古':'')+(names.get(guardian.defId)??'浮岛守卫'));
     const stage=guardianTell(w);
     boss.dataset.guardianMove=stage?.warn?.skill??(stage?.exposed?'overheat':'');
     text(el('guardian-phase'),stage?.warn?`${stage.warn.label} · ${stage.warn.skill==='shell'?'现在硬壳，等过热破绽':'离开预警范围'}`:stage?.exposed?'过热破绽 · 趁现在攻击':windup?'正在蓄力 · 拉开距离':'靠近按 F 反击，注意蓄力前兆');

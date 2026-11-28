@@ -79,7 +79,10 @@
     "p2-22-aurora": "Wide 2:1 isolated airborne natural hand-painted sky aurora curtain for the Frost Ark game, on a perfectly uniform pure RGB(255,0,255) magenta backdrop, unoccluded to every border. Center a long nearly horizontal oscillating thin flowing tapering multilayer shape with translucent-looking teal-blue eucalyptus and cool turquoise frost lights, gray pale cyan leading highlight, and just one faint amber glint at one taper. Dark desaturated upper-left light, subtle barely-there curling lower fringe and nonperiodic smooth elegance, like a gently blurred photographic aurora translated into refined handpainted painterly colored light. No solid sky image, no objects or mountains, no salt noise, no violet or neon, no text, no watermark, no sharp cutout boundaries, leave generous pure magenta margin. Will be alpha-keyed and composited dynamically.",
     "p2-22-aurora-clean": "Create a 3:2 wide original hand-painted Frost Ark aurora game sprite sheet divided into two equal horizontal halves (two equal rows only), each containing one distinct isolated sprite with generous perfectly uniform flat 100% saturated #FF00FF on all sides. Absolutely NO lavender, violet, purple, saturated acid green, indigo, pink or red in the artwork itself. Color only subdued natural mineral sea green, desaturated pale eucalyptus, and dark cool turquoise along translucent edges; use sage and thin pale mint glints. Top row centered: tiny inventory-world compass illustration of a smooth small folded aurora ribbon, tapering and resting nearly horizontally, three slight velvet folds softly lit from upper-left, broad symmetric image padding. Bottom row: long elegant wide, almost horizontal slowly curving thin layered natural aurora drape, open transparent-looking soft edges, two thin brighter misty bands in the middle, no repetitive folds, broad margin on every side. Natural atmospheric hand-painted effects with subtle graduated turquoise tones in low contrast, no hard lines, no white glow blowout, no letters, no frame, no objects or negative space patterns. The only vibrant color anywhere must be the pure fuchsia background, not near edge tints in the subjects. Max two parts.",
     "p2-25-skills": "Eight original small painterly ability icons for Frost Ark survival game, exact 4 columns by 2 rows cell layout. Every glyph centered isolated inside its cell with wide perfectly solid flat #FF00FF matte margins, no labels, grid lines, text, border or badges. Camera 40° elevated 2.5D, gentle upper-left cool winter light, muted graphite ice-blue and warm amber brush pigments with soft slate-brown contours; fully readable at 32px, compact silhouettes, no purple, neon, cast shadow or particles on the magenta. TOP left to right: (1) break-earth move as one upright irregular slate stone breaking into three bright blue-gray chunks, narrow amber crack; (2) ember fox surge as a low curving pair of warmly glowing amber flame tongues curling around a single little pale ember, no circle background; (3) yak charge as two carved orange-blue graphite horn curves lowered with strong forward slope, one small blue ice chip; (4) restorative elk field as one spiraling pale teal pine bough gently encompassing a little light blue warm drop, a few pine needles, no cross symbol. BOTTOM left to right: (5) razorwing dive as a single blue-grey detailed bird wing feather pivoting downward and two tiny pale ice airflow trailing wisps within shape; (6) magma creature breath as a compact sweeping horizontal mostly amber-red molten plume of two tapered tongues and small attached graphite ore shell; (7) tempest wyvern gust as differently proportioned rounded pale ice-blue wind funnel and visible little dark inner swirl, no cyan neon; (8) small bronze and ivory carved hourglass with a pale storm-blue sand core, crisp distinct passive cooldown icon. Match attached reference style not anatomy. Exactly eight individual silhouettes.",
-    "p2-26-incubator": "Original Frost Ark painterly survival game sprite atlas EXACT 2 columns × 2 rows square equal cells. Four solo subjects on 100% perfectly flat solid #FF00FF pure magenta incl any holes, very generous margins, no outside shadows, grid dividers, text or labels. Painterly crisp 2.5D art, three-quarter straight-front orthographic 40 degree raised camera, top and front visible, winter soft cool upper-left light, tactile frost-gray wood, felt, weathered brass and matte graphite contours like material reference. TOP LEFT: a compact distinct one-tile terrestrial cloud-beast thermostatic egg incubator, physical construction with four short stout weathered cast iron feet, warm oaken support under a horizontal open shallow round woven straw bowl lined in dark ginger felt and capped on its rear half with a small glass hood and tarnished copper coils, clearly remaining OPEN for accepting egg, no egg inside, no emitted glow, no person. Not a cage and not a furnace. TOP RIGHT: an isolated small soft cream-white bluish cloud-beast egg with slightly irregular smooth pebbled shell and single curling dull copper fleck bushed on shell, elegant silhouette, large game inventory icon, no nest. BOTTOM LEFT: isolated little pair of small eucalyptus teal and mint artistic mineral wisps with short pale cyan spark, elegantly flowing narrow wind currents, aura overlay motif, NO purple, no neon, no circular badge. BOTTOM RIGHT: isolated small pair of slim muted ember-orange copper curling flame-wisp ribbons with two tiny amber glints, warm magic overlay motif distinct from blue, not a cartoon torch or background glow. All subjects complete in cells, stone and felt refinement, no hard black, no perspective distortion."
+    "p2-26-incubator": "Original Frost Ark painterly survival game sprite atlas EXACT 2 columns × 2 rows square equal cells. Four solo subjects on 100% perfectly flat solid #FF00FF pure magenta incl any holes, very generous margins, no outside shadows, grid dividers, text or labels. Painterly crisp 2.5D art, three-quarter straight-front orthographic 40 degree raised camera, top and front visible, winter soft cool upper-left light, tactile frost-gray wood, felt, weathered brass and matte graphite contours like material reference. TOP LEFT: a compact distinct one-tile terrestrial cloud-beast thermostatic egg incubator, physical construction with four short stout weathered cast iron feet, warm oaken support under a horizontal open shallow round woven straw bowl lined in dark ginger felt and capped on its rear half with a small glass hood and tarnished copper coils, clearly remaining OPEN for accepting egg, no egg inside, no emitted glow, no person. Not a cage and not a furnace. TOP RIGHT: an isolated small soft cream-white bluish cloud-beast egg with slightly irregular smooth pebbled shell and single curling dull copper fleck bushed on shell, elegant silhouette, large game inventory icon, no nest. BOTTOM LEFT: isolated little pair of small eucalyptus teal and mint artistic mineral wisps with short pale cyan spark, elegantly flowing narrow wind currents, aura overlay motif, NO purple, no neon, no circular badge. BOTTOM RIGHT: isolated small pair of slim muted ember-orange copper curling flame-wisp ribbons with two tiny amber glints, warm magic overlay motif distinct from blue, not a cartoon torch or background glow. All subjects complete in cells, stone and felt refinement, no hard black, no perspective distortion.",
+    "p228-moods": {
+      "text": "Five hand-painted cloud-beast mood marks: stitched rose heart, warm amber lantern, food bowl, frosty crystal, bright salvaged chest. Frost Ark art, magenta background, 3x2 grid, empty sixth cell."
+    }
   },
   "assets": [
     {
@@ -6538,6 +6541,146 @@
       "tileW": 1,
       "tileH": 1,
       "maxBytes": 7200
+    },
+    {
+      "id": "icon-mood-heart",
+      "source": "p228-moods.png",
+      "crop": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9500
+    },
+    {
+      "id": "icon-mood-drive",
+      "source": "p228-moods.png",
+      "crop": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9500
+    },
+    {
+      "id": "icon-mood-hungry",
+      "source": "p228-moods.png",
+      "crop": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9500
+    },
+    {
+      "id": "icon-mood-cold",
+      "source": "p228-moods.png",
+      "crop": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9500
+    },
+    {
+      "id": "icon-mood-salvage",
+      "source": "p228-moods.png",
+      "crop": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "key": "magenta",
+      "keyClear": 41,
+      "postDefringe": "magenta",
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "targetAnchor": [
+        0.5,
+        0.5
+      ],
+      "tileW": 1,
+      "tileH": 1,
+      "maxBytes": 9500
     }
   ],
   "batchReferences": [

@@ -1,5 +1,5 @@
 import { alphaAttack,alphaMaxHp,eliteProfile,naturalAlpha,stepWildEcology,wildMind } from './wild-ecology';
-import { beastBond } from './beast-bond';
+import { beastBond,beastMood,bondWorkScale,emitBeastMood } from './beast-bond';
 import { inheritedMorph } from './breeding';
 import { beastAttackScale,beastWorkScale,gainBeastXp,growthDetails } from './beast-growth';
 import { getIndustrySave } from './m2-state';
@@ -252,7 +252,7 @@ function work(w:WorldState,b:BeastEntity):boolean{
     if(drift){
       const bonus=luckyParcel(w,b,drift.id)?[{itemId:drift.loot[0].itemId,count:1}]:[];
       if(inventoryChange(w,[],[...drift.loot,...bonus])||(bonus.length>0&&inventoryChange(w,[],drift.loot))){
-        w.sky.debris=w.sky.debris.filter(d=>d!==drift);return true;
+        w.sky.debris=w.sky.debris.filter(d=>d!==drift);emitBeastMood(w,b.id,'salvage',84);return true;
       }
     }
   }else if(b.defId==='frostyak'){
@@ -315,7 +315,7 @@ export function beastPanel(w:WorldState){
       const d=beastDefinitions.get(b.defId)!,den=currentDen(w,b);
       const status=b.warmth<=16?'失温停工':b.hunger<=10?'饥饿待喂':b.role==='companion'?'正在随行':
         !den?'未分配兽窝':!denWarm(w,den)?'兽窝太冷':b.role==='work'?'正在打工':'窝内休息';
-      return {...b,profile:beastProfile(w,b),growth:growthDetails(w,b),morph:inheritedMorph(w,b.id),bond:beastBond(w,b.id),workRate:traitWorkRate(w,b)*beastWorkScale(w,b),preferredBait:d.preferredBait,workSkill:d.workSkill,companionSkill:d.companionSkill,status};
+      return {...b,profile:beastProfile(w,b),growth:growthDetails(w,b),morph:inheritedMorph(w,b.id),bond:beastBond(w,b.id),mood:beastMood(w,b),workRate:traitWorkRate(w,b)*beastWorkScale(w,b)*bondWorkScale(w,b.id),preferredBait:d.preferredBait,workSkill:d.workSkill,companionSkill:d.companionSkill,status};
     }),
     wild:w.wildEntities.filter(e=>activeWild(w,e)).map(e=>{
       const d=beastDefinitions.get(e.defId)!;
@@ -359,11 +359,11 @@ export function stepBeasts(w:WorldState):void{
     }
     if(!b.workCooldown&&active(b)){
       if(working(w,b)){
-        if(work(w,b))gainBeastXp(w,b,5);
-        b.workCooldown=Math.ceil(TICK_RATE*(b.defId==='frostyak'?12:7)/(traitWorkRate(w,b)*beastWorkScale(w,b)));
+        if(work(w,b)){gainBeastXp(w,b,5);emitBeastMood(w,b.id,'drive');}
+        b.workCooldown=Math.ceil(TICK_RATE*(b.defId==='frostyak'?12:7)/(traitWorkRate(w,b)*beastWorkScale(w,b)*bondWorkScale(w,b.id)));
       }else if(b.role==='companion'){
         if(companionWork(w,b))gainBeastXp(w,b,4);
-        b.workCooldown=Math.ceil(TICK_RATE*10/(traitWorkRate(w,b)*beastWorkScale(w,b)));
+        b.workCooldown=Math.ceil(TICK_RATE*10/(traitWorkRate(w,b)*beastWorkScale(w,b)*bondWorkScale(w,b.id)));
       }
     }
   }

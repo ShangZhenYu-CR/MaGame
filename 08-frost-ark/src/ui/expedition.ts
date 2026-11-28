@@ -1,3 +1,4 @@
+import { petBond } from '../sim/beast-bond';
 import { currentLeader,gainBeastXp } from '../sim/beast-growth';
 import { activeCave,caveChestTaken,caveContext,caveEntrance,caveEntranceTitle,caveGuard,enterCave,nearCaveGate,useCave } from '../sim/cave';
 import { collectQuarry, harvestForage, nearQuarry, nearForage, patchContents, patchReady, patchTitles, type Patch } from '../sim/forage';
@@ -8,11 +9,11 @@ import { areaAt, gangwayGeometry, islandNodeRemaining, islandNodes, nearestIslan
 import { helmPoint, nearHelm, toggleCruise } from '../sim/sky-map';
 import { harvestIslandResource, toolStatus } from '../sim/tools';
 import { itemNames } from '../sim/ark';
-import type { Vec2,WildEntity, WorldState } from '../sim/types';
+import type { BeastEntity,Vec2,WildEntity, WorldState } from '../sim/types';
 
 const byId=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id)! as T;
 const set=(node:HTMLElement,s:string)=>{if(node.textContent!==s)node.textContent=s;};
-type ContextAction='helm'|'deploy'|'stow'|'gather'|'open-cache'|'landmark'|'forage'|'quarry'|'cave-enter'|'cave-chest'|'cave-exit'|'cave-hunt'|'return'|'board'|'dock'|'none';
+type ContextAction='helm'|'deploy'|'stow'|'gather'|'open-cache'|'landmark'|'forage'|'quarry'|'cave-enter'|'cave-chest'|'cave-exit'|'cave-hunt'|'pet'|'return'|'board'|'dock'|'none';
 const duration=350;
 export type ExpeditionArea=ReturnType<typeof areaAt>;
 interface Hooks{
@@ -22,7 +23,7 @@ interface Hooks{
 export function expeditionUi(hooks:Hooks){
  const view=byId('game-canvas'),root=byId('expedition-context'),interact=byId<HTMLButtonElement>('expedition-interact');
  const progress=byId<HTMLProgressElement>('expedition-progress');
- let current:ContextAction|null=null;
+ let current:ContextAction|null=null,petSelected:BeastEntity|null=null;
  let gathering:{node:IslandResource;finish:number;world:WorldState}|null=null;
  const area=()=>{const w=hooks.state();return areaAt(w,w.player.x,w.player.y);};
  function cruise(){
@@ -87,6 +88,9 @@ export function expeditionUi(hooks:Hooks){
   return null;
  }
  function use():boolean{
+  if(petSelected){
+   hooks.message(petBond(hooks.state(),petSelected.id),'抚摸了'+petSelected.name+'，羁绊提升。','place');return true;
+  }
   const action=keyAction();
   if(action==='cave-enter'||action==='cave-exit'||action==='cave-chest'){
     const w=hooks.state();
@@ -131,7 +135,8 @@ export function expeditionUi(hooks:Hooks){
   return false;
  }
  function cancel(){gathering=null;progress.hidden=true;}
- function update(now:number,hide=false,primary=true):ExpeditionArea{
+ function update(now:number,hide=false,primary=true,pet:BeastEntity|null=null):ExpeditionArea{
+  petSelected=hide?null:pet;
   const w=hooks.state(),here=area(),box=gangwayGeometry(w),v=here==='island'?islandChoice():undefined;
   const node=v?.tag==='node'?v.point:undefined;
   if(gathering){
@@ -175,7 +180,9 @@ export function expeditionUi(hooks:Hooks){
       `${itemNames.get(node.itemId)??node.itemId} ×${islandNodeRemaining(w,node)} · ${tool.name} ${tool.durability}/${tool.maxDurability}`;
    }
   }else if(here==='gangway'){action='board';title='在跳板上';detail='靠着板中央继续走，上岛和回船都不用再次按键。';}
-  else if(box&&nearGangway(w)){
+  else if(pet){
+   action='pet';title=pet.name;detail='抚摸让它安心；投喂暖粮也会加深羁绊。';label='抚摸';
+  }else if(box&&nearGangway(w)){
    action=box.deployed?'stow':'deploy';
    title=box.deployed?'跳板已搭好':'已靠泊 · '+docks[box.side].label+'登岛口';
    const verb=docks[box.side].verb;

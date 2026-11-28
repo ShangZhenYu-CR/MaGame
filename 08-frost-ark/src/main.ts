@@ -1,3 +1,4 @@
+import { nearBondBeast,petBond } from './sim/beast-bond';
 import { castBeastSkill,companionSkillStatus } from './sim/beast-skills';
 import { voyageBiome } from './sim/expansion';
 import { couldMoorTrader } from './sim/sky-events';
@@ -180,7 +181,7 @@ function finishAction(issue:string|null,success:string,event?:'craft'|'undo'|'di
   void saveNow();
 }
 type PrimaryInteraction={kind:'expedition'|'trader'|'fishing'|'feed'|'storage'|'beasts'|'close-storage'|'close-station'|'close-beasts'|'none'}|
-  {kind:'station';id:string;label:string}|{kind:'door';id:string;open:boolean};
+  {kind:'station';id:string;label:string}|{kind:'door';id:string;open:boolean}|{kind:'pet';id:string};
 function primaryInteraction():PrimaryInteraction{
   if(beasts.open())return {kind:'close-beasts'};
   if(industry.stationOpen())return {kind:'close-station'};
@@ -215,6 +216,12 @@ function primaryInteraction():PrimaryInteraction{
     const helm=helmPoint(w),dist=Math.hypot(w.player.x-helm.x,w.player.y-helm.y);
     if(!station||dist<=Math.max(.55,industryDistance(w,station)+.28))return {kind:'expedition'};
   }
+  const friend=panel.hidden&&!industry.catalogOpen()?nearBondBeast(w):undefined;
+  if(friend){
+    const dist=Math.hypot(friend.x-w.player.x,friend.y-w.player.y);
+    if([box,station,animal].filter(v=>v!==undefined).every(v=>industryDistance(w,v)>dist+.35))
+      return {kind:'pet',id:friend.id};
+  }
   if(animal&&(!box||industryDistance(w,animal)<industryDistance(w,box))&&
     (!station||industryDistance(w,animal)<industryDistance(w,station)))return {kind:'beasts'};
   if(station&&(!box||industryDistance(w,station)<industryDistance(w,box)))
@@ -231,6 +238,10 @@ function useNearby():void{
     case 'expedition':expedition.use();break;
     case 'fishing':triggerFishing();break;
     case 'trader':skyEvents.show();break;
+    case 'pet':{
+      const friend=w.beasts.find(b=>b.id===action.id);
+      finishAction(petBond(w,action.id),'抚摸了'+(friend?.name??'云兽')+'，羁绊提升。','place');break;
+    }
     case 'beasts':toggleBeastRoster(true);break;
     case 'door':finishAction(operateWindDoor(w,action.id),action.open?'防风门已关上。':'防风门已打开。');break;
     case 'station':openIndustry(action.id);break;
@@ -729,7 +740,8 @@ function frame(now:number):void {
   const overlay=down||skyEvents.open()||chart.open()||!panel.hidden||!locker.hidden||industry.stationOpen()||industry.catalogOpen()||beasts.open();
   radar.update(w,!overlay&&!w.activeIsland&&!finale.open()&&!finale.blocking());
   const context=primaryInteraction();
-  const here=expedition.update(now,overlay||finale.arena()||context.kind==='fishing'||context.kind==='trader',context.kind==='expedition');
+  const here=expedition.update(now,overlay||finale.arena()||context.kind==='fishing'||context.kind==='trader',context.kind==='expedition'||context.kind==='pet',
+    context.kind==='pet'?w.beasts.find(b=>b.id===context.id)??null:null);
   const feedKey=el('wild-feed').querySelector('kbd')!;
   feedKey.hidden=context.kind!=='feed';
   beasts.update(now,overlay);m5Ui.update(now,overlay);

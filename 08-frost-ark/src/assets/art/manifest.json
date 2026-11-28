@@ -4752,6 +4752,86 @@
         62
       ],
       "bytes": 3134
+    },
+    "icon-mood-heart": {
+      "file": "icon-mood-heart.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        7,
+        62,
+        57
+      ],
+      "bytes": 7241
+    },
+    "icon-mood-drive": {
+      "file": "icon-mood-drive.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        5,
+        2,
+        59,
+        62
+      ],
+      "bytes": 6147
+    },
+    "icon-mood-hungry": {
+      "file": "icon-mood-hungry.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        2,
+        10,
+        62,
+        54
+      ],
+      "bytes": 6959
+    },
+    "icon-mood-cold": {
+      "file": "icon-mood-cold.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        4,
+        2,
+        60,
+        62
+      ],
+      "bytes": 7035
+    },
+    "icon-mood-salvage": {
+      "file": "icon-mood-salvage.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        4,
+        2,
+        61,
+        62
+      ],
+      "bytes": 7914
     }
   }
 }

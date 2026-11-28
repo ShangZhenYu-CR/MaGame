@@ -1,3 +1,4 @@
+import { partnerCritical } from './beast-bond';
 import { beastAttackScale,gainBeastXp } from './beast-growth';
 import { traitStrike,traitWatchful } from './beast-traits';
 import { gangwayGeometry } from './island';
@@ -68,7 +69,7 @@ export function claimIslandCacheSeed(w:WorldState,nodeKey:string):boolean{
   return (id==='sulfur_furnace'||id==='permafrost_ruins')&&nodeKey==='chest_2068'&&claimSunSeed(w,id);
 }
 
-function hurt(w:WorldState,e:WildEntity,damage:number,bypassArmor=false,penetration=0,element?:Element,dot=false){
+function hurt(w:WorldState,e:WildEntity,damage:number,bypassArmor=false,penetration=0,element?:Element,dot=false,criticalOverride=false){
   const arm=armorBroken(w,e.id)?0:(specs.hostiles[e.defId as HostileId]?.armor??0);
   const effect=element?resolveElement(w,e.id,damage,element):{damage,critical:false};
   const before=e.hp;
@@ -221,9 +222,11 @@ function stepCompanions(w:WorldState){
     const target=w.wildEntities.find(e=>isOwned(e)&&e.hp>0&&length(b,e)<=2.4&&
       (w.activeIsland?e.kind==='boss':e.kind==='raider'));
     if(!target)continue;
-    const before=target.hp;
-    hurt(w,target,(beastAttack.get(b.defId)??10)*traitStrike(w,b)*beastAttackScale(w,b),b.defId==='burrowback'||b.defId==='magmalisk',0,b.defId==='magmalisk'?'fire':undefined);
-    if(target.hp<before)gainBeastXp(w,b,target.hp<=0?14:6);
+    const before=target.hp,crit=partnerCritical(w,b.id,target.id);
+    hurt(w,target,(beastAttack.get(b.defId)??10)*traitStrike(w,b)*beastAttackScale(w,b)*(crit?1.45:1),b.defId==='burrowback'||b.defId==='magmalisk',0,b.defId==='magmalisk'?'fire':undefined,false,crit);
+    if(target.hp<before){
+      gainBeastXp(w,b,target.hp<=0?14:6);
+    }
     flash(w,b,target,b.defId==='magmalisk'?'fire':'strike');
   }
 }

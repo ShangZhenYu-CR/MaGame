@@ -1,4 +1,4 @@
-import { feedBond } from '../sim/beast-bond';
+import { feedBond,petBond } from '../sim/beast-bond';
 import { breedBeasts,breedPanel,INCUBATION,startIncubating,takeIncubating } from '../sim/breeding';
 import { chooseBeastLead } from '../sim/beast-growth';
 import { skills } from '../sim/beast-skills';
@@ -35,7 +35,7 @@ export function beastUi(h:BeastUIHooks){
  const load=el<HTMLButtonElement>('beast-feed-load');
  const sector=document.querySelector<HTMLElement>('.sector');
  let lockedId:string|null=null,targetId:string|null=null,last=0,packKey='',cardKey='',breedKey='';
- const cards=new Map<string,{role:HTMLElement,status:HTMLElement,vitals:HTMLElement,label:HTMLElement,rate:HTMLElement,training:HTMLElement,lead:HTMLButtonElement,bond:HTMLElement,feed:HTMLButtonElement,rename:HTMLDetailsElement,input:HTMLInputElement,buttons:HTMLButtonElement[]}>();
+ const cards=new Map<string,{role:HTMLElement,status:HTMLElement,vitals:HTMLElement,label:HTMLElement,rate:HTMLElement,training:HTMLElement,lead:HTMLButtonElement,bond:HTMLElement,feed:HTMLButtonElement,stroke:HTMLButtonElement,rename:HTMLDetailsElement,input:HTMLInputElement,buttons:HTMLButtonElement[]}>();
  const button=(label:string,fn:()=>void)=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.onclick=fn;return b;};
  const img=(src:string)=>{const i=document.createElement('img');i.src=src;i.alt='';return i;};
  function feedback(issue:string|null,msg:string,event?:'craft'|'hit'){h.msg(issue,msg,event);update(performance.now(),encounter.hidden,true);}
@@ -159,8 +159,10 @@ export function beastUi(h:BeastUIHooks){
   lead.dataset.beastLeader='true';lead.hidden=beast.role!=='companion';lead.setAttribute('aria-label',beast.name+'设为领队');
   const feed=button('喂暖粮',()=>feedback(feedBond(h.state(),beast.id),'已投喂，羁绊提升。','craft'));
   feed.dataset.beastBondFeed='true';feed.setAttribute('aria-label',beast.name+'喂暖粮');
-  row.append(...buttons,lead,feed);card.append(head,status,vitals,profile,skillText,row,rename);
-  cards.set(beast.id,{role,status,vitals,label,rate,training,lead,bond,feed,rename,input:edit,buttons});return card;
+  const stroke=button('抚摸',()=>feedback(petBond(h.state(),beast.id),'抚摸了云兽，羁绊提升。','craft'));
+  stroke.dataset.beastPet='true';stroke.setAttribute('aria-label',beast.name+'抚摸');
+  row.append(...buttons,lead,feed,stroke);card.append(head,status,vitals,profile,skillText,row,rename);
+  cards.set(beast.id,{role,status,vitals,label,rate,training,lead,bond,feed,stroke,rename,input:edit,buttons});return card;
  }
  function updateBreeding(w:WorldState){
   const info=breedPanel(w),shell=el('breeding-panel');
@@ -227,6 +229,9 @@ export function beastUi(h:BeastUIHooks){
    card.label.closest('article')!.setAttribute('data-morph',x.morph.variant??'');
    card.feed.disabled=x.bond>=100||countItem(w,'beast_feed')<1||Math.hypot(w.player.x-x.x,w.player.y-x.y)>2.5;
    card.feed.setAttribute('aria-label',x.name+'喂暖粮');
+   card.stroke.disabled=Math.hypot(w.player.x-x.x,w.player.y-x.y)>1.42;
+   card.stroke.setAttribute('aria-label',x.name+'抚摸');
+   card.label.closest('article')!.setAttribute('data-mood',x.mood?.kind??'');
    put(card.rate,'工作 '+Math.round(x.workRate*100)+'%');
    put(card.training,'Lv.'+x.growth.level+' · '+x.growth.xp+'/'+x.growth.next+' 经验');
    card.lead.hidden=x.role!=='companion';card.lead.disabled=x.growth.lead;

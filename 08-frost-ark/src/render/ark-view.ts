@@ -1,3 +1,4 @@
+import { beastMood } from '../sim/beast-bond';
 import { incubatorOccupied,type Variant } from '../sim/breeding';
 import { paintCompanionBurst } from './beast-skills-view';
 import { paintWindZone } from './wind-zones';
@@ -78,7 +79,7 @@ const ironDeck='building-iron-deck';
 const required=[
   ...deckIds,'boss-frost-whale-1','boss-frost-whale-2','boss-frost-whale-3','solar-hearth','aurora-crystal','manan-south','manan-north','manan-west','manan-east','latte-sleep','latte-alert','latte-walk','latte-walk-alt',
   'hearth-1','hearth-2','hearth-3','rail','corner','rock','icicles',ironDeck,...Object.values(buildingVisuals).map(v=>v.art),
-  'debris-wood','debris-iron','debris-rope','debris-heavy','clouds','rail-side','rock-side','frost-frame','floor-insulated','icon-driftwood','icon-coal-chunk','icon-iron','icon-raw-root','icon-cloud-fish','icon-raw-meat','icon-beast-feed','building-wind-door-open','building-airlock-open','forage-berries','forage-grass','forage-tubers','forage-crystal','icon-fishing-bobber','icon-cloud-egg','variant-aurora-wisp','variant-ember-wisp',...ISLAND_ART,...LANDMARK_ART,...CAVE_ART,...EVENT_ART,...BEAST_ART,...HOSTILE_ART,...ELEMENT_ART,
+  'debris-wood','debris-iron','debris-rope','debris-heavy','clouds','rail-side','rock-side','frost-frame','floor-insulated','icon-driftwood','icon-coal-chunk','icon-iron','icon-raw-root','icon-cloud-fish','icon-raw-meat','icon-beast-feed','building-wind-door-open','building-airlock-open','forage-berries','forage-grass','forage-tubers','forage-crystal','icon-fishing-bobber','icon-cloud-egg','variant-aurora-wisp','variant-ember-wisp','icon-mood-heart','icon-mood-drive','icon-mood-hungry','icon-mood-cold','icon-mood-salvage',...ISLAND_ART,...LANDMARK_ART,...CAVE_ART,...EVENT_ART,...BEAST_ART,...HOSTILE_ART,...ELEMENT_ART,
 ] as const;
 interface Cell { x:number; y:number; hash:number; iron:boolean; insulated:boolean; temperature:number; left:boolean; right:boolean; front:boolean; back:boolean }
 interface Actor {
@@ -487,14 +488,31 @@ export class ArkView {
     paintM5CombatEffects(c,w,project,s);
     paintCompanionBurst(c,w,project,s);
     for(const hostile of hostiles)paintHostileBar(c,project(hostile.x,hostile.y),hostile,s);
+    const moodMarks:string[]=[];
     for(const b of beasts){
       const p=project(b.x,b.y);paintBeastCues(c,p,b,s,w.tick);
+      const owned=w.beasts.find(v=>v.id===b.id),mood=owned&&beastMood(w,owned);
+      if(mood&&moodMarks.length<7&&Math.hypot(b.x-pl.x,b.y-pl.y)<=6.2){
+        moodMarks.push(mood.kind);
+        c.save();
+        const w=56+(mood.kind==='salvage'?18:0);
+        const yy=clamp(p.y-b.float-b.height*b.scale*s-.22*s,26,c.canvas.height-25);
+        const xx=clamp(p.x,w/2+5,c.canvas.width-w/2-5);
+        c.lineWidth=1;c.strokeStyle=mood.kind==='heart'||mood.kind==='drive'?'#c69966':'#6b9aae';
+        c.fillStyle='rgba(22,41,55,.91)';c.beginPath();c.roundRect(xx-w/2,yy-21,w,22,4);c.fill();c.stroke();
+        c.beginPath();c.moveTo(xx-4,yy+1);c.lineTo(xx,yy+6);c.lineTo(xx+5,yy+1);c.fill();
+        this.art.paint(c,'icon-mood-'+mood.kind,xx-w/2+12,yy-10,1,{width:20,height:20});
+        c.fillStyle='#e9e6da';c.font='600 10px system-ui, sans-serif';c.textBaseline='middle';
+        c.fillText(mood.label,xx-w/2+23,yy-10);c.restore();
+      }
+
       if(b.tint){
         c.save();c.globalAlpha=.46+.20*Math.sin(w.tick*.072);c.globalCompositeOperation='screen';
         this.art.paint(c,'variant-'+b.tint+'-wisp',p.x,p.y-s*(.08+.08*Math.sin(w.tick*.11)),s,{width:b.width*(b.alpha?1.16:.82),height:b.alpha?.67:.51});
         c.restore();
       }
     }
+    this.canvas.dataset.beastMoods=moodMarks.join(',');
     paintElementSigns(c,this.art,actors,w,project,s);
     this.juice.paint(c,project,s,now);
     // Aiming is a control cue, not world geometry. Keep it above night tint,

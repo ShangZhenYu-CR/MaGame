@@ -1,3 +1,4 @@
+import { partnerCritical } from './beast-bond';
 import { beastCooldown,beastLevel,beastAttackScale,currentLeader,gainBeastXp,startBeastCooldown } from './beast-growth';
 import { traitStrike } from './beast-traits';
 import { strikeWildWithWeapon } from './beasts';
@@ -53,7 +54,7 @@ export function castBeastSkill(w:WorldState,aim?:Vec2):{issue:string|null;label:
  const toward=aim&&distance(p,aim)>.24?aim:closest??{x:p.x+p.facing.x,y:p.y+p.facing.y};
  const gap=distance(p,toward),span=skill.range?(closest===toward?Math.min(skill.range,gap):gap>1.2?Math.min(skill.range,gap):skill.range):0;
  const q=gap>.002?{x:p.x+(toward.x-p.x)*span/gap,y:p.y+(toward.y-p.y)*span/gap}:point(p);
- const damage=Math.round(skill.damage*beastAttackScale(w,companion)*traitStrike(w,companion));
+ const damage=Math.round(skill.damage*beastAttackScale(w,companion)*traitStrike(w,companion)*(partnerCritical(w,companion.id,'skill')?1.45:1));
  const affected=(t:Vec2)=>distance(t,q)<=skill.radius&&visible(t);
  let hit=0;
  if(damage>0){

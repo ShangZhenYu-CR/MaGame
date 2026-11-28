@@ -1378,3 +1378,29 @@ assert.ok(joined&&beastProfile(restElite,joined).rare);
 const alphaJSON=deserializeWorld(serializeWorld(restElite));
 assert.equal(beastProfile(alphaJSON,joined).rare,beastProfile(restElite,joined).rare);
 console.log('[sim-smoke:P2-27] OK: seeded elite HP and attack, live wild intent/movement, fear from sudden approach, real net/feed and permanent golden trait');
+
+import { beastMood,bondWorkScale,changeBond,partnerCritical,petBond } from '../src/sim/beast-bond';
+import { bondFixture } from './p2-bond-fixture';
+const {w:bondWorld,a:bonded,b:hungryBeast}=bondFixture();
+assert.equal(beastMood(bondWorld,hungryBeast)?.kind,'hungry');
+assert.equal(petBond(bondWorld,bonded.id),null);
+assert.equal(beastBond(bondWorld,bonded.id),52);
+assert.equal(beastMood(bondWorld,bonded)?.kind,'heart');
+assert.match(petBond(bondWorld,bonded.id)!,/缓一缓/);
+const warmFoodBefore=countItem(bondWorld,'beast_feed');
+assert.equal(feedBond(bondWorld,bonded.id),null);
+assert.equal(countItem(bondWorld,'beast_feed'),warmFoodBefore-1);
+assert.equal(beastBond(bondWorld,bonded.id),63);
+const timid=deserializeWorld(serializeWorld(bondWorld)),trusted=deserializeWorld(serializeWorld(bondWorld));
+changeBond(trusted,bonded.id,22);
+assert.equal(bondWorkScale(timid,bonded.id),1);
+assert.equal(bondWorkScale(trusted,bonded.id),1.2);
+let normalCrit=0,bonusCrit=0;
+for(let j=0;j<1000;j++){
+ normalCrit+=Number(partnerCritical(timid,bonded.id,'same_foe'));
+ bonusCrit+=Number(partnerCritical(trusted,bonded.id,'same_foe'));
+ timid.tick++;trusted.tick++;
+}
+assert.ok(normalCrit>=25&&normalCrit<=85&&bonusCrit>normalCrit*2.8&&bonusCrit<270);
+assert.equal(beastBond(deserializeWorld(serializeWorld(trusted)),bonded.id),85);
+console.log('[sim-smoke:P2-28] OK: atomic pet/feed and cooldown, emotional cue, high-bond 20% work scale, paired deterministic crit rolls and archive');

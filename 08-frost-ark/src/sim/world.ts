@@ -1,3 +1,4 @@
+import { guardianWalkScale } from './guardians-p2';
 import { stepBreeding } from './breeding';
 import { stepSkyEvents } from './sky-events';
 import { stepCave } from './cave';
@@ -145,7 +146,7 @@ export function stepWorld(world: WorldState, ticks = 1, direction: Vec2 = {x: 0,
     world.tick += 1;
     stepAirlocks(world);
     const motion=rollMotion(world,direction);
-    walkExpedition(world,motion.direction,motion.scale*(motion.scale===1?walkScale:1));
+    walkExpedition(world,motion.direction,motion.scale*(motion.scale===1?walkScale*guardianWalkScale(world):1));
     stepNavigation(world);
     stepSkyEvents(world);
     stepCloud(world);

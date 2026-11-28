@@ -1,3 +1,5 @@
+import { guardianLoot } from '../sim/guardians-p2';
+import { paintGuardianEffects } from './guardian-view';
 import { paintDefenseEffects } from './defense-view';
 import { latteBoon,latteProfile,latteTreasure,outfits } from '../sim/latte-growth';
 import { treasureCue } from './latte-view';
@@ -87,6 +89,7 @@ const required=[
   ...deckIds,'boss-frost-whale-1','boss-frost-whale-2','boss-frost-whale-3','solar-hearth','aurora-crystal','manan-south','manan-north','manan-west','manan-east','latte-sleep','latte-alert','latte-walk','latte-walk-alt',
   'hearth-1','hearth-2','hearth-3','rail','corner','rock','icicles',ironDeck,...Object.values(buildingVisuals).map(v=>v.art),
   ...outfits.filter(o=>o!=='classic').flatMap(o=>['sleep','alert','walk','walk-alt'].map(p=>'latte-'+o+'-'+p)),
+  'icon-frostmane-blueprint','icon-riftcarapace-blueprint',
   'debris-wood','debris-iron','debris-rope','debris-heavy','clouds','rail-side','rock-side','frost-frame','floor-insulated','icon-driftwood','icon-coal-chunk','icon-iron','icon-raw-root','icon-cloud-fish','icon-raw-meat','icon-beast-feed','building-wind-door-open','building-airlock-open','forage-berries','forage-grass','forage-tubers','forage-crystal','icon-fishing-bobber','icon-cloud-egg','variant-aurora-wisp','variant-ember-wisp','icon-mood-heart','icon-mood-drive','icon-mood-hungry','icon-mood-cold','icon-mood-salvage',...ISLAND_ART,...LANDMARK_ART,...CAVE_ART,...EVENT_ART,...BEAST_ART,...HOSTILE_ART,...ELEMENT_ART,
 ] as const;
 interface Cell { x:number; y:number; hash:number; iron:boolean; insulated:boolean; temperature:number; left:boolean; right:boolean; front:boolean; back:boolean }
@@ -353,6 +356,10 @@ export class ArkView {
     });
     actors.push(...beasts);
     this.canvas.dataset.alphaVisible=String(beasts.filter(b=>b.alpha).length);
+    paintGuardianEffects(c,w,project,s);
+    const blueprint=guardianLoot(w);
+    if(blueprint&&!activeCave(w))actors.push({x:blueprint.x,y:blueprint.y,art:blueprint.art,width:.73,height:.73,
+      shadow:.22,float:s*(.16+.045*Math.sin(w.tick*.092))});
     const hostiles=m5Actors(w);
     for(const hostile of hostiles)paintAttackTell(c,project(hostile.x,hostile.y),hostile,s,w.tick);
     actors.push(...hostiles);

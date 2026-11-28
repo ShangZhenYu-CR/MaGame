@@ -4,5 +4,7 @@
   {"id":"magma_insulated_coat","slot":"outer","cold":0.43,"guard":0.15,"personalHeat":0,"hookRadius":0},
   {"id":"aurora_mithril_cloak","slot":"outer","cold":0.55,"guard":0.22,"personalHeat":0,"hookRadius":0},
   {"id":"pocket_hand_warmer","slot":"charm","cold":0.08,"guard":0.04,"personalHeat":6,"hookRadius":0},
-  {"id":"magnetic_salvage_buckle","slot":"charm","cold":0.04,"guard":0.05,"personalHeat":0,"hookRadius":0.17}
+  {"id":"magnetic_salvage_buckle","slot":"charm","cold":0.04,"guard":0.05,"personalHeat":0,"hookRadius":0.17},
+  {"id":"frostmane_amulet","slot":"charm","cold":0.14,"guard":0.06,"personalHeat":3,"hookRadius":0},
+  {"id":"riftcarapace_guard","slot":"guard","cold":0.21,"guard":0.29,"personalHeat":3,"hookRadius":0}
 ]

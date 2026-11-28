@@ -1,3 +1,4 @@
+import { runP2Guardians } from "./p2-guardians-e2e";
 import { runP2Raiders } from "./p2-raiders-e2e";
 import { runP2Defense } from "./p2-defense-e2e";
 import { runP2Latte } from "./p2-latte-e2e";
@@ -679,6 +680,7 @@ try {
   await runP2Latte(browser,baseUrl,outDir,errors);
   await runP2Defense(browser,baseUrl,outDir,errors);
   await runP2Raiders(browser,baseUrl,outDir,errors);
+  await runP2Guardians(browser,baseUrl,outDir,errors);
 
   if (errors.length > 0) {
     throw new Error(errors.join('\n'));

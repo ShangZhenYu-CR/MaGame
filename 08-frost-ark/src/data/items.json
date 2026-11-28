@@ -75,5 +75,9 @@
   {"id":"drift_treasure","name":"稀有漂流宝匣","category":"loot","stack":15,"gatherable":true},
   {"id":"ancient_cave_blueprint","name":"冰窟稀有图纸","category":"quest","stack":16,"gatherable":true},
   {"id":"merchant_route_blueprint","name":"游商航路图纸","category":"quest","stack":16,"gatherable":true},
-  {"id":"cloud_egg","name":"云兽蛋","category":"quest","stack":12,"gatherable":true}
+  {"id":"cloud_egg","name":"云兽蛋","category":"quest","stack":12,"gatherable":true},
+  {"id":"frostmane_blueprint","name":"霜鬃骨牙图纸","category":"material","stack":1},
+  {"id":"riftcarapace_blueprint","name":"炎甲护臂图纸","category":"material","stack":1},
+  {"id":"frostmane_amulet","name":"霜鬃骨牙护符","category":"equipment","stack":1},
+  {"id":"riftcarapace_guard","name":"炎甲护臂","category":"equipment","stack":1}
 ]

@@ -231,7 +231,7 @@ function primaryInteraction():PrimaryInteraction{
   const here=expedition.area(),travel=expedition.keyAction();
   if(here==='island'){
     const wild=beasts.nearby();
-    if(travel!=='cave-enter'&&wild&&(wild.stunnedTicks>0||wild.hp<=wild.maxHp*.35||(travel!=='landmark'&&travel!=='forage'&&travel!=='quarry'&&!nearestIslandNode(w,1.8))))return {kind:'feed'};
+    if(travel!=='cave-enter'&&travel!=='guardian-loot'&&wild&&(wild.stunnedTicks>0||wild.hp<=wild.maxHp*.35||(travel!=='landmark'&&travel!=='forage'&&travel!=='quarry'&&!nearestIslandNode(w,1.8))))return {kind:'feed'};
   }
   if(fishingPanel(w))return {kind:'fishing'};
   if(panel.hidden&&!industry.catalogOpen()&&couldMoorTrader(w))return {kind:'trader'};

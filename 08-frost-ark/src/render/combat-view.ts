@@ -10,6 +10,7 @@ const hostileArt={
   frostspike_bat:{art:'enemy-frostspike-bat',width:1.71,height:1.35,shadow:.35},
   heatwraith:{art:'enemy-heatwraith',width:1.22,height:1.71,shadow:.34},
   mist_priest:{art:'enemy-mist-priest',width:1.30,height:1.74,shadow:.47},
+  frostpack_wolf:{art:'enemy-frost-wolf',width:1.10,height:.95,shadow:.33},
   frostmane_lord:{art:'boss-frost-mane',width:2.46,height:2.31,shadow:.94},
   rift_carapace:{art:'boss-rift-armor',width:2.63,height:2.34,shadow:1.03},
 };
@@ -27,7 +28,7 @@ export function m5Actors(w:WorldState):CombatActor[]{
     const motion=w.tick*.11+e.x*.9+e.y*.6;
     return [{...hostileArt[id],id:e.id,x:e.x,y:e.y,telegraph:charge,reach:def.range,
       float:id==='frostspike_bat'?5+5*(1+Math.sin(motion*1.4)):id==='heatwraith'?3+3*(1+Math.sin(motion)):0,
-      hp:clamp(e.hp/Math.max(1,e.maxHp)),boss:e.kind==='boss',name:def.name,flip:w.player.x>e.x,
+      hp:clamp(e.hp/Math.max(1,e.maxHp)),boss:e.kind==='boss'&&id!=='frostpack_wolf',name:def.name,flip:w.player.x>e.x,
       scale:charge?1.035:1+Math.sin(motion)*.014,rotation:charge?Math.sin(w.tick*.46)*.021:0}];
   });
 }

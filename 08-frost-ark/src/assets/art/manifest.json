@@ -5200,6 +5200,86 @@
         139
       ],
       "bytes": 9681
+    },
+    "icon-frostmane-blueprint": {
+      "file": "icon-frostmane-blueprint.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        7,
+        2,
+        57,
+        62
+      ],
+      "bytes": 6402
+    },
+    "icon-riftcarapace-blueprint": {
+      "file": "icon-riftcarapace-blueprint.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        7,
+        2,
+        57,
+        62
+      ],
+      "bytes": 5500
+    },
+    "icon-frostmane-amulet": {
+      "file": "icon-frostmane-amulet.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        12,
+        2,
+        52,
+        62
+      ],
+      "bytes": 3899
+    },
+    "icon-riftcarapace-guard": {
+      "file": "icon-riftcarapace-guard.png",
+      "width": 64,
+      "height": 64,
+      "anchorX": 32,
+      "anchorY": 32,
+      "tileW": 1,
+      "tileH": 1,
+      "contentBox": [
+        3,
+        2,
+        61,
+        62
+      ],
+      "bytes": 6903
+    },
+    "enemy-frost-wolf": {
+      "file": "enemy-frost-wolf.png",
+      "width": 144,
+      "height": 144,
+      "anchorX": 72,
+      "anchorY": 132,
+      "tileW": 1.1,
+      "tileH": 0.95,
+      "contentBox": [
+        2,
+        15,
+        142,
+        138
+      ],
+      "bytes": 8702
     }
   }
 }

@@ -1,5 +1,5 @@
 import { countItem,itemNames } from '../sim/ark';
-import { craftGear,equipGear,equipment,equipmentCost,gearLabel,gearModifiers,gearSlots } from '../sim/equipment';
+import { availableEquipment,craftGear,equipGear,equipmentCost,gearLabel,gearModifiers,gearSlots } from '../sim/equipment';
 import type { WorldState } from '../sim/types';
 import { itemList } from './industry';
 
@@ -34,7 +34,7 @@ export function equipmentUi(h:EquipmentHooks){
    }));
    bonus.textContent='抗寒 '+pct(mods.cold)+' · 减伤 '+pct(mods.guard)+
      (mods.personalHeat?' · 随身温感 +'+mods.personalHeat+'°C':'')+(mods.hookRadius?' · 捞取容差增加':'');
-   list.replaceChildren(...equipment.map(d=>{
+   list.replaceChildren(...availableEquipment(w).map(d=>{
      const e=document.createElement('article'),left=document.createElement('div'),title=document.createElement('strong'),details=document.createElement('small');
      const id=d.id,owned=countItem(w,id)>0,wearing=owned&&p.gear[d.slot]===id;
      e.dataset.gearRecipe=id;

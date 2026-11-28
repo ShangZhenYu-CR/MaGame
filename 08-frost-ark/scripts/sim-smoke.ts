@@ -1478,3 +1478,36 @@ for(const day of [5,10]){
  assert.ok(serializeWorld(deserializeWorld(serializeWorld(siege))));
 }
 console.log('[sim-smoke:P2-31] OK: day 5 & 10 actual wave profiles, controlled local thermal drop and live priest reinforcements verified');
+
+import { guardianHitScale,guardianLoot,guardianTell,guardianWalkScale,takeGuardianLoot } from '../src/sim/guardians-p2';
+import { guardians,guardianFixture } from './p2-guardians-fixture';
+for(const info of guardians){
+ const {w:trial,boss}=guardianFixture(info);
+ assert.match(craftGear(trial,info.gear)!,/图纸/);
+ const moves=new Set<string>();let compare=1;
+ for(let j=0;j<600&&moves.size<2;j++){
+  trial.player.hp=100;stepWorld(trial);
+  const current=guardianTell(trial);
+  if(current?.warn){moves.add(current.warn.skill);compare=Math.min(compare,guardianHitScale(trial,boss));}
+  if(current?.trail&&Math.hypot(current.trail.b.x-trial.player.x,current.trail.b.y-trial.player.y)<.2)assert.equal(guardianWalkScale(trial),.58);
+ }
+ assert.deepEqual([...moves],info.skills);
+ if(info.boss==='rift_carapace'){
+  assert.equal(compare,.5);
+  for(let j=0;j<64&&!guardianTell(trial)?.exposed;j++)stepWorld(trial);
+  assert.equal(guardianHitScale(trial,boss),1.4);
+ }
+ strikeHostileWithWeapon(trial,boss,560,100);
+ const dropped=guardianLoot(trial)!;
+ assert.ok(dropped&&trial.skyheartCores===1);
+ const aged=deserializeWorld(serializeWorld(trial));Object.assign(aged.player,{x:dropped.x,y:dropped.y,hp:95});
+ const filled=deserializeWorld(serializeWorld(aged));
+ filled.player.inventory=filled.player.inventory.map(x=>x??{itemId:'rope',count:1});
+ assert.match(takeGuardianLoot(filled).issue!,/腾出/);
+ assert.ok(guardianLoot(filled));
+ assert.equal(takeGuardianLoot(aged).issue,null);
+ assert.equal(countItem(aged,info.blueprint),1);
+ assert.equal(takeGuardianLoot(aged).name,'');
+ assert.equal(craftGear(aged,info.gear),null);
+}
+console.log('[sim-smoke:P2-32] OK: both two-skill patterns, walkable frost path, overheat armor window, real unique seed and atomic blueprint unlocking after reload');

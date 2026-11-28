@@ -1,3 +1,4 @@
+import { guardianTell } from '../sim/guardians-p2';
 import { attackM5, m5Status, m5Telegraph } from '../sim/m5';
 import { areaAt } from '../sim/island';
 import { TICK_RATE, type WorldState } from '../sim/types';
@@ -51,7 +52,9 @@ export function combatM5Ui(h:Hooks){
    if(guardian){
     const windup=m5Telegraph(w,guardian.id);boss.dataset.telegraph=String(windup);
     text(el('guardian-name'),names.get(guardian.defId)??'浮岛守卫');
-    text(el('guardian-phase'),windup?'正在蓄力 · 拉开距离':'靠近按 F 反击，注意蓄力前兆');
+    const stage=guardianTell(w);
+    boss.dataset.guardianMove=stage?.warn?.skill??(stage?.exposed?'overheat':'');
+    text(el('guardian-phase'),stage?.warn?`${stage.warn.label} · ${stage.warn.skill==='shell'?'现在硬壳，等过热破绽':'离开预警范围'}`:stage?.exposed?'过热破绽 · 趁现在攻击':windup?'正在蓄力 · 拉开距离':'靠近按 F 反击，注意蓄力前兆');
     bossHp.max=guardian.maxHp;bossHp.value=Math.max(0,guardian.hp);
     text(el('guardian-hp-value'),`${Math.ceil(guardian.hp)}/${guardian.maxHp}`);
    }

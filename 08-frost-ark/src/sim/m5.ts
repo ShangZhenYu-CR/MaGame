@@ -1,3 +1,4 @@
+import { awardGuardian,clearGuardianStage,guardianHitScale,guardianTell,stepGuardian } from './guardians-p2';
 import { defenseSlow,raiderConcealed,stepDefenses } from './defenses-p2';
 import { partnerCritical } from './beast-bond';
 import { beastAttackScale,gainBeastXp } from './beast-growth';
@@ -54,7 +55,7 @@ export function m5Status(w:WorldState){
     wave:s?.raidDay===w.day?s.wave:0, plan:raidPlan(w).map(wave=>wave.map(id=>specs.hostiles[id as HostileId].name)),
     raidsRemaining:w.wildEntities.filter(e=>e.kind==='raider'&&isOwned(e)&&e.hp>0).length,
     seeds:w.skyheartCores,
-    bosses:w.wildEntities.filter(e=>e.kind==='boss'&&isOwned(e)&&e.hp>0),
+    bosses:w.wildEntities.filter(e=>e.kind==='boss'&&e.defId!=='frostpack_wolf'&&isOwned(e)&&e.hp>0),
   };
 }
 
@@ -73,7 +74,8 @@ export function claimIslandCacheSeed(w:WorldState,nodeKey:string):boolean{
 
 function hurt(w:WorldState,e:WildEntity,damage:number,bypassArmor=false,penetration=0,element?:Element,dot=false,criticalOverride=false){
   const arm=armorBroken(w,e.id)?0:(specs.hostiles[e.defId as HostileId]?.armor??0);
-  const effect=element?resolveElement(w,e.id,damage,element):{damage,critical:false};
+  const intensity=damage*guardianHitScale(w,e);
+  const effect=element?resolveElement(w,e.id,intensity,element):{damage:intensity,critical:false};
   const before=e.hp;
   e.hp=Math.max(0,e.hp-Math.max(1,effect.damage-(bypassArmor?0:Math.max(0,arm-penetration))));
   emitJuice(w,dot?'burn':'hit',e,before-e.hp,{target:e.id,melt:effect.critical,critical:criticalOverride||effect.critical||(!dot&&e.kind==='boss'&&!e.hp)});
@@ -81,7 +83,7 @@ function hurt(w:WorldState,e:WildEntity,damage:number,bypassArmor=false,penetrat
   const island=w.sky.islands.find(n=>n.id===w.activeIsland?.nodeId);
   if(!island||bossByIsland[island.id]!==e.defId)return;
   island.bossDefeated=true;
-  claimSunSeed(w,island.id as M5SeedId);
+  claimSunSeed(w,island.id as M5SeedId);awardGuardian(w,e);
 }
 export function strikeHostileWithWeapon(w:WorldState,e:WildEntity,damage:number,penetration:number,element?:Element):boolean {
   if(!isOwned(e)||e.hp<=0)return false;
@@ -120,7 +122,7 @@ export function endSkyRaid(w:WorldState,id:string):void{
 }
 function stepBoss(w:WorldState,s:M5State){
   const island=w.activeIsland,id=island?.nodeId??null;
-  if(id!==s.bossIsland){resetEntities(w,e=>e.kind==='boss');s.bossIsland=id;}
+  if(id!==s.bossIsland){clearGuardianStage(w,s.bossIsland);resetEntities(w,e=>e.kind==='boss');s.bossIsland=id;}
   const node=w.sky.islands.find(n=>n.id===id);
   const defId=id?bossByIsland[id]:undefined;
   if(!island||!node||!defId||node.bossDefeated||w.wildEntities.some(e=>e.kind==='boss'&&e.defId===defId))return;
@@ -179,6 +181,10 @@ function stepEnemy(w:WorldState,e:WildEntity,s:M5State){
   if(burnDamage(w,e.id))hurt(w,e,3,true,0,undefined,true);
   if(e.hp<=0)return;
   if(frozen(w,e.id)){if(clock.strike)clock.strike++;return;}
+  if(e.kind==='boss'&&stepGuardian(w,e,(pos,n)=>{
+    const mob='guardian_wolf_'+e.id+'_'+n;
+    if(!w.wildEntities.some(v=>v.id===mob))add(w,'frostpack_wolf',mob,'boss',pos);
+  })){clock.strike=0;return;}
   const building=(id:string)=>w.ark.buildings.find(b=>b.id===id&&b.hp>0);
   const heat=e.defId==='heatwraith'?w.ark.buildings.filter(b=>b.hp>1&&(b.defId==='hearth_core'||b.defId==='ward_searchlight'||b.defId==='heat_relay'||b.defId==='torch_post')&&
     (b.defId!=='hearth_core'||b.fuel>0)).sort((a,b)=>length(e,center(a))-length(e,center(b)))[0]:undefined;
@@ -215,7 +221,7 @@ function stepEnemy(w:WorldState,e:WildEntity,s:M5State){
   if(clock.cooldown<=w.tick){clock.target=target;clock.strike=w.tick+d.windup;}
 }
 export function m5Telegraph(w:WorldState,id:string):boolean {
-  return (get(w)?.clocks[id]?.strike??0)>w.tick;
+  return (id.startsWith('boss_')&&guardianTell(w)?.warn!==null&&!!guardianTell(w)?.warn)||(get(w)?.clocks[id]?.strike??0)>w.tick;
 }
 
 export function attackM5(w:WorldState):string|null {

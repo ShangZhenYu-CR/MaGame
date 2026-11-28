@@ -1,3 +1,4 @@
+import { guardianLoot,takeGuardianLoot } from '../sim/guardians-p2';
 import { petBond } from '../sim/beast-bond';
 import { currentLeader,gainBeastXp } from '../sim/beast-growth';
 import { activeCave,caveChestTaken,caveContext,caveEntrance,caveEntranceTitle,caveGuard,enterCave,nearCaveGate,useCave } from '../sim/cave';
@@ -13,7 +14,7 @@ import type { BeastEntity,Vec2,WildEntity, WorldState } from '../sim/types';
 
 const byId=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id)! as T;
 const set=(node:HTMLElement,s:string)=>{if(node.textContent!==s)node.textContent=s;};
-type ContextAction='helm'|'deploy'|'stow'|'gather'|'open-cache'|'landmark'|'forage'|'quarry'|'cave-enter'|'cave-chest'|'cave-exit'|'cave-hunt'|'pet'|'return'|'board'|'dock'|'none';
+type ContextAction='helm'|'deploy'|'stow'|'gather'|'open-cache'|'landmark'|'forage'|'quarry'|'cave-enter'|'cave-chest'|'cave-exit'|'cave-hunt'|'guardian-loot'|'pet'|'return'|'board'|'dock'|'none';
 const duration=350;
 export type ExpeditionArea=ReturnType<typeof areaAt>;
 interface Hooks{
@@ -75,6 +76,7 @@ export function expeditionUi(hooks:Hooks){
   }
   if(here==='island'&&nearCaveGate(w))return 'cave-enter';
   if(here==='island'){
+   if(guardianLoot(w)?.canTake)return 'guardian-loot';
    const choice=islandChoice();
    if(choice?.tag==='mark'&&landmarkPrompt(w,choice.point).label)return 'landmark';
    if(choice?.tag==='forage'&&patchReady(w,choice.point))return 'forage';
@@ -98,6 +100,9 @@ export function expeditionUi(hooks:Hooks){
     hooks.message(issue,action==='cave-enter'?'已进入地下冰窟。':action==='cave-exit'?'已返回浮岛地表。':'获得冰窟稀有图纸与物资。','place');
     return true;
   }
+  if(action==='guardian-loot'){
+   const loot=takeGuardianLoot(hooks.state());hooks.message(loot.issue,'取得'+loot.name+'，装备配方已解锁。','craft');return true;
+  }
   if(action==='landmark'){const mark=islandChoice();if(mark?.tag!=='mark')return false;useLandmark(mark.point);return true;}
   if(action==='quarry'){const v=islandChoice();if(v?.tag!=='quarry')return false;
     hooks.message(collectQuarry(hooks.state(),v.point.id),'已拾取冻云兽肉 ×2。','hit');return true;}
@@ -117,6 +122,8 @@ export function expeditionUi(hooks:Hooks){
    return true;
   }
   if(a==='island'){
+   const reward=guardianLoot(w);
+   if(reward?.canTake&&Math.hypot(at.x-reward.x,at.y-reward.y)<.92)return use();
    const gate=caveEntrance(w);
    if(gate&&nearCaveGate(w)&&Math.hypot(at.x-gate.x,at.y-gate.y)<1.3){use();return true;}
    const v=islandChoice();
@@ -159,7 +166,9 @@ export function expeditionUi(hooks:Hooks){
    const g=caveEntrance(w)!;
    action='cave-enter';title=caveEntranceTitle(g.tier);detail='下面有寒气、冰刺和守卫，原路可以返回。';label='下到地底';
   }else if(here==='island'){
-   if(mark){
+   const reward=guardianLoot(w);
+   if(reward?.canTake){action='guardian-loot';title=reward.name;detail='守卫掉落，拾取后可在背包制作对应装备。';label='拾取图纸';}
+   else if(mark){
     action='landmark';
     ({title,detail,label}=landmarkPrompt(w,mark));
    }else if(patch){
